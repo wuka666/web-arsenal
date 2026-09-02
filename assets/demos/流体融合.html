@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>流体融合演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { height: 100vh; overflow: hidden; font-family: system-ui, "Microsoft YaHei", sans-serif; background: #f4f6fb; }
+  /* 色块层：整体过 goo 滤镜，色块相遇时融合成液体 */
+  .goo { position: absolute; inset: 0; filter: url(#goo); opacity: .85; }
+  .blob { position: absolute; }
+  /* 前景示例内容：证明「轻量化不抢主体」 */
+  .card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; color: #333c4e; }
+  .card h1 { font-size: 30px; letter-spacing: 6px; margin-bottom: 10px; font-weight: 900; }
+  .card p { font-size: 13px; opacity: .7; letter-spacing: 2px; }
+  .hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: rgba(30,40,60,.5); }
+</style>
+</head>
+<body>
+<!-- goo 滤镜：先高斯模糊，再把 alpha 通道拉开对比 → 模糊的交界被「焊」成液体 -->
+<svg width="0" height="0"><filter id="goo">
+  <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b"/>
+  <feColorMatrix in="b" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"/>
+</filter></svg>
+<div class="goo" id="goo"></div>
+<div class="card" id="card">
+  <h1>灵 感 弹 药 库</h1>
+  <p>低饱和流体 · 启动页 / 转场背景</p>
+</div>
+<div class="hint">色块慢慢漂移，相遇时融合成液体——调「融合度」看交界消失的临界点</div>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    count: 4,          // 色块数量
+    size: 160,         // 色块大小（px）
+    moveSpeed: 1,      // 漂移速度（倍）
+    morphSpeed: 1,     // 形变速度（倍）
+    blur: 18,          // 柔化程度（px）
+    goo: 16,           // 融合度（越高越容易融在一起）
+    color1: "#7fa8d9", // 颜色一（低饱和蓝）
+    color2: "#b8a7d9", // 颜色二（低饱和紫）
+    color3: "#8fd0c3", // 颜色三（低饱和青）
+    bg: "#f4f6fb",     // 背景色
+    alpha: 0.85,       // 整体透明度
+    showCard: true     // 显示中间示例内容
+  };
+  const gooEl = document.getElementById("goo");
+  const card = document.getElementById("card");
+  const blurNode = document.querySelector("#goo feGaussianBlur");
+  const matrixNode = document.querySelector("#goo feColorMatrix");
+  let blobs = [];
+
+  // 重建色块（数量变化时调用）
+  function build() {
+    gooEl.innerHTML = "";
+    blobs = [];
+    for (let i = 0; i < state.count; i++) {
+      const el = document.createElement("div");
+      el.className = "blob";
+      gooEl.appendChild(el);
+      blobs.push({ el, seed: i * 1.7 + 0.3 }); // seed 让每个色块轨迹错开
+    }
+    paint();
+  }
+
+  // 把参数落到 DOM / 滤镜上
+  function paint() {
+    const cs = [state.color1, state.color2, state.color3];
+    blobs.forEach((b, i) => {
+      b.el.style.width = b.el.style.height = state.size + "px";
+      b.el.style.background = cs[i % cs.length];
+    });
+    document.body.style.background = state.bg;
+    gooEl.style.opacity = state.alpha;
+    card.style.display = state.showCard ? "" : "none";
+    blurNode.setAttribute("stdDeviation", state.blur);
+    // 融合度 → alpha 通道斜率：斜率越大，模糊交界被切得越「干脆」
+    const slope = 9 + state.goo;
+    matrixNode.setAttribute("values", "1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 " + slope + " " + (-(slope * 0.55)));
+  }
+  function apply() { build(); }
+
+  // 动画循环：色块各走椭圆轨迹 + 边界呼吸形变
+  let t = 0;
+  function frame() {
+    t += 0.016 * state.moveSpeed;
+    blobs.forEach(b => {
+      const s = b.seed;
+      const cx = 50 + 26 * Math.sin(t * 0.5 + s);        // 中心 x（百分比）
+      const cy = 50 + 24 * Math.cos(t * 0.38 + s * 2);   // 中心 y（百分比）
+      const m = Math.sin(t * state.morphSpeed + s * 3);  // 形变量（-1~1）
+      b.el.style.left = cx + "%";
+      b.el.style.top = cy + "%";
+      b.el.style.transform = "translate(-50%,-50%) rotate(" + (t * 8 + s * 40) + "deg) scale(" + (1 + m * 0.12) + ")";
+      b.el.style.borderRadius = (46 + m * 6) + "% " + (54 - m * 6) + "% " + (58 + m * 4) + "% " + (42 - m * 4) + "% / " +
+        (52 - m * 5) + "% " + (44 + m * 5) + "% " + (56 - m * 4) + "% " + (48 + m * 4) + "%";
+    });
+    requestAnimationFrame(frame);
+  }
+  build();
+  requestAnimationFrame(frame);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+</script>
+</body>
+</html>

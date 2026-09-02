@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>转场衔接演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  .btn.sec { background: #fff; color: #1a1a1a; border: 2px solid #1a1a1a; margin-top: 14px; }
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+    transition: background .3s ease;
+  }
+  .mask.show { background: var(--maskbg, rgba(0,0,0,.3)); pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h, 55vh);
+    border-radius: var(--radius, 20px) var(--radius, 20px) 0 0;
+    background: var(--sheet, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow, .12));
+    transform: translateY(105%);
+    transition: transform var(--dur, .38s) var(--ease, cubic-bezier(.32,.72,0,1)),
+                height var(--dur, .38s) var(--ease, cubic-bezier(.32,.72,0,1)),
+                border-radius var(--dur, .38s) ease,
+                background var(--dur, .38s) ease;
+  }
+  .sheet.show { transform: translateY(0); }
+  /* 转场衔接：抽屉直接延伸为全屏新页面，不关掉重开 */
+  .sheet.page { height: 100%; border-radius: 0; transform: translateY(0); background: var(--page, #fff); }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd); margin: 10px auto 0; }
+  .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; }
+  .page-body { display: none; text-align: center; padding: 30px 20px; }
+  .sheet.page .sheet-title, .sheet.page .handle { display: none; }
+  .sheet.page .page-body { display: block; }
+</style>
+</head>
+<body>
+<button class="btn" id="open">打开抽屉</button>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="handle"></div>
+  <div class="sheet-title">抽屉内容</div>
+  <div style="text-align:center"><button class="btn sec" id="go">进入详情页</button></div>
+  <div class="page-body">
+    <h3 style="margin-bottom:10px">详情页 ✓</h3>
+    <p style="font-size:13px;color:#666">抽屉直接延伸成了新页面，中间没有「关掉再打开」的割裂感。</p>
+  </div>
+</div>
+<p class="hint">点「进入详情页」：抽屉就地长成全屏新页面</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.38,         // 转场时长（秒）
+    ease: "先快后慢",   // 缓动方式
+    sheetH: 55,        // 抽屉高度（vh）
+    radius: 20,        // 顶部圆角（px）
+    shadow: 0.12,      // 投影浓度
+    mask: 0.3,         // 遮罩浓度
+    maskColor: "#000000",  // 遮罩颜色
+    sheetBg: "#ffffff",    // 抽屉底色
+    pageBg: "#ffffff",     // 详情页底色
+    handleColor: "#dddddd" // 手柄颜色
+  };
+  const mask = document.getElementById("mask");
+  const sheet = document.getElementById("sheet");
+
+  // 十六进制转 rgba
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+  // 缓动方式 → 贝塞尔曲线（走 CSS 变量，改完立即生效）
+  const EASES = {
+    "先快后慢": "cubic-bezier(.32,.72,0,1)",
+    "匀速": "linear",
+    "回弹": "cubic-bezier(.34,1.56,.64,1)"
+  };
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--dur", state.dur + "s");
+    R.setProperty("--ease", EASES[state.ease] || EASES["先快后慢"]);
+    R.setProperty("--h", state.sheetH + "vh");
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--shadow", state.shadow);
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
+    R.setProperty("--sheet", state.sheetBg);
+    R.setProperty("--page", state.pageBg);
+    R.setProperty("--handlec", state.handleColor);
+  }
+
+  document.getElementById("open").addEventListener("click", () => {
+    sheet.classList.add("show");
+    mask.classList.add("show");
+  });
+  document.getElementById("go").addEventListener("click", (e) => {
+    e.stopPropagation();
+    sheet.classList.add("page");
+    mask.classList.remove("show");
+  });
+  mask.addEventListener("click", () => {
+    sheet.classList.remove("show", "page");
+    mask.classList.remove("show");
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

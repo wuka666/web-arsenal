@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>底部抽屉演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  /* 遮罩：颜色 + 浓度分两个变量，透明度直接参与过渡 */
+  .mask {
+    position: fixed; inset: 0; background: var(--mc, #000000); opacity: 0; pointer-events: none;
+    transition: opacity var(--dur, .3s) ease;
+  }
+  .mask.show { opacity: var(--mo, .35); pointer-events: auto; }
+  .drawer {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h, 240px);
+    border-radius: var(--r, 20px) var(--r, 20px) 0 0;
+    background: var(--db, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,.12);
+    transform: translateY(105%);
+  }
+  /* 关键帧停顿：滑到露出大半时顿一下，再完全展开——状态更容易被识别 */
+  .drawer.in { animation: drawerIn var(--dur, .38s) ease-out forwards; }
+  .drawer.out { animation: drawerOut var(--od, .26s) ease-in forwards; }
+  @keyframes drawerIn {
+    0%   { transform: translateY(105%); }
+    55%  { transform: translateY(12%); }
+    70%  { transform: translateY(6%); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes drawerOut { to { transform: translateY(105%); } }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: #ddd; margin: 10px auto 0; }
+  .title { text-align: center; font-weight: 800; font-size: 17px; margin-top: 12px; color: var(--tc, #1a1a1a); }
+</style>
+</head>
+<body>
+<button class="btn" id="open">打开抽屉</button>
+<div class="mask" id="mask"></div>
+<div class="drawer" id="drawer">
+  <div class="handle" id="handle"></div>
+  <div class="title">底部抽屉</div>
+  <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">展开到一半顿一下，再完全落位</p>
+</div>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.38, outDur: 0.26, height: 240, radius: 20,
+    maskColor: "#000000", maskOpacity: 0.35, drawerBg: "#ffffff", titleColor: "#1a1a1a", handle: true
+  };
+  const mask = document.getElementById("mask");
+  const drawer = document.getElementById("drawer");
+  const root = document.documentElement;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--od", state.outDur + "s");
+    s.setProperty("--h", state.height + "px");
+    s.setProperty("--r", state.radius + "px");
+    s.setProperty("--mc", state.maskColor);
+    s.setProperty("--mo", state.maskOpacity);
+    s.setProperty("--db", state.drawerBg);
+    s.setProperty("--tc", state.titleColor);
+    document.getElementById("handle").style.display = state.handle ? "block" : "none";
+  }
+
+  function open() {
+    drawer.classList.remove("out");
+    drawer.classList.add("in");
+    mask.classList.add("show");
+  }
+  function close() {
+    drawer.classList.remove("in");
+    drawer.classList.add("out");
+    mask.classList.remove("show");
+  }
+  document.getElementById("open").addEventListener("click", open);
+  mask.addEventListener("click", close);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

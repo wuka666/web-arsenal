@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>明确进度条演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .rail {
+    position: relative;
+    width: var(--width, 300px);
+    height: var(--thick, 8px);
+    border-radius: var(--round, 8px);
+    background: var(--track, #eee);
+    overflow: hidden;
+  }
+  .fill {
+    height: 100%; width: 0%;
+    border-radius: var(--round, 8px);
+    background: var(--color, #1a1a1a);
+    box-shadow: var(--glow, 0 0 0 transparent);
+    transition: width .12s linear;
+  }
+  .pct {
+    font-size: var(--pctSize, 18px);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: right;
+    color: var(--color, #1a1a1a);
+    display: var(--showPct, inline);
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 10px 24px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="rail"><div class="fill" id="fill"></div></div>
+  <div class="pct" id="pct">0%</div>
+</div>
+<button class="btn" id="btn">重新加载</button>
+<p class="hint">进度可算的任务：填充宽度 + 百分比同步走，用户知道完成比例</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 2,            // 加载时长（秒），越大越慢
+    thick: 8,          // 轨道粗细（px）
+    round: 8,          // 圆角（px）
+    width: 300,        // 轨道宽度（px）
+    easing: "easeOut", // 缓动：easeOut（开头快结尾缓）/ linear（匀速）/ easeInOut（两端缓）
+    showPct: true,     // 是否显示百分比数字
+    pctSize: 18,       // 百分比字号
+    glow: false,       // 填充是否发光
+    color: "#1a1a1a",  // 填充主色
+    track: "#eee"      // 轨道底色
+  };
+  const fill = document.getElementById("fill");
+  const pct = document.getElementById("pct");
+
+  // 缓动函数：把进度 t（0-1）映射到不同曲线
+  function ease(t) {
+    if (state.easing === "linear") return t;
+    if (state.easing === "easeInOut") return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+    return 1 - Math.pow(1 - t, 3); // easeOut：开头快结尾缓
+  }
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--round", state.round + "px");
+    root.style.setProperty("--width", state.width + "px");
+    root.style.setProperty("--pctSize", state.pctSize + "px");
+    root.style.setProperty("--showPct", state.showPct ? "inline" : "none");
+    root.style.setProperty("--glow", state.glow
+      ? ("0 0 " + Math.max(6, state.thick) + "px " + state.color + "66")
+      : "0 0 0 transparent");
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    fill.style.width = "0%";
+    pct.textContent = "0%";
+    const start = performance.now();
+    const dur = state.dur * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const p = Math.round(100 * ease(t));
+      fill.style.width = p + "%";
+      pct.textContent = p + "%";
+      if (t < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  document.getElementById("btn").addEventListener("click", run);
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    applyStyle();
+    if (d.key === "dur" || d.key === "easing") run();
+  });
+  applyStyle();
+</script>
+</body>
+</html>

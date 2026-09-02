@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>悬浮边框演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--page-bg, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif; padding: 20px;
+  }
+  /* 就一张大卡片：鼠标移上去冒出渐变描边并上浮 */
+  .item {
+    position: relative; z-index: 0;
+    width: min(420px, 80vw); height: 200px;
+    background: var(--card-bg, #faf9f6); border-radius: var(--r, 16px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+    transition: box-shadow var(--edge-dur, .2s) ease, transform var(--edge-dur, .2s) ease;
+  }
+  /* 渐变描边：伪元素垫在卡片底下，比卡片大一圈，悬停时淡入 */
+  .item::before {
+    content: ""; position: absolute; z-index: -1;
+    inset: calc(-1 * var(--bw, 1px));
+    border-radius: calc(var(--r, 16px) + var(--bw, 1px));
+    background: linear-gradient(135deg, var(--c1, #635bff), var(--c2, #3ec6ff));
+    opacity: 0;
+    transition: opacity var(--edge-dur, .2s) ease;
+  }
+  .item:hover::before { opacity: 1; }
+  .item:hover {
+    transform: translateY(calc(-1 * var(--lift, 4px)));
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--c1, #635bff) var(--glow, 14%), transparent);
+  }
+  .item h4 { font-size: 18px; }
+  .item p { font-size: 13px; color: #8a8a85; }
+</style>
+</head>
+<body>
+  <div class="item">
+    <h4>收款</h4>
+    <p>鼠标移上来，看边框颜色</p>
+  </div>
+  <script>
+    // 默认参数（父页面详情页可调）
+    const state = {
+      color: "#635bff", color2: "#3ec6ff", dur: 0.2, width: 1,
+      radius: 16, glow: 14, lift: 4, cardBg: "#faf9f6", bg: "#ffffff"
+    };
+
+    function apply() {
+      const s = document.documentElement.style;
+      s.setProperty("--c1", state.color);
+      s.setProperty("--c2", state.color2);
+      s.setProperty("--edge-dur", state.dur + "s");
+      s.setProperty("--bw", state.width + "px");
+      s.setProperty("--r", state.radius + "px");
+      s.setProperty("--glow", state.glow + "%");
+      s.setProperty("--lift", state.lift + "px");
+      s.setProperty("--card-bg", state.cardBg);
+      s.setProperty("--page-bg", state.bg);
+    }
+
+    // 接收父页面（index.html 详情页）传来的参数
+    window.addEventListener("message", (e) => {
+      const d = e.data;
+      if (!d || d.type !== "param") return;
+      state[d.key] = d.value;
+      apply();
+    });
+    apply();
+  </script>
+</body>
+</html>

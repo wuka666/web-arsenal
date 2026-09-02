@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>按钮加载演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    position: relative; cursor: pointer; user-select: none; border: none; outline: none;
+    background: var(--color, #1a1a1a); color: var(--txtColor, #fff);
+    font-size: var(--fontSize, 16px); font-weight: 700; letter-spacing: var(--letter, 2px);
+    min-width: var(--minW, 180px); height: var(--height, 48px);
+    border-radius: var(--radius, 12px);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .2s ease, opacity .2s ease;
+  }
+  .btn:active:not(.loading) { transform: scale(.97); }
+  .btn.loading { opacity: .75; cursor: default; pointer-events: none; }
+  .spinner {
+    display: none; width: var(--sSize, 16px); height: var(--sSize, 16px); border-radius: 50%;
+    border: var(--sThick, 2px) solid var(--sTrack, rgba(255,255,255,.35));
+    border-top-color: var(--sHead, #fff);
+    animation: spin var(--dur, .9s) linear infinite;
+  }
+  .btn.loading .spinner { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<button class="btn" id="btn">
+  <span class="spinner"></span>
+  <span class="txt" id="txt">提交</span>
+</button>
+<p class="hint">点一下：进入加载态（转圈 + 禁点），完成后恢复</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.9,          // 旋转一圈秒数
+    wait: 1.8,          // 模拟后端处理时长（秒）
+    label: "提交",      // 按钮文案
+    loadingLabel: "处理中", // 加载中文案
+    doneLabel: "已提交 ✓",  // 完成文案
+    radius: 12,         // 圆角（px）
+    height: 48,         // 按钮高度（px）
+    minW: 180,          // 最小宽度（px）
+    fontSize: 16,       // 字号（px）
+    letter: 2,          // 字间距（px）
+    sSize: 16,          // 旋转图标大小（px）
+    sThick: 2,          // 旋转图标粗细（px）
+    color: "#1a1a1a",   // 按钮背景
+    txtColor: "#ffffff",// 按钮文字
+    sTrack: "rgba(255,255,255,.35)", // 旋转图标轨色
+    sHead: "#ffffff"    // 旋转图标头色
+  };
+  const btn = document.getElementById("btn");
+  const txt = document.getElementById("txt");
+
+  function apply() {
+    const root = document.documentElement;
+    root.style.setProperty("--dur", state.dur + "s");
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--txtColor", state.txtColor);
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--height", state.height + "px");
+    root.style.setProperty("--minW", state.minW + "px");
+    root.style.setProperty("--fontSize", state.fontSize + "px");
+    root.style.setProperty("--letter", state.letter + "px");
+    root.style.setProperty("--sSize", state.sSize + "px");
+    root.style.setProperty("--sThick", state.sThick + "px");
+    root.style.setProperty("--sTrack", state.sTrack);
+    root.style.setProperty("--sHead", state.sHead);
+    if (!btn.classList.contains("loading")) txt.textContent = state.label;
+  }
+
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("loading")) return;
+    btn.classList.add("loading");
+    txt.textContent = state.loadingLabel;
+    setTimeout(() => {
+      txt.textContent = state.doneLabel;
+      setTimeout(() => {
+        btn.classList.remove("loading");
+        txt.textContent = state.label;
+      }, 900);
+    }, state.wait * 1000);
+  });
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>勾选动效演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .check {
+    width: var(--size, 56px); height: var(--size, 56px); border-radius: var(--r, 50%);
+    cursor: pointer; user-select: none;
+    background: var(--offbg, #fff); border: 2px solid var(--bd, #d0d0d0);
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--dur, .25s) ease, border-color var(--dur, .25s) ease;
+  }
+  .check.on { background: var(--onbg, #1a1a1a); border-color: var(--onbg, #1a1a1a); }
+  /* 勾：用 stroke-dashoffset 逐笔画出 */
+  .check svg { width: var(--icon, 30px); height: var(--icon, 30px); }
+  .check path {
+    fill: none; stroke: var(--ck, #fff); stroke-width: var(--width, 3);
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 26; stroke-dashoffset: 26;
+  }
+  .check.on path { animation: drawCheck var(--dur, .35s) ease-out forwards; }
+  @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+<div class="check" id="ck" role="checkbox" aria-checked="false" tabindex="0">
+  <svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>
+</div>
+<p class="hint">点一下：勾从对勾头一笔一笔画出来，呈现成功的过程感</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.35, width: 3, size: 56, iconSize: 30,
+    bgColor: "#1a1a1a", offBg: "#ffffff", borderColor: "#d0d0d0", checkColor: "#ffffff", radius: 50
+  };
+  const ck = document.getElementById("ck");
+  const root = document.documentElement;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--width", state.width);
+    s.setProperty("--size", state.size + "px");
+    s.setProperty("--icon", state.iconSize + "px");
+    s.setProperty("--onbg", state.bgColor);
+    s.setProperty("--offbg", state.offBg);
+    s.setProperty("--bd", state.borderColor);
+    s.setProperty("--ck", state.checkColor);
+    s.setProperty("--r", state.radius + "%");
+  }
+
+  let on = false;
+  function toggle() {
+    on = !on;
+    ck.classList.toggle("on", on);
+    ck.setAttribute("aria-checked", on);
+  }
+  ck.addEventListener("click", toggle);
+  ck.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); }
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

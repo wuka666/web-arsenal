@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>嵌套抽屉演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  .btn.sec { background: #fff; color: #1a1a1a; border: 2px solid #1a1a1a; margin-top: 14px; }
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+    transition: background .3s ease;
+  }
+  .mask.show { background: var(--maskbg, rgba(0,0,0,.35)); pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h1, 55vh);
+    border-radius: var(--radius, 20px) var(--radius, 20px) 0 0;
+    background: var(--bg1, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow, .12));
+    transform: translateY(105%);
+    transition: transform var(--dur, .35s) cubic-bezier(.32,.72,0,1), scale var(--dur, .35s) ease, filter var(--dur, .35s) ease;
+  }
+  .sheet.show { transform: translateY(0); }
+  /* 第二层弹出：第一层后退 + 缩小 + 变暗 */
+  .sheet.back { transform: translateY(0) scale(var(--back, .94)); filter: brightness(var(--dim, .72)); }
+  .sheet2 {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h2, 70vh);
+    border-radius: var(--radius, 20px) var(--radius, 20px) 0 0;
+    background: var(--bg2, #f7f7f7); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow2, .14));
+    transform: translateY(105%);
+    transition: transform var(--dur, .35s) cubic-bezier(.32,.72,0,1);
+  }
+  .sheet2.show { transform: translateY(0); }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd); margin: 10px auto 0; }
+  .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; }
+</style>
+</head>
+<body>
+<button class="btn" id="open">打开第一层</button>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="s1">
+  <div class="handle"></div>
+  <div class="sheet-title">第一层</div>
+  <div style="text-align:center"><button class="btn sec" id="open2">打开第二层</button></div>
+</div>
+<div class="sheet2" id="s2">
+  <div class="handle"></div>
+  <div class="sheet-title">第二层</div>
+  <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">第一层同步后退、缩小、变暗</p>
+</div>
+<p class="hint">两层联动：开第二层时第一层退后</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.35,         // 两层弹出时长（秒）
+    back: 0.94,        // 第一层后退缩小比例
+    dim: 0.72,         // 第一层压暗程度（1=不变暗）
+    h1: 55,            // 第一层高度（vh）
+    h2: 70,            // 第二层高度（vh）
+    radius: 20,        // 顶部圆角（px）
+    shadow: 0.12,      // 第一层投影浓度
+    mask: 0.35,        // 遮罩浓度
+    maskColor: "#000000", // 遮罩颜色
+    bg1: "#ffffff",       // 第一层底色
+    bg2: "#f7f7f7"        // 第二层底色
+  };
+  const mask = document.getElementById("mask");
+  const s1 = document.getElementById("s1");
+  const s2 = document.getElementById("s2");
+
+  // 十六进制转 rgba
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--dur", state.dur + "s");
+    R.setProperty("--back", state.back);
+    R.setProperty("--dim", state.dim);
+    R.setProperty("--h1", state.h1 + "vh");
+    R.setProperty("--h2", state.h2 + "vh");
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--shadow", state.shadow);
+    R.setProperty("--shadow2", Math.min(0.4, state.shadow + 0.02)); // 第二层影子稍重一点
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
+    R.setProperty("--bg1", state.bg1);
+    R.setProperty("--bg2", state.bg2);
+  }
+
+  document.getElementById("open").addEventListener("click", () => {
+    s1.classList.add("show");
+    mask.classList.add("show");
+  });
+  document.getElementById("open2").addEventListener("click", (e) => {
+    e.stopPropagation();
+    s2.classList.add("show");
+    s1.classList.add("back");
+    mask.classList.add("show");
+  });
+  mask.addEventListener("click", () => {
+    s1.classList.remove("show", "back");
+    s2.classList.remove("show");
+    mask.classList.remove("show");
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

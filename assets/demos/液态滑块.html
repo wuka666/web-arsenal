@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>液态滑块演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .row { display: flex; align-items: center; gap: 18px; }
+  .val {
+    min-width: 64px; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums;
+    font-size: var(--vfs, 34px); color: var(--vc, #1a1a1a);
+  }
+  input[type=range] {
+    width: var(--w, 260px); height: var(--h, 8px); border-radius: 999px; appearance: none; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--fill, #1a1a1a) var(--pct, 50%), var(--track, #e3e3e3) var(--pct, 50%));
+  }
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none; width: var(--thumb, 26px); height: var(--thumb, 26px); border-radius: 50%;
+    background: var(--knob, #fff); border: 3px solid var(--fill, #1a1a1a);
+    box-shadow: 0 2px 6px rgba(0,0,0,.18); transition: transform var(--dur, .2s) ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  /* 数值切换：从旧值滚动到新值，不突然跳变 */
+  .val.pop { animation: valPop var(--dur, .2s) ease; }
+  @keyframes valPop {
+    0% { transform: translateY(0); opacity: 1; }
+    40% { transform: translateY(8px); opacity: 0; }
+    60% { transform: translateY(-8px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="row">
+  <input type="range" id="rng" min="0" max="100" value="50">
+  <div class="val" id="val">50</div>
+</div>
+<p class="hint">拖动：轨道填充、滑钮、数值动画同频，数值滚动后缓停不突兀</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.2, color: "#1a1a1a", track: "#e3e3e3", knob: "#ffffff",
+    width: 260, height: 8, thumb: 26, fontSize: 34, valColor: "#1a1a1a"
+  };
+  const rng = document.getElementById("rng");
+  const val = document.getElementById("val");
+  const root = document.documentElement;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--fill", state.color);
+    s.setProperty("--track", state.track);
+    s.setProperty("--knob", state.knob);
+    s.setProperty("--w", state.width + "px");
+    s.setProperty("--h", state.height + "px");
+    s.setProperty("--thumb", state.thumb + "px");
+    s.setProperty("--vfs", state.fontSize + "px");
+    s.setProperty("--vc", state.valColor);
+  }
+
+  rng.addEventListener("input", () => {
+    rng.style.setProperty("--pct", rng.value + "%");
+    val.textContent = rng.value;
+    val.classList.remove("pop");
+    void val.offsetWidth; // 重启动画
+    val.classList.add("pop");
+  });
+  rng.style.setProperty("--pct", "50%");
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

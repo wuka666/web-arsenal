@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文字遮罩演示（ReactBits MaskedHeading）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: system-ui, "Microsoft YaHei", sans-serif; padding: 24px;
+  }
+  /* 文字遮罩：文字内部显示图片，鼠标移动图片跟着滑动（视差） */
+  .masked-heading {
+    position: relative; width: min(720px, 92vw); margin: 0; padding: 50px 0;
+    text-align: center; font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+  }
+  .masked-heading__measure { color: transparent; display: inline-block; }
+  .masked-heading__defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .masked-heading__reveal { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+  .masked-heading__clip { position: absolute; inset: 0; clip-path: url(#mh-clip); }
+  .masked-heading__media { position: absolute; inset: 0; will-change: transform, filter; }
+  .masked-heading__source { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; }
+</style>
+</head>
+<body>
+<h2 class="masked-heading" id="mh">
+  <!-- 透明文字占位：用来测量文字真实位置 -->
+  <span class="masked-heading__measure" id="measure">灵感藏在细节里</span>
+  <!-- SVG 里放同样的文字，作为裁剪形状 -->
+  <svg class="masked-heading__defs">
+    <defs>
+      <clipPath id="mh-clip" clipPathUnits="userSpaceOnUse">
+        <text id="mh-glyph">灵感藏在细节里</text>
+      </clipPath>
+    </defs>
+  </svg>
+  <!-- 图片层：被裁剪成文字形状，随鼠标滑动 -->
+  <span class="masked-heading__reveal" id="reveal">
+    <span class="masked-heading__clip">
+      <span class="masked-heading__media" id="media">
+        <img class="masked-heading__source" id="img" alt="">
+      </span>
+    </span>
+  </span>
+</h2>
+<script>
+  const root = document.getElementById("mh");
+  const measure = document.getElementById("measure");
+  const glyph = document.getElementById("mh-glyph");
+  const reveal = document.getElementById("reveal");
+  const media = document.getElementById("media");
+  const img = document.getElementById("img");
+
+  // 默认参数（父页面详情页可调）
+  const state = {
+    parallax: 26, drift: 18, duration: 1.1, brightness: 1, reveal: "rise",
+    text: "灵感藏在细节里", bg: "#ffffff", scale: 1.25, saturate: 1.4, sizeScale: 1,
+    shadowColor: "#4a7dff", shadowBlur: 14
+  };
+  const off = { x: 0, y: 0, tx: 0, ty: 0 };
+  let clock = 0, last = performance.now(), fs = 40, played = false;
+
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+  // 背景图：同目录下的 遮罩图.jpg（Windows 默认壁纸压出来的抽象蓝，可换成你自己的图）
+  img.src = "遮罩图.jpg";
+
+  // 测量 HTML 文字位置，同步给 SVG 裁剪文字
+  function sync() {
+    // 换文字 / 换字号后重新测量
+    measure.textContent = state.text;
+    glyph.textContent = state.text;
+    fs = clamp(root.clientWidth * 0.13 * state.sizeScale, 20, 160);
+    root.style.fontSize = fs + "px";
+    const cs = getComputedStyle(measure);
+    glyph.setAttribute("x", measure.offsetLeft);
+    glyph.setAttribute("y", Math.round(measure.offsetTop + fs * 0.78));
+    glyph.setAttribute("font-size", fs);
+    glyph.setAttribute("font-family", cs.fontFamily);
+    glyph.setAttribute("font-weight", cs.fontWeight);
+    glyph.setAttribute("letter-spacing", cs.letterSpacing);
+  }
+
+  // 每帧：图片跟随鼠标视差 + 缓慢漂移
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    clock += dt;
+    const dx = Math.sin(clock * 0.21) * state.drift;
+    const dy = Math.cos(clock * 0.17) * state.drift * 0.6;
+    const ease = 1 - Math.exp(-dt / 0.18);
+    off.x += (off.tx + dx - off.x) * ease;
+    off.y += (off.ty + dy - off.y) * ease;
+    const maxX = root.clientWidth * 0.12;
+    const maxY = root.clientHeight * 0.15;
+    media.style.transform = "translate3d(" + clamp(off.x, -maxX, maxX).toFixed(1) + "px, " +
+      clamp(off.y, -maxY, maxY).toFixed(1) + "px, 0) scale(" + state.scale + ")";
+    media.style.filter = "brightness(" + state.brightness + ") saturate(" + state.saturate + ")";
+    // 文字投影：颜色 + 模糊半径实时可调
+    reveal.style.filter = "drop-shadow(0 4px " + state.shadowBlur + "px " + state.shadowColor + ")";
+    requestAnimationFrame(frame);
+  }
+
+  // 入场动画：先摆好"还没进场"的状态
+  function rest() {
+    reveal.style.transition = "none";
+    glyph.style.transition = "none";
+    glyph.style.transform = "";
+    reveal.style.transform = "";
+    if (state.reveal === "rise") {
+      reveal.style.opacity = "1";
+      glyph.style.transform = "translateY(" + (fs * 1.15) + "px)";
+    } else if (state.reveal === "wipe") {
+      reveal.style.opacity = "1";
+      reveal.style.clipPath = "inset(0% 100% 0% 0%)";
+    } else if (state.reveal === "fade") {
+      reveal.style.opacity = "0";
+      reveal.style.transform = "scale(1.08)";
+    } else {
+      reveal.style.opacity = "1";
+    }
+  }
+
+  function play() {
+    const dur = state.duration;
+    if (state.reveal === "rise") {
+      requestAnimationFrame(() => {
+        glyph.style.transition = "transform " + dur + "s cubic-bezier(.16,1,.3,1)";
+        glyph.style.transform = "translateY(0)";
+      });
+    } else if (state.reveal === "wipe") {
+      requestAnimationFrame(() => {
+        reveal.style.transition = "clip-path " + dur + "s cubic-bezier(.77,0,.18,1)";
+        reveal.style.clipPath = "inset(0% 0% 0% 0%)";
+      });
+    } else if (state.reveal === "fade") {
+      requestAnimationFrame(() => {
+        reveal.style.transition = "opacity " + dur + "s ease-out, transform " + dur + "s ease-out";
+        reveal.style.opacity = "1";
+        reveal.style.transform = "scale(1)";
+      });
+    } else {
+      reveal.style.opacity = "1";
+    }
+  }
+
+  // 参数变了：重播一次入场动画，让效果立即可见
+  function apply() {
+    document.body.style.background = state.bg;
+    played = true;
+    sync();
+    rest();
+    setTimeout(play, 40);
+  }
+
+  root.addEventListener("pointermove", (e) => {
+    const r = root.getBoundingClientRect();
+    off.tx = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1) * -state.parallax;
+    off.ty = clamp(((e.clientY - r.top) / r.height) * 2 - 1, -1, 1) * -state.parallax;
+  });
+  root.addEventListener("pointerleave", () => { off.tx = 0; off.ty = 0; });
+  window.addEventListener("resize", () => sync());
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+
+  img.onload = () => sync();
+  sync();
+  rest();
+  // 进入视口才播放入场动画
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some(en => en.isIntersecting) && !played) {
+      played = true;
+      play();
+      io.disconnect();
+    }
+  }, { threshold: 0.2 });
+  io.observe(root);
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>

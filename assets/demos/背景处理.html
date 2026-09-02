@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>背景处理演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  /* 底层内容：弹层打开时模糊 + 轻微缩小，强化"退到后面"的状态 */
+  .bg {
+    position: fixed; inset: 0; padding: 40px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    transition: filter var(--dur, .35s) ease, transform var(--dur, .35s) ease;
+  }
+  .bg.away { filter: blur(var(--blur, 6px)) brightness(var(--dim, .72)); transform: scale(var(--scale, .96)); }
+  .mini {
+    background: var(--card, #f0f0f0); border-radius: 14px; padding: 20px;
+    font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    color: #666; min-height: 120px;
+  }
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+    transition: background var(--dur, .35s) ease;
+  }
+  .mask.show { background: var(--maskbg, rgba(0,0,0,.25)); pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h, 45vh);
+    border-radius: var(--radius, 20px) var(--radius, 20px) 0 0;
+    background: var(--sheet, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow, .12));
+    transform: translateY(105%); transition: transform var(--dur, .35s) cubic-bezier(.32,.72,0,1);
+  }
+  .sheet.show { transform: translateY(0); }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd); margin: 10px auto 0; }
+  .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="bg" id="bg">
+  <div class="mini">内容卡片 1</div>
+  <div class="mini">内容卡片 2</div>
+  <div class="mini">内容卡片 3</div>
+  <div class="mini">内容卡片 4</div>
+</div>
+<button class="btn" id="open">打开弹层</button>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="handle" id="handle"></div>
+  <div class="sheet-title">底层已退后</div>
+  <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">模糊 + 缩小，一眼看出它在后面</p>
+</div>
+<p class="hint">弹层打开时，底层页面模糊 + 轻微缩小</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    blur: 6,          // 底层模糊（px）
+    scale: 0.96,      // 底层缩小比例
+    dur: 0.35,        // 过渡时长（秒）
+    dim: 0.72,        // 底层压暗程度（1=不变暗）
+    sheetH: 45,       // 弹层高度（vh）
+    radius: 20,       // 顶部圆角（px）
+    mask: 0.25,       // 遮罩浓度
+    maskColor: "#000000",  // 遮罩颜色
+    sheetBg: "#ffffff",    // 弹层底色
+    cardBg: "#f0f0f0",     // 底层卡片颜色
+    handleColor: "#dddddd" // 手柄颜色
+  };
+  const bg = document.getElementById("bg");
+  const mask = document.getElementById("mask");
+  const sheet = document.getElementById("sheet");
+
+  // 十六进制转 rgba
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--blur", state.blur + "px");
+    R.setProperty("--scale", state.scale);
+    R.setProperty("--dim", state.dim);
+    R.setProperty("--dur", state.dur + "s");
+    R.setProperty("--h", state.sheetH + "vh");
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
+    R.setProperty("--sheet", state.sheetBg);
+    R.setProperty("--card", state.cardBg);
+    R.setProperty("--handlec", state.handleColor);
+  }
+
+  function open() {
+    bg.classList.add("away");
+    sheet.classList.add("show");
+    mask.classList.add("show");
+  }
+  function close() {
+    bg.classList.remove("away");
+    sheet.classList.remove("show");
+    mask.classList.remove("show");
+  }
+  document.getElementById("open").addEventListener("click", open);
+  mask.addEventListener("click", close);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

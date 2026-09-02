@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全屏遮罩导航演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --theme:#2563eb; --bg:#0f172a; --text:#f8fafc; --hover:#38bdf8; --close:#f8fafc; --dur:.4s; --fs:28px; --gap:22px; --blur:0px; }
+  body { font-family:system-ui,"Microsoft YaHei",sans-serif; background:#eef2f7; }
+  .open-btn { position:fixed; top:20px; right:24px; z-index:30; background:var(--theme); color:#fff; border:none; padding:12px 22px; border-radius:30px; font-size:15px; cursor:pointer; }
+  .full { position:fixed; inset:0; background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--gap); z-index:50; opacity:0; pointer-events:none; transition:opacity var(--dur) ease; backdrop-filter:blur(var(--blur)); }
+  .full.open { opacity:1; pointer-events:auto; }
+  .ftitle { font-size:14px; letter-spacing:3px; text-transform:uppercase; opacity:.6; margin-bottom:6px; }
+  .fitems { display:flex; flex-direction:column; align-items:center; gap:var(--gap); }
+  .fitem { font-size:var(--fs); font-weight:700; cursor:pointer; transition:color .2s; letter-spacing:1px; }
+  .fitem:hover { color:var(--hover); }
+  .close { position:fixed; top:22px; right:26px; z-index:60; background:none; border:none; color:var(--close); font-size:34px; cursor:pointer; line-height:1; }
+  .content { padding:80px 26px; max-width:880px; margin:0 auto; }
+  .content h1 { color:#111827; margin-bottom:10px; }
+  .content p { color:#6b7280; line-height:1.9; }
+</style>
+</head>
+<body>
+  <button class="open-btn" id="open">菜单</button>
+  <div class="full" id="full"><button class="close" id="close">×</button><div class="ftitle" id="ftitle"></div><div class="fitems" id="fitems"></div></div>
+  <div class="content"><h1>全屏遮罩导航</h1><p>点开全屏覆盖、菜单居中大字排列，聚焦导航本身。适配作品集、品牌官网等需要强调导航的场景。点右上「菜单」试试。</p></div>
+<script>
+  const state = {
+    theme:"#2563eb", bg:"#0f172a", text:"#f8fafc", hover:"#38bdf8", closeColor:"#f8fafc",
+    dur:0.4, fontSize:28, gap:22, blur:0, itemAlign:"居中",
+    brand:"Portfolio", items:"Work,About,Services,Contact"
+  };
+  const openBtn=document.getElementById("open"), full=document.getElementById("full"), closeBtn=document.getElementById("close"), fitems=document.getElementById("fitems"), ftitle=document.getElementById("ftitle");
+  function render(){
+    fitems.innerHTML="";
+    fitems.style.justifyContent = state.itemAlign==="分散"?"space-between":"center";
+    state.items.split(",").forEach(t=>{ const d=document.createElement("div"); d.className="fitem"; d.textContent=t; fitems.appendChild(d); });
+  }
+  openBtn.onclick=()=> full.classList.add("open");
+  closeBtn.onclick=()=> full.classList.remove("open");
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--bg",state.bg); R.setProperty("--text",state.text);
+    R.setProperty("--hover",state.hover); R.setProperty("--close",state.closeColor);
+    R.setProperty("--dur",state.dur+"s"); R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--gap",state.gap+"px"); R.setProperty("--blur",state.blur+"px");
+    ftitle.textContent=state.brand; render();
+  }
+  window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

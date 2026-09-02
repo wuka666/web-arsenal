@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微光动效演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .demo-card { width: var(--width, 300px); background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+  /* 微光：叠加在占位块上的移动亮光，提示「内容加载中」 */
+  .ph {
+    border-radius: var(--round, 8px); margin-bottom: 12px;
+    background: linear-gradient(var(--angle, 100deg),
+      var(--bg, #ececec) 40%, rgb(255 255 255 / var(--light, .6)) 50%, var(--bg, #ececec) 60%);
+    background-size: 200% 100%;
+    animation: shimmer var(--dur, 1.2s) infinite linear;
+  }
+  .ph-avatar { width: 44px; height: 44px; border-radius: 50%; margin-bottom: 12px; }
+  .ph-line { height: var(--lineH, 14px); }
+  .ph-line.w60 { width: 60%; }
+  .ph-line.w40 { width: 40%; }
+  @keyframes shimmer {
+    from { background-position: 130% 0; }
+    to   { background-position: -70% 0; }
+  }
+</style>
+</head>
+<body>
+<div class="demo-card">
+  <div class="ph ph-avatar"></div>
+  <div class="ph ph-line"></div>
+  <div class="ph ph-line w60"></div>
+  <div class="ph ph-line w40"></div>
+</div>
+<p class="hint">灰色占位 + 一道移动亮光：内容还没来，但系统在动</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 1.2,          // 光带流动周期（秒）
+    angle: 100,        // 光带倾斜角度（度）
+    light: 0.6,        // 高光峰值亮度（0-1）
+    width: 300,        // 卡片宽度（px）
+    round: 8,          // 占位圆角（px）
+    lineH: 14,         // 文字行高（px）
+    count: 4,          // 占位行数
+    lastW: 40,         // 末行宽度百分比（%）
+    reverse: false,    // 反向流动
+    pulse: false,      // 是否随时间轻微脉动亮度
+    bg: "#ececec",     // 底色
+    lightColor: "#ffffff" // 高光颜色
+  };
+
+  function apply() {
+    const root = document.documentElement;
+    root.style.setProperty("--dur", (state.reverse ? -1 : 1) * state.dur + "s");
+    root.style.setProperty("--angle", state.angle + "deg");
+    root.style.setProperty("--light", state.light);
+    root.style.setProperty("--width", state.width + "px");
+    root.style.setProperty("--round", state.round + "px");
+    root.style.setProperty("--lineH", state.lineH + "px");
+    root.style.setProperty("--bg", state.bg);
+    // 重新生成占位行
+    const card = document.querySelector(".demo-card");
+    // 保留第一个 avatar
+    const avatar = card.querySelector(".ph-avatar").outerHTML;
+    card.innerHTML = avatar;
+    for (let i = 0; i < state.count - 1; i++) {
+      const d = document.createElement("div");
+      d.className = "ph ph-line";
+      if (i === state.count - 2) d.classList.add("w" + Math.min(95, Math.max(15, state.lastW)));
+      else if (i % 2 === 0) d.classList.add("w60");
+      else d.style.width = (50 + (i * 7) % 35) + "%";
+      card.appendChild(d);
+    }
+    // 脉动：CSS 变量 + JS 同步
+    if (state.pulse) {
+      document.querySelectorAll(".ph").forEach(el => {
+        el.style.animation += ", pulse 1.8s ease-in-out infinite";
+      });
+    }
+  }
+  // 加 keyframes
+  const styleEl = document.createElement("style");
+  styleEl.textContent = "@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }";
+  document.head.appendChild(styleEl);
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

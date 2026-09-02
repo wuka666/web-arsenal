@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>单选下拉演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; width:260px; }
+  .trigger {
+    width:100%; display:flex; align-items:center; gap:8px;
+    padding:11px 14px; background:#fff; border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px);
+    font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; user-select:none;
+    box-shadow:0 4px 14px rgba(0,0,0,var(--shadow,.12)); transition:border-color .15s;
+    justify-content:var(--align,flex-start);
+  }
+  .trigger .val { flex:1; text-align:inherit; }
+  .trigger .val.ph { color:#9ca3af; }
+  .caret { transition:transform var(--dur,.22s) ease; color:var(--arrow,#6b7280); flex:none; }
+  .field.open .caret { transform:rotate(180deg); }
+  .field.open .trigger { border-color:var(--theme,#2563eb); }
+  .menu {
+    position:absolute; top:calc(100% + 6px); left:0; right:0; background:#fff; border:1px solid var(--border,#d1d5db);
+    border-radius:var(--radius,10px); box-shadow:0 10px 30px rgba(0,0,0,var(--shadow,.12));
+    max-height:var(--maxh,240px); overflow:auto; opacity:0; transform:translateY(-6px); pointer-events:none;
+    transition:opacity var(--dur,.22s) ease, transform var(--dur,.22s) ease; z-index:5;
+  }
+  .field.open .menu { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .opt { padding:10px 14px; font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; }
+  .opt:hover { background:var(--hover,#eff6ff); }
+  .opt.sel { color:var(--theme,#2563eb); font-weight:700; }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="trigger" id="trigger">
+      <span class="val ph" id="val">请选择</span>
+      <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="menu" id="menu"></div>
+  </div>
+  <p class="hint">点击展开 · 选中自动回填并更新状态</p>
+<script>
+  const OPTIONS = ["苹果","香蕉","橙子","西瓜","葡萄","芒果","荔枝","菠萝","草莓","蓝莓"];
+  const state = {
+    theme:"#2563eb", text:"#1f2937", radius:10, fontSize:15, dur:0.22,
+    border:"#d1d5db", hoverBg:"#eff6ff", menuMaxH:240, arrowColor:"#6b7280",
+    align:"左", placeholder:"请选择", shadow:0.12
+  };
+  const field=document.getElementById("field"), trigger=document.getElementById("trigger"),
+        val=document.getElementById("val"), menu=document.getElementById("menu");
+  let selected=null, open=false;
+  function buildMenu(){
+    menu.innerHTML="";
+    OPTIONS.forEach(o=>{
+      const d=document.createElement("div");
+      d.className="opt"+(o===selected?" sel":"");
+      d.textContent=o;
+      d.onclick=()=>{ selected=o; val.textContent=o; val.classList.remove("ph"); close(); markSel(); };
+      menu.appendChild(d);
+    });
+  }
+  function markSel(){ [...menu.children].forEach((c,i)=> c.classList.toggle("sel", OPTIONS[i]===selected)); }
+  function openMenu(){ open=true; field.classList.add("open"); }
+  function close(){ open=false; field.classList.remove("open"); }
+  trigger.onclick=()=> open?close():openMenu();
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)) close(); });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme);
+    R.setProperty("--text",state.text);
+    R.setProperty("--radius",state.radius+"px");
+    R.setProperty("--fs",state.fontSize+"px");
+    R.setProperty("--dur",state.dur+"s");
+    R.setProperty("--border",state.border);
+    R.setProperty("--hover",state.hoverBg);
+    R.setProperty("--maxh",state.menuMaxH+"px");
+    R.setProperty("--arrow",state.arrowColor);
+    R.setProperty("--shadow",state.shadow);
+    R.setProperty("--align", state.align==="左"?"flex-start":state.align==="右"?"flex-end":"center");
+    if(!selected){ val.textContent=state.placeholder; val.classList.add("ph"); }
+    buildMenu(); markSel();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

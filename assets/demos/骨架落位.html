@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>骨架落位演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .card {
+    width: var(--cw, 300px); border: 1px solid #eee; border-radius: var(--r, 14px); padding: 18px;
+    background: var(--cb, #fff); box-shadow: 0 6px 16px rgba(0,0,0,.05);
+    transition: width .2s ease;
+  }
+  /* 骨架条：高度与真实内容一致，所以加载完不会跳动 */
+  .skeleton .bar {
+    height: 16px; border-radius: 8px; margin-bottom: 10px;
+    background: linear-gradient(90deg, var(--base, #f0f0f0) 25%, var(--hi, #e4e4e4) 50%, var(--base, #f0f0f0) 75%);
+    background-size: 200% 100%; animation: shimmer var(--dur, 1.1s) infinite linear;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  .skeleton .title-bar { width: 55%; height: 20px; margin-bottom: 14px; }
+  .skeleton .line-s { width: 40%; }
+  /* 真实内容：骨架占位时不可见，加载完成后原位出现（不跳动） */
+  .content { display: none; }
+  .card.loaded .content { display: block; animation: fadeIn .25s ease; }
+  .card.loaded .skeleton { display: none; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .btn {
+    margin-top: 8px; cursor: pointer; user-select: none; border: none; outline: none;
+    background: var(--bb, #1a1a1a); color: var(--bc, #fff); font-size: 14px; font-weight: 700;
+    padding: 10px 24px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="skeleton">
+    <div class="bar title-bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar line-s"></div>
+  </div>
+  <div class="content">
+    <h3 style="font-size:17px;margin-bottom:8px">加载完成 ✓</h3>
+    <p style="font-size:13px;color:#666">骨架条高度和这一行内容一样高，所以内容出现时页面纹丝不动。</p>
+  </div>
+</div>
+<button class="btn" id="btn">重新加载</button>
+<p class="hint">加载中显示骨架 → 内容原位落位，不跳动</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 1.1, wait: 1.4, base: "#f0f0f0", highlight: "#e4e4e4",
+    cardBg: "#ffffff", cardWidth: 300, radius: 14, btnBg: "#1a1a1a", btnColor: "#ffffff"
+  };
+  const card = document.getElementById("card");
+  const root = document.documentElement;
+  let timer = 0;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--base", state.base);
+    s.setProperty("--hi", state.highlight);
+    s.setProperty("--cb", state.cardBg);
+    s.setProperty("--cw", state.cardWidth + "px");
+    s.setProperty("--r", state.radius + "px");
+    s.setProperty("--bb", state.btnBg);
+    s.setProperty("--bc", state.btnColor);
+    // 尺寸变了就重新演一遍，保证骨架/内容落位关系可见
+    load();
+  }
+
+  function load() {
+    clearTimeout(timer);
+    card.classList.remove("loaded");
+    timer = setTimeout(() => card.classList.add("loaded"), state.wait * 1000);
+  }
+  document.getElementById("btn").addEventListener("click", load);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

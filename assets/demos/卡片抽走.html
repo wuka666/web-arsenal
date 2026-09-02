@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>卡片抽走演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .deck { position: relative; }
+  .pcard {
+    position: absolute; inset: 0; border-radius: var(--r, 16px); cursor: pointer; user-select: none;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;
+    transition: transform var(--dur, .4s) cubic-bezier(.4,0,.2,1), opacity var(--dur, .4s) ease;
+  }
+  .pcard.top { background: var(--tbg, #1a1a1a); color: var(--tc, #fff); }
+  .pcard.under1 { background: #e8e8e8; color: #1a1a1a; }
+  .pcard.under2 { background: #f5f5f5; color: #1a1a1a; }
+  /* 抽走：上面的卡片移开 + 旋转 + 淡出，露出下面压着的卡 */
+  .pcard.gone {
+    transform: translate(var(--fx, 220px), var(--fy, -60px)) rotate(var(--rot, 18deg)) scale(var(--sh, .85));
+    opacity: 0; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="pcard top">第 1 张</div>
+  <div class="pcard under1">第 2 张</div>
+  <div class="pcard under2">第 3 张</div>
+</div>
+<p class="hint">点最上面的卡：它抽走让位，露出下面压着的卡，堆叠逻辑看得懂</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.4, offset: 8, flyX: 220, flyY: -60, rotate: 18, shrink: 0.85,
+    radius: 16, cardWidth: 240, topBg: "#1a1a1a", topColor: "#ffffff"
+  };
+  const deck = document.getElementById("deck");
+  const root = document.documentElement;
+  const cards = [...deck.querySelectorAll(".pcard")];
+
+  // 把剩下的卡按堆叠偏移重新压好
+  function restack() {
+    cards.forEach((c, i) => {
+      if (c.classList.contains("gone")) return;
+      c.style.transform = i === 0 ? "" :
+        "translate(" + i * state.offset + "px," + i * state.offset + "px) scale(" + (1 - i * 0.04) + ")";
+    });
+  }
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--fx", state.flyX + "px");
+    s.setProperty("--fy", state.flyY + "px");
+    s.setProperty("--rot", state.rotate + "deg");
+    s.setProperty("--sh", state.shrink);
+    s.setProperty("--r", state.radius + "px");
+    s.setProperty("--tbg", state.topBg);
+    s.setProperty("--tc", state.topColor);
+    deck.style.width = state.cardWidth + "px";
+    deck.style.height = Math.round(state.cardWidth * 320 / 240) + "px";
+    restack();
+  }
+
+  deck.addEventListener("click", () => {
+    const top = deck.querySelector(".pcard:not(.gone)");
+    if (!top) return;
+    top.classList.add("gone");
+    // 抽出后剩下的卡自动浮正，重新压好
+    restack();
+    setTimeout(() => {
+      if (!deck.querySelector(".pcard:not(.gone)")) {
+        // 抽完了：把牌堆还原
+        cards.forEach(c => c.classList.remove("gone"));
+        restack();
+      }
+    }, 1600);
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

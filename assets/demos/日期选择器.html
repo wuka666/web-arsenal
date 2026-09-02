@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日期选择器演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; }
+  .trigger {
+    width:200px; padding:11px 14px; background:#fff; border:1px solid var(--border,#e5e7eb); border-radius:var(--radius,8px);
+    font-size:15px; color:var(--text,#1f2937); cursor:pointer; text-align:center; user-select:none;
+  }
+  .pop {
+    position:absolute; top:calc(100% + 6px); left:0; width:280px; background:#fff; border:1px solid var(--border,#e5e7eb);
+    border-radius:var(--radius,8px); box-shadow:0 12px 34px rgba(0,0,0,.12); padding:12px; opacity:0; transform:translateY(-6px);
+    pointer-events:none; transition:opacity var(--dur,.2s) ease, transform var(--dur,.2s) ease; z-index:5;
+  }
+  .field.open .pop { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; color:var(--hc,#111827); font-weight:700; }
+  .head button { border:0; background:var(--hb,#f3f4f6); width:28px; height:28px; border-radius:7px; cursor:pointer; font-size:15px; color:var(--hc,#111827); }
+  .grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .wd { text-align:center; font-size:12px; color:#9ca3af; padding:4px 0; }
+  .cell {
+    height:var(--cs,36px); display:flex; align-items:center; justify-content:center; font-size:14px;
+    border-radius:8px; cursor:pointer; color:var(--text,#1f2937);
+  }
+  .cell.we { color:var(--we,#6b7280); }
+  .cell:hover { background:var(--hover,#eff6ff); }
+  .cell.muted { color:#cbd5e1; }
+  .cell.today { box-shadow:inset 0 0 0 2px var(--today,#ef4444); }
+  .cell.sel { background:var(--theme,#2563eb); color:#fff; }
+  .cell.in { background:var(--theme,#2563eb); color:#fff; opacity:.35; }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="trigger" id="trigger">选择日期</div>
+    <div class="pop" id="pop">
+      <div class="head">
+        <button id="prev">‹</button>
+        <span id="title"></span>
+        <button id="next">›</button>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+  <p class="hint">选单日或范围 · 选完回填字段</p>
+<script>
+  const WD_SUN = ["日","一","二","三","四","五","六"];
+  const state = {
+    theme:"#2563eb", text:"#1f2937", todayColor:"#ef4444", radius:8, cellSize:36, dur:0.2,
+    weekStart:"日", showRange:false, border:"#e5e7eb", hoverBg:"#eff6ff", headerColor:"#111827", weekendColor:"#6b7280"
+  };
+  const field=document.getElementById("field"), trigger=document.getElementById("trigger"), pop=document.getElementById("pop"),
+        grid=document.getElementById("grid"), title=document.getElementById("title");
+  const today=new Date(); today.setHours(0,0,0,0);
+  let vy=today.getFullYear(), vm=today.getMonth(), sel=null, rs=null, re=null, open=false;
+  function same(a,b){ return a&&b&&a.getTime()===b.getTime(); }
+  function diffDays(a,b){ return Math.round((a-b)/864e5); }
+  function build(){
+    const startIdx = state.weekStart==="日" ? 0 : 1;
+    const wd=[...WD_SUN.slice(startIdx), ...WD_SUN.slice(0,startIdx)];
+    title.textContent = vy+" 年 "+(vm+1)+" 月";
+    let html=wd.map(w=>'<div class="wd">'+w+'</div>').join("");
+    const first=new Date(vy,vm,1), lead=(first.getDay()-startIdx+7)%7;
+    const days=new Date(vy,vm+1,0).getDate();
+    for(let i=0;i<lead;i++) html+='<div class="cell muted"></div>';
+    for(let d=1;d<=days;d++){
+      const dt=new Date(vy,vm,d); const wdIdx=dt.getDay();
+      const we=(wdIdx===0||wdIdx===6)?" we":"";
+      const t=same(dt,today)?" today":"";
+      let cls="cell"+we+t;
+      if(sel&&same(dt,sel)) cls+=" sel";
+      else if(state.showRange&&rs&&re){ if(diffDays(dt,rs)>=0&&diffDays(dt,re)<=0) cls+=" in"; }
+      html+='<div class="'+cls+'" data-d="'+d+'">'+d+'</div>';
+    }
+    grid.innerHTML=html;
+    [...grid.querySelectorAll(".cell[data-d]")].forEach(c=> c.onclick=()=> pick(new Date(vy,vm,+c.dataset.d)) );
+  }
+  function pick(dt){
+    if(state.showRange){
+      if(!rs||(rs&&re)){ rs=dt; re=null; sel=null; }
+      else if(dt<rs){ re=rs; rs=dt; } else { re=dt; }
+    } else { sel=dt; rs=re=null; trigger.textContent=(dt.getMonth()+1)+" 月 "+dt.getDate()+" 日"; }
+    build();
+  }
+  document.getElementById("prev").onclick=()=>{ vm--; if(vm<0){vm=11;vy--;} build(); };
+  document.getElementById("next").onclick=()=>{ vm++; if(vm>11){vm=0;vy++;} build(); };
+  trigger.onclick=()=>{ open=!open; field.classList.toggle("open",open); };
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)){ open=false; field.classList.remove("open"); } });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--text",state.text); R.setProperty("--today",state.todayColor);
+    R.setProperty("--radius",state.radius+"px"); R.setProperty("--cs",state.cellSize+"px"); R.setProperty("--dur",state.dur+"s");
+    R.setProperty("--border",state.border); R.setProperty("--hover",state.hoverBg);
+    R.setProperty("--hc",state.headerColor); R.setProperty("--we",state.weekendColor);
+    build();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>级联选择器演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; width:260px; }
+  .trigger {
+    width:100%; padding:11px 14px; background:#fff; border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px);
+    font-size:15px; color:var(--text,#1f2937); cursor:pointer; user-select:none; box-shadow:0 4px 14px rgba(0,0,0,.12);
+    display:flex; align-items:center; gap:8px; justify-content:space-between;
+  }
+  .trigger .val.ph { color:#9ca3af; }
+  .trigger .val.path { color:var(--pc,#2563eb); font-weight:600; }
+  .panel {
+    position:absolute; top:calc(100% + 6px); left:0; display:flex; gap:var(--cgap,4px); background:#fff;
+    border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px); box-shadow:0 12px 30px rgba(0,0,0,.12);
+    padding:6px; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity var(--dur,.2s) ease, transform var(--dur,.2s) ease; z-index:5;
+  }
+  .field.open .panel { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .col { width:var(--pw,180px); max-height:240px; overflow:auto; }
+  .col + .col { border-left:1px solid var(--border,#d1d5db); }
+  .ci { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-radius:7px; font-size:15px; color:var(--text,#1f2937); cursor:pointer; }
+  .ci:hover { background:var(--hover,#eff6ff); }
+  .ci.on { color:var(--theme,#2563eb); font-weight:700; }
+  .ci .a { color:var(--arrow,#9ca3af); }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="trigger" id="trigger">
+      <span class="val ph" id="val">请选择地区</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel" id="panel"></div>
+  </div>
+  <p class="hint">逐级选择 · 末级回填完整路径</p>
+<script>
+  const TREE = [
+    { name:"中国", children:[
+      { name:"浙江", children:[{name:"杭州"},{name:"宁波"},{name:"温州"}] },
+      { name:"江苏", children:[{name:"南京"},{name:"苏州"},{name:"无锡"}] },
+      { name:"广东", children:[{name:"广州"},{name:"深圳"},{name:"东莞"}] }
+    ]},
+    { name:"美国", children:[
+      { name:"加州", children:[{name:"旧金山"},{name:"洛杉矶"}] },
+      { name:"纽约州", children:[{name:"纽约市"},{name:"布法罗"}] }
+    ]}
+  ];
+  const state = {
+    theme:"#2563eb", text:"#1f2937", radius:10, fontSize:15, dur:0.2, panelW:180,
+    pathColor:"#2563eb", border:"#d1d5db", hoverBg:"#eff6ff", arrowColor:"#9ca3af", sep:" / ", colGap:4, lastFill:true
+  };
+  const field=document.getElementById("field"), trigger=document.getElementById("trigger"), val=document.getElementById("val"),
+        panel=document.getElementById("panel");
+  let path=[], cols=[TREE], open=false;
+  function render(){
+    panel.innerHTML="";
+    cols.forEach((list, ci)=>{
+      const col=document.createElement("div"); col.className="col";
+      list.forEach(node=>{
+        const d=document.createElement("div");
+        const on = path[ci] && path[ci].name===node.name;
+        d.className="ci"+(on?" on":"");
+        d.innerHTML='<span>'+node.name+'</span>'+(node.children?'<span class="a">›</span>':'');
+        d.onclick=()=> choose(ci, node);
+        col.appendChild(d);
+      });
+      panel.appendChild(col);
+    });
+  }
+  function choose(ci, node){
+    path=path.slice(0,ci); path[ci]=node;
+    if(node.children){ cols=cols.slice(0,ci+1); cols[ci+1]=node.children; render(); }
+    else {
+      if(state.lastFill){ val.textContent=path.map(p=>p.name).join(state.sep); val.classList.remove("ph"); val.classList.add("path"); }
+      open=false; field.classList.remove("open");
+    }
+  }
+  trigger.onclick=()=>{ open=!open; field.classList.toggle("open",open); if(open) render(); };
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)){ open=false; field.classList.remove("open"); } });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--text",state.text); R.setProperty("--radius",state.radius+"px");
+    R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--dur",state.dur+"s"); R.setProperty("--pw",state.panelW+"px");
+    R.setProperty("--pc",state.pathColor); R.setProperty("--border",state.border); R.setProperty("--hover",state.hoverBg);
+    R.setProperty("--arrow",state.arrowColor);
+    render();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

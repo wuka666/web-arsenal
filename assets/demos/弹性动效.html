@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>弹性动效演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+    transition: background .3s ease;
+  }
+  .mask.show { background: var(--maskbg, rgba(0,0,0,.3)); pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h, 45vh);
+    border-radius: var(--radius, 20px) var(--radius, 20px) 0 0;
+    background: var(--sheet, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow, .12));
+    transform: translateY(105%);
+  }
+  /* 弹出：先拉伸过头再复位，模拟物理拉扯质感 */
+  .sheet.in { animation: sheetIn var(--dur, .45s) cubic-bezier(.32,.72,0,1) forwards; }
+  .sheet.out { animation: sheetOut var(--dur, .25s) ease-in forwards; }
+  @keyframes sheetIn {
+    0%   { transform: translateY(105%) scaleY(var(--stretch, .92)); }
+    55%  { transform: translateY(var(--oy, -4%)) scaleY(1); }
+    78%  { transform: translateY(2%) scaleY(var(--over, 1.02)); }
+    100% { transform: translateY(0) scaleY(1); }
+  }
+  @keyframes sheetOut { to { transform: translateY(105%); } }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd); margin: 10px auto 0; }
+  .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; }
+</style>
+</head>
+<body>
+<button class="btn" id="open">打开弹层</button>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="handle" id="handle"></div>
+  <div class="sheet-title">弹性弹出</div>
+  <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">先拉伸过头，再复位落定</p>
+</div>
+<p class="hint">弹出时先冲过头再落回，像被拽出来的</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    stretch: 0.92,    // 起始压扁程度（越小越扁）
+    over: 1.02,       // 回落时的过冲拉伸
+    dur: 0.45,        // 弹出时长（秒）
+    oy: -4,           // 冲过头位移（%，负=向上冲）
+    sheetH: 45,       // 弹层高度（vh）
+    radius: 20,       // 顶部圆角（px）
+    shadow: 0.12,     // 投影浓度
+    handle: true,     // 是否显示顶部手柄
+    mask: 0.3,        // 遮罩浓度
+    maskColor: "#000000",  // 遮罩颜色
+    sheetBg: "#ffffff",    // 弹层底色
+    handleColor: "#dddddd" // 手柄颜色
+  };
+  const mask = document.getElementById("mask");
+  const sheet = document.getElementById("sheet");
+  const handle = document.getElementById("handle");
+
+  // 十六进制转 rgba
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--stretch", state.stretch); // 关键帧里读 CSS 变量，改完再弹立即生效
+    R.setProperty("--over", state.over);
+    R.setProperty("--dur", state.dur + "s");
+    R.setProperty("--oy", state.oy + "%");
+    R.setProperty("--h", state.sheetH + "vh");
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--shadow", state.shadow);
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
+    R.setProperty("--sheet", state.sheetBg);
+    R.setProperty("--handlec", state.handleColor);
+    handle.style.display = state.handle ? "block" : "none";
+  }
+
+  function open() {
+    sheet.classList.remove("out");
+    sheet.classList.add("in");
+    mask.classList.add("show");
+  }
+  function close() {
+    sheet.classList.remove("in");
+    sheet.classList.add("out");
+    mask.classList.remove("show");
+  }
+  document.getElementById("open").addEventListener("click", open);
+  mask.addEventListener("click", close);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

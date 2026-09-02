@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面包屑导航演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --theme:#2563eb; --text:#6b7280; --link:#2563eb; --hover:#1d4ed8; --pageBg:#ffffff; --fs:14px; --gap:8px; --radius:8px; }
+  body { font-family:system-ui,"Microsoft YaHei",sans-serif; background:#eef0f3; color:var(--text); }
+  #bar { background:var(--pageBg); padding:16px 26px; border-radius:var(--radius); box-shadow:0 2px 10px rgba(0,0,0,.05); display:flex; align-items:center; gap:var(--gap); font-size:var(--fs); flex-wrap:wrap; }
+  .crumb { display:inline-flex; align-items:center; gap:var(--gap); color:var(--link); cursor:pointer; transition:color .15s; }
+  .crumb:hover { color:var(--hover); }
+  .crumb.home svg { width:15px; height:15px; }
+  .crumb.current { color:var(--text); cursor:default; }
+  .sep { color:#cbd5e1; user-select:none; }
+  .content { padding:40px 26px; max-width:880px; margin:20px auto; background:#fff; border-radius:12px; }
+  .content h1 { color:#111827; margin-bottom:10px; }
+  .content p { color:#6b7280; line-height:1.9; }
+</style>
+</head>
+<body>
+  <div style="padding:20px 26px 0;"><nav id="bar"></nav></div>
+  <div class="content"><h1>当前页面</h1><p>面包屑以「首页 / 分类 / 子分类」路径展示当前页面层级，让用户随时知道自己在哪、能往哪跳。适配电商、文档站等深层级网站。改「层级」参数可增减路径深度。</p></div>
+<script>
+  const HOME='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
+  const state = {
+    theme:"#2563eb", text:"#6b7280", link:"#2563eb", hover:"#1d4ed8", pageBg:"#ffffff",
+    sep:" / ", fontSize:14, gap:8, radius:8, bold:true,
+    items:"首页,课程,前端,下拉组件", homeIcon:true
+  };
+  const bar=document.getElementById("bar");
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--text",state.text); R.setProperty("--link",state.link);
+    R.setProperty("--hover",state.hover); R.setProperty("--pageBg",state.pageBg);
+    R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--gap",state.gap+"px"); R.setProperty("--radius",state.radius+"px");
+    const parts=state.items.split(",");
+    bar.innerHTML="";
+    parts.forEach((t,i)=>{
+      if(i>0){ const s=document.createElement("span"); s.className="sep"; s.textContent=state.sep; bar.appendChild(s); }
+      const c=document.createElement("span");
+      const isLast=i===parts.length-1;
+      c.className="crumb"+(i===0&&state.homeIcon?" home":"")+(isLast?" current":"");
+      if(state.bold && isLast) c.style.fontWeight="700";
+      c.innerHTML=(i===0&&state.homeIcon?HOME:"")+("<span>"+t+"</span>");
+      bar.appendChild(c);
+    });
+  }
+  window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

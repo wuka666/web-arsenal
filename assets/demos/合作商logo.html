@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>logo 墙演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 24px;
+    background: var(--page, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif;
+  }
+  .tip { font-size: 13px; color: #8a8a85; }
+  .brands {
+    width: min(860px, 92vw); overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  /* 边缘渐隐开关：关掉后两端不虚化 */
+  .brands.flat { mask-image: none; }
+  .track { display: flex; gap: var(--gap, 64px); width: max-content; animation: scroll var(--scroll-s, 10s) linear infinite; }
+  .brand {
+    font-size: var(--fs, 24px); font-weight: 800; letter-spacing: 1px;
+    color: var(--base-c, #b9b4a9); cursor: default; white-space: nowrap;
+    transition: color .2s ease, transform .2s ease;
+  }
+  .brand:hover { color: var(--hover-c, #635bff); transform: scale(var(--hs, 1.15)); }
+  .track.colorful .brand { color: var(--hover-c, #635bff); }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+</style>
+</head>
+<body>
+  <p class="tip">这一排名字会一直慢慢滚动——鼠标移到哪个名字上，哪个就变彩色</p>
+  <div class="brands" id="brands">
+    <div class="track" id="track">
+      <span class="brand">ACME</span><span class="brand">NOVA</span><span class="brand">云启</span>
+      <span class="brand">墨白</span><span class="brand">FABLE</span><span class="brand">ORBITA</span>
+      <span class="brand">清梧</span><span class="brand">STELLAR</span>
+    </div>
+  </div>
+  <script>
+    // 默认参数（父页面详情页可调）
+    const state = {
+      speed: 10, colorful: false, baseColor: "#b9b4a9", hoverColor: "#635bff",
+      gap: 64, font: 24, hoverScale: 1.15, maskEdge: true, bg: "#ffffff"
+    };
+    const brands = document.getElementById("brands");
+    const track = document.getElementById("track");
+    track.innerHTML += track.innerHTML;
+
+    function apply() {
+      const s = document.documentElement.style;
+      s.setProperty("--scroll-s", state.speed + "s");
+      s.setProperty("--base-c", state.baseColor);
+      s.setProperty("--hover-c", state.hoverColor);
+      s.setProperty("--gap", state.gap + "px");
+      s.setProperty("--fs", state.font + "px");
+      s.setProperty("--hs", state.hoverScale);
+      s.setProperty("--page", state.bg);
+      track.classList.toggle("colorful", !!state.colorful);
+      brands.classList.toggle("flat", !state.maskEdge);
+    }
+
+    // 接收父页面（index.html 详情页）传来的参数
+    window.addEventListener("message", (e) => {
+      const d = e.data;
+      if (!d || d.type !== "param") return;
+      state[d.key] = d.value;
+      apply();
+    });
+    apply();
+  </script>
+</body>
+</html>

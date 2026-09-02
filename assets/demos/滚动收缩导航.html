@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>滚动收缩导航演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --theme:#e8702a; --initBg:#111827; --scrollBg:#111827; --text:#ffffff; --shadowC:#000000; --sh:56px; --ih:80px; --dur:.3s; --fs:16px; }
+  body { font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  #nav { position:fixed; top:0; left:0; right:0; z-index:50; height:var(--ih); display:flex; align-items:center; gap:22px; padding:0 30px; color:var(--text); transition:height var(--dur) ease, background var(--dur) ease, box-shadow var(--dur) ease; }
+  #nav.shrunk { height:var(--sh); }
+  .brand { font-weight:800; font-size:calc(var(--fs)+3px); color:var(--theme); }
+  .items { display:flex; gap:6px; flex:1; }
+  .item { padding:8px 14px; border-radius:10px; font-size:var(--fs); cursor:pointer; transition:background .15s; }
+  .item:hover { background:rgba(255,255,255,.12); }
+  .cta { background:var(--theme); color:#fff; padding:9px 18px; border-radius:10px; font-size:var(--fs); cursor:pointer; }
+  .hero { height:100vh; background:linear-gradient(135deg,#1f2937,#111827); display:flex; align-items:center; justify-content:center; color:#fff; font-size:30px; font-weight:800; text-align:center; padding:0 20px; }
+  .sec { height:90vh; padding:0 30px; max-width:880px; margin:0 auto; display:flex; align-items:center; }
+  .sec h2 { color:#111827; }
+  .sec p { color:#6b7280; margin-top:10px; line-height:1.9; }
+</style>
+</head>
+<body>
+  <nav id="nav"><div class="brand" id="brand">Lithos</div><div class="items" id="items"></div><div class="cta">开始</div></nav>
+  <div class="hero">向下滚动，看导航从透明大图收缩为实色矮条</div>
+  <div class="sec"><div><h2>关于我们</h2><p>初始透明贴合大图营造沉浸感，下滑后自动变矮并切换实色背景，适配带 hero 大图的官网首页。</p></div></div>
+  <div class="sec" style="height:90vh;"></div>
+<script>
+  const state = {
+    theme:"#e8702a", initBg:"#111827", scrollBg:"#111827", text:"#ffffff", shadowColor:"#000000",
+    initOpacity:0, shrinkH:56, initH:80, dur:0.3, fontSize:16,
+    brand:"Lithos", items:"首页,课程,作品,关于"
+  };
+  const nav=document.getElementById("nav"), itemsEl=document.getElementById("items"), brandEl=document.getElementById("brand");
+  function render(){ itemsEl.innerHTML=""; state.items.split(",").forEach(t=>{ const d=document.createElement("div"); d.className="item"; d.textContent=t; itemsEl.appendChild(d); }); }
+  function hexA(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return `rgba(${r},${g},${b},${a})`; }
+  function onScroll(){
+    const scrolled = window.scrollY > 40;
+    nav.classList.toggle("shrunk", scrolled);
+    nav.style.background = scrolled ? hexA(state.scrollBg, 1) : hexA(state.initBg, state.initOpacity);
+    nav.style.boxShadow = '0 6px 20px ' + hexA(state.shadowColor, scrolled?0.18:0);
+  }
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--initBg",state.initBg); R.setProperty("--scrollBg",state.scrollBg);
+    R.setProperty("--text",state.text); R.setProperty("--shadowC",state.shadowColor);
+    R.setProperty("--sh",state.shrinkH+"px"); R.setProperty("--ih",state.initH+"px");
+    R.setProperty("--dur",state.dur+"s"); R.setProperty("--fs",state.fontSize+"px");
+    brandEl.textContent=state.brand; render(); onScroll();
+  }
+  window.addEventListener("scroll", onScroll);
+  window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

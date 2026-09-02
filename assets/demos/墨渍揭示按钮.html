@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨渍按钮演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--page-bg, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif;
+  }
+  .btn {
+    position: relative; overflow: hidden; cursor: pointer; min-width: 250px;
+    background: var(--btn-bg, #fff); color: var(--ink, #1a1a1a); border: 2px solid var(--ink, #1a1a1a);
+    font-size: 17px; font-weight: 700; letter-spacing: 3px;
+    padding: 18px 48px; border-radius: var(--btn-r, 14px); user-select: none;
+    transition: color .25s ease, background .25s ease;
+  }
+  .btn.inked { background: var(--ink, #1a1a1a); color: var(--after-c, #fff); }
+  /* 点击涟漪：从点下去的位置扩散 */
+  .ripple {
+    position: absolute; border-radius: 50%;
+    background: color-mix(in srgb, var(--ink, #1a1a1a) 25%, transparent);
+    transform: scale(0); pointer-events: none;
+  }
+  .ripple.go { animation: inkRipple var(--ripple-dur, .6s) ease-out forwards; }
+  @keyframes inkRipple { to { transform: scale(1); opacity: 0; } }
+  /* 墨渍：两个错位的墨团同时放大，边缘更自然 */
+  .stain, .stain2 {
+    position: absolute; border-radius: 50%; background: var(--ink, #1a1a1a);
+    transform: scale(0); pointer-events: none;
+  }
+  .stain { left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; }
+  .stain2 { left: 63%; top: 36%; width: 10px; height: 10px; margin: -5px 0 0 -5px; }
+  .stain.go { animation: inkStainReveal var(--stain-dur, .55s) ease-out forwards; }
+  .stain2.go { animation: inkStainReveal2 var(--stain-dur, .55s) ease-out .04s forwards; }
+  /* 扩散倍数用 CSS 变量，改了立刻生效 */
+  @keyframes inkStainReveal { to { transform: scale(var(--spread, 55)); } }
+  @keyframes inkStainReveal2 { to { transform: scale(calc(var(--spread, 55) * .73)); } }
+</style>
+</head>
+<body>
+<button class="btn" id="btn">点击展开墨渍</button>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    ripple: 0.6, stain: 0.55, reset: 1.6, ink: "#1a1a1a", spread: 55,
+    textColor: "#ffffff", btnBg: "#ffffff", bg: "#ffffff", radius: 14,
+    delay: 120, text: "点击展开墨渍"
+  };
+  const btn = document.getElementById("btn");
+  let locked = false;
+
+  function apply() {
+    const s = document.documentElement.style;
+    s.setProperty("--ripple-dur", state.ripple + "s");
+    s.setProperty("--stain-dur", state.stain + "s");
+    s.setProperty("--spread", state.spread);
+    s.setProperty("--ink", state.ink);
+    s.setProperty("--after-c", state.textColor);
+    s.setProperty("--btn-bg", state.btnBg);
+    s.setProperty("--btn-r", state.radius + "px");
+    s.setProperty("--page-bg", state.bg);
+    // 静止状态下换文案
+    if (!locked) btn.textContent = state.text;
+  }
+
+  btn.addEventListener("click", (e) => {
+    if (locked) return;
+    locked = true;
+    const rect = btn.getBoundingClientRect();
+    const r = Math.max(rect.width, rect.height) * 1.2;
+    const rip = document.createElement("span");
+    rip.className = "ripple";
+    rip.style.width = rip.style.height = r + "px";
+    rip.style.left = (e.clientX - rect.left - r / 2) + "px";
+    rip.style.top = (e.clientY - rect.top - r / 2) + "px";
+    btn.appendChild(rip);
+    rip.classList.add("go");
+    setTimeout(() => {
+      const s1 = document.createElement("span");
+      s1.className = "stain";
+      const s2 = document.createElement("span");
+      s2.className = "stain2";
+      btn.append(s1, s2);
+      s1.classList.add("go");
+      s2.classList.add("go");
+      btn.classList.add("inked");
+      btn.textContent = "已揭示 ✓";
+    }, state.delay);
+    setTimeout(() => {
+      btn.classList.remove("inked");
+      btn.textContent = state.text;
+      btn.querySelectorAll(".ripple, .stain, .stain2").forEach(n => n.remove());
+      locked = false;
+    }, state.reset * 1000);
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

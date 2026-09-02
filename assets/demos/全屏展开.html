@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全屏展开演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+  }
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+    transition: background .35s ease;
+  }
+  .mask.show { background: var(--maskbg, rgba(0,0,0,.4)); pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    height: var(--half, 50vh); border-radius: var(--radius, 16px) var(--radius, 16px) 0 0;
+    background: var(--sheet, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,var(--shadow, .12));
+    transform: translateY(105%);
+    transition: height var(--dur, .38s) var(--ease, cubic-bezier(.32,.72,0,1)),
+                border-radius var(--dur, .38s) ease,
+                transform var(--dur, .38s) var(--ease, cubic-bezier(.32,.72,0,1));
+  }
+  .sheet.show { transform: translateY(0); }
+  /* 全屏时：圆角归零、抓手移到顶部缩成一条，视觉统一不穿帮 */
+  .sheet.full { height: 100%; border-radius: 0; }
+  .handle {
+    width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd);
+    margin: 10px auto 0; transition: transform var(--dur, .38s) ease, margin var(--dur, .38s) ease;
+  }
+  .sheet.full .handle { transform: translateY(6px) scaleX(6); margin-top: 6px; }
+  .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; color: var(--titlec, #1a1a1a); }
+  .full-btn {
+    display: block; margin: 18px auto 0; cursor: pointer; user-select: none; border: none;
+    background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700;
+    padding: 8px 20px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<button class="btn" id="open">打开弹层</button>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="handle" id="handle"></div>
+  <div class="sheet-title">半屏 → 全屏</div>
+  <button class="full-btn" id="full">展开全屏</button>
+  <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">圆角与抓手同步调整，视觉保持统一</p>
+</div>
+<p class="hint">先半屏弹出，点「展开全屏」看过渡</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.38,           // 过渡时长（秒）
+    radius: 16,          // 半屏时顶部圆角（px）
+    half: 50,            // 半屏高度（vh）
+    shadow: 0.12,        // 投影浓度
+    handle: true,        // 是否显示顶部手柄
+    mask: 0.4,           // 遮罩浓度
+    maskColor: "#000000",   // 遮罩颜色
+    sheetBg: "#ffffff",     // 弹层底色
+    handleColor: "#dddddd", // 手柄颜色
+    titleColor: "#1a1a1a"   // 标题文字颜色
+  };
+  const mask = document.getElementById("mask");
+  const sheet = document.getElementById("sheet");
+  const handle = document.getElementById("handle");
+
+  // 十六进制转 rgba
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--half", state.half + "vh");
+    R.setProperty("--dur", state.dur + "s"); // 时长走 CSS 变量，改动即时生效
+    R.setProperty("--shadow", state.shadow);
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
+    R.setProperty("--sheet", state.sheetBg);
+    R.setProperty("--handlec", state.handleColor);
+    R.setProperty("--titlec", state.titleColor);
+    handle.style.display = state.handle ? "block" : "none";
+  }
+
+  function open() { sheet.classList.add("show"); mask.classList.add("show"); }
+  function close() { sheet.classList.remove("show", "full"); mask.classList.remove("show"); }
+  document.getElementById("open").addEventListener("click", open);
+  document.getElementById("full").addEventListener("click", (e) => {
+    e.stopPropagation();
+    sheet.classList.toggle("full");
+  });
+  mask.addEventListener("click", close);
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

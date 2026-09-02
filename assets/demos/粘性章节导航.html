@@ -1,0 +1,92 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>粘性章节导航</title>
+<style>
+  /* 原站签名缓动：出场用 cubic-bezier(0.4,0,1,1)，这里高亮态复用滚动揭示缓动 */
+  :root{ --ease: cubic-bezier(.44,0,.56,1); }
+  body{margin:0;min-height:220vh;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg,#fff);}
+  /* 每个章节：占满一屏高，制造滚动区 */
+  .sec{min-height:90vh;display:flex;align-items:center;justify-content:center;color:#333;font-size:22px;font-weight:700;border-bottom:1px solid #f0f0f0;}
+  /* 导航容器：垂直居中固定在左/右 */
+  .nav{position:fixed;top:50%;transform:translateY(-50%);z-index:9;display:flex;flex-direction:column;align-items:center;gap:var(--gap,20px);}
+  /* 进度连线：贯穿圆点的竖线 */
+  #line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--linec,#ddd);transform:translateX(-50%);z-index:0;}
+  /* 圆点：默认色，激活时放大并换色 */
+  .dot{position:relative;z-index:1;width:var(--size,12px);height:var(--size,12px);border-radius:50%;background:var(--idle,#ccc);cursor:pointer;border:var(--stroke,0) solid #fff;transition:transform .25s var(--ease),background .25s var(--ease);}
+  .dot.on{background:var(--active,#111);transform:scale(1.6);}
+  /* 章节标签：可开关，贴在圆点外侧 */
+  .lab{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;color:var(--labc,#666);white-space:nowrap;display:var(--showlab,none);}
+  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+</style></head>
+<body>
+  <nav class="nav" id="nav"><div id="line"></div></nav>
+  <div class="hint">滚动看变化</div>
+  <section class="sec" data-i="0">第一章 · 开篇</section>
+  <section class="sec" data-i="1">第二章 · 背景</section>
+  <section class="sec" data-i="2">第三章 · 方法</section>
+  <section class="sec" data-i="3">第四章 · 案例</section>
+  <section class="sec" data-i="4">第五章 · 收尾</section>
+  <script>
+  // 章节名（用于标签）
+  const names=["第一章","第二章","第三章","第四章","第五章"];
+  // 默认参数：父页面（详情页）可实时调
+  const state = {
+    size: 12,        // 圆点大小（px）
+    gap: 20,         // 圆点间距（px）
+    idle: "#cccccc", // 默认色
+    active: "#111111", // 激活色
+    side: "右",      // 位置：左 / 右
+    labels: false,   // 标签显隐
+    labelColor: "#666666", // 标签色
+    line: false,     // 进度连线
+    lineColor: "#dddddd", // 连线色
+    stroke: false,   // 圆点描边
+    bg: "#ffffff"    // 底色（页面背景）
+  };
+  const nav=document.getElementById("nav"), line=document.getElementById("line");
+  const dots=[];
+  // 生成圆点
+  names.forEach((n,i)=>{
+    const d=document.createElement("div"); d.className="dot"; d.dataset.i=i;
+    const lab=document.createElement("span"); lab.className="lab"; lab.textContent=n;
+    d.appendChild(lab);
+    d.addEventListener("click",()=>{ document.querySelectorAll(".sec")[i].scrollIntoView({behavior:"smooth"}); });
+    nav.appendChild(d); dots.push(d);
+  });
+  const secs=[...document.querySelectorAll(".sec")];
+  let cur=0;
+  function setActive(i){ cur=i; dots.forEach((d,k)=>d.classList.toggle("on",k===i)); }
+
+  // apply：把每个 state 键映射到真实样式
+  function apply(){
+    const root=document.documentElement;
+    root.style.setProperty("--size", state.size+"px");
+    root.style.setProperty("--gap", state.gap+"px");
+    root.style.setProperty("--idle", state.idle);
+    root.style.setProperty("--active", state.active);
+    root.style.setProperty("--labc", state.labelColor);
+    root.style.setProperty("--linec", state.lineColor);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--showlab", state.labels ? "block" : "none");
+    root.style.setProperty("--stroke", state.stroke ? (Math.max(2,state.size/4)+"px") : "0");
+    line.style.display = state.line ? "block" : "none";
+    // 位置：左侧或右侧
+    if(state.side==="左"){ nav.style.right="auto"; nav.style.left="20px"; }
+    else { nav.style.left="auto"; nav.style.right="20px"; }
+    // 标签贴在圆点外侧（左导航在右、右导航在左）
+    dots.forEach(d=>{ const lab=d.querySelector(".lab");
+      if(state.side==="左"){ lab.style.right=(state.size+8)+"px"; lab.style.left="auto"; }
+      else { lab.style.left=(state.size+8)+"px"; lab.style.right="auto"; } });
+    setActive(cur);
+  }
+
+  // 以视口中线判定当前章节（IntersectionObserver）
+  const io=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting) setActive(+e.target.dataset.i); });
+  },{rootMargin:"-50% 0px -50% 0px",threshold:0});
+  secs.forEach(s=>io.observe(s));
+
+  // 父页面消息：调参实时生效
+  window.addEventListener("message",(e)=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+  </script>
+</body></html>

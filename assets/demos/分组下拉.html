@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分组下拉演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; width:280px; }
+  .trigger {
+    width:100%; display:flex; align-items:center; gap:8px;
+    padding:11px 14px; background:#fff; border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px);
+    font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; user-select:none;
+    box-shadow:0 4px 14px rgba(0,0,0,var(--shadow,.12)); transition:border-color .15s;
+  }
+  .trigger .val { flex:1; }
+  .trigger .val.ph { color:#9ca3af; }
+  .caret { transition:transform var(--dur,.22s) ease; color:var(--arrow,#6b7280); flex:none; }
+  .field.open .caret { transform:rotate(180deg); }
+  .field.open .trigger { border-color:var(--theme,#2563eb); }
+  .menu {
+    position:absolute; top:calc(100% + 6px); left:0; right:0; background:#fff; border:1px solid var(--border,#d1d5db);
+    border-radius:var(--radius,10px); box-shadow:0 10px 30px rgba(0,0,0,var(--shadow,.12));
+    max-height:300px; overflow:auto; opacity:0; transform:translateY(-6px); pointer-events:none;
+    transition:opacity var(--dur,.22s) ease, transform var(--dur,.22s) ease; z-index:5; padding:6px;
+  }
+  .field.open .menu { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .ghead { padding:8px 12px 4px; font-size:var(--gts,12px); color:var(--gt,#9ca3af); font-weight:700; letter-spacing:.04em; }
+  .opt { padding:9px 12px; font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; border-radius:7px; }
+  .opt:hover { background:var(--hover,#f3f4f6); }
+  .opt.sel { color:var(--theme,#2563eb); font-weight:700; }
+  .grp + .grp { margin-top:var(--ggap,6px); }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="trigger" id="trigger">
+      <span class="val ph" id="val">请选择城市</span>
+      <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="menu" id="menu"></div>
+  </div>
+  <p class="hint">组名不可选 · 选中回填对应内容</p>
+<script>
+  const GROUPS = [
+    { name:"华北", items:["北京","天津","石家庄"] },
+    { name:"华东", items:["上海","杭州","南京","苏州"] },
+    { name:"华南", items:["广州","深圳","厦门"] }
+  ];
+  const FLAT = GROUPS.flatMap(g=>g.items);
+  const state = {
+    theme:"#2563eb", text:"#1f2937", groupTitle:"#9ca3af", radius:10, fontSize:15, dur:0.22,
+    border:"#d1d5db", hoverBg:"#f3f4f6", groupTitleSize:12, groupGap:6, placeholder:"请选择城市", arrowColor:"#6b7280"
+  };
+  const field=document.getElementById("field"), trigger=document.getElementById("trigger"),
+        val=document.getElementById("val"), menu=document.getElementById("menu");
+  let selected=null, open=false;
+  function buildMenu(){
+    menu.innerHTML="";
+    GROUPS.forEach(g=>{
+      const wrap=document.createElement("div"); wrap.className="grp";
+      const h=document.createElement("div"); h.className="ghead"; h.textContent=g.name; wrap.appendChild(h);
+      g.items.forEach(o=>{
+        const d=document.createElement("div");
+        d.className="opt"+(o===selected?" sel":""); d.textContent=o;
+        d.onclick=()=>{ selected=o; val.textContent=o; val.classList.remove("ph"); close(); };
+        wrap.appendChild(d);
+      });
+      menu.appendChild(wrap);
+    });
+  }
+  function openMenu(){ open=true; field.classList.add("open"); }
+  function close(){ open=false; field.classList.remove("open"); }
+  trigger.onclick=()=> open?close():openMenu();
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)) close(); });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--text",state.text);
+    R.setProperty("--gt",state.groupTitle); R.setProperty("--radius",state.radius+"px");
+    R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--dur",state.dur+"s");
+    R.setProperty("--border",state.border); R.setProperty("--hover",state.hoverBg);
+    R.setProperty("--gts",state.groupTitleSize+"px"); R.setProperty("--ggap",state.groupGap+"px");
+    R.setProperty("--arrow",state.arrowColor);
+    if(!selected){ val.textContent=state.placeholder; val.classList.add("ph"); }
+    buildMenu();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

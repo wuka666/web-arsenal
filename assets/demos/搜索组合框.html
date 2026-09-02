@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>可搜索组合框演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; width:280px; }
+  .box {
+    display:flex; align-items:center; gap:8px; padding:4px 12px; background:var(--ibg,#fff);
+    border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px);
+    box-shadow:0 4px 14px rgba(0,0,0,var(--shadow,.12)); transition:border-color .15s;
+  }
+  .field.open .box { border-color:var(--theme,#2563eb); }
+  .box svg { color:var(--arrow,#6b7280); flex:none; }
+  #inp {
+    flex:1; border:0; outline:0; background:transparent; padding:9px 0; font-size:var(--fs,15px);
+    color:var(--text,#1f2937); font-family:inherit;
+  }
+  #inp::placeholder { color:#9ca3af; }
+  .menu {
+    position:absolute; top:calc(100% + 6px); left:0; right:0; background:#fff; border:1px solid var(--border,#d1d5db);
+    border-radius:var(--radius,10px); box-shadow:0 10px 30px rgba(0,0,0,var(--shadow,.12));
+    max-height:260px; overflow:auto; opacity:0; transform:translateY(-6px); pointer-events:none;
+    transition:opacity var(--dur,.2s) ease, transform var(--dur,.2s) ease; z-index:5;
+  }
+  .field.open .menu { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .opt { padding:10px 14px; font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; }
+  .opt:hover { background:var(--hover,#eff6ff); }
+  .opt mark { background:transparent; color:var(--mc,#2563eb); font-weight:700; }
+  .opt.none { color:#9ca3af; cursor:default; }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="inp" type="text" placeholder="输入关键词筛选…" autocomplete="off">
+    </div>
+    <div class="menu" id="menu"></div>
+  </div>
+  <p class="hint">输入实时筛选 · 选中回填输入框</p>
+<script>
+  const OPTIONS = ["北京","上海","广州","深圳","杭州","成都","西安","武汉","南京","重庆","苏州","天津","长沙","青岛","厦门","昆明"];
+  const state = {
+    theme:"#2563eb", text:"#1f2937", radius:10, fontSize:15, dur:0.2,
+    border:"#d1d5db", hoverBg:"#eff6ff", inputBg:"#ffffff", matchColor:"#2563eb",
+    noResult:"无匹配项", placeholder:"输入关键词筛选…", minChars:1
+  };
+  const field=document.getElementById("field"), inp=document.getElementById("inp"), menu=document.getElementById("menu");
+  let open=false;
+  function esc(s){ return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+  function render(){
+    const q=inp.value.trim().toLowerCase();
+    const list = q.length < state.minChars ? OPTIONS : OPTIONS.filter(o=>o.toLowerCase().includes(q));
+    if(!list.length){ menu.innerHTML='<div class="opt none">'+esc(state.noResult)+'</div>'; return; }
+    menu.innerHTML = list.map(o=>{
+      let html=esc(o);
+      if(q){ const i=o.toLowerCase().indexOf(q); if(i>=0) html=esc(o.slice(0,i))+"<mark>"+esc(o.slice(i,i+q.length))+"</mark>"+esc(o.slice(i+q.length)); }
+      return '<div class="opt">'+html+'</div>';
+    }).join("");
+    [...menu.children].forEach((c,i)=>{ if(list[i]) c.onclick=()=>{ inp.value=list[i]; close(); }; });
+  }
+  function openMenu(){ open=true; field.classList.add("open"); render(); }
+  function close(){ open=false; field.classList.remove("open"); }
+  inp.addEventListener("focus",openMenu);
+  inp.addEventListener("input",()=>{ open=true; field.classList.add("open"); render(); });
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)) close(); });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--text",state.text);
+    R.setProperty("--radius",state.radius+"px"); R.setProperty("--fs",state.fontSize+"px");
+    R.setProperty("--dur",state.dur+"s"); R.setProperty("--border",state.border);
+    R.setProperty("--hover",state.hoverBg); R.setProperty("--ibg",state.inputBg);
+    R.setProperty("--mc",state.matchColor); R.setProperty("--arrow",state.theme);
+    R.setProperty("--shadow",0.12);
+    inp.placeholder=state.placeholder;
+    render();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

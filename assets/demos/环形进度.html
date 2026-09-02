@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>环形进度条演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .ring-wrap {
+    position: relative;
+    width: var(--size, 120px); height: var(--size, 120px);
+  }
+  .ring-track { fill: none; stroke: var(--track, #eee); stroke-width: var(--thick, 10); }
+  .ring {
+    fill: none; stroke: var(--color, #1a1a1a); stroke-width: var(--thick, 10);
+    stroke-linecap: var(--cap, round);
+    stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
+    transform: rotate(var(--rot, -90deg)); transform-origin: center;
+    filter: drop-shadow(var(--glow, 0 0 0 transparent));
+  }
+  .ring-pct {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: var(--pctSize, 24px); font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--color, #1a1a1a);
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 10px 24px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="ring-wrap" id="wrap">
+  <svg viewBox="0 0 120 120" id="svg">
+    <circle class="ring-track" id="ringTrack" cx="60" cy="60" r="52"></circle>
+    <circle class="ring" id="ring" cx="60" cy="60" r="52"></circle>
+  </svg>
+  <div class="ring-pct" id="pct">0%</div>
+</div>
+<button class="btn" id="btn">重新转</button>
+<p class="hint">小空间（卡片/指标）展示明确进度：环 + 百分比</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 2,            // 转满时长（秒）
+    easing: "easeOut", // 缓动
+    size: 120,         // 环直径（px）
+    thick: 10,         // 环线粗细（px）
+    cap: "round",      // 端点形状
+    rot: -90,          // 起点旋转角度
+    showPct: true,     // 是否显示百分比文字
+    pctSize: 24,       // 百分比字号
+    glow: false,       // 环是否发光
+    reverse: false,    // 进度方向（顺时针/逆时针）
+    color: "#1a1a1a",  // 环主色
+    track: "#eee"      // 轨道底色
+  };
+  const ring = document.getElementById("ring");
+  const ringTrack = document.getElementById("ringTrack");
+  const pct = document.getElementById("pct");
+  const wrap = document.getElementById("wrap");
+  const svg = document.getElementById("svg");
+
+  function ease(t) {
+    if (state.easing === "linear") return t;
+    if (state.easing === "easeInOut") return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--size", state.size + "px");
+    root.style.setProperty("--cap", state.cap === "butt" ? "butt" : "round");
+    root.style.setProperty("--rot", state.rot + "deg");
+    root.style.setProperty("--pctSize", state.pctSize + "px");
+    root.style.setProperty("--showPct", state.showPct ? "flex" : "none");
+    pct.style.display = state.showPct ? "flex" : "none";
+    root.style.setProperty("--glow", state.glow
+      ? ("0 0 6px " + state.color + "88")
+      : "0 0 0 transparent");
+    svg.setAttribute("width", state.size);
+    svg.setAttribute("height", state.size);
+    const r = 52 - Math.min(state.thick / 2, 8);
+    ring.setAttribute("r", r);
+    ringTrack.setAttribute("r", r);
+    const circ = 2 * Math.PI * r;
+    ring.style.strokeDasharray = circ;
+    ring.style.strokeDashoffset = circ;
+    pct.textContent = "0%";
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    const r = 52 - Math.min(state.thick / 2, 8);
+    const circ = 2 * Math.PI * r;
+    ring.style.strokeDashoffset = circ;
+    pct.textContent = "0%";
+    const start = performance.now();
+    const dur = state.dur * 1000;
+    const dir = state.reverse ? -1 : 1;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const p = Math.round(100 * ease(t));
+      ring.style.strokeDashoffset = circ * (1 - p / 100);
+      pct.textContent = p + "%";
+      if (t < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    applyStyle();
+    if (d.key === "dur" || d.key === "easing" || d.key === "reverse") run();
+  });
+</script>
+</body>
+</html>

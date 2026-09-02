@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>悬浮吸顶导航演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --theme:#2563eb; --bg:#ffffff; --text:#1f2937; --hover:#eff6ff; --floatBg:#ffffff; --radius:16px; --h:60px; --shadow:.16; --fs:15px; }
+  body { font-family:system-ui,"Microsoft YaHei",sans-serif; color:var(--text); background:#f5f6f8; }
+  #nav {
+    position:sticky; top:0; z-index:50; height:var(--h);
+    display:flex; align-items:center; gap:22px; padding:0 26px;
+    background:var(--bg); color:var(--text);
+    transition:all .35s cubic-bezier(.16,1,.3,1);
+  }
+  #nav.floating {
+    position:fixed; top:14px; left:50%; transform:translateX(-50%);
+    width:min(960px,92%); border-radius:var(--radius);
+    background:var(--floatBg); box-shadow:0 12px 34px rgba(0,0,0,var(--shadow));
+  }
+  .brand { font-weight:800; font-size:calc(var(--fs) + 3px); color:var(--theme); letter-spacing:.5px; }
+  .items { display:flex; gap:6px; flex:1; }
+  .item { padding:8px 14px; border-radius:10px; font-size:var(--fs); cursor:pointer; transition:background .15s,color .15s; }
+  .item:hover { background:var(--hover); color:var(--theme); }
+  .cta { background:var(--theme); color:#fff; padding:9px 18px; border-radius:10px; font-size:var(--fs); cursor:pointer; }
+  .hero { height:60vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#dbeafe,#eff6ff); font-size:26px; color:#1e40af; font-weight:800; text-align:center; }
+  .sec { padding:60px 26px; max-width:960px; margin:0 auto; }
+  .sec h2 { margin-bottom:12px; color:#111827; }
+  .sec p { color:#6b7280; line-height:1.9; }
+  .spacer { height:120vh; }
+</style>
+</head>
+<body>
+  <nav id="nav">
+    <div class="brand" id="brand">Lithos</div>
+    <div class="items" id="items"></div>
+    <div class="cta">开始</div>
+  </nav>
+  <div class="hero">向下滚动，看导航变成圆角卡片吸顶</div>
+  <div class="sec"><h2>第一段</h2><p>悬浮吸顶导航在页面顶部时融入内容流；一旦滚动越过阈值，就以圆角卡片形式固定在视口顶部，并加投影浮起。适配长文章、商品列表类等需要持续下滑、又随时要能跳转的页面。</p></div>
+  <div class="sec"><h2>第二段</h2><p>继续滚动，卡片一直跟随。调「吸顶触发阈值」可控制它多晚浮起，调「圆角」「投影浓度」控制卡片气质。</p></div>
+  <div class="spacer"></div>
+<script>
+  const state = {
+    theme:"#2563eb", bg:"#ffffff", text:"#1f2937", hover:"#eff6ff", floatBg:"#ffffff",
+    radius:16, threshold:120, height:60, shadow:0.16, fontSize:15,
+    brand:"Lithos", items:"首页,课程,作品,关于"
+  };
+  const nav=document.getElementById("nav"), itemsEl=document.getElementById("items"), brandEl=document.getElementById("brand");
+  function renderItems(){
+    itemsEl.innerHTML="";
+    state.items.split(",").forEach(t=>{ const d=document.createElement("div"); d.className="item"; d.textContent=t; itemsEl.appendChild(d); });
+  }
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--bg",state.bg); R.setProperty("--text",state.text);
+    R.setProperty("--hover",state.hover); R.setProperty("--floatBg",state.floatBg);
+    R.setProperty("--radius",state.radius+"px"); R.setProperty("--h",state.height+"px");
+    R.setProperty("--shadow",state.shadow); R.setProperty("--fs",state.fontSize+"px");
+    brandEl.textContent=state.brand; renderItems();
+  }
+  function onScroll(){ nav.classList.toggle("floating", window.scrollY > state.threshold); }
+  window.addEventListener("scroll", onScroll);
+  window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); onScroll(); });
+  apply(); onScroll();
+</script>
+</body>
+</html>

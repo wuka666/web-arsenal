@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 沉浸滚动演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { height: 100vh; overflow: hidden; font-family: system-ui, "Microsoft YaHei", sans-serif; background: #0a0e1a; }
+  /* 可滚动舞台：perspective 提供透视，滚动条藏掉 */
+  .viewport { position: absolute; inset: 0; overflow-y: scroll; perspective: 1000px; }
+  .viewport::-webkit-scrollbar { display: none; }
+  .spacer { height: 400vh; } /* 撑出滚动距离 = 镜头推进的路程 */
+  /* 3D 世界：sticky 钉在视口里，translateZ 由滚动进度驱动 */
+  .world { position: sticky; top: 0; height: 100vh; transform-style: preserve-3d; }
+  .layer { position: absolute; left: 50%; top: 50%; }
+  .hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: rgba(255,255,255,.45); z-index: 5; }
+  /* 底部进度条 */
+  .progress { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: rgba(255,255,255,.08); z-index: 5; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--c1); transition: width .1s linear; }
+</style>
+</head>
+<body>
+<div class="viewport" id="viewport">
+  <div class="world" id="world"></div>
+  <div class="spacer"></div>
+</div>
+<div class="hint" id="hint">滚动滚轮推进镜头穿过层层元素 · 鼠标轻移带视角倾斜</div>
+<div class="progress"><i id="pfill"></i></div>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    layers: 8,          // 层数
+    depth: 1600,        // 纵深距离（px）
+    persp: 1000,        // 透视强度（px，越小透视越夸张）
+    tilt: 6,            // 视角跟随（度）
+    spin: 0.3,          // 自转速度（度/帧）
+    size: 110,          // 元素大小（px）
+    shape: "圆环",       // 形状
+    color1: "#6f9bff",  // 主色
+    color2: "#a8c8ff",  // 辅色
+    bg: "#0a0e1a",      // 背景色
+    glow: true,         // 发光
+    fade: true          // 远处渐隐
+  };
+  const viewport = document.getElementById("viewport");
+  const world = document.getElementById("world");
+  const pfill = document.getElementById("pfill");
+  let layerEls = [];
+
+  // 伪随机（固定种子，元素位置刷新后一致）
+  const rnd = i => { const x = Math.sin(i * 91.7 + 47.3) * 43758.5; return x - Math.floor(x); };
+
+  // 生成纵深层：每层一个 z 位置 + 平面偏移
+  function build() {
+    world.innerHTML = "";
+    layerEls = [];
+    for (let i = 0; i < state.layers; i++) {
+      const el = document.createElement("div");
+      el.className = "layer";
+      const s = state.size * (0.7 + rnd(i) * 0.6); // 大小错落
+      // 形状：圆环 / 方块 / 圆点
+      if (state.shape === "圆环") {
+        el.style.border = "2px solid " + (i % 2 ? state.color2 : state.color1);
+        el.style.borderRadius = "50%";
+      } else if (state.shape === "方块") {
+        el.style.background = (i % 2 ? state.color2 : state.color1);
+        el.style.borderRadius = "10px";
+      } else {
+        el.style.background = (i % 2 ? state.color2 : state.color1);
+        el.style.borderRadius = "50%";
+        el.style.filter = "blur(1px)";
+      }
+      if (state.glow) el.style.boxShadow = "0 0 30px " + (i % 2 ? state.color2 : state.color1) + "55";
+      el.style.width = el.style.height = s + "px";
+      const z = -(i + 1) * state.depth / state.layers;   // 纵深位置
+      const px = (rnd(i + 31) - 0.5) * 340;              // 平面偏移（错落分布）
+      const py = (rnd(i + 67) - 0.5) * 220;
+      el.style.marginLeft = -s / 2 + "px";
+      el.style.marginTop = -s / 2 + "px";
+      el.dataset.z = z;
+      el.dataset.px = px;
+      el.dataset.py = py;
+      world.appendChild(el);
+      layerEls.push(el);
+    }
+    document.body.style.background = state.bg;
+    render();
+  }
+
+  let progress = 0, mx = 0, my = 0, spinAngle = 0;
+  function render() {
+    // 世界：镜头推进（translateZ = 进度 × 纵深） + 鼠标视角 + 慢速自转
+    spinAngle += state.spin * 0.1;
+    world.style.transform =
+      "translateZ(" + (progress * state.depth * 0.92) + "px)" +
+      " rotateY(" + (mx * state.tilt + spinAngle) + "deg)" +
+      " rotateX(" + (-my * state.tilt) + "deg)";
+    // 每层：根据「离镜头的距离」决定透明度（远处渐隐、越过的淡出）
+    layerEls.forEach(el => {
+      const z = +el.dataset.z + progress * state.depth * 0.92; // 相对镜头的深度
+      let a = 1;
+      if (state.fade) a = Math.max(0, Math.min(1, (z + 80) / (state.depth * 0.7)));
+      el.style.opacity = a;
+      el.style.transform = "translate3d(" + el.dataset.px + "px," + el.dataset.py + "px," + el.dataset.z + "px)";
+    });
+    pfill.style.width = (progress * 100) + "%";
+  }
+
+  // 滚动 → 进度 0~1
+  viewport.addEventListener("scroll", () => {
+    progress = viewport.scrollTop / (viewport.scrollHeight - innerHeight || 1);
+    render();
+  });
+  // 鼠标 → 视角倾斜
+  addEventListener("mousemove", e => {
+    mx = e.clientX / innerWidth * 2 - 1;
+    my = e.clientY / innerHeight * 2 - 1;
+    render();
+  });
+  // 自转持续运转
+  (function loop() { if (state.spin > 0) render(); requestAnimationFrame(loop); })();
+
+  function apply() {
+    viewport.style.perspective = state.persp + "px";
+    document.documentElement.style.setProperty("--c1", state.color1);
+    build();
+  }
+  apply();
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+</script>
+</body>
+</html>

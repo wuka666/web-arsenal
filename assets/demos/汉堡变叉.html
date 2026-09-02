@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汉堡变叉演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .burger {
+    width: var(--size, 56px); height: var(--size, 56px); border-radius: var(--r, 12px);
+    cursor: pointer; user-select: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--gap, 7px);
+    background: var(--bg, #1a1a1a); transition: background .2s ease;
+  }
+  .burger:active { background: var(--pr, #333); }
+  /* 单个元件（三条线）完成汉堡↔叉的切换，操作位置不丢；--off = 间距+线粗 */
+  .burger span {
+    width: var(--line, 28px); height: var(--th, 3px); border-radius: 3px; background: var(--lc, #fff);
+    transition: transform var(--dur, .32s) ease, opacity var(--dur, .32s) ease;
+  }
+  .burger.open span:nth-child(1) { transform: translateY(var(--off, 10px)) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .burger.open span:nth-child(3) { transform: translateY(calc(-1 * var(--off, 10px))) rotate(-45deg); }
+</style>
+</head>
+<body>
+<div class="burger" id="bg" role="button" aria-label="菜单" tabindex="0">
+  <span></span><span></span><span></span>
+</div>
+<p class="hint">点一下：汉堡三条线原地变成叉，没有新元素顶替</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.32, size: 56, thick: 3, gap: 7, radius: 12,
+    bgColor: "#1a1a1a", lineColor: "#ffffff", pressColor: "#333333"
+  };
+  const bg = document.getElementById("bg");
+  const root = document.documentElement;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--size", state.size + "px");
+    s.setProperty("--th", state.thick + "px");
+    s.setProperty("--gap", state.gap + "px");
+    // 汇合距离 = 间距 + 线粗，变叉时上下两条线正好在中线相交
+    s.setProperty("--off", (state.gap + state.thick) + "px");
+    s.setProperty("--line", Math.round(state.size / 2) + "px"); // 线长随按钮尺寸缩放
+    s.setProperty("--r", state.radius + "px");
+    s.setProperty("--bg", state.bgColor);
+    s.setProperty("--lc", state.lineColor);
+    s.setProperty("--pr", state.pressColor);
+  }
+  function toggle() { bg.classList.toggle("open"); }
+  bg.addEventListener("click", toggle);
+  bg.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); }
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>绸缎渐变演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: var(--page-bg, #0b0b12); overflow: hidden; font-family: system-ui, "Microsoft YaHei", sans-serif; }
+  .silk, .silk2 { position: absolute; border-radius: 50%; }
+  .silk {
+    inset: -50%;
+    /* 三个渐变色都可调，from 角度即起始角度 */
+    background: conic-gradient(from var(--angle, 0deg), var(--c1, #7b5cff), var(--c2, #ff5c8a), var(--c3, #3ec6ff), var(--c1, #7b5cff));
+    filter: blur(var(--silk-blur, 48px)) saturate(var(--silk-sat, 1.4));
+    animation: spin var(--silk-speed, 18s) linear infinite;
+  }
+  .silk2 {
+    inset: -30%;
+    background: conic-gradient(from calc(var(--angle, 0deg) + 180deg), var(--c3, #3ec6ff), var(--c1, #7b5cff), var(--c2, #ff5c8a), var(--c3, #3ec6ff));
+    filter: blur(calc(var(--silk-blur, 48px) * 1.45)) saturate(var(--silk-sat, 1.4));
+    opacity: .7;
+    animation: spin calc(var(--silk-speed, 18s) * 1.44) linear infinite reverse;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .content {
+    position: relative; z-index: 1; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    color: #fff; text-align: center; padding: 0 20px;
+  }
+  .content h1 { font-size: clamp(26px, 4.5vw, 40px); font-weight: 800; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+  .content .btn { background: #fff; color: #111; font-weight: 700; padding: 11px 26px; border-radius: 999px; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="silk"></div>
+  <div class="silk2"></div>
+  <div class="content">
+    <h1 id="title">冷暖色不断旋转的背景</h1>
+    <span class="btn">立即开始</span>
+  </div>
+  <script>
+    // 默认参数（父页面详情页可调）
+    const state = {
+      speed: 18, blur: 48, c1: "#7b5cff", c2: "#ff5c8a", c3: "#3ec6ff",
+      angle: 0, sat: 1.4, text: "冷暖色不断旋转的背景", bg: "#0b0b12"
+    };
+
+    // 参数变了：改 CSS 变量，转速/柔化/三色/角度实时变
+    function apply() {
+      const s = document.documentElement.style;
+      s.setProperty("--silk-speed", state.speed + "s");
+      s.setProperty("--silk-blur", state.blur + "px");
+      s.setProperty("--silk-sat", state.sat);
+      s.setProperty("--c1", state.c1);
+      s.setProperty("--c2", state.c2);
+      s.setProperty("--c3", state.c3);
+      s.setProperty("--angle", state.angle + "deg");
+      s.setProperty("--page-bg", state.bg);
+      document.getElementById("title").textContent = state.text;
+    }
+
+    // 接收父页面（index.html 详情页）传来的参数
+    window.addEventListener("message", (e) => {
+      const d = e.data;
+      if (!d || d.type !== "param") return;
+      state[d.key] = d.value;
+      apply();
+    });
+    apply();
+  </script>
+</body>
+</html>

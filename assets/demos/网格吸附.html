@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网格吸附演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { height: 100vh; overflow: hidden; font-family: system-ui, "Microsoft YaHei", sans-serif; background: #eef0f4; }
+  .stage { position: absolute; inset: 0; overflow: hidden; }
+  /* 背景层：吸附时反向漂移 + 缩小退后 */
+  .bg { position: absolute; inset: -60px; background: linear-gradient(135deg, #dfe7f5, #e9e2f2 55%, #dbeaf0);
+    transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease); }
+  /* 网格线：吸附时浮现，标出「精准坐标」 */
+  .gridlines { position: absolute; inset: 0; opacity: 0; transition: opacity var(--dur) ease;
+    background-image: linear-gradient(var(--gridc) 1px, transparent 1px), linear-gradient(90deg, var(--gridc) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell); background-position: center; }
+  /* 卡片：外层管吸附定位（带过渡），内层管鼠标视差（即时跟手） */
+  .cell { position: absolute; transition: transform var(--dur) var(--ease), width var(--dur) var(--ease), height var(--dur) var(--ease); }
+  .inner { position: absolute; inset: 0; border-radius: var(--radius); background: var(--cardbg);
+    box-shadow: 0 6px 18px rgba(20, 30, 60, .1); display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #9aa4b8; font-size: 18px; }
+  .btn { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); cursor: pointer; border: none;
+    background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 10px 26px; border-radius: 8px; }
+  .btn:active { transform: translateX(-50%) scale(.96); }
+  .hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: rgba(30,40,60,.5); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg" id="bg"></div>
+  <div class="gridlines" id="gridlines"></div>
+  <div id="cells"></div>
+</div>
+<button class="btn" id="btn">吸附到网格</button>
+<div class="hint">先移动鼠标看自由视差，再点按钮看「自由 → 网格 → 释放」的切换</div>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    cols: 3,              // 列数
+    gap: 20,              // 网格间距（px）
+    radius: 12,           // 卡片圆角（px）
+    dur: 0.6,             // 吸附时长（秒）
+    stagger: 0.08,        // 逐个错峰（秒）
+    ease: "先快后慢",      // 缓动方式
+    parallax: 14,         // 视差强度（px）
+    bgShift: 10,          // 背景反向漂移（px）
+    gridShow: true,       // 显示网格线
+    gridColor: "#c5cddd", // 网格线颜色
+    cardBg: "#ffffff",    // 卡片底色
+    scatter: 70           // 散布幅度（px）
+  };
+  // 缓动名 → 贝塞尔曲线
+  const EASE = { "先快后慢": "cubic-bezier(.22,1,.36,1)", "匀速": "linear", "回弹": "cubic-bezier(.34,1.56,.64,1)" };
+  const gridlines = document.getElementById("gridlines");
+  const cellsBox = document.getElementById("cells");
+  const bg = document.getElementById("bg");
+  const btn = document.getElementById("btn");
+  let grid = false, cells = [];
+
+  // 伪随机（固定种子，保证每次刷新散布一致）
+  const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5; return x - Math.floor(x); };
+
+  // 生成卡片：先算网格基准位，再叠散布偏移
+  function build() {
+    cellsBox.innerHTML = "";
+    cells = [];
+    const rows = 3, pad = 60;
+    const cardW = Math.min(180, (innerWidth - pad * 2 - state.gap * (state.cols - 1)) / state.cols);
+    const cardH = Math.min(120, (innerHeight - pad * 2 - state.gap * (rows - 1)) / rows);
+    const totalW = state.cols * cardW + state.gap * (state.cols - 1);
+    const totalH = rows * cardH + state.gap * (rows - 1);
+    const x0 = (innerWidth - totalW) / 2, y0 = (innerHeight - totalH) / 2;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < state.cols; c++) {
+        const i = r * state.cols + c;
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        const inner = document.createElement("div");
+        inner.className = "inner";
+        inner.textContent = String(i + 1).padStart(2, "0");
+        cell.appendChild(inner);
+        cellsBox.appendChild(cell);
+        cells.push({
+          el: cell, inner, i, w: cardW, h: cardH,
+          gx: x0 + c * (cardW + state.gap), gy: y0 + r * (cardH + state.gap), // 网格基准位
+          ox: (rnd(i) - 0.5) * 2 * state.scatter,                             // 自由态偏移
+          oy: (rnd(i + 50) - 0.5) * 2 * state.scatter,
+          rot: (rnd(i + 99) - 0.5) * 14,
+          depth: 0.4 + rnd(i + 7) * 0.6                                       // 视差深度（各不相同）
+        });
+      }
+    }
+    // 网格线间距 = 卡片宽 + 间距
+    document.documentElement.style.setProperty("--cell", (cardW + state.gap) + "px");
+    layout();
+  }
+
+  // 布局：自由态（散布+旋转） ⇄ 网格态（精准对齐）
+  function layout() {
+    cells.forEach(c => {
+      const x = grid ? c.gx : c.gx + c.ox;
+      const y = grid ? c.gy : c.gy + c.oy;
+      c.el.style.width = c.w + "px";
+      c.el.style.height = c.h + "px";
+      c.el.style.transform = "translate(" + x + "px," + y + "px) rotate(" + (grid ? 0 : c.rot) + "deg)";
+      c.el.style.transitionDelay = (c.i * state.stagger) + "s"; // 逐个错峰
+    });
+    gridlines.style.opacity = (grid && state.gridShow) ? 0.8 : 0;
+  }
+
+  // 参数落地
+  function apply() {
+    const root = document.documentElement.style;
+    root.setProperty("--dur", state.dur + "s");
+    root.setProperty("--ease", EASE[state.ease] || EASE["先快后慢"]);
+    root.setProperty("--radius", state.radius + "px");
+    root.setProperty("--gridc", state.gridColor);
+    root.setProperty("--cardbg", state.cardBg);
+    build();
+  }
+
+  // 切换：自由 ⇄ 网格
+  btn.addEventListener("click", () => {
+    grid = !grid;
+    btn.textContent = grid ? "释放" : "吸附到网格";
+    layout();
+  });
+
+  // 鼠标视差：卡片轻微跟手（各自深度不同），背景反向漂移
+  addEventListener("mousemove", e => {
+    const mx = e.clientX / innerWidth * 2 - 1;
+    const my = e.clientY / innerHeight * 2 - 1;
+    cells.forEach(c => {
+      const k = grid ? 0.25 : 1; // 网格态视差收着点，保持秩序感
+      c.inner.style.transform = "translate(" + mx * state.parallax * c.depth * k + "px," + my * state.parallax * c.depth * k + "px)";
+    });
+    bg.style.transform = "translate(" + -mx * state.bgShift + "px," + -my * state.bgShift + "px)" + (grid ? " scale(.94)" : "");
+    bg.style.filter = grid ? "saturate(.75) brightness(.97)" : "none";
+  });
+
+  apply();
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+</script>
+</body>
+</html>

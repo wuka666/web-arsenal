@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模糊进度条演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .rail {
+    position: relative;
+    width: var(--width, 300px);
+    height: var(--thick, 6px);
+    border-radius: var(--round, 6px);
+    background: var(--track, #eee);
+    overflow: hidden;
+  }
+  .indet {
+    position: absolute; top: 0; height: 100%;
+    width: calc(100% / var(--count, 2) - var(--gap, 4px));
+    border-radius: var(--round, 6px);
+    background: var(--color, #1a1a1a);
+    opacity: var(--opa, 1);
+    box-shadow: var(--glow, 0 0 0 transparent);
+    animation: indetSlide var(--speed, 1.6s) ease-in-out infinite;
+  }
+  @keyframes indetSlide {
+    0%   { left: calc(-1 * (100% / var(--count, 2))); }
+    100% { left: calc(100%); }
+  }
+</style>
+</head>
+<body>
+<div class="rail" id="rail"></div>
+<p class="hint">无法估算时长的任务：光条来回流动，只说「在运行」，不假装有进度</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    speed: 1.6,        // 流动速度（秒）
+    count: 2,          // 光条数量（条）
+    thick: 6,          // 粗细（px）
+    round: 6,          // 圆角（px）
+    width: 300,        // 轨道宽度（px）
+    gap: 4,            // 光条间隔（px）
+    opa: 1,            // 透明度（0-1）
+    glow: false,       // 是否发光
+    color: "#1a1a1a",  // 光条主色
+    track: "#eee"      // 轨道底色
+  };
+  const rail = document.getElementById("rail");
+
+  function apply() {
+    const root = document.documentElement;
+    root.style.setProperty("--speed", state.speed + "s");
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--round", state.round + "px");
+    root.style.setProperty("--width", state.width + "px");
+    root.style.setProperty("--gap", state.gap + "px");
+    root.style.setProperty("--opa", state.opa);
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--count", state.count);
+    root.style.setProperty("--glow", state.glow
+      ? ("0 0 " + Math.max(8, state.thick * 2) + "px " + state.color + "66")
+      : "0 0 0 transparent");
+    // 按条数重建光条（错开延迟，像波浪）
+    rail.innerHTML = "";
+    for (let i = 0; i < state.count; i++) {
+      const b = document.createElement("div");
+      b.className = "indet";
+      if (i > 0) b.style.animationDelay = (-state.speed * i / state.count) + "s";
+      rail.appendChild(b);
+    }
+  }
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

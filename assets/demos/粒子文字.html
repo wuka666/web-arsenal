@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>粒子文字演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: #ffffff; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+  // 默认参数（父页面详情页可通过消息实时调）
+  const state = {
+    text: "墨点聚字", density: 7, size: 2.2, repel: 90, speed: 5.5,
+    color: "#181612", accent: "#3d5fd6", bg: "#ffffff", highlight: true
+  };
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, particles = [];
+  const pointer = { x: -9999, y: -9999 };
+  // 把 #rrggbb 转成 rgba() 字符串
+  const rgba = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  };
+
+  // 把文字画到离屏画布，按间隔采样出粒子目标点
+  function sample(text) {
+    const off = document.createElement("canvas");
+    const octx = off.getContext("2d");
+    const fs = Math.min(W, H) * 0.17;
+    octx.font = "900 " + fs + "px 'Microsoft YaHei', sans-serif";
+    const tw = octx.measureText(text).width;
+    off.width = Math.ceil(tw) + 40;
+    off.height = Math.ceil(fs * 1.8);
+    octx.font = "900 " + fs + "px 'Microsoft YaHei', sans-serif";
+    octx.textBaseline = "middle";
+    octx.fillStyle = "#000";
+    octx.fillText(text, 20, off.height / 2);
+    const data = octx.getImageData(0, 0, off.width, off.height).data;
+    const pts = [];
+    for (let y = 0; y < off.height; y += state.density) {
+      for (let x = 0; x < off.width; x += state.density) {
+        if (data[(y * off.width + x) * 4 + 3] > 128) {
+          pts.push({ x: x - off.width / 2, y: y - off.height / 2 });
+        }
+      }
+    }
+    return pts;
+  }
+
+  function init() {
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+    document.body.style.background = state.bg;
+    const pts = sample(state.text);
+    particles = pts.map(p => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      tx: W / 2 + p.x,
+      ty: H / 2 + p.y,
+      blue: state.highlight && Math.random() < 0.06,
+      drift: Math.random() * Math.PI * 2
+    }));
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    const k = state.speed / 100; // 回归速度（0-10 映射到 0-0.1）
+    for (const p of particles) {
+      const dx = p.x - pointer.x;
+      const dy = p.y - pointer.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < state.repel * state.repel) {
+        const d = Math.sqrt(d2) || 1;
+        p.x += (dx / d) * 3.2;
+        p.y += (dy / d) * 3.2;
+      }
+      p.x += (p.tx - p.x) * k;
+      p.y += (p.ty - p.y) * k;
+      p.drift += 0.008;
+      const gx = p.tx + Math.sin(p.drift) * 1.4;
+      const gy = p.ty + Math.cos(p.drift * 0.7) * 1.4;
+      p.x += (gx - p.x) * 0.03;
+      p.y += (gy - p.y) * 0.03;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, state.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.blue ? rgba(state.accent, .85) : rgba(state.color, .8);
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // 参数变了就重新采样粒子，让效果立即更新
+  function apply() {
+    init();
+  }
+
+  canvas.addEventListener("mousemove", e => { pointer.x = e.clientX; pointer.y = e.clientY; });
+  canvas.addEventListener("mouseleave", () => { pointer.x = -9999; pointer.y = -9999; });
+  canvas.addEventListener("touchmove", e => {
+    pointer.x = e.touches[0].clientX;
+    pointer.y = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener("resize", () => init());
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+
+  init();
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>

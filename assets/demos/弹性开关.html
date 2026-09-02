@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>弹性开关演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .switch {
+    border-radius: 999px;
+    background: var(--off, #e3e3e3); cursor: pointer; position: relative; user-select: none;
+    transition: background var(--dur, .25s) ease;
+  }
+  .knob {
+    position: absolute; top: 3px; left: 3px; border-radius: 50%;
+    width: var(--knob, 28px); height: var(--knob, 28px);
+    background: var(--knobc, #fff);
+    box-shadow: var(--sh, 0 2px 6px rgba(0,0,0,.22));
+  }
+  /* 开：滑钮起步横向拉长，落位压回原宽，体现质量感（行程 = 轨道宽 - 轨道高） */
+  .switch.on { background: var(--on, #1a1a1a); }
+  .switch.on .knob { animation: knobOn var(--dur, .3s) ease-out forwards; }
+  .switch.off .knob { animation: knobOff var(--dur, .3s) ease-out forwards; }
+  @keyframes knobOn {
+    0%   { transform: translateX(0) scaleX(1); }
+    40%  { transform: translateX(calc(var(--travel, 32px) / 2)) scaleX(var(--stretch, 1.28)); }
+    75%  { transform: translateX(var(--travel, 32px)) scaleX(.82); }
+    100% { transform: translateX(var(--travel, 32px)) scaleX(1); }
+  }
+  @keyframes knobOff {
+    0%   { transform: translateX(var(--travel, 32px)) scaleX(1); }
+    40%  { transform: translateX(calc(var(--travel, 32px) / 2)) scaleX(var(--stretch, 1.28)); }
+    75%  { transform: translateX(0) scaleX(.82); }
+    100% { transform: translateX(0) scaleX(1); }
+  }
+</style>
+</head>
+<body>
+<div class="switch" id="sw" role="switch" aria-checked="false"><span class="knob"></span></div>
+<p class="hint">点一下开关：滑钮先横向拉长，落位再压回原宽</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    stretch: 1.28, dur: 0.3, width: 66, height: 34,
+    trackOff: "#e3e3e3", trackOn: "#1a1a1a", knob: "#ffffff", shadow: true
+  };
+  const sw = document.getElementById("sw");
+  const root = document.documentElement;
+
+  function apply() {
+    const s = root.style;
+    s.setProperty("--stretch", state.stretch);
+    s.setProperty("--dur", state.dur + "s");
+    sw.style.width = state.width + "px";
+    sw.style.height = state.height + "px";
+    // 手柄直径 = 轨道高 - 6px 边距；行程 = 轨道宽 - 轨道高
+    s.setProperty("--knob", (state.height - 6) + "px");
+    s.setProperty("--travel", Math.max(state.width - state.height, 0) + "px");
+    s.setProperty("--off", state.trackOff);
+    s.setProperty("--on", state.trackOn);
+    s.setProperty("--knobc", state.knob);
+    s.setProperty("--sh", state.shadow ? "0 2px 6px rgba(0,0,0,.22)" : "none");
+  }
+
+  let on = false;
+  sw.addEventListener("click", () => {
+    on = !on;
+    sw.classList.toggle("on", on);
+    sw.classList.toggle("off", !on);
+    sw.setAttribute("aria-checked", on);
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

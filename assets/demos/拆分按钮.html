@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拆分按钮演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .split { display:inline-flex; box-shadow:0 6px 18px rgba(0,0,0,var(--shadow,.12)); border-radius:var(--radius,10px); }
+  .main {
+    border:0; outline:0; cursor:pointer; padding:12px 22px; font-size:var(--fs,15px); font-weight:700;
+    background:var(--main,#2563eb); color:var(--text,#fff); border-radius:var(--radius,10px) 0 0 var(--radius,10px);
+    font-family:inherit;
+  }
+  .arrow {
+    border:0; outline:0; cursor:pointer; padding:0 14px; display:flex; align-items:center; justify-content:center;
+    background:var(--acol,#1d4ed8); border-left:1px solid var(--div,#e5e7eb); border-radius:0 var(--radius,10px) var(--radius,10px) 0;
+    color:var(--text,#fff); font-size:var(--asize,14px);
+  }
+  .arrow svg { transition:transform var(--dur,.18s) ease; }
+  .split.open .arrow svg { transform:rotate(180deg); }
+  .menu {
+    position:absolute; min-width:180px; background:var(--mbg,#fff); border:1px solid var(--div,#e5e7eb);
+    border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,var(--shadow,.12)); overflow:hidden;
+    opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity var(--dur,.18s) ease, transform var(--dur,.18s) ease; z-index:5;
+  }
+  .split.open .menu { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .mi { padding:11px 16px; font-size:var(--fs,15px); color:#1f2937; cursor:pointer; }
+  .mi:hover { background:var(--hm,#f3f4f6); }
+  .mi.danger { color:#dc2626; }
+  .wrap { position:relative; display:inline-flex; }
+  .toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(10px); opacity:0;
+    background:#111827; color:#fff; padding:10px 18px; border-radius:10px; font-size:14px; transition:.2s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .hint { font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="split" id="split">
+      <button class="main" id="main">保存</button>
+      <button class="arrow" id="arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="menu" id="menu">
+        <div class="mi" data-a="保存并关闭">保存并关闭</div>
+        <div class="mi" data-a="另存为…">另存为…</div>
+        <div class="mi" data-a="导出 PDF">导出 PDF</div>
+        <div class="mi danger" data-a="删除">删除</div>
+      </div>
+    </div>
+  </div>
+  <p class="hint">点按钮主体执行默认 · 点箭头展开其他操作</p>
+  <div class="toast" id="toast"></div>
+<script>
+  const state = {
+    mainColor:"#2563eb", arrowColor:"#1d4ed8", text:"#ffffff", radius:10, fontSize:15, dur:0.18,
+    menuBg:"#ffffff", hoverMenu:"#f3f4f6", divLine:"#e5e7eb", shadow:0.12, arrowSize:14, defaultLabel:"保存"
+  };
+  const split=document.getElementById("split"), main=document.getElementById("main"), arrow=document.getElementById("arrow"),
+        menu=document.getElementById("menu"), toast=document.getElementById("toast");
+  let open=false, t=null;
+  function showToast(msg){ toast.textContent=msg; toast.classList.add("show"); clearTimeout(t); t=setTimeout(()=>toast.classList.remove("show"),1400); }
+  function toggle(){ open=!open; split.classList.toggle("open",open); }
+  arrow.onclick=(e)=>{ e.stopPropagation(); toggle(); };
+  main.onclick=()=> showToast("已执行：" + state.defaultLabel);
+  [...menu.children].forEach(mi=> mi.onclick=()=>{ showToast("已执行：" + mi.dataset.a); open=false; split.classList.remove("open"); });
+  document.addEventListener("click",e=>{ if(!split.contains(e.target)){ open=false; split.classList.remove("open"); } });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--main",state.mainColor); R.setProperty("--acol",state.arrowColor);
+    R.setProperty("--text",state.text); R.setProperty("--radius",state.radius+"px");
+    R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--dur",state.dur+"s");
+    R.setProperty("--mbg",state.menuBg); R.setProperty("--hm",state.hoverMenu);
+    R.setProperty("--div",state.divLine); R.setProperty("--shadow",state.shadow);
+    R.setProperty("--asize",state.arrowSize+"px");
+    main.textContent=state.defaultLabel;
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

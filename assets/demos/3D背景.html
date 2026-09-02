@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 背景演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: #101014; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  .fallback {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #8b8992; font-size: 14px; text-align: center; padding: 0 20px;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="fallback" id="fb" hidden>当前浏览器不支持 WebGL，换 Chrome / Edge 打开看 3D 效果</div>
+<script>
+  const canvas = document.getElementById("c");
+  const gl = canvas.getContext("webgl", { antialias: true, alpha: false });
+  if (!gl) {
+    document.getElementById("fb").hidden = false;
+    throw new Error("WebGL 不可用");
+  }
+
+  // 默认参数（父页面详情页可调）
+  const state = {
+    count: 260, speed: 4, fov: 60, size: 3.5, alpha: 0.9,
+    color: "#735cd9", color2: "#ffffff", bg: "#101014", glow: false
+  };
+  // hex → [r,g,b]（0-1）
+  const rgb = hex => {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  };
+
+  const vs = `
+    attribute vec3 aPos;
+    attribute float aMix;
+    varying float vMix;
+    uniform mat4 uMVP;
+    uniform float uDpr;
+    uniform float uSize;
+    void main() {
+      vMix = aMix;
+      gl_PointSize = uSize * uDpr;
+      gl_Position = uMVP * vec4(aPos, 1.0);
+    }`;
+  const fs = `
+    precision mediump float;
+    varying float vMix;
+    uniform vec3 uColor;
+    uniform vec3 uColor2;
+    uniform float uAlpha;
+    void main() {
+      vec2 d = gl_PointCoord - vec2(0.5);
+      if (dot(d, d) > 0.25) discard;
+      gl_FragColor = vec4(mix(uColor, uColor2, vMix), uAlpha);
+    }`;
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+    return sh;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const uMVP = gl.getUniformLocation(prog, "uMVP");
+  const uDpr = gl.getUniformLocation(prog, "uDpr");
+  const uSize = gl.getUniformLocation(prog, "uSize");
+  const uColor = gl.getUniformLocation(prog, "uColor");
+  const uColor2 = gl.getUniformLocation(prog, "uColor2");
+  const uAlpha = gl.getUniformLocation(prog, "uAlpha");
+  const posLoc = gl.getAttribLocation(prog, "aPos");
+  const mixLoc = gl.getAttribLocation(prog, "aMix");
+  let N = 260;
+  let posBuf = null, mixBuf = null;
+
+  // Fibonacci 球面：把 N 个点均匀撒在球上
+  function buildPoints(count) {
+    const pts = new Float32Array(count * 3);
+    const mixes = new Float32Array(count);
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < count; i++) {
+      const y = 1 - (i / (count - 1)) * 2;
+      const r = Math.sqrt(Math.max(0, 1 - y * y));
+      const th = golden * i;
+      pts[i * 3]     = Math.cos(th) * r;
+      pts[i * 3 + 1] = y;
+      pts[i * 3 + 2] = Math.sin(th) * r;
+      mixes[i] = Math.random();
+    }
+    return { pts, mixes };
+  }
+
+  function rebuild(count) {
+    const { pts, mixes } = buildPoints(count);
+    if (!posBuf) {
+      posBuf = gl.createBuffer();
+      mixBuf = gl.createBuffer();
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, pts, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, mixBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, mixes, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(mixLoc);
+    gl.vertexAttribPointer(mixLoc, 1, gl.FLOAT, false, 0, 0);
+    N = count;
+  }
+
+  // 参数变了：数量重新生成，颜色/大小/透明度/背景/混合模式立即更新
+  function apply() {
+    if (state.count !== N) rebuild(state.count);
+    gl.uniform3fv(uColor, rgb(state.color));
+    gl.uniform3fv(uColor2, rgb(state.color2));
+    gl.uniform1f(uSize, state.size);
+    gl.uniform1f(uAlpha, state.alpha);
+    gl.clearColor(...rgb(state.bg), 1);
+    // 发光：叠加混合，亮点互相加亮
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, state.glow ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
+    document.body.style.background = state.bg;
+    resize(); // 透视角度可能变了，重建投影矩阵
+  }
+
+  function perspective(fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2);
+    const o = new Float32Array(16);
+    o[0] = f / aspect; o[5] = f; o[10] = (far + near) / (near - far);
+    o[11] = -1; o[14] = (2 * far * near) / (near - far);
+    return o;
+  }
+  function mult(a, b) {
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) {
+      for (let r = 0; r < 4; r++) {
+        o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] +
+                       a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3];
+      }
+    }
+    return o;
+  }
+  function rotY(a) {
+    const c = Math.cos(a), s = Math.sin(a);
+    return new Float32Array([c, 0, s, 0,  0, 1, 0, 0,  -s, 0, c, 0,  0, 0, 0, 1]);
+  }
+  function rotX(a) {
+    const c = Math.cos(a), s = Math.sin(a);
+    return new Float32Array([1, 0, 0, 0,  0, c, -s, 0,  0, s, c, 0,  0, 0, 0, 1]);
+  }
+
+  let proj = null;
+  let rot = 0, tilt = 0.35;
+  const pointer = { x: 0, y: 0 };
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform1f(uDpr, dpr);
+    proj = perspective(state.fov * Math.PI / 180, w / h, 0.1, 10);
+  }
+
+  function frame() {
+    rot += 0.004 + state.speed * 0.00035 + pointer.x * 0.00025;
+    tilt = 0.35 + pointer.y * 0.00035;
+    gl.uniformMatrix4fv(uMVP, false, mult(proj, mult(rotY(rot), rotX(tilt))));
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, N);
+    requestAnimationFrame(frame);
+  }
+
+  canvas.addEventListener("mousemove", e => {
+    pointer.x = (e.clientX / innerWidth - 0.5) * 2;
+    pointer.y = (e.clientY / innerHeight - 0.5) * 2;
+  });
+  canvas.addEventListener("touchmove", e => {
+    pointer.x = (e.touches[0].clientX / innerWidth - 0.5) * 2;
+    pointer.y = (e.touches[0].clientY / innerHeight - 0.5) * 2;
+  }, { passive: true });
+  window.addEventListener("resize", () => resize());
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+
+  resize();
+  apply();
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>

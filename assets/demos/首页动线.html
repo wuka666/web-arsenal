@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首页动线方案</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--page, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif; padding: 20px;
+  }
+  .plan { width: min(560px, 94vw); }
+  .plan h1 { font-size: 26px; font-weight: 800; color: var(--ink, #1a1a1a); }
+  .aim { margin-top: 6px; font-size: 14px; color: #8a8a85; }
+  .steps { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--card, #faf9f6); border: 1px solid #ecebe7;
+    border-radius: var(--r, 12px); padding: 12px 14px;
+    font-size: 14px; line-height: 1.7; color: #555;
+  }
+  .step b { color: var(--ink, #1a1a1a); white-space: nowrap; }
+  .flow { margin-top: 20px; display: flex; flex-direction: column; gap: var(--gap, 8px); }
+  .flow div {
+    border-radius: var(--flow-r, 10px); padding: 14px; text-align: center;
+    font-size: 13.5px; font-weight: 600;
+  }
+  /* 焦点区：三色渐变，三个颜色独立可调 */
+  .f1 { background: linear-gradient(135deg, var(--a1, #7b5cff), var(--a2, #ff5c8a) 50%, var(--a3, #3ec6ff)); color: #fff; }
+  .f2, .f4 { background: var(--flow-bg, #f2f0eb); }
+  .f3 { background: var(--ink, #1a1a1a); color: #fff; }
+</style>
+</head>
+<body>
+  <div class="plan">
+    <h1>首页动线</h1>
+    <p class="aim">目的：让访客从上到下，一步一步被带着走</p>
+    <div class="steps">
+      <div class="step"><b>① 焦点</b> 一上来先给最吸睛的画面（大图/彩光/动画）</div>
+      <div class="step"><b>② 信息</b> 一句话说清你是干嘛的，3 秒看懂</div>
+      <div class="step"><b>③ 行动</b> 只给一个主按钮，让访客点</div>
+      <div class="step"><b>④ 证明</b> 数据 / 特性 / 合作方，让访客放心</div>
+    </div>
+    <div class="flow">
+      <div class="f1">① 焦点（最吸睛）</div>
+      <div class="f2">② 信息（价值主张）</div>
+      <div class="f3">③ 行动（主按钮）</div>
+      <div class="f4">④ 证明（数据 / 特性）</div>
+    </div>
+  </div>
+  <script>
+    // 默认参数（父页面详情页可调）
+    const state = {
+      accent1: "#7b5cff", accent2: "#ff5c8a", accent3: "#3ec6ff", dark: "#1a1a1a",
+      bg: "#ffffff", cardBg: "#faf9f6", flowBg: "#f2f0eb", radius: 12, gap: 8
+    };
+
+    // 参数变了：全部走 CSS 变量，颜色/圆角/间距实时变
+    function apply() {
+      const s = document.documentElement.style;
+      s.setProperty("--a1", state.accent1);
+      s.setProperty("--a2", state.accent2);
+      s.setProperty("--a3", state.accent3);
+      s.setProperty("--ink", state.dark);
+      s.setProperty("--page", state.bg);
+      s.setProperty("--card", state.cardBg);
+      s.setProperty("--flow-bg", state.flowBg);
+      s.setProperty("--r", state.radius + "px");
+      s.setProperty("--gap", state.gap + "px");
+    }
+
+    // 接收父页面（index.html 详情页）传来的参数
+    window.addEventListener("message", (e) => {
+      const d = e.data;
+      if (!d || d.type !== "param") return;
+      state[d.key] = d.value;
+      apply();
+    });
+    apply();
+  </script>
+</body>
+</html>

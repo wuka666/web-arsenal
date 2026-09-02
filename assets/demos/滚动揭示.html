@@ -1,0 +1,68 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{ --ease: cubic-bezier(.44,0,.56,1); }
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:220vh;background:#fafafa;}
+  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+  .replay{position:fixed;right:12px;top:12px;z-index:9;padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;font-size:13px;cursor:pointer}
+  .wrap{width:var(--width);max-width:92vw;margin:0 auto;padding:14vh 16px;display:flex;flex-direction:column;gap:16vh;}
+  /* 区块初始：下移 dist + 透明度 opStart；进入视口加 .in 复位，缓动平滑进出 */
+  .block{background:var(--bg);color:var(--fg);border-radius:var(--radius);padding:46px 40px;
+    text-align:var(--align);line-height:1.6;font-size:17px;
+    opacity:var(--opStart);transform:translateY(var(--dist));
+    transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease),filter var(--dur) var(--ease);}
+  .block.in{opacity:1;transform:translateY(0);}
+  .block.bf{filter:blur(12px);} .block.in.bf{filter:blur(0);}
+  .block b{font-size:22px;display:block;margin-bottom:8px}
+</style></head>
+<body>
+  <button class="replay" id="rp">重播</button>
+  <div class="wrap" id="wrap">
+    <div class="block"><b>滚动揭示</b>区块进入视口时，从下方淡入并上移到位，缓动平滑进出。</div>
+    <div class="block"><b>错峰延迟</b>每个区块按索引延迟 stagger 秒依次入场，形成节奏感。</div>
+    <div class="block"><b>可调参数</b>位移、时长、透明度、模糊、阈值都能实时改，方便搭效果。</div>
+    <div class="block"><b>适配多页</b>适合落地页、产品介绍等分节内容逐个揭示。</div>
+  </div>
+  <div class="hint">向下滚动 / 调右侧参数看变化</div>
+  <script>
+  const state = {
+    dist: 40, dur: 0.8, opStart: 0, blur: false, thresh: 0.2, stagger: 0.12,
+    bg: "#0e0e0e", fg: "#f5f5f5", radius: 16, width: 560, align: "左"
+  };
+  const root = document.documentElement;
+  const wrap = document.getElementById("wrap");
+  const blocks = [...wrap.children];
+  function apply(){
+    // 把 state 落到 CSS 变量，所有参数实时生效
+    root.style.setProperty("--dist", state.dist + "px");
+    root.style.setProperty("--dur", state.dur + "s");
+    root.style.setProperty("--opStart", state.opStart);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--fg", state.fg);
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--width", state.width + "px");
+    root.style.setProperty("--align", state.align === "左" ? "left" : state.align === "右" ? "right" : "center");
+    // 模糊开关 + 错峰延迟逐块写入
+    blocks.forEach((b,i)=>{
+      b.classList.toggle("bf", state.blur);
+      b.style.transitionDelay = (i * state.stagger) + "s";
+    });
+  }
+  let io;
+  function reset(){ // 重播：清状态并重新用 IntersectionObserver 观察
+    blocks.forEach(b=>b.classList.remove("in"));
+    if(io) io.disconnect();
+    io = new IntersectionObserver((es)=>{
+      es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("in"); });
+    }, { threshold: state.thresh });
+    blocks.forEach(b=>io.observe(b));
+  }
+  document.getElementById("rp").onclick = reset;
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply(); reset();
+  });
+  apply(); reset();
+  </script>
+</body></html>

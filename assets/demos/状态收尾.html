@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>状态收尾演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .hint { font-size: 13px; color: #999; }
+  .action {
+    position: relative; overflow: hidden; cursor: pointer; user-select: none; border: none; outline: none;
+    background: var(--btnbg, #1a1a1a); color: var(--btnc, #fff);
+    font-size: 16px; font-weight: 700; letter-spacing: 2px;
+    width: var(--w, 200px); height: var(--h, 52px); border-radius: var(--radius, 14px);
+    transition: width var(--dur, .45s) cubic-bezier(.32,.72,0,1),
+                height var(--dur, .45s) cubic-bezier(.32,.72,0,1),
+                border-radius var(--dur, .45s) ease,
+                background var(--dur, .45s) ease;
+  }
+  /* 收尾：任务完成后，按钮变形为对勾提示状态（不是弹个新框） */
+  .action.done {
+    width: var(--final, 52px); height: var(--final, 52px);
+    border-radius: 50%; background: var(--ok, #16a34a); cursor: default;
+  }
+  .action .txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transition: opacity .2s ease; }
+  .action .tick {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0;
+  }
+  .action.done .txt { opacity: 0; }
+  .action.done .tick { opacity: 1; }
+  .tick svg { width: 26px; height: 26px; }
+  .tick path {
+    fill: none; stroke: var(--tickc, #fff); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 26; stroke-dashoffset: 26;
+    animation: drawTick var(--dur, .45s) ease .15s forwards;
+  }
+  @keyframes drawTick { to { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+<button class="action" id="act">
+  <span class="txt" id="txt">保存设置</span>
+  <span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>
+</button>
+<p class="hint">点一下：按钮自己变形为「已保存 ✓」，不用弹新窗口</p>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    dur: 0.45,           // 收尾变形时长（秒）
+    text: "保存设置",     // 按钮文字
+    w: 200,              // 按钮宽度（px）
+    h: 52,               // 按钮高度（px）
+    radius: 14,          // 按钮圆角（px）
+    finalSize: 52,       // 收尾圆形直径（px）
+    success: "#16a34a",  // 成功色
+    btnBg: "#1a1a1a",    // 按钮底色
+    btnColor: "#ffffff", // 按钮文字颜色
+    tickColor: "#ffffff" // 对勾颜色
+  };
+  const act = document.getElementById("act");
+  const txt = document.getElementById("txt");
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty("--dur", state.dur + "s");
+    R.setProperty("--w", state.w + "px");
+    R.setProperty("--h", state.h + "px");
+    R.setProperty("--radius", state.radius + "px");
+    R.setProperty("--final", state.finalSize + "px");
+    R.setProperty("--ok", state.success);
+    R.setProperty("--btnbg", state.btnBg);
+    R.setProperty("--btnc", state.btnColor);
+    R.setProperty("--tickc", state.tickColor);
+    txt.textContent = state.text; // 按钮文字实时可改
+  }
+
+  act.addEventListener("click", () => {
+    if (act.classList.contains("done")) return;
+    act.classList.add("done");
+    act.setAttribute("aria-label", "已完成");
+    setTimeout(() => act.classList.remove("done"), 2400);
+  });
+
+  // 接收父页面（index.html 详情页）传来的参数
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多选下拉演示</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f5f6f8; font-family:system-ui,"Microsoft YaHei",sans-serif; }
+  .field { position:relative; width:300px; }
+  .trigger {
+    min-height:46px; display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:8px 12px; background:#fff;
+    border:1px solid var(--border,#d1d5db); border-radius:var(--radius,10px); cursor:pointer; user-select:none;
+    box-shadow:0 4px 14px rgba(0,0,0,.12); transition:border-color .15s;
+  }
+  .field.open .trigger { border-color:var(--theme,#2563eb); }
+  .trigger .ph { color:#9ca3af; font-size:var(--fs,15px); }
+  .tag {
+    display:inline-flex; align-items:center; gap:6px; padding:4px 8px; background:var(--tagbg,#dbeafe);
+    color:var(--tagtext,#1e40af); border-radius:var(--tr,6px); font-size:13px; font-weight:600;
+  }
+  .tag b { cursor:pointer; font-weight:700; opacity:.7; }
+  .tag b:hover { opacity:1; }
+  .caret { margin-left:auto; color:#6b7280; transition:transform var(--dur,.2s) ease; }
+  .field.open .caret { transform:rotate(180deg); }
+  .menu {
+    position:absolute; top:calc(100% + 6px); left:0; right:0; background:#fff; border:1px solid var(--border,#d1d5db);
+    border-radius:var(--radius,10px); box-shadow:0 10px 30px rgba(0,0,0,.12); max-height:260px; overflow:auto;
+    opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity var(--dur,.2s) ease, transform var(--dur,.2s) ease; z-index:5; padding:6px;
+  }
+  .field.open .menu { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .opt { display:flex; align-items:center; gap:10px; padding:9px 12px; font-size:var(--fs,15px); color:var(--text,#1f2937); border-radius:7px; cursor:pointer; }
+  .opt:hover { background:var(--hover,#eff6ff); }
+  .box { width:16px; height:16px; border:2px solid var(--border,#d1d5db); border-radius:5px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .opt.on .box { background:var(--theme,#2563eb); border-color:var(--theme,#2563eb); }
+  .opt.on .box::after { content:"✓"; color:#fff; font-size:12px; }
+  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+  <div class="field" id="field">
+    <div class="trigger" id="trigger">
+      <span class="ph" id="ph">请选择（可多选）</span>
+      <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="menu" id="menu"></div>
+  </div>
+  <p class="hint">选中以标签呈现 · 可删除 · 数量与结果同步</p>
+<script>
+  const OPTIONS = ["设计","前端","后端","产品","运营","测试","数据","算法"];
+  const state = {
+    theme:"#2563eb", tagBg:"#dbeafe", text:"#1f2937", radius:10, fontSize:15, dur:0.2,
+    border:"#d1d5db", hoverBg:"#eff6ff", tagText:"#1e40af", tagRadius:6, placeholder:"请选择（可多选）", maxTags:0
+  };
+  const field=document.getElementById("field"), trigger=document.getElementById("trigger"), ph=document.getElementById("ph"), menu=document.getElementById("menu");
+  let sel=[], open=false;
+  function buildMenu(){
+    menu.innerHTML="";
+    OPTIONS.forEach(o=>{
+      const d=document.createElement("div"); d.className="opt"+(sel.includes(o)?" on":"");
+      d.innerHTML='<span class="box"></span><span>'+o+'</span>';
+      d.onclick=()=>{ sel.includes(o)?sel=sel.filter(x=>x!==o):sel.push(o); renderTags(); buildMenu(); };
+      menu.appendChild(d);
+    });
+  }
+  function renderTags(){
+    trigger.querySelectorAll(".tag").forEach(t=>t.remove());
+    const show = state.maxTags>0 ? sel.slice(0,state.maxTags) : sel;
+    const extra = state.maxTags>0 ? sel.length-state.maxTags : 0;
+    show.forEach(o=>{
+      const t=document.createElement("span"); t.className="tag"; t.innerHTML='<span>'+o+'</span><b>×</b>';
+      t.querySelector("b").onclick=(e)=>{ e.stopPropagation(); sel=sel.filter(x=>x!==o); renderTags(); buildMenu(); };
+      trigger.insertBefore(t, trigger.querySelector(".caret"));
+    });
+    if(extra>0){ const t=document.createElement("span"); t.className="tag"; t.innerHTML='<span>+'+extra+'</span>'; trigger.insertBefore(t, trigger.querySelector(".caret")); }
+    ph.style.display = sel.length ? "none" : "";
+  }
+  trigger.onclick=()=>{ open=!open; field.classList.toggle("open",open); };
+  document.addEventListener("click",e=>{ if(!field.contains(e.target)){ open=false; field.classList.remove("open"); } });
+  function apply(){
+    const R=document.documentElement.style;
+    R.setProperty("--theme",state.theme); R.setProperty("--tagbg",state.tagBg); R.setProperty("--text",state.text);
+    R.setProperty("--radius",state.radius+"px"); R.setProperty("--fs",state.fontSize+"px"); R.setProperty("--dur",state.dur+"s");
+    R.setProperty("--border",state.border); R.setProperty("--hover",state.hoverBg); R.setProperty("--tagtext",state.tagText);
+    R.setProperty("--tr",state.tagRadius+"px");
+    ph.textContent=state.placeholder;
+    buildMenu(); renderTags();
+  }
+  window.addEventListener("message",e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

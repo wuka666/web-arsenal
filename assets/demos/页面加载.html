@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面加载演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+    overflow: hidden;
+  }
+  .loader {
+    position: fixed; inset: 0; background: var(--bg, #fff); z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--gap, 22px);
+    transition: opacity var(--dur, .5s) ease, visibility var(--dur, .5s) ease;
+  }
+  .loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  .logo { font-size: var(--logoSize, 30px); font-weight: 900; letter-spacing: var(--letter, 4px); color: var(--color, #1a1a1a); }
+  .logo span { opacity: 0; animation: popIn .5s ease forwards; display: inline-block; }
+  .logo span:nth-child(1) { animation-delay: .1s; }
+  .logo span:nth-child(2) { animation-delay: .2s; }
+  .logo span:nth-child(3) { animation-delay: .3s; }
+  .logo span:nth-child(4) { animation-delay: .4s; }
+  @keyframes popIn { to { opacity: 1; } }
+  .loader-bar {
+    width: var(--barW, 160px); height: var(--barH, 4px); border-radius: var(--barH, 4px); background: var(--track, #eee); overflow: hidden;
+  }
+  .loader-fill {
+    height: 100%; width: 40%; border-radius: var(--barH, 4px);
+    background: var(--color, #1a1a1a);
+    animation: fillSlide var(--speed, 1.2s) ease-in-out infinite;
+  }
+  @keyframes fillSlide {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+  }
+  .loader-tip { font-size: var(--tipSize, 13px); color: #999; }
+  .page {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    padding: 40px; text-align: center;
+  }
+  .page h2 { font-size: 28px; }
+  .page p { font-size: 14px; color: #666; max-width: 420px; line-height: 1.8; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 10px 24px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="loader" id="loader">
+  <div class="logo" id="logo"><span id="logoText"></span></div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-tip" id="tip">页面内容准备中…</div>
+</div>
+<div class="page">
+  <h2>页面主体</h2>
+  <p>首次打开或核心内容未加载完成时，先展示全屏加载层；就绪后整体淡出，露出页面主体。</p>
+  <button class="btn" id="btn">重播加载</button>
+</div>
+<script>
+  // 默认参数（父页面详情页可调）
+  const state = {
+    wait: 2,            // 加载层显示时长（秒）
+    dur: 0.5,           // 淡出时长（秒）
+    speed: 1.2,         // 内部进度条跑动速度（秒）
+    letter: 4,          // 标字母距（px）
+    gap: 22,            // 内部元素间距（px）
+    logoSize: 30,       // Logo 字号（px）
+    barW: 160,          // 进度条宽度（px）
+    barH: 4,            // 进度条粗细（px）
+    tipSize: 13,        // 提示字号（px）
+    showTip: true,      // 是否显示底部提示
+    spinnerOnly: false, // 是否只用旋转图标（不用进度条）
+    brand: "加载完成",  // 品牌名/Logo 文字
+    tip: "页面内容准备中…", // 提示文案
+    bg: "#ffffff",      // 加载层底色
+    color: "#1a1a1a",   // 主色
+    track: "#eeeeee"    // 进度条轨道色
+  };
+  const loader = document.getElementById("loader");
+  const logoText = document.getElementById("logoText");
+  const tipEl = document.getElementById("tip");
+
+  function apply() {
+    const root = document.documentElement;
+    root.style.setProperty("--dur", state.dur + "s");
+    root.style.setProperty("--speed", state.speed + "s");
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--logoSize", state.logoSize + "px");
+    root.style.setProperty("--letter", state.letter + "px");
+    root.style.setProperty("--gap", state.gap + "px");
+    root.style.setProperty("--barW", state.barW + "px");
+    root.style.setProperty("--barH", state.barH + "px");
+    root.style.setProperty("--tipSize", state.tipSize + "px");
+    logoText.innerHTML = "";
+    for (const ch of state.brand) {
+      const s = document.createElement("span");
+      s.textContent = ch;
+      logoText.appendChild(s);
+    }
+    tipEl.textContent = state.tip;
+    tipEl.style.display = state.showTip ? "block" : "none";
+    document.querySelector(".loader-bar").style.display = state.spinnerOnly ? "none" : "block";
+  }
+
+  function play() {
+    loader.classList.remove("hide");
+    setTimeout(() => loader.classList.add("hide"), state.wait * 1000);
+  }
+  document.getElementById("btn").addEventListener("click", play);
+
+  window.addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.type !== "param") return;
+    state[d.key] = d.value;
+    apply();
+  });
+  apply();
+  play();
+</script>
+</body>
+</html>
