@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>粒子星系 · Three.js 完整版</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #000; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+  .panel-toggle {
+    position: fixed; right: 16px; bottom: 16px; z-index: 10;
+    width: 40px; height: 40px; border-radius: 999px;
+    background: #ffffff1f; border: 0; color: #ffffffcc; font-size: 18px; cursor: pointer; transition: background .15s;
+    display: grid; place-items: center;
+  }
+  .panel-toggle:hover { background: #ffffff33; }
+  .panel {
+    position: fixed; right: 16px; bottom: 64px; z-index: 10;
+    width: 280px; max-height: 70vh; overflow-y: auto;
+    background: #111; border: 1px solid #ffffff1a; border-radius: 12px;
+    padding: 16px; display: none; flex-direction: column; gap: 10px;
+  }
+  .panel.open { display: flex; }
+  .panel h3 { color: #ffffff99; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin: 4px 0 2px; }
+  .panel label { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #ffffffcc; font-size: 13px; }
+  .panel input[type="range"] { width: 120px; accent-color: #ffffff; }
+  .panel input[type="color"] { width: 60px; height: 24px; border: 0; background: transparent; cursor: pointer; }
+  .panel select { background: #222; color: #fff; border: 1px solid #ffffff33; border-radius: 6px; padding: 2px 6px; font-size: 12px; }
+  .panel .note { color: #ffffff66; font-size: 11px; margin-top: 4px; }
+  .hint { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); color: #ffffff40; font: 400 13px / 1.4 system-ui, sans-serif; letter-spacing: .02em; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="astra"></canvas>
+<p class="hint">拖动旋转 · 划过推开星尘 · 右下角调参</p>
+<button class="panel-toggle" id="toggle" aria-label="调参面板">⚙</button>
+<div class="panel" id="panel">
+  <h3>星场</h3>
+  <label>星数 <b id="v-starCount">4000</b><input id="starCount" type="range" min="800" max="12000" step="200" value="4000"></label>
+  <label>星星大小 <b id="v-size">2.05</b><input id="size" type="range" min="0.5" max="3" step="0.05" value="2.05"></label>
+  <label>星带宽度 <b id="v-scatter">0.041</b><input id="scatter" type="range" min="0" max="0.14" step="0.001" value="0.041"></label>
+  <label>背景星 <b id="v-backgroundRatio">0.14</b><input id="backgroundRatio" type="range" min="0" max="1" step="0.02" value="0.14"></label>
+  <label>厚度 <b id="v-rotationDepth">1.4</b><input id="rotationDepth" type="range" min="0" max="2" step="0.05" value="1.4"></label>
+  <label>调色板 <select id="palette"><option value="astra">Astra</option><option value="aurora">Aurora</option><option value="ember">Ember</option><option value="ice">Ice</option><option value="gold">Gold</option></select></label>
+  <h3>光学</h3>
+  <label>Bloom 强度 <b id="v-bloomIntensity">0.7</b><input id="bloomIntensity" type="range" min="0" max="2" step="0.05" value="0.7"></label>
+  <label>Bloom 阈值 <b id="v-bloomThreshold">0.08</b><input id="bloomThreshold" type="range" min="0" max="0.6" step="0.01" value="0.08"></label>
+  <label>整体亮度 <b id="v-intensity">1.35</b><input id="intensity" type="range" min="0.2" max="3" step="0.05" value="1.35"></label>
+  <label>镜头光晕 <b id="v-flare">0.28</b><input id="flare" type="range" min="0" max="1" step="0.02" value="0.28"></label>
+  <label>氛围色 <input id="ambientColor" type="color" value="#23435f"></label>
+  <label>暗角 <b id="v-vignette">1</b><input id="vignette" type="range" min="0" max="1" step="0.05" value="1"></label>
+  <h3>动态</h3>
+  <label>流动速度 <b id="v-flowSpeed">0.8</b><input id="flowSpeed" type="range" min="0" max="3" step="0.05" value="0.8"></label>
+  <label>闪烁速度 <b id="v-twinkleSpeed">0.62</b><input id="twinkleSpeed" type="range" min="0" max="2" step="0.02" value="0.62"></label>
+  <p class="note">调参后通过 postMessage({type:'param',key,value}) 实时更新<br>注意：本文件需 HTTP 服务才能运行（npx serve .）</p>
+</div>
+
+<script type="module">
+  import { createAstraScene, detectWebGL, renderStaticFallback } from '../库/starflow.js'
+
+  const canvas = document.getElementById('astra')
+  const state = {
+    starCount: 4000, size: 2.05, scatter: 0.041, backgroundRatio: 0.14,
+    rotationDepth: 1.4, palette: 'astra',
+    bloomIntensity: 0.7, bloomThreshold: 0.08, intensity: 1.35,
+    flare: 0.28, ambientColor: '#23435f', vignette: 1,
+    flowSpeed: 0.8, twinkleSpeed: 0.62
+  }
+
+  let astra = null
+
+  function init() {
+    if (astra) { astra.dispose(); astra = null }
+    if (!detectWebGL()) {
+      renderStaticFallback(canvas, { type: 'galaxy' }, { starCount: state.starCount, palette: state.palette, scatter: state.scatter })
+      return
+    }
+    astra = createAstraScene(canvas, {
+      flowSpeed: state.flowSpeed, bloomIntensity: state.bloomIntensity, bloomThreshold: state.bloomThreshold,
+      intensity: state.intensity, lensFlare: { intensity: state.flare },
+      ambientColor: state.ambientColor, ambientOpacity: 0.55, vignette: state.vignette,
+      twinkleSpeed: state.twinkleSpeed, size: state.size, introDuration: 3,
+    })
+    astra.setSource({ type: 'galaxy' }, {
+      starCount: state.starCount, scatter: state.scatter, size: state.size,
+      palette: state.palette, backgroundRatio: state.backgroundRatio, rotationDepth: state.rotationDepth,
+    })
+  }
+
+  init()
+
+  const panel = document.getElementById('panel')
+  document.getElementById('toggle').addEventListener('click', () => panel.classList.toggle('open'))
+
+  function bindSlider(id, key) {
+    const el = document.getElementById(id)
+    const val = document.getElementById('v-' + id)
+    el.addEventListener('input', () => {
+      const v = parseFloat(el.value)
+      val.textContent = v
+      state[key] = v
+      if (astra) {
+        if (['starCount','scatter','backgroundRatio','rotationDepth','palette'].includes(key)) {
+          astra.dispose(); init()
+        } else {
+          astra.setConfig?.({ [key]: v })
+        }
+      }
+    })
+  }
+
+  ;['starCount','size','scatter','backgroundRatio','rotationDepth','bloomIntensity','bloomThreshold','intensity','flare','vignette','flowSpeed','twinkleSpeed'].forEach(k => bindSlider(k, k))
+
+  document.getElementById('palette').addEventListener('change', e => {
+    state.palette = e.target.value; if (astra) { astra.dispose(); init() }
+  })
+  document.getElementById('ambientColor').addEventListener('input', e => {
+    state.ambientColor = e.target.value; if (astra) astra.setConfig?.({ ambientColor: state.ambientColor })
+  })
+
+  window.addEventListener('message', e => {
+    const d = e.data; if (!d || d.type !== 'param') return
+    state[d.key] = d.value
+    if (['starCount','scatter','backgroundRatio','rotationDepth','palette'].includes(d.key)) {
+      if (astra) { astra.dispose(); init() }
+    } else if (astra) { astra.setConfig?.({ [d.key]: d.value }) }
+  })
+</script>
+</body>
+</html>

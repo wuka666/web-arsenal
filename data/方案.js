@@ -3181,5 +3181,170 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
       }
     ],
     来源: "素材库 s205 焦点型Hero（2026-09-07 并入方案库）"
+  },
+  {
+    id: "s206",
+    风格名: "星流/Astra 暗色发布页",
+    骨架: "粒子星系 + 滚动编排 + 暗色内容",
+    配色: {
+      "黑(底)": "55%",
+      "白(文字)": "18%",
+      "氛围蓝(环境)": "15%",
+      "半透白(装饰)": "12%"
+    },
+    布局骨架: "固定 Canvas 粒子星系（全屏，z-index 0）+ 内容层叠（z-index 1）+ 顶栏/底部控制（z-index 2）。首屏全屏无遮挡，内容区居左 669px 窄栏，两侧留空让星轨通过。形状 cue 区 576px × 80vh 居中展示。",
+    重色落点: "黑底托底不抢戏，白字/胶囊控件做交互焦点，氛围蓝（#23435f）渐变为环境色——整个页面的视觉重心在运动的星系本身，文字只是标注。",
+    第一屏内容: "全屏星系（无文案）+ 顶栏语言切换/调参按钮。首屏下方两个标签（如「星流 / Starflow」）逐字入场，之后向下滚动触发翻转→散开→形状。",
+    删减元素: "去渐变、去阴影、去毛玻璃以外的任何装饰、去滚动动效（只有星星响应滚动，文字无 parallax）、去导航菜单（只有语言切换和调参）。",
+    适用: "AI 产品发布 / 模型发布 / 品牌升级 /「新一代」揭幕 / 任何想要沉浸式首屏的场景",
+    禁忌: "信息密集页 / 多任务页 / 需要快速传达功能的产品页",
+    参考站: [
+      "OpenAI GPT-6 Astra 发布页",
+      "Win-Hao/starflow (GitHub)",
+      "OpenAI 官网"
+    ],
+    我的说明: "星流/Astra 暗色发布页 = 粒子星系做背景 + 窄栏内容 + 滚动编排。核心不是技术（Three.js 粒子系统），而是「把活的星系当作视觉语言」：星系翻转代表「让位」、散开代表「让出空间」、聚成形状代表「能力显现」——视觉叙事，不是装饰。黑白配色 + 氛围蓝 + 胶囊控件 = 极克制设计语言，所有注意力留给星星。在线版：https://win-hao.github.io/starflow/。\n\n如果需要更传统的发布页布局（大标题+图表+对比），应该用 Codex 发布页那种结构化布局而非此方案。",
+    Agent提示词: `【星流/Astra 暗色发布页 · 设计语言宪法】
+效力声明：本文件为本方案的唯一设计权威，采用 Google Stitch DESIGN.md 范式。若对条文写法有疑问，可先查阅 https://github.com/VoltAgent/awesome-design-md 仓库内的 DESIGN.md 范本再输出。优先级：本宪法 > 具体需求描述 > 通用审美经验。任何冲突一律以本宪法为准，不得自行更改取值或添加风格。
+
+第一章 总纲 · 设计哲学
+把「活的星系」当视觉语言，不是装饰：星系翻转=让位、散开=让出空间、聚成形状=能力显现。黑白 + 氛围蓝 + 胶囊控件 = 极克制设计语言，所有注意力留给星星。页面为暗色沉浸式发布页。
+
+第二章 设计 Token 法典（取值唯一，禁止近似值）
+2.1 颜色 colors
+  底 --di #000000（页面唯一画布色）
+  主文字 --zi #ffffff
+  次级文字 --cizi #ffffff99
+  氛围蓝 --ambient #23435f（环境光，仅允许以向外渐变形式存在）
+  玻璃底 --glass #ffffff1f（玻璃控件底色）
+  cue 说明 --caption #fafafad9
+  主按钮：底 #ffffff、字 #000000
+2.2 字体 typography
+  字体栈：HarmonyOS Sans SC / MiSans / PingFang SC / 微软雅黑
+  正文 17px / 行高 1.65 / 字距 0
+  大标题 display 字重、clamp(32px, 5vw, 64px)
+  小标签 14px / 字距 .08em（如「星流 / Starflow」）
+  拉丁词（Starflow）可收 -0.04em 负字距
+2.3 圆角 rounded
+  胶囊 9999px：一切按钮、标签、控件
+  cue 形状外框 10px
+2.4 间距 spacing
+  段间距 24px；内容窄栏最大宽 669px；首屏内边距 26vh；cue 形状区 576px × 80vh 居中
+2.5 动效 motion
+  星系约 4000 星、沿 5 旋臂流动 + 闪烁 + Bloom 辉光 + 镜头光晕 + 暗角；可拖拽旋转视角、划过推开星尘；向下滚动触发星系翻转→散开→聚成形状；文字不响应滚动
+2.6 层级 layout
+  星系 Canvas fixed inset-0（z0）→ 内容层（z1）→ 顶栏/底部控制（z2）
+
+第三章 组件规范 components（全部引用第二章 token）
+  顶栏 topbar：fixed 顶部、右对齐；玻璃胶囊按钮（语言切换 / 调参），底 --glass、字 --zi
+  主按钮 btn-primary：底 #ffffff、字 #000000、圆角 9999px、高 40px
+  玻璃按钮 btn-glass：底 #ffffff1f、字 #fff、hover 提亮
+  首屏标签 brand-tag：「星流 / Starflow」逐字入场，小标签规格
+  cue 区 cue-target：576px × 80vh 居中，展示星系聚成形状 + 下方 caption 说明文字
+
+第四章 布局法
+  首屏全屏星系、无文案；内容窄栏居左 669px、两侧留空让星轨通过；cue 形状区 80vh 居中；段间距 24px
+
+第五章 降级条款
+  无 WebGL 时星系降级为 Canvas 2D 版，布局、配色一律不变，禁止因降级改动排版
+
+第六章 禁忌条款（绝对禁止）
+  不加渐变（除氛围光）、不加阴影、不加毛玻璃以外的装饰、文字不做 parallax、不加导航菜单；信息密集页 / 多任务页禁用本设计语言
+
+第七章 执行令
+  现在把下面这段【页面内容】套进上面的设计语言里，输出完整 HTML：
+`,
+    演示页: "assets/demos/方案-Astra暗色发布页.html",
+    ThreeJS演示: "assets/demos/粒子星系-ThreeJS.html",
+    下载: "assets/库/starflow.js",
+    代码: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>产品名 · Astra 暗色发布页</title>
+<style>
+  /* openai-astra tokens */
+  :root{--zhucai:#ffffff;--zhongdian:#7EC8E3;--di:#000000;--zi:#ffffff;--cizi:#ffffff99;--yuanjiao:10px;--jianju:10px;--zihao:17px;--yinying:0;--faguang:0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{margin:0;background:var(--di);color:var(--zi);font:400 var(--zihao,17px)/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.01em}
+  .stage{position:fixed;inset:0;z-index:0;background:var(--di)}
+  #astra{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:pan-y pinch-zoom;cursor:grab}
+  .page{position:relative;z-index:1;pointer-events:none}
+  .page a,.page button{pointer-events:auto}
+  .hero{height:100svh}
+  .copy{max-width:669px;margin:0 auto;padding:26vh 24px}
+  .copy h2{margin:0 0 16px;font:500 30px/1.32 var(--font-display,system-ui);letter-spacing:-.01em}
+  .copy p{margin:0 0 24px;color:var(--cizi)}
+  .cue{display:flex;flex-direction:column;align-items:center;gap:16px;padding:18vh 24px}
+  .cue-target{width:min(576px,100%);height:80svh;display:flex;align-items:center;justify-content:center}
+  .caption{margin:0;font:500 14px/1.5 system-ui;letter-spacing:.08em;color:#fafafad9}
+  .cue-note{max-width:440px;margin:0;text-align:center;font-size:14px;line-height:1.7;color:var(--cizi)}
+  .btn{display:inline-flex;align-items:center;min-height:40px;padding:12px 16px;border:0;border-radius:9999px;font:500 14px/1 system-ui;text-decoration:none;cursor:pointer;transition:background-color .3s}
+  .btn-primary{background:var(--zhucai);color:#000}
+  .btn-glass{background:#ffffff1f;color:var(--zi)}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:3;display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;pointer-events:none}
+  .topbar button{pointer-events:auto;background:#ffffff1f;color:var(--zi);border:0;border-radius:999px;padding:8px 14px;font:500 13px/1 system-ui;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="stage"><canvas id="astra"></canvas></div>
+<div class="topbar"><button id="langToggle">EN</button></div>
+<div class="page" id="page">
+  <section class="hero"></section>
+  <section class="copy" data-astra-intro>
+    <h2>标题段</h2>
+    <p>文案：先让位，再出场。真正有用的智能不抢镜头。</p>
+    <p>它退到两侧，把中间留给你的工作。</p>
+  </section>
+  <section class="cue" data-astra-shape="cursor">
+    <div class="cue-target"><svg viewBox="0 0 19 19" fill="none"></svg></div>
+    <p class="caption">它会动手</p>
+    <p class="cue-note">不只回答问题，给它一个目标，它会完成整个流程。</p>
+  </section>
+  <section class="copy tail">
+    <p>到底了。往回滚，一切逆序发生。</p>
+    <div><a class="btn btn-primary" href="#">开始使用</a><a class="btn btn-glass" href="#">了解更多</a></div>
+  </section>
+</div>
+<script type="module">
+  import {createAstraScene,detectWebGL,renderStaticFallback,PATH_PRESETS} from './assets/库/starflow.js'
+  const canvas=document.getElementById('astra')
+  if(!detectWebGL()){renderStaticFallback(canvas,{type:'galaxy'});document.title+=' (静态回退)';}
+  else{
+    const astra=createAstraScene(canvas,{flowSpeed:.8,bloomIntensity:.7,bloomThreshold:.08,ambientColor:'#23435f',ambientOpacity:.55,vignette:1,introDuration:5.5})
+    astra.setSource({type:'galaxy'},{starCount:4000,scatter:.041,palette:'astra'})
+    const page=document.getElementById('page')
+    let ticking=false
+    window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{ticking=false;const sy=window.scrollY,vh=window.innerHeight,intro=page.querySelector('[data-astra-intro]'),introTop=intro?intro.getBoundingClientRect().top:vh,tilt=Math.max(0,Math.min(1,(vh-introTop+200)/400)),scatter=Math.max(0,Math.min(1,(vh-introTop+300)/500));let shape=null;for(const cue of page.querySelectorAll('[data-astra-shape]')){const r=cue.getBoundingClientRect(),p=1-r.top/(vh*1.2);if(p>0&&p<1){const preset=PATH_PRESETS[cue.dataset.astraShape];if(preset){const s=p<.36?p/.36:1-(p-.36)/.5;shape={id:cue.dataset.astraShape,samples:preset.paths,strength:Math.max(0,Math.min(1,s)),centerNdc:[0,0],sizeNdc:[.4,.4]}}}}
+        astra.setScroll({progress:Math.min(1,sy/800),tiltProgress:tilt,scatterProgress:scatter,shape})});ticking=true}})
+    window.addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')astra.setConfig?.({[d.key]:d.value})})
+  }
+</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#ffffff;--zhongdian:#7EC8E3;--di:#000000;--zi:#ffffff;--cizi:#ffffff99}
+.stage{position:fixed;inset:0;z-index:0;background:var(--di)}
+#astra{position:absolute;inset:0;display:block;width:100%;height:100%}
+.page{position:relative;z-index:1;pointer-events:none}
+.copy{max-width:669px;margin:0 auto;padding:26vh 24px}
+.copy h2{font:500 30px/1.32 system-ui}
+.copy p{color:var(--cizi)}
+.cue{display:flex;flex-direction:column;align-items:center;gap:16px;padding:18vh 24px}
+.cue-target{width:min(576px,100%);height:80svh}
+.btn-primary{background:var(--zhucai);color:#000;border-radius:9999px;padding:12px 16px;font:500 14px/1 system-ui}`,
+    参数: [
+      { "键": "zhucai", "名": "主色（按钮/重点）", "类型": "color", "默认": "#ffffff" },
+      { "键": "zhongdian", "名": "重点色（数据高亮）", "类型": "color", "默认": "#7EC8E3" },
+      { "键": "di", "名": "页面底色", "类型": "color", "默认": "#000000" },
+      { "键": "zi", "名": "正文色", "类型": "color", "默认": "#ffffff" },
+      { "键": "cizi", "名": "次要文字色", "类型": "color", "默认": "#ffffff99" },
+      { "键": "yuanjiao", "名": "圆角(px)", "类型": "slider", "最小": 4, "最大": 24, "步长": 1, "默认": 10 },
+      { "键": "jianju", "名": "间距(px)", "类型": "slider", "最小": 4, "最大": 32, "步长": 1, "默认": 10 },
+      { "键": "zihao", "名": "基础字号(px)", "类型": "slider", "最小": 13, "最大": 22, "步长": 1, "默认": 17 },
+      { "键": "yinying", "名": "阴影强度", "类型": "slider", "最小": 0, "最大": 50, "步长": 2, "默认": 0 },
+      { "键": "faguang", "名": "发光强度(%)", "类型": "slider", "最小": 0, "最大": 30, "步长": 1, "默认": 0 }
+    ],
+    来源: "GitHub Win-Hao/starflow（MIT）+ OpenAI GPT-6 Astra 发布页设计系统（2026-09-07 入库）"
   }
 ];

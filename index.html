@@ -138,6 +138,20 @@
   }
   .add-btn:hover { background: var(--accent); }
   .add-btn.in { background: #22a06b; }
+  .preview-badge {
+    position: absolute; bottom: 8px; right: 8px; z-index: 2;
+    background: #f59e0b; color: #fff; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 6px; letter-spacing: .3px; line-height: 1.5;
+    pointer-events: none; user-select: none;
+  }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 10px; padding: 6px 14px;
+    background: #e8e8e4; color: #1a1a1a; text-decoration: none;
+    font-size: 12px; font-weight: 600; border-radius: 8px;
+    transition: background .15s, color .15s;
+  }
+  .dl-btn:hover { background: #1a1a1a; color: #fff; }
 
   .card-body { padding: 14px 16px 15px; }
   .card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -366,7 +380,7 @@
   // ---- 数据 ----
   const ITEMS = (window.WEB_ARSENAL || []).slice();
   const SCHEMES = (window.WEB_SCHEMES || []).slice();
-  const CATS = ["文字动画", "动画", "组件", "背景"]; // “方案”分类已并入方案库（顶部视图切换），素材库不再显示
+  const CATS = ["文字动画", "动效", "组件", "背景", "布局骨架"]; // “方案”分类已并入方案库（顶部视图切换），素材库不再显示
   let view = "arsenal"; // 视图：arsenal(素材库) / schemes(风格方案库)
 
   // ---- 筛选状态 ----
@@ -600,6 +614,11 @@
     add.title = "加入购物车";
     add.addEventListener("click", (e) => { e.stopPropagation(); toggleCart(it.id); });
     thumb.append(loading, iframe, add);
+    // 降级预览标识：有 ThreeJS演示 字段的素材，卡片上标注"预览版"
+    if (it.ThreeJS演示) {
+      const badge = el("span", "preview-badge", "预览版");
+      thumb.appendChild(badge);
+    }
 
     const body = el("div", "card-body");
     const top = el("div", "card-top");
@@ -615,6 +634,15 @@
     (it.场景 || []).forEach(t => tags.appendChild(el("span", "tag scene", t)));
     const hint = el("p", "hint", "点卡片展开：调参数 + 说明 + 提示词");
     body.append(top, h2, tags, hint);
+    // 下载按钮：有 下载 字段的素材，卡片标题下方提供下载
+    if (it.下载) {
+      const dlBtn = el("a", "dl-btn", "⬇ 下载 3D 模型文件");
+      dlBtn.href = it.下载;
+      dlBtn.download = it.下载.split("/").pop();
+      dlBtn.title = "下载 " + it.下载.split("/").pop();
+      dlBtn.addEventListener("click", (e) => e.stopPropagation());
+      body.appendChild(dlBtn);
+    }
 
     const detail = el("div", "detail");
     detail.hidden = true;
@@ -973,6 +1001,7 @@
     info.appendChild(textSection("删减元素", s.删减元素 || ""));
     info.appendChild(textSection("适用", s.适用 || ""));
     info.appendChild(textSection("禁忌", s.禁忌 || ""));
+    if (s.Agent提示词) info.appendChild(codeBlock("Agent 提示词（可直接喂给 AI 复用）", s.Agent提示词));
     if (s.参考站 && s.参考站.length) {
       const sec = el("section", "desc");
       sec.appendChild(el("h3", null, "参考站（可模仿）"));
@@ -992,6 +1021,28 @@
       const link = el("a", "scheme-link", "打开完整演示页 →");
       link.href = s.演示页; link.target = "_blank"; link.rel = "noopener";
       info.appendChild(link);
+    }
+    // 3D 版下载：有 ThreeJS演示 / 下载 字段的方案，提供 Three.js 3D 版下载入口
+    if (s.ThreeJS演示 || s.下载) {
+      const sec = el("section", "desc");
+      sec.appendChild(el("h3", null, "3D 建模（Three.js）下载"));
+      const dl = el("div", "scheme-refs");
+      if (s.ThreeJS演示) {
+        const a = el("a", "dl-btn", "⬇ 下载 3D 版 HTML（需 HTTP 服务）");
+        a.href = s.ThreeJS演示;
+        a.download = s.ThreeJS演示.split("/").pop();
+        a.rel = "noopener";
+        dl.appendChild(a);
+      }
+      if (s.下载) {
+        const a = el("a", "dl-btn", "⬇ 下载 starflow.js（3D 核心库）");
+        a.href = s.下载;
+        a.download = s.下载.split("/").pop();
+        a.rel = "noopener";
+        dl.appendChild(a);
+      }
+      sec.appendChild(dl);
+      info.appendChild(sec);
     }
     return info;
   }
