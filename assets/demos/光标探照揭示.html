@@ -22,7 +22,6 @@
   .blurb button { border: 0; color: #fff; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 9999px; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
   .blurb button:hover { transform: scale(1.03); }
   .blurb button:active { transform: scale(0.95); }
-  .badge { position: fixed; left: 14px; bottom: 12px; z-index: 90; font-size: 11px; color: rgba(255,255,255,0.55); }
 </style>
 </head>
 <body>
@@ -42,11 +41,10 @@
       <p id="desc">移动光标，柔和光晕会揭示藏在底图之下的第二张画面 —— 这是地理叙事站最常用的「探索式首屏」。</p>
       <button id="cta">Start Digging</button>
     </div>
-    <div class="badge">光标探照揭示 · postMessage 可调参</div>
   </div>
 
 <script>
-/* ---------- 可调参数（与弹药库 params 一一对应，12 项、5 颜色） ---------- */
+/* ---------- 可调参数 ---------- */
 const state = {
   radius: 260,        // 探照半径(px) slider
   ease: 0.1,          // 缓动系数(0.02~0.3) slider
@@ -87,8 +85,11 @@ function hexA(hex, a) {
 }
 
 function apply() {
-  base.style.backgroundImage = `url(${state.baseImg})`;
-  reveal.style.backgroundImage = `url(${state.revealImg})`;
+  // 降级保护：图片URL在前、CSS渐变在后——断网时图片加载失败自动回退到品牌渐变，不黑屏
+  const baseFallback = `linear-gradient(135deg, ${state.baseTint} 0%, #2a1a08 55%, #0d0904 100%)`;
+  const revealFallback = `linear-gradient(135deg, ${state.revealTint} 0%, #5a4a2a 55%, #2a2010 100%)`;
+  base.style.backgroundImage = `url(${state.baseImg}), ${baseFallback}`;
+  reveal.style.backgroundImage = `url(${state.revealImg}), ${revealFallback}`;
   baseTint.style.background = state.baseTint;
   revealTint.style.background = state.revealTint;
   t1.textContent = state.titleText;
@@ -140,7 +141,7 @@ function loop() {
 }
 raf = requestAnimationFrame(loop);
 
-/* 外部调参契约（弹药库 iframe 用 postMessage 控制） */
+/* 外部调参 */
 window.addEventListener('message', ev => {
   const d = ev.data;
   if (d && d.type === 'param' && d.key in state) {

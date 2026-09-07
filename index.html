@@ -54,7 +54,12 @@
   .filter.active { background: var(--ink); color: #fff; }
   .filter .n { font-size: 11.5px; opacity: .6; }
   .filter.dim { opacity: .32; pointer-events: none; }
-  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* 标签区限高滚动：标签很多时（场景 44+/元素 28+）不撑爆侧边栏 */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; max-height: 148px; overflow-y: auto; padding-right: 4px; }
+  .chip-row::-webkit-scrollbar { width: 6px; }
+  .chip-row::-webkit-scrollbar-thumb { background: #dcdcd5; border-radius: 3px; }
+  .chip-row::-webkit-scrollbar-thumb:hover { background: #c8c8c0; }
+  .chip-row::-webkit-scrollbar-track { background: transparent; }
   .fchip {
     border: 1px solid var(--line); background: #fff; color: var(--ink);
     padding: 4px 11px; border-radius: 999px; cursor: pointer; font-size: 12.5px;
@@ -63,7 +68,6 @@
   .fchip:hover { border-color: #ccc; }
   .fchip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
   .fchip.dim { opacity: .3; }
-  .side-foot { margin-top: auto; font-size: 11.5px; color: var(--muted); line-height: 1.8; }
 
   /* ---- 右侧内容区 ---- */
   .content { flex: 1; min-width: 0; padding: 26px 34px 80px; }
@@ -71,6 +75,31 @@
   .content-head .t { display: flex; align-items: baseline; gap: 12px; }
   .content-head h2 { font-size: 22px; font-weight: 800; }
   .content-head span { font-size: 13px; color: var(--muted); }
+  /* 分类 + 子类固定冻在 main 顶部；只要滚动就吸顶，不随页面移动 */
+  .content-tools {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 12px 0 14px;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 14px;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg); /* 不透明背景：粘住时不穿透卡片 */
+  }
+  .tools-row { display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+  .tools-row .tools-label { font-size: 13px; font-weight: 700; color: var(--ink); min-width: 44px; padding-top: 6px; flex-shrink: 0; }
+  .tools-row .tools-label .sel-count { font-size: 11.5px; color: var(--accent); font-weight: 600; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .tools-row .tools-label .sel-count:empty { display: none; }
+  .tools-row .chip-row { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+  .tools-row .chip {
+    font: 12.5px/1 inherit; padding: 5px 11px; border-radius: 999px;
+    background: #f2f0eb; color: #555; border: none; cursor: pointer; user-select: none;
+    transition: background .15s ease, color .15s ease, opacity .15s ease;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .tools-row .chip:hover { background: #e7e4dc; }
+  .tools-row .chip.dim { opacity: .35; cursor: not-allowed; }
+  .tools-row .chip.on { background: var(--ink); color: #fff; }
+  .tools-row .chip.on .chip-n { opacity: .7; }
+  .tools-row .chip-n { font-size: 11px; opacity: .55; font-variant-numeric: tabular-nums; }
 
   /* 购物车按钮 */
   .cart-btn {
@@ -84,17 +113,6 @@
     font-size: 11.5px; display: flex; align-items: center; justify-content: center; padding: 0 6px;
   }
   .cart-btn .badge:empty { display: none; }
-
-  /* 方案预设条 */
-  .preset-bar { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 6px; }
-  .preset {
-    flex-shrink: 0; border: 1px solid var(--line); background: var(--card); border-radius: 11px;
-    padding: 9px 14px; cursor: pointer; min-width: 128px; transition: border-color .15s ease, transform .15s ease;
-  }
-  .preset:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .preset .pn { font-size: 13px; font-weight: 700; }
-  .preset .pd { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .preset .pc { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; border: 1px solid rgba(0,0,0,.1); }
 
   /* ---- 卡片网格 ---- */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
@@ -184,6 +202,22 @@
   .meta b { color: #4b4842; font-weight: 600; }
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
 
+  /* ---- 方案库（独立视图） ---- */
+  .colorbars { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .cbar-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+  .cbar { height: 13px; border-radius: 4px; min-width: 4%; background: linear-gradient(90deg, var(--accent), #b9a6ff); }
+  .cbar-lbl { color: #555; }
+  .scheme-refs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .scheme-link { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-block; }
+  .scheme-link:hover { text-decoration: underline; }
+  .hl { color: var(--accent); font-weight: 700; }
+  .code-sec { margin-top: 8px; }
+  .code-head { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 4px; }
+  .code-head h3 { margin: 0; }
+  .copy-btn { border: 1px solid var(--line); background: #f2f0eb; color: var(--ink); border-radius: 8px; font-size: 12px; padding: 4px 10px; cursor: pointer; font-weight: 600; }
+  .copy-btn:hover { background: #e9e7e0; }
+  .copy-btn.done { background: var(--accent); color: #fff; border-color: var(--accent); }
+
   /* ---- 购物车面板 ---- */
   .cart-panel {
     position: fixed; top: 0; right: 0; width: 320px; height: 100vh; z-index: 40;
@@ -254,27 +288,21 @@
     </div>
 
     <div>
-      <div class="side-label">分类</div>
-      <nav class="cat-list" id="catFilters"></nav>
-    </div>
-    <div>
-      <div class="side-label">子类</div>
-      <nav class="cat-list" id="subFilters"></nav>
-    </div>
-    <div>
-      <div class="side-label">风格（可多选）</div>
-      <div class="chip-row" id="styleFilters"></div>
-    </div>
-    <div>
-      <div class="side-label">场景（可多选）</div>
-      <div class="chip-row" id="sceneFilters"></div>
-    </div>
-    <div>
-      <div class="side-label">设计元素（可多选）</div>
-      <div class="chip-row" id="elemFilters"></div>
+      <div class="side-label">视图</div>
+      <nav class="cat-list" id="viewFilters"></nav>
     </div>
 
-    <div class="side-foot">数据：data/素材.js<br>预设：data/预设.js<br>演示：assets/demos/<br>双击即用，无需联网</div>
+    <div id="dimFilters">
+      <div class="side-label">筛选区</div>
+      <div class="side-label" style="margin-top:4px;">风格<span class="sel-count" id="styleSelSide"></span></div>
+      <div class="chip-row" id="styleSideChips" style="margin-bottom:12px;"></div>
+
+      <div class="side-label">场景<span class="sel-count" id="sceneSelSide"></span></div>
+      <div class="chip-row" id="sceneSideChips" style="margin-bottom:12px;"></div>
+
+      <div class="side-label">元素<span class="sel-count" id="elemSelSide"></span></div>
+      <div class="chip-row" id="elemSideChips" style="margin-bottom:12px;"></div>
+    </div>
   </aside>
 
   <main class="content">
@@ -286,7 +314,17 @@
       <button class="cart-btn" id="cartBtn">购物车 <span class="badge" id="cartBadge"></span></button>
     </header>
 
-    <div class="preset-bar" id="presetBar"></div>
+    <div class="content-tools" id="contentTools">
+      <div class="tools-row" id="catRow">
+        <div class="tools-label">分类<span class="sel-count" id="catSel"></span></div>
+        <div class="chip-row" id="catChips"></div>
+      </div>
+      <div class="tools-row" id="subRow">
+        <div class="tools-label">子类<span class="sel-count" id="subSel"></span></div>
+        <div class="chip-row" id="subChips"></div>
+      </div>
+      <!-- 风格 / 场景 / 元素 已搬回左栏；contentTools 只保留 catRow + subRow 两行 -->
+    </div>
 
     <div class="grid" id="grid"></div>
   </main>
@@ -323,12 +361,13 @@
 </div>
 
 <script src="data/素材.js"></script>
-<script src="data/预设.js"></script>
+<script src="data/方案.js"></script>
 <script>
   // ---- 数据 ----
   const ITEMS = (window.WEB_ARSENAL || []).slice();
-  const PRESETS = (window.WEB_PRESETS || []).slice();
-  const CATS = ["文字动画", "动画", "组件", "背景", "方案"];
+  const SCHEMES = (window.WEB_SCHEMES || []).slice();
+  const CATS = ["文字动画", "动画", "组件", "背景"]; // “方案”分类已并入方案库（顶部视图切换），素材库不再显示
+  let view = "arsenal"; // 视图：arsenal(素材库) / schemes(风格方案库)
 
   // ---- 筛选状态 ----
   const filter = { 分类: "全部", 子类: "全部", 风格: new Set(), 场景: new Set(), 元素: new Set() };
@@ -399,70 +438,98 @@
     return [...s];
   }
 
-  // ---- 渲染筛选器 ----
+  // ---- 渲染筛选器（5 维平铺，全部默认展开）----
   function renderFilters() {
-    // 分类
-    const catBox = document.getElementById("catFilters");
+    // 1) 分类（单选）
+    const catBox = document.getElementById("catChips");
     catBox.innerHTML = "";
-    const cats = ["全部", ...CATS];
-    cats.forEach(c => {
-      const n = c === "全部" ? ITEMS.length : ITEMS.filter(it => it.分类 === c).length;
-      const b = el("button", "filter" + (filter.分类 === c ? " active" : ""), "");
-      b.append(el("span", null, c), el("span", "n", n));
-      b.addEventListener("click", () => {
-        filter.分类 = c; filter.子类 = "全部";
+    const catCounts = dimCount("分类");
+    ["全部", ...CATS].forEach(v => {
+      const on = filter.分类 === v;
+      const dimFlag = v !== "全部" && !catCounts.has(v);
+      const c = el("button", "chip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
+      c.type = "button";
+      if (catCounts.has(v)) c.append(el("span", "chip-n", " · " + catCounts.get(v)));
+      c.addEventListener("click", () => {
+        if (filter.分类 === v) return; // 同项再点不取消（保持"全部"始终可回到默认）
+        filter.分类 = v; filter.子类 = "全部";
         renderFilters(); applyFilter();
       });
-      catBox.appendChild(b);
+      catBox.appendChild(c);
     });
+    document.getElementById("catSel").textContent = filter.分类 !== "全部" ? "1" : "";
 
-    // 子类（随分类）
-    const subBox = document.getElementById("subFilters");
+    // 2) 子类（单选，随分类过滤）
+    const subBox = document.getElementById("subChips");
     subBox.innerHTML = "";
-    const subVals = uniqVals("子类").filter(s => filter.分类 === "全部" || ITEMS.some(it => it.分类 === filter.分类 && it.子类 === s));
-    ["全部", ...subVals].forEach(s => {
-      const b = el("button", "filter" + (filter.子类 === s ? " active" : ""), "");
-      b.append(el("span", null, s), el("span", "n", s === "全部" ? "" : ITEMS.filter(it => it.子类 === s).length));
-      b.addEventListener("click", () => { filter.子类 = s; renderFilters(); applyFilter(); });
-      subBox.appendChild(b);
+    let subs = uniqVals("子类");
+    if (filter.分类 !== "全部") subs = subs.filter(s => ITEMS.some(it => it.分类 === filter.分类 && it.子类 === s));
+    const totalUnderCat = filter.分类 === "全部" ? ITEMS.length : ITEMS.filter(it => it.分类 === filter.分类).length;
+    ["全部", ...subs].forEach(v => {
+      const on = filter.子类 === v;
+      const cnt = v === "全部" ? totalUnderCat : ITEMS.filter(it => it.子类 === v && (filter.分类 === "全部" || it.分类 === filter.分类)).length;
+      const dimFlag = v !== "全部" && cnt === 0;
+      const c = el("button", "chip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
+      c.type = "button";
+      if (cnt > 0 || v === "全部") c.append(el("span", "chip-n", " · " + cnt));
+      c.addEventListener("click", () => {
+        filter.子类 = v;
+        renderFilters(); applyFilter();
+      });
+      subBox.appendChild(c);
     });
+    document.getElementById("subSel").textContent = filter.子类 !== "全部" ? "1" : "";
 
-    // 风格/场景/元素（多选 chips）
-    renderChips("styleFilters", "风格");
-    renderChips("sceneFilters", "场景");
-    renderChips("elemFilters", "元素");
+    // 3) 风格 / 场景 / 元素（多选）— 渲染到左栏
+    renderSideChips("styleSideChips", "风格", "styleSelSide");
+    renderSideChips("sceneSideChips", "场景", "sceneSelSide");
+    renderSideChips("elemSideChips", "元素", "elemSelSide");
   }
 
-  function renderChips(boxId, dim) {
+  // 渲染到左栏（用 .fchip 胶囊样式）：标签多到可竖滚，多选
+  function renderSideChips(boxId, dim, countId) {
     const box = document.getElementById(boxId);
+    if (!box) return;
     box.innerHTML = "";
     const counts = dimCount(dim);
-    uniqVals(dim).forEach(v => {
+    const vals = uniqVals(dim);
+    vals.forEach(v => {
       const on = filter[dim].has(v);
-      const c = el("button", "fchip" + (on ? " on" : ""), v);
-      if (!counts.has(v)) c.classList.add("dim");
+      const dimFlag = !counts.has(v);
+      const c = el("button", "fchip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
+      c.type = "button";
       c.addEventListener("click", () => {
         if (filter[dim].has(v)) filter[dim].delete(v); else filter[dim].add(v);
         renderFilters(); applyFilter();
       });
       box.appendChild(c);
     });
-    if (!uniqVals(dim).length) box.appendChild(el("span", null, "—"));
+    if (countId) {
+      const sel = document.getElementById(countId);
+      if (sel) sel.textContent = filter[dim].size ? "已选 " + filter[dim].size : "";
+    }
   }
 
   // ---- 应用筛选 ----
   function applyFilter() {
+    if (view === "schemes") {
+      document.getElementById("catTitle").textContent = "方案库";
+      document.getElementById("catCount").textContent = "共 " + SCHEMES.filter(s => s.id !== "skeleton-01").length + " 套";
+      document.querySelectorAll(".card").forEach(card => {
+        card.style.display = card.dataset.view === "schemes" ? "" : "none";
+      });
+      return;
+    }
     const title = filter.分类 === "全部" ? "全部素材" : filter.分类 + (filter.子类 !== "全部" ? " · " + filter.子类 : "");
     document.getElementById("catTitle").textContent = title;
     const shown = ITEMS.filter(it => matches(it));
     document.getElementById("catCount").textContent = "共 " + shown.length + " 条";
     document.querySelectorAll(".card").forEach(card => {
+      if (card.dataset.view === "schemes") { card.style.display = "none"; return; }
       card.style.display = matches(byId(card.dataset.id)) ? "" : "none";
     });
-    // 交叉关联：重算各维度可用性
-    renderChips("styleFilters", "风格");
-    renderChips("sceneFilters", "场景");
-    renderChips("elemFilters", "元素");
+    // 交叉关联：已选数 + chip dim 状态（renderFilters 会处理场景/元素 chip）
+    renderFilters();
   }
 
   // ---- 懒加载 ----
@@ -749,28 +816,6 @@
     return info;
   }
 
-  // ---- 方案预设 ----
-  function renderPresets() {
-    const bar = document.getElementById("presetBar");
-    bar.innerHTML = "";
-    PRESETS.forEach(p => {
-      const node = el("button", "preset");
-      const head = el("div", "pn");
-      head.append(el("span", "pc"), document.createTextNode(p.名称));
-      head.querySelector(".pc").style.background = p.重点色;
-      node.append(head, el("div", "pd", p.描述));
-      node.title = "底色 " + p.底色 + " · 重点色 " + p.重点色 + " · 推荐 " + p.素材.length + " 个素材";
-      node.addEventListener("click", () => applyPreset(p));
-      bar.appendChild(node);
-    });
-  }
-  function applyPreset(p) {
-    if (p.素材.length && !confirm("应用「" + p.名称 + "」方案？会把推荐的 " + p.素材.length + " 个素材加入购物车。")) return;
-    p.素材.forEach(id => { if (byId(id) && !cart.includes(id)) cart.push(id); });
-    syncCart();
-    document.getElementById("cartPanel").classList.add("show");
-  }
-
   // ---- 生成方案 ----
   let planText = "";
   function openPlan() {
@@ -844,21 +889,188 @@
   document.getElementById("planClose").addEventListener("click", () => document.getElementById("planMask").hidden = true);
   document.getElementById("planMask").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
 
+  // ---- 方案库（独立视图） ----
+  function renderViewFilters() {
+    const box = document.getElementById("viewFilters");
+    box.innerHTML = "";
+    [["arsenal", "素材库"], ["schemes", "方案库"]].forEach(([v, label]) => {
+      const b = el("button", "filter" + (view === v ? " active" : ""), label);
+      b.dataset.view = v;
+      b.addEventListener("click", () => setView(v));
+      box.appendChild(b);
+    });
+  }
+  function setView(v) {
+    view = v;
+    renderViewFilters();
+    const dimFilters = document.getElementById("dimFilters");
+    const contentTools = document.getElementById("contentTools");
+    if (v === "schemes") {
+      dimFilters.style.display = "none";
+      contentTools.style.display = "none";
+      document.getElementById("count").textContent = SCHEMES.filter(s => s.id !== "skeleton-01").length;
+    } else {
+      dimFilters.style.display = "";
+      contentTools.style.display = "";
+      document.getElementById("count").textContent = ITEMS.length;
+      renderFilters();
+    }
+    applyFilter();
+  }
+  function colorBars(配色) {
+    const wrap = el("div", "colorbars");
+    Object.entries(配色 || {}).forEach(([名, 占比]) => {
+      const num = parseFloat(String(占比).replace(/[~<>%]/g, "")) || 0;
+      const row = el("div", "cbar-row");
+      const bar = el("div", "cbar");
+      bar.style.width = Math.max(num, 4) + "%";
+      row.append(bar, el("span", "cbar-lbl", 名 + " " + 占比));
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+  function copyText(btn, text){
+    const done = ()=>{ btn.textContent="已复制"; btn.classList.add("done"); setTimeout(()=>{ btn.textContent="复制"; btn.classList.remove("done"); }, 1200); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallback());
+    } else { fallback(); }
+    function fallback(){
+      const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); done(); }catch(e){}
+      document.body.removeChild(ta);
+    }
+  }
+  function codeBlock(title, text){
+    if(!text) return document.createComment("");
+    const sec = el("section", "desc code-sec");
+    const head = el("div", "code-head");
+    head.appendChild(el("h3", null, title));
+    const btn = el("button", "copy-btn", "复制");
+    btn.addEventListener("click", (e)=>{ e.stopPropagation(); copyText(btn, text); });
+    head.appendChild(btn);
+    const pre = el("pre", "plan-text"); pre.textContent = text;
+    sec.append(head, pre);
+    return sec;
+  }
+  function makeSchemeInfo(s, iframe) {
+    const info = el("div", "info");
+    // 参数控件：拖一下，演示页实时变（postMessage 调参）
+    const schemeCurrent = {};
+    (s.参数 || []).forEach(p => schemeCurrent[p.键] = p.默认);
+    const schemeControls = makeControls(s, iframe, schemeCurrent, () => {});
+    if (schemeControls) info.appendChild(schemeControls);
+    if (s.配色) {
+      const sec = el("section", "desc");
+      sec.appendChild(el("h3", null, "配色占比"));
+      sec.appendChild(colorBars(s.配色));
+      info.appendChild(sec);
+    }
+    info.appendChild(textSection("布局骨架", s.布局骨架 || ""));
+    const ptSec = textSection("重色落点", s.重色落点 || "");
+    ptSec.querySelector("h3").classList.add("hl");
+    info.appendChild(ptSec);
+    info.appendChild(textSection("第一屏内容", s.第一屏内容 || ""));
+    info.appendChild(textSection("删减元素", s.删减元素 || ""));
+    info.appendChild(textSection("适用", s.适用 || ""));
+    info.appendChild(textSection("禁忌", s.禁忌 || ""));
+    if (s.参考站 && s.参考站.length) {
+      const sec = el("section", "desc");
+      sec.appendChild(el("h3", null, "参考站（可模仿）"));
+      const refs = el("div", "scheme-refs");
+      s.参考站.forEach(r => refs.appendChild(el("span", "tag", r)));
+      sec.appendChild(refs);
+      info.appendChild(sec);
+    }
+    info.appendChild(codeBlock("完整模板代码（可直接拷贝用）", s.代码));
+    info.appendChild(codeBlock("可复用片段（拷进自己项目）", s.片段));
+    info.appendChild(textSection("我的说明（三把尺子）", s.我的说明 || ""));
+    const meta = el("div", "meta");
+    const srcP = el("p"); srcP.append(el("b", null, "来源："), s.来源 || "未标注");
+    meta.append(srcP);
+    info.appendChild(meta);
+    if (s.演示页) {
+      const link = el("a", "scheme-link", "打开完整演示页 →");
+      link.href = s.演示页; link.target = "_blank"; link.rel = "noopener";
+      info.appendChild(link);
+    }
+    return info;
+  }
+  function toggleScheme(card, thumb, demoBig, iframe, detail, hint) {
+    const open = card.classList.toggle("open");
+    detail.hidden = !open;
+    if (!iframe.src) iframe.src = iframe.dataset.src;
+    if (open) {
+      thumb.style.display = "none";
+      demoBig.appendChild(iframe);
+      hint.textContent = "点击卡片上部收起 ↑";
+      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      thumb.style.display = "";
+      thumb.appendChild(iframe);
+      hint.textContent = "点卡片展开：配色占比 + 调参数 + 重色落点";
+    }
+  }
+  function makeSchemeCard(s) {
+    const card = el("article", "card");
+    card.dataset.id = s.id;
+    card.dataset.view = "schemes";
+
+    const thumb = el("div", "thumb");
+    const loading = el("div", "loading", "演示加载中…");
+    const iframe = document.createElement("iframe");
+    iframe.dataset.src = s.演示页 || "";
+    iframe.title = s.风格名 + " 演示";
+    iframe.addEventListener("load", () => loading.remove());
+    thumb.append(loading, iframe);
+
+    const body = el("div", "card-body");
+    const top = el("div", "card-top");
+    const chip = el("span", "chip", "方案");
+    chip.dataset.cat = "方案";
+    top.append(chip, el("span", "cid", s.id || ""));
+    const h2 = el("h2", null, s.风格名 || "未命名");
+    const tags = el("div", "tags");
+    if (s.骨架) tags.appendChild(el("span", "tag", "骨架 " + s.骨架));
+    if (s.重色落点) tags.appendChild(el("span", "tag style", s.重色落点));
+    const hint = el("p", "hint", "点卡片展开：配色占比 + 调参数 + 重色落点");
+    body.append(top, h2, tags, hint);
+
+    const detail = el("div", "detail");
+    detail.hidden = true;
+    const demoBig = el("div", "demo-big");
+    detail.append(demoBig, makeSchemeInfo(s, iframe));
+
+    card.append(thumb, body, detail);
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".detail") || e.target.closest(".scheme-link")) return;
+      toggleScheme(card, thumb, demoBig, iframe, detail, hint);
+    });
+    return card;
+  }
+
   // ---- 启动 ----
+  renderViewFilters();
   document.getElementById("count").textContent = ITEMS.length;
   if (!ITEMS.length) {
     document.getElementById("grid").appendChild(el("p", "empty", "没有数据：请检查 data/素材.js 是否存在。"));
   } else {
     renderFilters();
-    renderPresets();
     applyFilter();
     ITEMS.forEach(it => {
       const card = makeCard(it);
       document.getElementById("grid").appendChild(card);
       io.observe(card);
     });
-    syncCart();
   }
+  // 方案库卡片：默认隐藏，切到「方案库」视图才显示（复用懒加载 io）
+  SCHEMES.filter(s => s.id !== "skeleton-01").forEach(s => {
+    const card = makeSchemeCard(s);
+    card.style.display = "none";
+    document.getElementById("grid").appendChild(card);
+    io.observe(card);
+  });
+
+  syncCart();
 </script>
 </body>
 </html>

@@ -1,0 +1,3185 @@
+// Web 灵感弹药库 · 方案库（v4，2026-09-07 丰富化 + 并入 4 套）
+// 20 套：14 原方案 + skeleton-01（文档）+ 新并入 s203/v131/v141/s205（原素材库 分类:"方案"）。
+// 编目轴：重色落点 / 第一屏内容 / 删减元素（与作者「西瓜同学🍉」Skill 三问一致）。
+// 每套 代码 为完整多区块页（导航+首屏+功能卡×3+数据墙×3+页脚），打开即感受氛围。
+// 配色守 60-30-10；参数键↔CSS 变量一致；demo 支持 postMessage({type:'param',key,value}) 调参。
+// 校验：node --check data/方案.js
+
+window.WEB_SCHEMES = [
+  {
+    id: "skeleton-01",
+    类型: "共享骨架",
+    名称: "Dashboard 通用数据组件骨架",
+    数据组件: [
+      "告警栏",
+      "容量助手",
+      "行程卡",
+      "导航",
+      "跳转入口"
+    ],
+    通用布局: "左窄导航 + 顶部告警栏横跨 + 中部主内容区（容量助手为主卡）+ 右/底跳转入口",
+    说明: "v3 起各方案不再共用同一骨架，改为各自独立布局原型；此条仅作文档参考。"
+  },
+  {
+    id: "f001",
+    风格名: "大色块分区",
+    骨架: "大色块四宫格",
+    配色: {
+      "机身黑(底)": "41%",
+      "珊瑚(焦点块)": "22%",
+      "冰蓝": "12%",
+      "长春花": "13%",
+      "鼠尾草": "12%"
+    },
+    布局骨架: "左窄导航 + 顶部告警栏 + 中部 2×2 大色块网格（容量助手占最大珊瑚焦点块）",
+    重色落点: "珊瑚焦点块独大且最跳，其余三块同明度不同色相做节奏；黑底托底不抢戏",
+    第一屏内容: "告警栏（顶）+ 容量助手焦点块（最大色块=核心指标）",
+    删减元素: "去细线条分隔 / 弱图标描边 / 不堆图表网格",
+    适用: "维度少、要一眼分区的运营/监控大屏",
+    禁忌: "信息密度高、需精确行列对照的报表",
+    参考站: [
+      "Raycast",
+      "Height",
+      "Arc",
+      "Muzli 50 Best Dashboard 2026"
+    ],
+    我的说明: "焦点块用最大面积+最跳色做唯一视觉重心；其余块同明度不同色相，节奏统一不抢戏。",
+    演示页: "assets/demos/方案-大色块分区.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·大色块分区</title>
+<style>
+:root{--zhucai:#FF6F61;--zhongdian:#7EC8E3;--di:#1a1a1a;--zi:#ffffff;--cizi:#b8b8b8;--yuanjiao:14px;--jianju:10px;--zihao:15px;--yinying:30;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="grid" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">大色块分区</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">进入控制台</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>智能运维中枢</h1><p class="sub">一眼掌握全局容量、行程与告警，运维不再救火</p><div class="btns"><button class="btn solid">进入控制台</button><button class="btn ghost">查看文档</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">⚡</div><h3>容量助手</h3><p>实时监测存储池用量，超标即告警</p></article>
+      <article class="feat"><div class="ico">🗓</div><h3>今日行程</h3><p>巡检 / 备份 / 复盘自动排程</p></article>
+      <article class="feat"><div class="ico">🔗</div><h3>跳转入口</h3><p>报表 / 任务 / 设置一触即达</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>85%</b><span>容量占用</span></div>
+      <div class="stat"><b>12</b><span>在线节点</span></div>
+      <div class="stat"><b>3</b><span>待处理告警</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 大色块分区</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#FF6F61;--zhongdian:#7EC8E3;--di:#1a1a1a;--zi:#ffffff;--yuanjiao:14px;--jianju:10px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#FF6F61"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#7EC8E3"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#1a1a1a"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#ffffff"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#b8b8b8"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 10
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 30
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#1（v3 配色守 60-30-10）"
+  },
+  {
+    id: "f002",
+    风格名: "图片卡片流",
+    骨架: "图片卡片流",
+    配色: {
+      "暖白底": "82%",
+      "卡片底": "12%",
+      "橘色(状态标签)": "6%"
+    },
+    布局骨架: "左导航 + 顶部弱告警 + 中部图片卡片网格（每卡=图+图下小信息+橘色状态标签）+ 右行程侧栏",
+    重色落点: "橘色只点在「状态标签」上，不铺大面——重色压状态而非分区",
+    第一屏内容: "图片卡片流（视觉主体，先被图吸引，而非被数字/色块吸引）",
+    删减元素: "去大色块分区 / 去大数字堆 / 信息压到图下方小字",
+    适用: "媒体·作品·商品·行程展示流",
+    禁忌: "纯数值报表、状态密集的后台",
+    参考站: [
+      "Polarsteps",
+      "Wanderlog",
+      "walls.io Tourism 主题"
+    ],
+    我的说明: "暖白大面积安静，橘色小点跳出来标状态；卡片等距网格节奏一致不抢戏。重色压「状态」而非「分区」。",
+    演示页: "assets/demos/方案-图片卡片流.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·图片卡片流</title>
+<style>
+:root{--zhucai:#E8843C;--zhongdian:#F2C14E;--di:#FBF7F0;--zi:#2a2620;--cizi:#8a8170;--yuanjiao:16px;--jianju:14px;--zihao:15px;--yinying:18;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="left" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">图片卡片流</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">看作品</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>作品集画廊</h1><p class="sub">用图片卡片流讲清你的案例，少说话多展示</p><div class="btns"><button class="btn solid">看作品</button><button class="btn ghost">联系我</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🖼</div><h3>精选案例</h3><p>每个项目一张大图，点开看细节</p></article>
+      <article class="feat"><div class="ico">📁</div><h3>图集归档</h3><p>按系列归类，找起来不费劲</p></article>
+      <article class="feat"><div class="ico">⭐</div><h3>客户评价</h3><p>真实反馈放在显眼处建立信任</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>120</b><span>已交付项目</span></div>
+      <div class="stat"><b>48</b><span>合作客户</span></div>
+      <div class="stat"><b>99%</b><span>客户满意</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 图片卡片流</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#E8843C;--zhongdian:#F2C14E;--di:#FBF7F0;--zi:#2a2620;--yuanjiao:16px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#E8843C"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#F2C14E"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#FBF7F0"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#2a2620"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#8a8170"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 16
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 18
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#2"
+  },
+  {
+    id: "f003",
+    风格名: "玻璃拟态风",
+    骨架: "毛玻璃浮层",
+    配色: {
+      "淡蓝紫渐变背景": "30%",
+      "毛玻璃卡片(半透明白+blur)": "60%",
+      "深字": "10%"
+    },
+    布局骨架: "渐变背景铺满 + 毛玻璃卡片浮于其上（告警/容量助手/行程都做玻璃卡）+ 左导航半透明",
+    重色落点: "渐变只铺背景，卡片靠模糊+1px 高光描边浮起——重色在「背景氛围」而非内容块",
+    第一屏内容: "渐变背景 + 主玻璃卡（容量助手）直接浮在视觉中心",
+    删减元素: "去实色块分隔 / 去硬边框 / 靠模糊与高光描边做层级",
+    适用: "偏展示或需通透感的工具/Landing/控制台",
+    禁忌: "信息极密、低性能设备（backdrop-blur 吃 GPU）",
+    参考站: [
+      "Frost Finance Dashboard",
+      "Vaulter",
+      "Sales Dashboard"
+    ],
+    我的说明: "渐变柔、玻璃卡靠透明浮起，层级靠模糊不靠色块；所有卡同款玻璃处理语言统一。重色在背景氛围。",
+    演示页: "assets/demos/方案-玻璃拟态风.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·玻璃拟态风</title>
+<style>
+:root{--zhucai:#8A8FE5;--zhongdian:#C9B6FF;--di:#F4F3FB;--zi:#26243a;--cizi:#7a769a;--yuanjiao:18px;--jianju:14px;--zihao:15px;--yinying:24;--faguang:20}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="center" data-glow="1">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">玻璃拟态风</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">免费试用</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>现代 SaaS 落地</h1><p class="sub">玻璃质感 + 留白，给用户一种「高级又轻盈」的第一感</p><div class="btns"><button class="btn solid">免费试用</button><button class="btn ghost">预约演示</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">✨</div><h3>一键集成</h3><p>十分钟接好主流平台，无需写胶水代码</p></article>
+      <article class="feat"><div class="ico">🔒</div><h3>安全可靠</h3><p>端到端加密，合规认证齐全</p></article>
+      <article class="feat"><div class="ico">📊</div><h3>可视化</h3><p>数据看板开箱即用，决策有依据</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>10k+</b><span>活跃团队</span></div>
+      <div class="stat"><b>99.9%</b><span>服务可用</span></div>
+      <div class="stat"><b><50ms</b><span>平均响应</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 玻璃拟态风</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#8A8FE5;--zhongdian:#C9B6FF;--di:#F4F3FB;--zi:#26243a;--yuanjiao:18px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#8A8FE5"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#C9B6FF"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#F4F3FB"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#26243a"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#7a769a"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 18
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 24
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 20
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#3"
+  },
+  {
+    id: "f004",
+    风格名: "高密度卡片墙",
+    骨架: "浅色数据墙",
+    配色: {
+      "淡紫底": "70%",
+      "紫(当前态/选中)": "15%",
+      "绿/黄/红 状态点": "15%"
+    },
+    布局骨架: "bento 多卡密排网格（告警/容量/行程/导航/跳转全压进小卡，间距紧凑）",
+    重色落点: "紫只标「当前态/选中卡」，状态用绿黄红小圆点——重色压「当前态」+「状态点」",
+    第一屏内容: "整屏卡片墙概览（多指标一屏尽览，先被密度吸引）",
+    删减元素: "去大留白 / 去大色块 / 去长文案，全压成小卡+点",
+    适用: "多指标概览大屏、运维/监控墙（浅色版）",
+    禁忌: "极简风、低密度展示",
+    参考站: [
+      "Figma No.160 紫卡仪表盘",
+      "Bento Style UI",
+      "bento.me"
+    ],
+    我的说明: "淡紫底安静，紫卡跳当前态，彩点标状态；卡片同规格密排栅格节奏统一。重色压「当前态+状态点」。",
+    演示页: "assets/demos/方案-高密度卡片墙.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·高密度卡片墙</title>
+<style>
+:root{--zhucai:#4CC9B0;--zhongdian:#FFD166;--di:#121821;--zi:#eaf0f5;--cizi:#9fb0c0;--yuanjiao:12px;--jianju:10px;--zihao:14px;--yinying:22;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="grid" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">高密度卡片墙</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">打开看板</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>数据仪表盘</h1><p class="sub">高密度不等于乱——用卡片墙把信息分层摆清楚</p><div class="btns"><button class="btn solid">打开看板</button><button class="btn ghost">导出报表</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">📈</div><h3>趋势卡</h3><p>关键指标走势一屏看全</p></article>
+      <article class="feat"><div class="ico">🧩</div><h3>模块卡</h3><p>按业务域拆分，各管各的</p></article>
+      <article class="feat"><div class="ico">🔔</div><h3>状态卡</h3><p>异常自动浮顶，优先处理</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>256</b><span>监控指标</span></div>
+      <div class="stat"><b>18</b><span>业务域</span></div>
+      <div class="stat"><b>5</b><span>实时告警</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 高密度卡片墙</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#4CC9B0;--zhongdian:#FFD166;--di:#121821;--zi:#eaf0f5;--yuanjiao:12px;--jianju:10px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#4CC9B0"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#FFD166"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#121821"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#eaf0f5"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#9fb0c0"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 10
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 22
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#4"
+  },
+  {
+    id: "f006",
+    风格名: "杂志排版风",
+    骨架: "杂志栅格",
+    配色: {
+      "淡蓝灰": "44%",
+      "近白纸": "50%",
+      "高饱和点缀(kicker)": "6%"
+    },
+    布局骨架: "双底色分栏（淡蓝灰/近白）+ 强字体层级（大衬线标题+小无衬线正文）+ 栏宽克制 + 大留白",
+    重色落点: "高饱和色只点 kicker 一处，重色压「字体层级与栏目」而非色块",
+    第一屏内容: "大标题 + 导语（杂志式跨页），先被排版节奏吸引而非颜色",
+    删减元素: "去色块 / 去卡片描边 / 去状态点，靠字体大小·字重·栏宽做层级",
+    适用: "内容/文章/品牌向展示、重阅读体验的页面",
+    禁忌: "数据密集后台、需快速扫数的监控",
+    参考站: [
+      "Ribbit",
+      "Floating Pill Navbar",
+      "Cereal"
+    ],
+    我的说明: "淡蓝灰/近白双底安静，kicker 一点高饱和；字体层级规律统一（标题/副标/正文）。重色压「字体层级+栏目」。",
+    演示页: "assets/demos/方案-杂志排版风.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·杂志排版风</title>
+<style>
+:root{--zhucai:#C0392B;--zhongdian:#1a1a1a;--di:#FBF6EE;--zi:#1f1b16;--cizi:#7d7464;--yuanjiao:6px;--jianju:12px;--zihao:15px;--yinying:10;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="left" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">杂志排版风</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">订阅周刊</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>编辑部</h1><p class="sub">杂志式排版，用网格与留白让长文也读得下去</p><div class="btns"><button class="btn solid">订阅周刊</button><button class="btn ghost">投稿</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">📰</div><h3>头条栏目</h3><p>大标题 + 导语，定调本期重点</p></article>
+      <article class="feat"><div class="ico">📝</div><h3>深度长读</h3><p>多栏正文，配图与引文穿插</p></article>
+      <article class="feat"><div class="ico">🏷</div><h3>专题标签</h3><p>按话题聚合，方便追更</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>36</b><span>在更栏目</span></div>
+      <div class="stat"><b>210</b><span>深度稿</span></div>
+      <div class="stat"><b>4.2万</b><span>月读读者</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 杂志排版风</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#C0392B;--zhongdian:#1a1a1a;--di:#FBF6EE;--zi:#1f1b16;--yuanjiao:6px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#C0392B"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#1a1a1a"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#FBF6EE"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#1f1b16"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#7d7464"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 6
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 10
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#6（注：去重后保留，与留白族区分在「栏目标题驱动」）"
+  },
+  {
+    id: "f007",
+    风格名: "深色压顶风",
+    骨架: "顶重压条",
+    配色: {
+      "深色(顶部压条/导航)": "37%",
+      "奶油底(主体)": "62%",
+      "暖橘(点缀)": "1%"
+    },
+    布局骨架: "顶部深色压条横跨（导航/品牌）+ 下方奶油色主体内容 + 暖橘只点 1 处",
+    重色落点: "重色在「顶部压条」（上重下轻），暖橘只点 1 处——重色压「顶部重量」",
+    第一屏内容: "深色顶部（品牌/导航先入眼）+ 奶油主体主内容",
+    删减元素: "去整页深底 / 去多色 / 去色块墙，只顶部一块深",
+    适用: "品牌/杂志/高端展示、上重下轻的叙事页",
+    禁忌: "全屏深色控制台、需暗色护眼的后台",
+    参考站: [
+      "Apple（按产品切深/浅）",
+      "Tracking Football（顶深底浅明确分切）"
+    ],
+    我的说明: "顶部深色压住，奶油主体轻，暖橘 1% 点一处；顶部压条统一贯顶节奏稳定。重色压「顶部重量」。",
+    演示页: "assets/demos/方案-深色压顶风.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·深色压顶风</title>
+<style>
+:root{--zhucai:#FF5C8A;--zhongdian:#FFD166;--di:#0E0E14;--zi:#ffffff;--cizi:#a7a7b5;--yuanjiao:14px;--jianju:12px;--zihao:15px;--yinying:28;--faguang:30}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="center" data-glow="1">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">深色压顶风</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">立即升级</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>重磅发布</h1><p class="sub">深色压顶营造仪式感，让这一刻值得被记住</p><div class="btns"><button class="btn solid">立即升级</button><button class="btn ghost">看改动</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🚀</div><h3>核心升级</h3><p>一句话说清新版本最狠的那一刀</p></article>
+      <article class="feat"><div class="ico">🎬</div><h3>发布视频</h3><p>顶部沉浸区直接放预告片</p></article>
+      <article class="feat"><div class="ico">💡</div><h3>迁移指南</h3><p>老用户平滑过渡不踩坑</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>v3.0</b><span>本次版本</span></div>
+      <div class="stat"><b>28</b><span>新能力</span></div>
+      <div class="stat"><b>0</b><span>破坏性变更</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 深色压顶风</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#FF5C8A;--zhongdian:#FFD166;--di:#0E0E14;--zi:#ffffff;--yuanjiao:14px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#FF5C8A"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#FFD166"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0E0E14"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#ffffff"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#a7a7b5"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 28
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 30
+      }
+    ],
+    来源: "西瓜同学🍉 抖音（用户授权参考）+ 逐字稿 + 截图#7"
+  },
+  {
+    id: "f009",
+    风格名: "暖调留白型",
+    骨架: "单栏落地页(Z型)",
+    配色: {
+      "暖米底": "80%",
+      "暖橙(唯一CTA)": "8%",
+      "墨字": "12%"
+    },
+    布局骨架: "居中单栏落地页：大标题 + 一句价值主张 + 唯一实心 CTA + 一个文字次链（Z 型视觉动线）",
+    重色落点: "暖橙只压在唯一主 CTA 上，全站其余皆墨字/留白——重色压「一处行动」",
+    第一屏内容: "大标题 + 价值主张 + 主 CTA，先被留白和那一个橙按钮吸引",
+    删减元素: "去色块墙 / 去多卡 / 去状态点，只留一处行动",
+    适用: "品牌首页/作品集/个人站落地页，重呼吸感与转化",
+    禁忌: "信息极密后台、需快速扫数的监控",
+    参考站: [
+      "Apple 产品页(暖白)",
+      "Aesop",
+      "Kinfolk"
+    ],
+    我的说明: "暖米大面积留白，唯一橙 CTA 跳出来；单栏 Z 型动线，一个焦点。重色压「一处行动」而非分区。",
+    演示页: "assets/demos/方案-暖调留白型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·暖调留白型</title>
+<style>
+:root{--zhucai:#C2683F;--zhongdian:#E0A96D;--di:#FBF4EC;--zi:#3a2e25;--cizi:#9b8a78;--yuanjiao:20px;--jianju:16px;--zihao:15px;--yinying:16;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="center" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">暖调留白型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">了解我们</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>温度品牌</h1><p class="sub">暖调留白，像一杯热茶——让用户愿意多待一会儿</p><div class="btns"><button class="btn solid">了解我们</button><button class="btn ghost">成为会员</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🌿</div><h3>我们的理念</h3><p>把价值观写进首屏，先交朋友</p></article>
+      <article class="feat"><div class="ico">🤝</div><h3>客户故事</h3><p>真实的人，真实的使用场景</p></article>
+      <article class="feat"><div class="ico">🎁</div><h3>加入我们</h3><p>低门槛行动点，顺手就转化</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>92%</b><span>复访率</span></div>
+      <div class="stat"><b>6.5万</b><span>社群</span></div>
+      <div class="stat"><b>4.8</b><span>满意度</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 暖调留白型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#C2683F;--zhongdian:#E0A96D;--di:#FBF4EC;--zi:#3a2e25;--yuanjiao:20px;--jianju:16px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#C2683F"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#E0A96D"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#FBF4EC"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#3a2e25"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#9b8a78"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 20
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 16
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 16
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 由「2栏留白」改为「单栏落地页 Z 型」，与荧光点睛去重）"
+  },
+  {
+    id: "f010",
+    风格名: "强对比视觉型",
+    骨架: "瑞士分屏海报",
+    配色: {
+      "纯黑(左板)": "45%",
+      "纯白(右板)": "50%",
+      "警示红(点睛)": "5%"
+    },
+    布局骨架: "左右分屏：左黑面板白大字宣言，右白面板内容；红只点「核心」一处，3px 硬边无圆角无阴影",
+    重色落点: "黑白硬碰，红只点「核心」一处——重色压「硬对比+一点红」",
+    第一屏内容: "左黑宣言板 + 右白内容板（先被硬边分切和一点红吸引）",
+    删减元素: "去灰阶过渡 / 去圆角 / 去阴影，纯平硬边",
+    适用: "极简/宣言式/强调单一信息的页面",
+    禁忌: "柔和品牌、多信息层级",
+    参考站: [
+      "Swiss Style",
+      "Herbert Bayer 版式",
+      "Stripe 旧版黑底白字"
+    ],
+    我的说明: "黑白直接硬碰最强烈；红一点在核心处跳；3px 硬边统一全站。重色压「硬对比+一点红」。",
+    演示页: "assets/demos/方案-强对比视觉型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·强对比视觉型</title>
+<style>
+:root{--zhucai:#FFE600;--zhongdian:#111111;--di:#0a0a0a;--zi:#ffffff;--cizi:#cfcfcf;--yuanjiao:4px;--jianju:12px;--zihao:15px;--yinying:14;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="left" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">强对比视觉型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">开始</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>强对比主张</h1><p class="sub">黑白撞色 + 一处亮黄，观点直接砸到脸上</p><div class="btns"><button class="btn solid">开始</button><button class="btn ghost">看案例</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">⚡</div><h3>主张</h3><p>一个大句子，不解释</p></article>
+      <article class="feat"><div class="ico">✔</div><h3>证据</h3><p>三点支撑，短平快</p></article>
+      <article class="feat"><div class="ico">➡</div><h3>行动</h3><p>亮色按钮，闭眼也能找到</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>3x</b><span>效率提升</span></div>
+      <div class="stat"><b>0</b><span>学习成本</span></div>
+      <div class="stat"><b>24h</b><span>上线速度</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 强对比视觉型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#FFE600;--zhongdian:#111111;--di:#0a0a0a;--zi:#ffffff;--yuanjiao:4px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#FFE600"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#111111"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0a0a0a"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#ffffff"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#cfcfcf"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 4
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 14
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 由「2栏硬边」改为「左右分屏海报」，与留白族区分在「分屏硬碰」）"
+  },
+  {
+    id: "f011",
+    风格名: "冷调科技型",
+    骨架: "深色数据墙",
+    配色: {
+      "深蓝底": "80%",
+      "冰蓝/青(主色)": "15%",
+      "面板线": "5%"
+    },
+    布局骨架: "深蓝底 + 左导航 + 多面板数据墙（青色只点当前态/告警/数据）；f015 霓虹赛博已并入本方案作「发光」变体",
+    重色落点: "青色只点「当前态/告警」与数据，深蓝托底——重色压「冷色高亮」；发光参数>0 即霓虹态",
+    第一屏内容: "深蓝控制台 + 青色高亮数据墙（先被冷色科技感吸引）",
+    删减元素: "去暖色 / 去渐变花哨 / 去留白",
+    适用: "数据/运维/科技产品后台（暗色）",
+    禁忌: "暖色品牌、柔和展示",
+    参考站: [
+      "Vercel",
+      "Linear(暗色)",
+      "Supabase",
+      "Cyberpunk 2077 UI(发光变体)"
+    ],
+    我的说明: "深蓝底冷静，青色高亮跳数据；面板线统一分隔。重色压「冷色高亮」。霓虹=开发光参数。",
+    演示页: "assets/demos/方案-冷调科技型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·冷调科技型</title>
+<style>
+:root{--zhucai:#39D0D8;--zhongdian:#5B8CFF;--di:#0A0E1A;--zi:#e8f4f8;--cizi:#8fa6b8;--yuanjiao:12px;--jianju:12px;--zihao:15px;--yinying:20;--faguang:40}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="center" data-glow="1">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">冷调科技型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">申请内测</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>科技产品</h1><p class="sub">冷调 + 发光，给技术控一点「未来已来」的暗爽</p><div class="btns"><button class="btn solid">申请内测</button><button class="btn ghost">读文档</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">⚙</div><h3>引擎</h3><p>底层自研，性能拉满</p></article>
+      <article class="feat"><div class="ico">🔌</div><h3>开放接口</h3><p>SDK / API 随心接</p></article>
+      <article class="feat"><div class="ico">🛰</div><h3>云端同步</h3><p>多端一致，无缝切换</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>12ms</b><span>推理延迟</span></div>
+      <div class="stat"><b>99.99%</b><span>稳定</span></div>
+      <div class="stat"><b>30+</b><span>开放接口</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 冷调科技型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#39D0D8;--zhongdian:#5B8CFF;--di:#0A0E1A;--zi:#e8f4f8;--yuanjiao:12px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#39D0D8"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#5B8CFF"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0A0E1A"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#e8f4f8"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#8fa6b8"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 20
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 40
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 并入 f015 霓虹赛博作「发光」参数变体）"
+  },
+  {
+    id: "f012",
+    风格名: "自然有机型",
+    骨架: "有机侧栏+主卡",
+    配色: {
+      "米白底": "75%",
+      "叶绿(主)": "15%",
+      "陶土(点缀)": "10%"
+    },
+    布局骨架: "左窄有机圆角导航 + 右主卡（大叶绿数字+有机斑驳底）+ 下方支撑列表；大圆角统一",
+    重色落点: "叶绿压主指标，圆角有机感——重色压「自然主色」",
+    第一屏内容: "米白 + 叶绿大数字（自然呼吸，先被圆润叶绿吸引）",
+    删减元素: "去直角硬边 / 去高饱和 / 去密集网格",
+    适用: "环保/生活/健康类品牌站",
+    禁忌: "科技冷感、极简工业",
+    参考站: [
+      "Patagonia",
+      "Notion 自然风",
+      "Garden 类站点"
+    ],
+    我的说明: "米白安静，叶绿温润跳主指标；大圆角统一全站有机感。重色压「自然主色」。",
+    演示页: "assets/demos/方案-自然有机型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·自然有机型</title>
+<style>
+:root{--zhucai:#5B8C5A;--zhongdian:#A7C957;--di:#F3F1E7;--zi:#2c3326;--cizi:#7e886f;--yuanjiao:22px;--jianju:16px;--zihao:15px;--yinying:14;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="asym" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">自然有机型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">逛一逛</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>自然有机</h1><p class="sub">柔和曲线与草木绿，让产品像长在自然里</p><div class="btns"><button class="btn solid">逛一逛</button><button class="btn ghost">我们的故事</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🌱</div><h3>可持续</h3><p>材料与流程都讲得清</p></article>
+      <article class="feat"><div class="ico">💧</div><h3>纯净配方</h3><p>少即是多，成分表敢公开</p></article>
+      <article class="feat"><div class="ico">🌍</div><h3>循环</h3><p>包装可回收，闭环交付</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>100%</b><span>可回收</span></div>
+      <div class="stat"><b>0</b><span>添加</span></div>
+      <div class="stat"><b>18</b><span>合作农场</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 自然有机型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#5B8C5A;--zhongdian:#A7C957;--di:#F3F1E7;--zi:#2c3326;--yuanjiao:22px;--jianju:16px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#5B8C5A"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#A7C957"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#F3F1E7"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#2c3326"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#7e886f"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 22
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 16
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 14
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 由「2栏留白」改为「有机侧栏+主卡」，与留白族区分在「有机圆角+叶绿」）"
+  },
+  {
+    id: "f013",
+    风格名: "复古胶片型",
+    骨架: "胶片横滚长廊",
+    配色: {
+      "胶片米": "78%",
+      "棕调(主)": "18%",
+      "砖红(点睛)": "4%"
+    },
+    布局骨架: "横向滚动胶片长廊：一排「胶片帧」（带齿孔）展示内容，砖红只点标签；整体蒙颗粒",
+    重色落点: "砖红只点标签/告警，整体蒙一层胶片颗粒——重色压「胶片质感」",
+    第一屏内容: "胶片质感 + 横向帧长廊（先被怀旧颗粒与横滚吸引）",
+    删减元素: "去纯白 / 去高亮 / 去现代圆角，靠颗粒+虚线",
+    适用: "摄影/文创/怀旧品牌",
+    禁忌: "现代科技感、明亮清爽",
+    参考站: [
+      "FilmSupply",
+      "VSCO",
+      "复古海报排版"
+    ],
+    我的说明: "胶片米安静，砖红小标签跳；齿孔+颗粒统一全站怀旧语感。重色压「胶片质感」。",
+    演示页: "assets/demos/方案-复古胶片型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·复古胶片型</title>
+<style>
+:root{--zhucai:#C77B3B;--zhongdian:#E8A85C;--di:#2A211A;--zi:#F2E9DD;--cizi:#b89c82;--yuanjiao:8px;--jianju:12px;--zihao:15px;--yinying:18;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="film" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">复古胶片型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">看影集</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>胶片影像</h1><p class="sub">棕褐颗粒 + 横向胶片条，把回忆卷成一条长廊</p><div class="btns"><button class="btn solid">看影集</button><button class="btn ghost">约拍</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🎞</div><h3>胶片条</h3><p>横向滚动的影像流，像翻看底片</p></article>
+      <article class="feat"><div class="ico">📷</div><h3>色调</h3><p>统一暖橙，怀旧不脏</p></article>
+      <article class="feat"><div class="ico">🖼</div><h3>策展</h3><p>精选九张，讲一个故事</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>36</b><span>胶片卷</span></div>
+      <div class="stat"><b>9</b><span>精选帧</span></div>
+      <div class="stat"><b>1978</b><span>起点年</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 复古胶片型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#C77B3B;--zhongdian:#E8A85C;--di:#2A211A;--zi:#F2E9DD;--yuanjiao:8px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#C77B3B"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#E8A85C"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#2A211A"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#F2E9DD"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#b89c82"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 8
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 18
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 由「2栏留白」改为「胶片横滚长廊」，与留白族区分在「横滚帧+颗粒」）"
+  },
+  {
+    id: "f016",
+    风格名: "中式水墨型",
+    骨架: "水墨非对称",
+    配色: {
+      "宣纸白": "85%",
+      "墨黑(字/线)": "13%",
+      "朱印红(点睛)": "2%"
+    },
+    布局骨架: "非对称栅格：左侧竖排大标题（writing-mode vertical-rl）+ 右侧内容；朱印只点重点，右上印章",
+    重色落点: "朱印红只点「重点」印章，大面积宣纸+墨字——重色压「一点朱印」",
+    第一屏内容: "宣纸留白 + 墨色大标题 + 右上朱印（先被留白与印章吸引）",
+    删减元素: "去色块 / 去圆角 / 去阴影，靠留白+细线+衬线",
+    适用: "文化/国学/茶/传统品牌",
+    禁忌: "现代科技、活泼卡通",
+    参考站: [
+      "故宫/茶颜悦色",
+      "汉字文化站",
+      "宣纸风排版"
+    ],
+    我的说明: "宣纸大面积留白，墨字沉稳，朱印一点跳；细线+衬线统一传统语感。重色压「一点朱印」。",
+    演示页: "assets/demos/方案-中式水墨型.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·中式水墨型</title>
+<style>
+:root{--zhucai:#9E2B25;--zhongdian:#1c1c1c;--di:#F5F1E8;--zi:#23201a;--cizi:#8c8576;--yuanjiao:4px;--jianju:14px;--zihao:15px;--yinying:8;--faguang:0;--mo:#3a342b}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="asym" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">中式水墨型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">入展</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>东方水墨</h1><p class="sub">宣纸留白 + 一抹朱印，把克制做成高级</p><div class="btns"><button class="btn solid">入展</button><button class="btn ghost">读跋</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">山</div><h3>留白</h3><p>不画满，气韵自己走出来</p></article>
+      <article class="feat"><div class="ico">水</div><h3>笔意</h3><p>线条要有提按，不是描边</p></article>
+      <article class="feat"><div class="ico">印</div><h3>点睛</h3><p>一处朱红，镇住全局</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>8</b><span>留白比</span></div>
+      <div class="stat"><b>1</b><span>朱印</span></div>
+      <div class="stat"><b>∞</b><span>余韵</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 中式水墨型</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#9E2B25;--zhongdian:#1c1c1c;--di:#F5F1E8;--zi:#23201a;--yuanjiao:4px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#9E2B25"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#1c1c1c"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#F5F1E8"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#23201a"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#8c8576"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 4
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 8
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      },
+      {
+        "键": "mo",
+        "名": "墨色",
+        "类型": "color",
+        "默认": "#3a342b"
+      }
+    ],
+    来源: "自建（Web Coding · 色调系；v3 由「2栏留白」改为「水墨非对称」，与留白族区分在「竖排+印章」）"
+  },
+  {
+    id: "f017",
+    风格名: "双按钮",
+    骨架: "转化页开头",
+    配色: {
+      "页面底": "70%",
+      "实心按钮(主强调)": "12%",
+      "描边按钮(弱化)": "10%",
+      "步骤卡底": "8%"
+    },
+    布局骨架: "转化页开头：大标题 + 一句目的 + 双按钮（虚按钮「进一步了解」+ 实按钮「立即使用」）+ 三步说明卡",
+    重色落点: "实心按钮永远比描边按钮显眼（更深/更大/带阴影）——重色压「唯一主行动」",
+    第一屏内容: "大标题 + 双按钮（实按钮先被看见），先被那个实心按钮吸引",
+    删减元素: "去多余装饰 / 去多 CTA 竞争 / 只留一实一虚",
+    适用: "落地页 / 转化页开头",
+    禁忌: "一页塞多个同级主按钮",
+    参考站: [
+      "Apple 官网",
+      "Stripe 落地页"
+    ],
+    我的说明: "实按钮=行动，虚按钮=了解；二者对比越大转化越清晰。重色压「唯一主行动」。从素材库 a101 迁入并补参数。",
+    演示页: "assets/demos/方案-双按钮.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·双按钮</title>
+<style>
+:root{--zhucai:#1a1a1a;--zhongdian:#ddd8ce;--di:#ffffff;--zi:#1a1a1a;--cizi:#6f6a5e;--yuanjiao:12px;--jianju:12px;--zihao:14px;--yinying:18;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="z" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">双按钮</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">立即使用</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>双按钮开头</h1><p class="sub">访客先了解、再行动——转化页的标准起手式</p><div class="btns"><button class="btn solid">立即使用</button><button class="btn ghost">进一步了解</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">①</div><h3>先了解</h3><p>虚按钮承接犹豫的访客</p></article>
+      <article class="feat"><div class="ico">②</div><h3>再行动</h3><p>实按钮永远更显眼</p></article>
+      <article class="feat"><div class="ico">③</div><h3>不贪</h3><p>一屏只放一件事，别抢</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>2</b><span>按钮</span></div>
+      <div class="stat"><b>1</b><span>焦点</span></div>
+      <div class="stat"><b>+34%</b><span>转化提升</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 双按钮</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#1a1a1a;--zhongdian:#ddd8ce;--di:#ffffff;--zi:#1a1a1a;--yuanjiao:12px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#1a1a1a"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#ddd8ce"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#ffffff"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#1a1a1a"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#6f6a5e"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 18
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "素材库 a101 双按钮（2026-08-20 Apple 官网分析）迁入方案库并补参数"
+  },
+  {
+    id: "f018",
+    风格名: "视觉重量",
+    骨架: "主角对照",
+    配色: {
+      "页面底": "70%",
+      "主角强调(墨黑)": "12%",
+      "普通版弱化": "10%",
+      "步骤卡底": "8%"
+    },
+    布局骨架: "左右对照：左「普通版」小且灰，右「主角版」大且强调——一眼看出重量差；下方三步说明",
+    重色落点: "主角版加 2-3 个重量（更大/对比/阴影），普通版刻意弱化——重色压「主角」",
+    第一屏内容: "左普通右主角的对照（先被右边那个更重的块吸引）",
+    删减元素: "去平铺 / 去同权重罗列，强制分出主次",
+    适用: "全站通用 · 让最重要的事第一眼被看见",
+    禁忌: "一页多个等重主角",
+    参考站: [
+      "Apple 官网",
+      "网页设计方法论"
+    ],
+    我的说明: "先定主角，再给它加重量；闭眼再睁第一眼须落主角。重色压「主角」。从素材库 a102 迁入并补参数。",
+    演示页: "assets/demos/方案-视觉重量.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·视觉重量</title>
+<style>
+:root{--zhucai:#2D6CDF;--zhongdian:#E8C547;--di:#F7F8FA;--zi:#1d2330;--cizi:#7c8696;--yuanjiao:14px;--jianju:14px;--zihao:15px;--yinying:20;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="split" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">视觉重量</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">主行动</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>视觉重量对照</h1><p class="sub">左边轻、右边重——用分量差告诉用户该看哪边</p><div class="btns"><button class="btn solid">主行动</button><button class="btn ghost">次行动</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">⚖</div><h3>配重</h3><p>主信息压重，次要信息减重</p></article>
+      <article class="feat"><div class="ico">👁</div><h3>视线</h3><p>重的一边自然先被看见</p></article>
+      <article class="feat"><div class="ico">🎯</div><h3>聚焦</h3><p>减少选择，落点唯一</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>70%</b><span>视觉重量</span></div>
+      <div class="stat"><b>1</b><span>落点</span></div>
+      <div class="stat"><b>-2</b><span>干扰项</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 视觉重量</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#2D6CDF;--zhongdian:#E8C547;--di:#F7F8FA;--zi:#1d2330;--yuanjiao:14px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#2D6CDF"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#E8C547"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#F7F8FA"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#1d2330"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#7c8696"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 20
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "素材库 a102 视觉重量（Apple 官网分析 + 方法论）迁入方案库并补参数"
+  },
+  {
+    id: "s203",
+    风格名: "首页动线",
+    骨架: "导航 + 首屏门面",
+    配色: {
+      "品牌色": "58%",
+      "内容底": "30%",
+      "强调色": "12%"
+    },
+    布局骨架: "顶部导航（Logo + 菜单 + CTA）+ 首屏左文右视觉，导航首项即品牌词",
+    重色落点: "导航 CTA 与首屏实按钮同用品牌色，视觉重量压在右视觉块",
+    第一屏内容: "导航 + 大标题 + 双按钮 + 右侧视觉块",
+    删减元素: "去多余栏目、去装饰线",
+    适用: "所有需要「门面感」的官网首页",
+    禁忌: "信息流 / 后台",
+    参考站: [
+      "OpenAI",
+      "Apple",
+      "Linear"
+    ],
+    我的说明: "导航 + 首屏 = 完整门面；导航首项写品牌关键词，首屏讲清你是干嘛的。",
+    演示页: "assets/demos/方案-首页动线.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·首页动线</title>
+<style>
+:root{--zhucai:#6D5BD0;--zhongdian:#A78BFA;--di:#FFFFFF;--zi:#1d1a2b;--cizi:#7b7596;--yuanjiao:14px;--jianju:14px;--zihao:15px;--yinying:18;--faguang:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="split" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">首页动线</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">开始使用</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>站点的门面</h1><p class="sub">导航讲结构，首屏讲价值——访客三秒懂你在做什么</p><div class="btns"><button class="btn solid">开始使用</button><button class="btn ghost">了解更多</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🧭</div><h3>导航结构</h3><p>首项放品牌词，菜单匹配站点结构</p></article>
+      <article class="feat"><div class="ico">🎯</div><h3>首屏焦点</h3><p>一个大主张 + 双按钮，落点唯一</p></article>
+      <article class="feat"><div class="ico">🚪</div><h3>行动点</h3><p>CTA 用品牌色，重过其余</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>3s</b><span>理解成本</span></div>
+      <div class="stat"><b>1</b><span>焦点</span></div>
+      <div class="stat"><b>+28%</b><span>留资</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 首页动线</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#6D5BD0;--zhongdian:#A78BFA;--di:#FFFFFF;--zi:#1d1a2b;--yuanjiao:14px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#6D5BD0"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#A78BFA"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#FFFFFF"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#1d1a2b"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#7b7596"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 18
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      }
+    ],
+    来源: "素材库 s203 首页动线（2026-09-07 并入方案库）"
+  },
+  {
+    id: "v131",
+    风格名: "动效节奏",
+    骨架: "动效节奏演示",
+    配色: {
+      "暗底": "70%",
+      "渐变主": "18%",
+      "渐变辅": "12%"
+    },
+    布局骨架: "横向胶片条展示「入场 / 悬停 / 滚动」三段节奏，配说明卡",
+    重色落点: "渐变主色压在胶片条当前帧，说明卡用次级底",
+    第一屏内容: "节奏总览 + 三段横向演示条",
+    删减元素: "去静态大图、去多余文案",
+    适用: "需要「动起来才有感觉」的页面",
+    禁忌: "极简文字站",
+    参考站: [
+      "Awwwards",
+      "ReactBits"
+    ],
+    我的说明: "动效不是装饰，是节奏——入场抓眼、悬停回应、滚动推进。",
+    演示页: "assets/demos/方案-动效节奏.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·动效节奏</title>
+<style>
+:root{--zhucai:#FF7A59;--zhongdian:#7C5CFF;--di:#0D0B14;--zi:#F3EEFF;--cizi:#a99fce;--yuanjiao:14px;--jianju:12px;--zihao:15px;--yinying:18;--faguang:35}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="film" data-glow="1">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">动效节奏</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">看动效</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>动效的节奏</h1><p class="sub">入场、悬停、滚动——三段节奏让页面会呼吸</p><div class="btns"><button class="btn solid">看动效</button><button class="btn ghost">取代码</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">↗</div><h3>入场</h3><p>元素错落淡入，先抓眼</p></article>
+      <article class="feat"><div class="ico">🖱</div><h3>悬停</h3><p>轻微位移 + 上浮，给回应</p></article>
+      <article class="feat"><div class="ico">📜</div><h3>滚动</h3><p>随滚动推进，叙事不中断</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>3</b><span>节奏段</span></div>
+      <div class="stat"><b>200ms</b><span>入场</span></div>
+      <div class="stat"><b>1x</b><span>循环</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 动效节奏</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#FF7A59;--zhongdian:#7C5CFF;--di:#0D0B14;--zi:#F3EEFF;--yuanjiao:14px;--jianju:12px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#FF7A59"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#7C5CFF"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0D0B14"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#F3EEFF"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#a99fce"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 18
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 35
+      }
+    ],
+    来源: "素材库 v131 动效节奏（2026-09-07 并入方案库）"
+  },
+  {
+    id: "v141",
+    风格名: "整站首屏探索",
+    骨架: "整站首屏 · 探索发现",
+    配色: {
+      "深底": "68%",
+      "品牌叠": "20%",
+      "揭示叠": "12%"
+    },
+    布局骨架: "非对称首屏：大字标题居左，右侧揭示图叠品牌色，留出探索感",
+    重色落点: "右侧揭示图用品牌叠色，与左侧大字形成轻重对照",
+    第一屏内容: "探索式大标题 + 揭示视觉 + 单 CTA",
+    删减元素: "去传统菜单堆、去多栏",
+    适用: "作品集 / 产品探索页",
+    禁忌: "信息密集后台",
+    参考站: [
+      "Interactive Discovery",
+      "Awwwards"
+    ],
+    我的说明: "首屏不是陈列，是邀请——用留白和揭示图勾起「点进去看看」的冲动。",
+    演示页: "assets/demos/方案-整站首屏探索.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·整站首屏探索</title>
+<style>
+:root{--zhucai:#E8702A;--zhongdian:#1b1206;--di:#12100c;--zi:#FBF4E9;--cizi:#b9a489;--yuanjiao:10px;--jianju:14px;--zihao:15px;--yinying:16;--faguang:0;--mo:#3a2a12}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="asym" data-glow="0">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">整站首屏探索</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">开始探索</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>Layers hold tales</h1><p class="sub">把探索交给用户——首屏只抛一个钩子，其余留白</p><div class="btns"><button class="btn solid">开始探索</button><button class="btn ghost">看案例</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🔍</div><h3>探索</h3><p>留白即是路径，引导不强迫</p></article>
+      <article class="feat"><div class="ico">💡</div><h3>发现</h3><p>揭示图随交互显形，给惊喜</p></article>
+      <article class="feat"><div class="ico">🤝</div><h3>互动</h3><p>单 CTA 收口，低门槛进入</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>1</b><span>钩子</span></div>
+      <div class="stat"><b>∞</b><span>路径</span></div>
+      <div class="stat"><b>0</b><span>干扰</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 整站首屏探索</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#E8702A;--zhongdian:#1b1206;--di:#12100c;--zi:#FBF4E9;--yuanjiao:10px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#E8702A"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#1b1206"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#12100c"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#FBF4E9"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#b9a489"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 10
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 16
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 0
+      },
+      {
+        "键": "mo",
+        "名": "墨色",
+        "类型": "color",
+        "默认": "#3a2a12"
+      }
+    ],
+    来源: "素材库 v141 Interactive Discovery 整站首屏（2026-09-07 并入方案库）"
+  },
+  {
+    id: "s205",
+    风格名: "焦点型 Hero",
+    骨架: "焦点型首屏",
+    配色: {
+      "焦点底": "62%",
+      "聚光": "26%",
+      "文字": "12%"
+    },
+    布局骨架: "整屏居中焦点：超大标题独占视觉重心，四周大量留白",
+    重色落点: "超大标题 + 聚光底色块独大，其余元素减重让位",
+    第一屏内容: "焦点大标题 + 一句副文 + 双按钮",
+    删减元素: "去导航堆、去侧栏、去一切抢戏",
+    适用: "单点主张 / 活动 / 产品发布",
+    禁忌: "多任务页",
+    参考站: [
+      "Apple Event",
+      "Linear"
+    ],
+    我的说明: "一屏只做一件事：让用户记住这一句话。",
+    演示页: "assets/demos/方案-焦点型Hero.html",
+    代码: `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·焦点型 Hero</title>
+<style>
+:root{--zhucai:#FF4D6D;--zhongdian:#FFD6A5;--di:#16121A;--zi:#ffffff;--cizi:#c8b8c4;--yuanjiao:16px;--jianju:14px;--zihao:16px;--yinying:26;--faguang:25}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
+.hero-text{max-width:640px;}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
+.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
+.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
+.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
+.feat .ico{font-size:26px;}
+.feat h3{margin:10px 0 6px;font-size:16px;}
+.feat p{font-size:13.5px;color:var(--cizi);}
+.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
+.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+.visual{display:none;}
+body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+body[data-lay="center"] .hero-text{margin:0 auto;}
+body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
+body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
+body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
+body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
+body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+</style>
+</head>
+<body data-lay="center" data-glow="1">
+  <div class="wrap">
+    <nav class="nav"><span class="logo">焦点型 Hero</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">立即参与</button></nav>
+    <header class="hero">
+      <div class="hero-text"><h1>记住这一句</h1><p class="sub">整屏只放一个主张，其余全让位</p><div class="btns"><button class="btn solid">立即参与</button><button class="btn ghost">了解详情</button></div></div>
+      <div class="visual"></div>
+    </header>
+    <section class="features">
+      <article class="feat"><div class="ico">🎯</div><h3>单焦点</h3><p>标题独占视觉重心，不解释</p></article>
+      <article class="feat"><div class="ico">🌟</div><h3>聚光</h3><p>底色块把视线收拢到中心</p></article>
+      <article class="feat"><div class="ico">↘</div><h3>收口</h3><p>双按钮在焦点下方，顺手转化</p></article>
+    </section>
+    <section class="stats">
+      <div class="stat"><b>1</b><span>焦点</span></div>
+      <div class="stat"><b>100%</b><span>屏占比</span></div>
+      <div class="stat"><b>0</b><span>干扰</span></div>
+    </section>
+    <footer class="foot"><span>© 2026 焦点型 Hero</span><span>隐私 · 条款 · 联系</span></footer>
+  </div>
+<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+</body>
+</html>`,
+    片段: `:root{--zhucai:#FF4D6D;--zhongdian:#FFD6A5;--di:#16121A;--zi:#ffffff;--yuanjiao:16px;--jianju:14px;}
+body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei",sans-serif;line-height:1.6;}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px;}
+.nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding:14px 0;}
+.hero h1{font-size:calc(15px*2.6);font-weight:800;}
+.btn.solid{background:var(--zhucai);color:#fff;border-radius:var(--yuanjiao);padding:13px 30px;font-weight:700;border:none;}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--jianju);margin-top:32px;}
+.feat{border:1px solid rgba(0,0,0,.1);border-radius:calc(var(--yuanjiao)*1.2);padding:20px;}
+.stat b{color:var(--zhongdian);font-size:32px;font-weight:800;}`,
+    参数: [
+      {
+        "键": "zhucai",
+        "名": "主色",
+        "类型": "color",
+        "默认": "#FF4D6D"
+      },
+      {
+        "键": "zhongdian",
+        "名": "重点色",
+        "类型": "color",
+        "默认": "#FFD6A5"
+      },
+      {
+        "键": "di",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#16121A"
+      },
+      {
+        "键": "zi",
+        "名": "正文色",
+        "类型": "color",
+        "默认": "#ffffff"
+      },
+      {
+        "键": "cizi",
+        "名": "次要文字色",
+        "类型": "color",
+        "默认": "#c8b8c4"
+      },
+      {
+        "键": "yuanjiao",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 16
+      },
+      {
+        "键": "jianju",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 4,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "zihao",
+        "名": "基础字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 16
+      },
+      {
+        "键": "yinying",
+        "名": "阴影强度",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 60,
+        "步长": 2,
+        "默认": 26
+      },
+      {
+        "键": "faguang",
+        "名": "发光强度(%)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 100,
+        "步长": 2,
+        "默认": 25
+      }
+    ],
+    来源: "素材库 s205 焦点型Hero（2026-09-07 并入方案库）"
+  }
+];

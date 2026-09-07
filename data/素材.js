@@ -627,223 +627,6 @@ window.WEB_ARSENAL = [
     复用记录: ""
   },
   {
-    id: "a101",
-    标题: "双按钮",
-    分类: "方案",
-    风格: [
-      "克制简约"
-    ],
-    场景: [
-      "落地页"
-    ],
-    元素: [
-      "版面",
-      "颜色"
-    ],
-    搭配: [
-      "水波按钮"
-    ],
-    标签: [
-      "转化",
-      "落地页"
-    ],
-    来源: "Apple 官网分析（2026-08-20）",
-    效果演示: "assets/demos/双按钮套路.html",
-    参数: [
-      {
-        键: "solidColor",
-        名: "实心按钮底色（主强调色）",
-        类型: "color",
-        默认: "#1a1a1a"
-      },
-      {
-        键: "solidText",
-        名: "实心按钮文字色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "ghostBorder",
-        名: "描边按钮边框色",
-        类型: "color",
-        默认: "#ddd8ce"
-      },
-      {
-        键: "ghostText",
-        名: "描边按钮文字色",
-        类型: "color",
-        默认: "#6f6a5e"
-      },
-      {
-        键: "bg",
-        名: "页面背景色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "cardBg",
-        名: "步骤卡片底色",
-        类型: "color",
-        默认: "#faf9f6"
-      },
-      {
-        键: "radius",
-        名: "卡片圆角（px）",
-        类型: "slider",
-        最小: 0,
-        最大: 24,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "btnRadius",
-        名: "按钮圆角（px）",
-        类型: "slider",
-        最小: 0,
-        最大: 30,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "fontSize",
-        名: "按钮字号（px）",
-        类型: "slider",
-        最小: 12,
-        最大: 20,
-        步长: 1,
-        默认: 14
-      },
-      {
-        键: "gap",
-        名: "按钮间距（px）",
-        类型: "slider",
-        最小: 0,
-        最大: 40,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "shadow",
-        名: "实心按钮阴影强度（%）",
-        类型: "slider",
-        最小: 0,
-        最大: 50,
-        步长: 2,
-        默认: 18
-      }
-    ],
-    效果说明: "落地页开头：大标题下放两个按钮——虚按钮（描边）让访客先了解，实按钮（实心）让访客行动。转化页的标准开头。",
-    用法: "方案页里三步写得清清楚楚，照做就行；不用调参。",
-    提示词: "帮我做一个落地页开头，用\"双按钮\"方案：\n\n目的：让访客先了解，再行动。\n\n步骤：\n1. 放一个大标题，说清你是干嘛的\n2. 标题下放两个按钮：虚按钮（描边）\"进一步了解\" + 实按钮（实心）\"立即使用\"\n3. 实按钮永远比虚按钮显眼（大 / 颜色深 / 带阴影）\n\n示意代码：\n<a class=\"btn ghost\">进一步了解</a>  // 虚：描边 + 低对比\n<a class=\"btn solid\">立即使用</a>    // 实：实心 + 高对比 + 阴影\n\n关键参数：\n- solidColor 实心按钮底色 / solidText 实心按钮文字色 / ghostBorder 描边按钮边框色 / ghostText 描边按钮文字色 / bg 页面背景色 / cardBg 步骤卡片底色 / radius 卡片圆角 / btnRadius 按钮圆角 / fontSize 按钮字号 / gap 按钮间距 / shadow 实心按钮阴影强度\n\n集成步骤：\n1. 复制 assets/demos/双按钮套路.html 的结构\n2. 换成你的产品文案\n3. 主按钮文案写成交动作（立即 / 购买 / 开始）",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>双按钮方案</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; display: flex; align-items: center; justify-content: center;\n    background: var(--page, #fff); font-family: system-ui, \"Microsoft YaHei\", sans-serif; padding: 20px;\n  }\n  .plan { width: min(560px, 94vw); }\n  .plan h1 { font-size: 26px; font-weight: 800; color: var(--ink, #1a1a1a); }\n  .aim { margin-top: 6px; font-size: 14px; color: #8a8a85; }\n  .steps { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }\n  .step {\n    display: flex; gap: 12px; align-items: flex-start;\n    background: var(--card, #faf9f6); border: 1px solid #ecebe7;\n    border-radius: var(--r, 12px); padding: 12px 14px;\n    font-size: 14px; line-height: 1.7; color: #555;\n  }\n  .step b { color: var(--ink, #1a1a1a); white-space: nowrap; }\n  .demo {\n    margin-top: 20px; border: 1px dashed #dcdad2; border-radius: var(--r, 12px);\n    padding: 22px; text-align: center;\n  }\n  .demo h2 { font-size: 18px; font-weight: 700; color: var(--ink, #1a1a1a); }\n  .demo p { margin-top: 6px; font-size: 12.5px; color: #8a8a85; }\n  .btns { margin-top: 14px; display: flex; justify-content: center; gap: var(--gap, 12px); }\n  .btn { font-size: var(--fs, 14px); padding: 11px 26px; border-radius: var(--btn-r, 12px); }\n  .btn.ghost { border: 1.5px solid var(--ghost-bd, #ddd8ce); color: var(--ghost-t, #6f6a5e); }\n  .btn.solid {\n    background: var(--solid, #1a1a1a); color: var(--solid-t, #fff); font-weight: 700;\n    box-shadow: 0 8px 18px color-mix(in srgb, var(--solid, #1a1a1a) var(--shadow, 18%), transparent);\n  }\n</style>\n</head>\n<body>\n  <div class=\"plan\">\n    <h1>双按钮</h1>\n    <p class=\"aim\">目的：让访客先了解，再行动——转化页的标准开头</p>\n    <div class=\"steps\">\n      <div class=\"step\"><b>1.</b> 放一个大标题，说清你是干嘛的</div>\n      <div class=\"step\"><b>2.</b> 标题下放两个按钮：<br>「虚」描边按钮 = 先给信息（进一步了解）<br>「实」实心按钮 = 要行动（立即使用）</div>\n      <div class=\"step\"><b>3.</b> 实按钮永远比虚按钮显眼（大/颜色深/带阴影）</div>\n    </div>\n    <div class=\"demo\">\n      <h2>把灵感变成可复用的弹药</h2>\n      <p>示意：左边虚、右边实</p>\n      <div class=\"btns\">\n        <span class=\"btn ghost\">进一步了解</span>\n        <span class=\"btn solid\">立即使用</span>\n      </div>\n    </div>\n  </div>\n  <script>\n    // 默认参数（父页面详情页可调）\n    const state = {\n      solidColor: \"#1a1a1a\", solidText: \"#ffffff\", ghostBorder: \"#ddd8ce\", ghostText: \"#6f6a5e\",\n      bg: \"#ffffff\", cardBg: \"#faf9f6\", radius: 12, btnRadius: 12, fontSize: 14,\n      gap: 12, shadow: 18\n    };\n\n    // 参数变了：全部走 CSS 变量，颜色/圆角/字号/间距实时变\n    function apply() {\n      const s = document.documentElement.style;\n      s.setProperty(\"--solid\", state.solidColor);\n      s.setProperty(\"--solid-t\", state.solidText);\n      s.setProperty(\"--ghost-bd\", state.ghostBorder);\n      s.setProperty(\"--ghost-t\", state.ghostText);\n      s.setProperty(\"--page\", state.bg);\n      s.setProperty(\"--card\", state.cardBg);\n      s.setProperty(\"--ink\", state.solidColor);\n      s.setProperty(\"--r\", state.radius + \"px\");\n      s.setProperty(\"--btn-r\", state.btnRadius + \"px\");\n      s.setProperty(\"--fs\", state.fontSize + \"px\");\n      s.setProperty(\"--gap\", state.gap + \"px\");\n      s.setProperty(\"--shadow\", state.shadow + \"%\");\n    }\n\n    // 接收父页面（index.html 详情页）传来的参数\n    window.addEventListener(\"message\", (e) => {\n      const d = e.data;\n      if (!d || d.type !== \"param\") return;\n      state[d.key] = d.value;\n      apply();\n    });\n    apply();\n  <\\/script>\n</body>\n</html>\n",
-    复用记录: ""
-  },
-  {
-    id: "a102",
-    标题: "视觉重量",
-    分类: "方案",
-    风格: [
-      "克制简约"
-    ],
-    场景: [
-      "全站通用"
-    ],
-    元素: [
-      "版面",
-      "留白"
-    ],
-    搭配: [
-      "双按钮"
-    ],
-    标签: [
-      "设计原理"
-    ],
-    来源: "Apple 官网分析 + 网页设计方法论（个人工作台已沉淀）",
-    效果演示: "assets/demos/视觉重量八杠杆.html",
-    参数: [
-      {
-        键: "accent",
-        名: "主角强调色",
-        类型: "color",
-        默认: "#1a1a1a"
-      },
-      {
-        键: "accentText",
-        名: "主角按钮文字色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "muteColor",
-        名: "普通版弱化色",
-        类型: "color",
-        默认: "#6f6a5e"
-      },
-      {
-        键: "bg",
-        名: "页面背景色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "cardBg",
-        名: "步骤卡片底色",
-        类型: "color",
-        默认: "#faf9f6"
-      },
-      {
-        键: "heroSize",
-        名: "主角字号（px）",
-        类型: "slider",
-        最小: 14,
-        最大: 36,
-        步长: 1,
-        默认: 22
-      },
-      {
-        键: "normalSize",
-        名: "普通版字号（px）",
-        类型: "slider",
-        最小: 12,
-        最大: 24,
-        步长: 1,
-        默认: 15
-      },
-      {
-        键: "radius",
-        名: "卡片圆角（px）",
-        类型: "slider",
-        最小: 0,
-        最大: 24,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "gap",
-        名: "对比卡片间距（px）",
-        类型: "slider",
-        最小: 4,
-        最大: 40,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "shadow",
-        名: "主角阴影强度（%）",
-        类型: "slider",
-        最小: 0,
-        最大: 50,
-        步长: 2,
-        默认: 18
-      }
-    ],
-    效果说明: "让页面上最重要的东西第一眼被看见：先定主角，给它加 2-3 个重量（变大 / 对比 / 留白 / 会动），闭眼再睁验证。",
-    用法: "方案页三步照做；演示页右边就是加过重量的对照，一眼看出差别；不用调参。",
-    提示词: "帮我做一个\"视觉重量\"方案页（纯 HTML/CSS/JS）：\n\n目的：让页面上最重要的东西，第一眼就被看见。\n\n步骤：\n1. 先定主角：这一页你最想让用户看什么\n2. 给主角加 2-3 个重量：变大加粗 / 颜色对比 / 周围留白 / 悬停会动\n3. 验证：闭眼再睁开，第一眼必须落在主角上\n\n示意代码（主角版）：\n.box.strong h3 { font-size: 22px; font-weight: 900; color: #1a1a1a; }\n.box.strong .b { background: #1a1a1a; color: #fff; box-shadow: 0 8px 18px rgba(26,26,26,.18); }\n\n关键参数：\n- accent 主角强调色 / accentText 主角按钮文字色 / muteColor 普通版弱化色 / bg 页面背景色 / cardBg 步骤卡片底色 / heroSize 主角字号 / normalSize 普通版字号 / radius 卡片圆角 / gap 对比卡片间距 / shadow 主角阴影强度\n\n集成步骤：\n1. 复制 assets/demos/视觉重量八杠杆.html 的结构\n2. 做自己的页面时先定主角，再加 2-3 个重量\n3. 验证：闭眼再睁，第一眼落在主角上",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>视觉重量方案</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; display: flex; align-items: center; justify-content: center;\n    background: var(--page, #fff); font-family: system-ui, \"Microsoft YaHei\", sans-serif; padding: 20px;\n  }\n  .plan { width: min(620px, 94vw); }\n  .plan h1 { font-size: 26px; font-weight: 800; color: var(--ink, #1a1a1a); }\n  .aim { margin-top: 6px; font-size: 14px; color: #8a8a85; }\n  .steps { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }\n  .step {\n    display: flex; gap: 12px; align-items: flex-start;\n    background: var(--card, #faf9f6); border: 1px solid #ecebe7;\n    border-radius: var(--r, 12px); padding: 12px 14px;\n    font-size: 14px; line-height: 1.7; color: #555;\n  }\n  .step b { color: var(--ink, #1a1a1a); white-space: nowrap; }\n  .compare {\n    margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap, 12px);\n  }\n  .box { border: 1px solid #ecebe7; border-radius: var(--r, 12px); padding: 18px; text-align: center; }\n  .box small { font-size: 12px; color: #8a8a85; }\n  .box h3 { margin-top: 10px; font-size: var(--normal-fs, 15px); font-weight: 600; color: var(--mute, #6f6a5e); }\n  .box .b {\n    margin-top: 10px; display: inline-block; font-size: 12.5px;\n    border: 1px solid #ddd8ce; color: var(--mute, #6f6a5e);\n    padding: 8px 18px; border-radius: 10px;\n  }\n  /* 主角版：字号更大更粗 + 强调色 + 阴影，三个「重量」杠杆一起上 */\n  .box.strong h3 { font-size: var(--hero-fs, 22px); font-weight: 900; color: var(--ink, #1a1a1a); }\n  .box.strong .b {\n    background: var(--ink, #1a1a1a); color: var(--solid-t, #fff);\n    border-color: var(--ink, #1a1a1a); font-weight: 700;\n    box-shadow: 0 8px 18px color-mix(in srgb, var(--ink, #1a1a1a) var(--shadow, 18%), transparent);\n  }\n</style>\n</head>\n<body>\n  <div class=\"plan\">\n    <h1>视觉重量</h1>\n    <p class=\"aim\">目的：让页面上最重要的东西，第一眼就被看见</p>\n    <div class=\"steps\">\n      <div class=\"step\"><b>1.</b> 先定主角：这一页你最想让用户看什么</div>\n      <div class=\"step\"><b>2.</b> 给主角加 2-3 个「重量」：变大加粗 / 颜色对比 / 周围留白 / 悬停会动</div>\n      <div class=\"step\"><b>3.</b> 验证：闭眼再睁开，第一眼必须落在主角上，不是就不够重</div>\n    </div>\n    <div class=\"compare\">\n      <div class=\"box\">\n        <small>普通版（重量不够）</small>\n        <h3>试试我们的产品</h3>\n        <span class=\"b\">了解更多</span>\n      </div>\n      <div class=\"box strong\">\n        <small>主角版（加了重量）</small>\n        <h3>把灵感变成弹药</h3>\n        <span class=\"b\">立即开始</span>\n      </div>\n    </div>\n  </div>\n  <script>\n    // 默认参数（父页面详情页可调）\n    const state = {\n      accent: \"#1a1a1a\", accentText: \"#ffffff\", muteColor: \"#6f6a5e\",\n      bg: \"#ffffff\", cardBg: \"#faf9f6\", heroSize: 22, normalSize: 15,\n      radius: 12, gap: 12, shadow: 18\n    };\n\n    // 参数变了：全部走 CSS 变量，字号对比/颜色/阴影实时变\n    function apply() {\n      const s = document.documentElement.style;\n      s.setProperty(\"--ink\", state.accent);\n      s.setProperty(\"--solid-t\", state.accentText);\n      s.setProperty(\"--mute\", state.muteColor);\n      s.setProperty(\"--page\", state.bg);\n      s.setProperty(\"--card\", state.cardBg);\n      s.setProperty(\"--hero-fs\", state.heroSize + \"px\");\n      s.setProperty(\"--normal-fs\", state.normalSize + \"px\");\n      s.setProperty(\"--r\", state.radius + \"px\");\n      s.setProperty(\"--gap\", state.gap + \"px\");\n      s.setProperty(\"--shadow\", state.shadow + \"%\");\n    }\n\n    // 接收父页面（index.html 详情页）传来的参数\n    window.addEventListener(\"message\", (e) => {\n      const d = e.data;\n      if (!d || d.type !== \"param\") return;\n      state[d.key] = d.value;\n      apply();\n    });\n    apply();\n  <\\/script>\n</body>\n</html>\n",
-    复用记录: ""
-  },
-  {
     id: "a103",
     标题: "产品卡悬停",
     分类: "动画",
@@ -1151,97 +934,6 @@ window.WEB_ARSENAL = [
     复用记录: ""
   },
   {
-    id: "s203",
-    标题: "首页动线",
-    分类: "方案",
-    风格: [
-      "克制简约"
-    ],
-    场景: [
-      "落地页"
-    ],
-    元素: [
-      "版面"
-    ],
-    搭配: [
-      "视觉重量"
-    ],
-    标签: [
-      "设计原理",
-      "转化",
-      "落地页"
-    ],
-    来源: "Stripe 官网分析（2026-08-26）",
-    效果演示: "assets/demos/首页动线.html",
-    参数: [
-      {
-        键: "accent1",
-        名: "焦点区渐变色 1",
-        类型: "color",
-        默认: "#7b5cff"
-      },
-      {
-        键: "accent2",
-        名: "焦点区渐变色 2",
-        类型: "color",
-        默认: "#ff5c8a"
-      },
-      {
-        键: "accent3",
-        名: "焦点区渐变色 3",
-        类型: "color",
-        默认: "#3ec6ff"
-      },
-      {
-        键: "dark",
-        名: "行动区主色",
-        类型: "color",
-        默认: "#1a1a1a"
-      },
-      {
-        键: "bg",
-        名: "页面背景色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "cardBg",
-        名: "步骤卡片底色",
-        类型: "color",
-        默认: "#faf9f6"
-      },
-      {
-        键: "flowBg",
-        名: "动线灰块底色",
-        类型: "color",
-        默认: "#f2f0eb"
-      },
-      {
-        键: "radius",
-        名: "卡片圆角（px）",
-        类型: "slider",
-        最小: 0,
-        最大: 24,
-        步长: 1,
-        默认: 12
-      },
-      {
-        键: "gap",
-        名: "动线块间距（px）",
-        类型: "slider",
-        最小: 2,
-        最大: 24,
-        步长: 1,
-        默认: 8
-      }
-    ],
-    效果说明: "落地页从上到下四步：焦点（吸睛画面）→ 信息（一句话说清）→ 行动（一个按钮）→ 证明（数据让访客放心）。",
-    用法: "方案页四步照做；演示页是四层示意图，直接换内容；不用调参。",
-    提示词: "帮我做一个按\"首页动线\"组织的落地页（纯 HTML/CSS/JS）：\n\n目的：让访客从上到下，一步一步被带着走。\n\n四步：\n① 焦点：一上来先给最吸睛的画面\n② 信息：一句话说清你是干嘛的\n③ 行动：只给一个主按钮\n④ 证明：数据 / 特性让访客放心\n\n结构示例：\n<section>① 焦点（大图/彩光）</section>\n<section>② 价值主张</section>\n<section>③ 主按钮</section>\n<section>④ 特性卡</section>\n\n关键参数：\n- accent1 焦点区渐变色 1 / accent2 焦点区渐变色 2 / accent3 焦点区渐变色 3 / dark 行动区主色 / bg 页面背景色 / cardBg 步骤卡片底色 / flowBg 动线灰块底色 / radius 卡片圆角 / gap 动线块间距\n\n集成步骤：\n1. 复制 assets/demos/首页动线.html 的结构\n2. 换成你的落地页内容\n3. 自查：第一眼焦点 → 价值主张 → 主行动 → 证明",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>首页动线方案</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; display: flex; align-items: center; justify-content: center;\n    background: var(--page, #fff); font-family: system-ui, \"Microsoft YaHei\", sans-serif; padding: 20px;\n  }\n  .plan { width: min(560px, 94vw); }\n  .plan h1 { font-size: 26px; font-weight: 800; color: var(--ink, #1a1a1a); }\n  .aim { margin-top: 6px; font-size: 14px; color: #8a8a85; }\n  .steps { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }\n  .step {\n    display: flex; gap: 12px; align-items: flex-start;\n    background: var(--card, #faf9f6); border: 1px solid #ecebe7;\n    border-radius: var(--r, 12px); padding: 12px 14px;\n    font-size: 14px; line-height: 1.7; color: #555;\n  }\n  .step b { color: var(--ink, #1a1a1a); white-space: nowrap; }\n  .flow { margin-top: 20px; display: flex; flex-direction: column; gap: var(--gap, 8px); }\n  .flow div {\n    border-radius: var(--flow-r, 10px); padding: 14px; text-align: center;\n    font-size: 13.5px; font-weight: 600;\n  }\n  /* 焦点区：三色渐变，三个颜色独立可调 */\n  .f1 { background: linear-gradient(135deg, var(--a1, #7b5cff), var(--a2, #ff5c8a) 50%, var(--a3, #3ec6ff)); color: #fff; }\n  .f2, .f4 { background: var(--flow-bg, #f2f0eb); }\n  .f3 { background: var(--ink, #1a1a1a); color: #fff; }\n</style>\n</head>\n<body>\n  <div class=\"plan\">\n    <h1>首页动线</h1>\n    <p class=\"aim\">目的：让访客从上到下，一步一步被带着走</p>\n    <div class=\"steps\">\n      <div class=\"step\"><b>① 焦点</b> 一上来先给最吸睛的画面（大图/彩光/动画）</div>\n      <div class=\"step\"><b>② 信息</b> 一句话说清你是干嘛的，3 秒看懂</div>\n      <div class=\"step\"><b>③ 行动</b> 只给一个主按钮，让访客点</div>\n      <div class=\"step\"><b>④ 证明</b> 数据 / 特性 / 合作方，让访客放心</div>\n    </div>\n    <div class=\"flow\">\n      <div class=\"f1\">① 焦点（最吸睛）</div>\n      <div class=\"f2\">② 信息（价值主张）</div>\n      <div class=\"f3\">③ 行动（主按钮）</div>\n      <div class=\"f4\">④ 证明（数据 / 特性）</div>\n    </div>\n  </div>\n  <script>\n    // 默认参数（父页面详情页可调）\n    const state = {\n      accent1: \"#7b5cff\", accent2: \"#ff5c8a\", accent3: \"#3ec6ff\", dark: \"#1a1a1a\",\n      bg: \"#ffffff\", cardBg: \"#faf9f6\", flowBg: \"#f2f0eb\", radius: 12, gap: 8\n    };\n\n    // 参数变了：全部走 CSS 变量，颜色/圆角/间距实时变\n    function apply() {\n      const s = document.documentElement.style;\n      s.setProperty(\"--a1\", state.accent1);\n      s.setProperty(\"--a2\", state.accent2);\n      s.setProperty(\"--a3\", state.accent3);\n      s.setProperty(\"--ink\", state.dark);\n      s.setProperty(\"--page\", state.bg);\n      s.setProperty(\"--card\", state.cardBg);\n      s.setProperty(\"--flow-bg\", state.flowBg);\n      s.setProperty(\"--r\", state.radius + \"px\");\n      s.setProperty(\"--gap\", state.gap + \"px\");\n    }\n\n    // 接收父页面（index.html 详情页）传来的参数\n    window.addEventListener(\"message\", (e) => {\n      const d = e.data;\n      if (!d || d.type !== \"param\") return;\n      state[d.key] = d.value;\n      apply();\n    });\n    apply();\n  <\\/script>\n</body>\n</html>\n",
-    复用记录: ""
-  },
-  {
     id: "s204",
     标题: "logo 墙",
     分类: "组件",
@@ -1250,7 +942,7 @@ window.WEB_ARSENAL = [
       "克制简约"
     ],
     场景: [
-      "企业官网"
+      "品牌官网",
     ],
     元素: [
       "版面"
@@ -2385,7 +2077,7 @@ window.WEB_ARSENAL = [
     ],
     场景: [
       "手机端网页",
-      "导航菜单"
+      "导航栏",
     ],
     元素: [
       "动效"
@@ -2810,7 +2502,7 @@ window.WEB_ARSENAL = [
     ],
     场景: [
       "手机端网页",
-      "详情页"
+      "产品展示",
     ],
     元素: [
       "版面"
@@ -3540,7 +3232,7 @@ window.WEB_ARSENAL = [
     ],
     场景: [
       "手机端网页",
-      "详情页"
+      "产品展示",
     ],
     元素: [
       "动效"
@@ -4944,128 +4636,6 @@ window.WEB_ARSENAL = [
     复用记录: ""
   },
   {
-    id: "v131",
-    标题: "动效节奏",
-    分类: "方案",
-    风格: [
-      "克制简约"
-    ],
-    场景: [
-      "全站通用"
-    ],
-    元素: [
-      "动效"
-    ],
-    搭配: [
-      "转场衔接"
-    ],
-    标签: [
-      "缓动",
-      "时长",
-      "规范",
-      "对比"
-    ],
-    来源: "视频拆解：6 种 UI 设计动效之动效系统规范（2026-08-30 用户提供，QQ 空间相册转场曲线；实现代码自写）",
-    效果演示: "assets/demos/动效节奏.html",
-    参数: [
-      {
-        键: "dur",
-        名: "时长（秒）",
-        类型: "slider",
-        最小: 0.3,
-        最大: 2,
-        步长: 0.05,
-        默认: 0.8
-      },
-      {
-        键: "dist",
-        名: "位移距离（px）",
-        类型: "slider",
-        最小: 40,
-        最大: 200,
-        步长: 5,
-        默认: 120
-      },
-      {
-        键: "scale",
-        名: "缩放幅度",
-        类型: "slider",
-        最小: 0,
-        最大: 0.3,
-        步长: 0.01,
-        默认: 0.12
-      },
-      {
-        键: "ease",
-        名: "转场缓动",
-        类型: "select",
-        选项: [
-          "减速度曲线",
-          "先快后慢",
-          "匀速",
-          "回弹"
-        ],
-        默认: "减速度曲线"
-      },
-      {
-        键: "color",
-        名: "强调色",
-        类型: "color",
-        默认: "#2b6cff"
-      },
-      {
-        键: "track",
-        名: "轨道色",
-        类型: "color",
-        默认: "#eef1f5"
-      },
-      {
-        键: "bg",
-        名: "背景色",
-        类型: "color",
-        默认: "#fafafa"
-      },
-      {
-        键: "panel",
-        名: "面板底色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "ballSize",
-        名: "小球大小（px）",
-        类型: "slider",
-        最小: 8,
-        最大: 24,
-        步长: 1,
-        默认: 14
-      },
-      {
-        键: "labelShow",
-        名: "显示曲线名称",
-        类型: "switch",
-        默认: true
-      },
-      {
-        键: "showCurve",
-        名: "显示曲线图",
-        类型: "switch",
-        默认: true
-      },
-      {
-        键: "loop",
-        名: "自动循环",
-        类型: "switch",
-        默认: false
-      }
-    ],
-    效果说明: "三种转场模式（容器转场/位移/淡入淡出）并排对比 + 四种缓动曲线同场赛跑。讲的是「动效系统」：全站统一时长与 1-2 条缓动曲线，动效才有一致的呼吸感，团队协作也省沟通成本。减速度曲线出自 QQ 空间相册转场，符合物理直觉。",
-    用法: "点「重播全部」看四种曲线的差异；调「时长」感受节奏变化；定规范推荐 0.3-0.8 秒 + 减速度曲线起步。",
-    提示词: "帮我做\"动效节奏\"规范页（纯 HTML/CSS/JS）：\n效果：三种转场模式（容器转场/位移/淡入淡出）并排对比 + 四种缓动曲线（匀速/先快后慢/减速度曲线/回弹）同场赛跑，统一时长与缓动让全站动效有一致的节奏感。减速度曲线 cubic-bezier(0,0,.15,1) 出自 QQ 空间相册转场，符合物理直觉。\n用法示例：\n.ball { transition: transform var(--dur) cubic-bezier(0,0,.15,1); }\n关键参数：\n- dur 时长（秒） / dist 位移距离（px） / scale 缩放幅度 / ease 转场缓动 / color 强调色 / track 轨道色 / bg 背景色 / panel 面板底色 / ballSize 小球大小（px） / labelShow 显示曲线名称 / showCurve 显示曲线图 / loop 自动循环\n集成步骤：\n1. 复制 assets/demos/动效节奏.html 的对比结构\n2. 定下全站统一的时长（推荐 0.3-0.8 秒）和 1-2 条缓动曲线，写进全局 CSS 变量\n3. 配转场衔接（v120）把规范落到页面切换上",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>动效节奏演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { min-height: 100vh; font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; color: #1a1a1a; padding: 20px; }\n  h1 { font-size: 17px; margin-bottom: 4px; }\n  .sub { font-size: 12px; color: #888; margin-bottom: 16px; }\n  h2 { font-size: 13px; color: #555; margin: 18px 0 10px; }\n  /* 三种转场模式并排 */\n  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }\n  .panel { background: var(--panel); border: 1px solid #ececec; border-radius: 10px; padding: 10px; }\n  .panel h3 { font-size: 12px; margin-bottom: 8px; }\n  .demo { position: relative; height: 84px; border-radius: 8px; background: var(--track); overflow: hidden; }\n  /* 容器转场：小胶囊变形成大卡片 */\n  .chip { position: absolute; left: 10px; top: 28px; width: 40%; height: 28px; border-radius: 14px; background: var(--color);\n    transform: scale(calc(1 - var(--scale)));\n    transition: width var(--dur) var(--ease), height var(--dur) var(--ease), top var(--dur) var(--ease), border-radius var(--dur) var(--ease), transform var(--dur) var(--ease); }\n  .demo.play .chip { width: calc(100% - 20px); height: 62px; top: 11px; border-radius: 10px; transform: scale(1); }\n  /* 位移：从左滑入 */\n  .slider { position: absolute; left: 10px; top: 11px; width: calc(100% - 20px); height: 62px; border-radius: 10px; background: var(--color);\n    transform: translateX(var(--dist-neg)); transition: transform var(--dur) var(--ease); }\n  .demo.play .slider { transform: translateX(0); }\n  /* 淡入淡出：纯透明度 */\n  .fader { position: absolute; inset: 10px; border-radius: 10px; background: var(--color); opacity: 0;\n    transition: opacity var(--dur) var(--ease); }\n  .demo.play .fader { opacity: 1; }\n  /* 缓动曲线赛跑 */\n  .lane { display: grid; grid-template-columns: 96px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }\n  .lane .name { font-size: 12px; color: #555; }\n  .lane .name code { display: block; font-size: 10px; color: #999; font-family: Consolas, monospace; }\n  .track { position: relative; height: 26px; border-radius: 13px; background: var(--track); }\n  .ball { position: absolute; left: 4px; top: 50%; border-radius: 50%; background: var(--color);\n    transform: translateY(-50%); }\n  .curve { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); opacity: .9; }\n  .btn { cursor: pointer; border: none; background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700;\n    padding: 8px 22px; border-radius: 8px; margin-bottom: 6px; }\n  .hint { font-size: 12px; color: #999; margin-top: 14px; }\n</style>\n</head>\n<body>\n<h1>动效节奏规范</h1>\n<div class=\"sub\">三种转场模式 × 四种缓动曲线——全站统一时长与缓动，动效才有一致的「呼吸」</div>\n<button class=\"btn\" id=\"btn\">重播全部</button>\n\n<h2>三种转场模式</h2>\n<div class=\"modes\">\n  <div class=\"panel\"><h3>① 容器转场（就地变形）</h3><div class=\"demo\" id=\"m1\"><div class=\"chip\"></div></div></div>\n  <div class=\"panel\"><h3>② 位移（滑入）</h3><div class=\"demo\" id=\"m2\"><div class=\"slider\"></div></div></div>\n  <div class=\"panel\"><h3>③ 淡入淡出</h3><div class=\"demo\" id=\"m3\"><div class=\"fader\"></div></div></div>\n</div>\n\n<h2>四种缓动曲线赛跑（同一时长）</h2>\n<div id=\"lanes\"></div>\n\n<div class=\"hint\">减速度曲线出自 QQ 空间相册转场：起步快、收尾慢，符合物体运动直觉</div>\n<script>\n  // 默认参数（父页面详情页可调）\n  const state = {\n    dur: 0.8,          // 时长（秒）\n    dist: 120,         // 位移距离（px）\n    scale: 0.12,       // 缩放幅度\n    ease: \"减速度曲线\",  // 转场模式用的缓动\n    color: \"#2b6cff\",  // 强调色\n    track: \"#eef1f5\",  // 轨道色\n    bg: \"#fafafa\",     // 背景色\n    panel: \"#ffffff\",  // 面板底色\n    ballSize: 14,      // 小球大小（px）\n    labelShow: true,   // 显示曲线名称\n    showCurve: true,   // 显示曲线图\n    loop: false        // 自动循环\n  };\n  // 缓动库：名字 → cubic-bezier\n  const EASES = {\n    \"匀速\": \"linear\",\n    \"先快后慢\": \"cubic-bezier(.25,.8,.35,1)\",\n    \"减速度曲线\": \"cubic-bezier(0,0,.15,1)\",   // QQ 空间相册同款\n    \"回弹\": \"cubic-bezier(.34,1.56,.64,1)\"\n  };\n  const lanesBox = document.getElementById(\"lanes\");\n  const demos = [document.getElementById(\"m1\"), document.getElementById(\"m2\"), document.getElementById(\"m3\")];\n\n  // 画一条迷你曲线图（SVG path 近似贝塞尔）\n  function curveSvg(bezier) {\n    const m = bezier.match(/cubic-bezier\\(([\\d.]+),\\s*([\\d.-]+),\\s*([\\d.]+),\\s*([\\d.-]+)\\)/);\n    let d;\n    if (!m) { d = \"M2,18 L58,2\"; } // linear 直线\n    else {\n      const [, x1, y1, x2, y2] = m.map(Number);\n      const X = v => 2 + v * 56, Y = v => 20 - v * 18;\n      d = \"M2,20 C\" + X(x1) + \",\" + Y(y1) + \" \" + X(x2) + \",\" + Y(y2) + \" 58,2\";\n    }\n    return '<svg class=\"curve\" width=\"60\" height=\"24\" viewBox=\"0 0 60 24\">' +\n      '<path d=\"' + d + '\" fill=\"none\" stroke=\"var(--color)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>';\n  }\n\n  // 生成四条赛跑道\n  function build() {\n    lanesBox.innerHTML = \"\";\n    Object.entries(EASES).forEach(([name, bz]) => {\n      const lane = document.createElement(\"div\");\n      lane.className = \"lane\";\n      const nameEl = document.createElement(\"div\");\n      nameEl.className = \"name\";\n      nameEl.innerHTML = name + (name === \"减速度曲线\" ? \"<code>cubic-bezier(0,0,.15,1)</code>\" : \"\");\n      const track = document.createElement(\"div\");\n      track.className = \"track\";\n      track.innerHTML = '<div class=\"ball\" data-bz=\"' + bz + '\"></div>' + (state.showCurve ? curveSvg(bz) : \"\");\n      lane.append(nameEl, track);\n      lanesBox.appendChild(lane);\n    });\n    apply();\n  }\n\n  // 参数落地\n  function apply() {\n    const root = document.documentElement.style;\n    root.setProperty(\"--dur\", state.dur + \"s\");\n    root.setProperty(\"--ease\", EASES[state.ease] || EASES[\"减速度曲线\"]);\n    root.setProperty(\"--dist-neg\", -state.dist + \"px\");\n    root.setProperty(\"--scale\", state.scale);\n    root.setProperty(\"--color\", state.color);\n    root.setProperty(\"--track\", state.track);\n    root.setProperty(\"--panel\", state.panel);\n    document.body.style.background = state.bg;\n    document.querySelectorAll(\".name\").forEach(n => n.style.display = state.labelShow ? \"\" : \"none\");\n    document.querySelectorAll(\".ball\").forEach(b => {\n      b.style.width = b.style.height = state.ballSize + \"px\";\n    });\n    document.querySelectorAll(\".curve\").forEach(c => c.style.display = state.showCurve ? \"\" : \"none\");\n    // 回弹球允许飞出轨道一点，视觉上看到「过头」\n    document.querySelectorAll(\".track\").forEach(t => t.style.overflow = \"visible\");\n  }\n\n  // 重播：先归零，强制回流，再播放\n  function play() {\n    demos.forEach(d => { d.classList.remove(\"play\"); });\n    document.querySelectorAll(\".ball\").forEach(b => { b.style.transition = \"none\"; b.style.transform = \"translateY(-50%) translateX(0)\"; });\n    void document.body.offsetWidth; // 强制回流，重置过渡\n    demos.forEach(d => d.classList.add(\"play\"));\n    document.querySelectorAll(\".ball\").forEach(b => {\n      b.style.transition = \"transform var(--dur) \" + b.dataset.bz;\n      // 滚动距离 = 轨道宽 - 球宽 - 边距\n      const track = b.parentElement;\n      const dist = track.clientWidth - state.ballSize - 8;\n      b.style.transform = \"translateY(-50%) translateX(\" + dist + \"px)\";\n    });\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", play);\n\n  // 自动循环\n  let timer = null;\n  function setLoop() {\n    clearInterval(timer);\n    if (state.loop) timer = setInterval(play, (state.dur + 0.6) * 1000);\n  }\n\n  build();\n  play();\n  // 接收父页面（index.html 详情页）传来的参数\n  window.addEventListener(\"message\", (e) => {\n    const d = e.data;\n    if (!d || d.type !== \"param\") return;\n    state[d.key] = d.value;\n    if (d.key === \"loop\") { setLoop(); return; }\n    build();\n    play();\n  });\n<\\/script>\n</body>\n</html>\n",
-    复用记录: ""
-  },
-  {
     id: "soa01",
     标题: "滚动揭示入场",
     分类: "动画",
@@ -5538,7 +5108,7 @@ window.WEB_ARSENAL = [
     ],
     场景: [
       "落地页",
-      "官网",
+      "品牌官网",
       "全站通用"
     ],
     元素: [
@@ -6132,7 +5702,7 @@ window.WEB_ARSENAL = [
     ],
     元素: [
       "下拉",
-      "分组"
+      "表单",
     ],
     搭配: [
       "普通单选下拉",
@@ -6252,12 +5822,12 @@ window.WEB_ARSENAL = [
     ],
     场景: [
       "表单",
-      "大数据集筛选",
+      "后台",
       "全站通用"
     ],
     元素: [
-      "输入框",
-      "筛选"
+      "表单",
+      "表单",
     ],
     搭配: [
       "普通单选下拉",
@@ -6380,7 +5950,7 @@ window.WEB_ARSENAL = [
     ],
     元素: [
       "按钮",
-      "菜单"
+      "导航",
     ],
     搭配: [
       "普通单选下拉",
@@ -6501,11 +6071,11 @@ window.WEB_ARSENAL = [
     场景: [
       "表单",
       "预订",
-      "报表"
+      "后台",
     ],
     元素: [
-      "日历",
-      "弹层"
+      "表单",
+      "弹窗",
     ],
     搭配: [
       "普通单选下拉",
@@ -6625,7 +6195,7 @@ window.WEB_ARSENAL = [
       "表单"
     ],
     元素: [
-      "级联",
+      "表单",
       "面板"
     ],
     搭配: [
@@ -6748,7 +6318,7 @@ window.WEB_ARSENAL = [
     ],
     元素: [
       "下拉",
-      "标签"
+      "表单",
     ],
     搭配: [
       "可搜索组合框",
@@ -6978,375 +6548,127 @@ window.WEB_ARSENAL = [
     复用记录: ""
   },
   {
-            "id": "v140",
-            "标题": "光标探照揭示 Hero",
-            "分类": "特效",
-            "子类": "光标交互",
-            "风格": [
-              "沉浸暗色",
-              "叙事感",
-              "高级"
-            ],
-            "场景": [
-              "品牌首屏",
-              "作品集",
-              "产品发布",
-              "地理/科普叙事"
-            ],
-            "元素": [
-              "光标跟随",
-              "蒙版揭示",
-              "图层",
-              "首屏"
-            ],
-            "搭配": [
-              "滚动揭示",
-              "文字逐行"
-            ],
-            "标签": [
-              "光标",
-              "探照",
-              "蒙版",
-              "揭示",
-              "hero",
-              "canvas",
-              "鼠标"
-            ],
-            "来源": "网站拆解：motionsites.ai Interactive Discovery Hero（2026-08-30 提取，光标探照揭示机制，零依赖实现）",
-            "效果演示": "assets/demos/光标探照揭示.html",
-            "参数": [
-              {
-                "键": "radius",
-                "名": "探照半径（px）",
-                "类型": "slider",
-                "最小": 80,
-                "最大": 480,
-                "步长": 10,
-                "默认": 260
-              },
-              {
-                "键": "ease",
-                "名": "缓动系数",
-                "类型": "slider",
-                "最小": 0.02,
-                "最大": 0.3,
-                "步长": 0.01,
-                "默认": 0.1
-              },
-              {
-                "键": "baseImg",
-                "名": "底图 URL",
-                "类型": "string",
-                "默认": "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85"
-              },
-              {
-                "键": "revealImg",
-                "名": "揭示图 URL",
-                "类型": "string",
-                "默认": "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85"
-              },
-              {
-                "键": "centerColor",
-                "名": "锥光中心色",
-                "类型": "color",
-                "默认": "#ffffff"
-              },
-              {
-                "键": "headingColor",
-                "名": "标题色",
-                "类型": "color",
-                "默认": "#ffffff"
-              },
-              {
-                "键": "accentColor",
-                "名": "按钮色",
-                "类型": "color",
-                "默认": "#e8702a"
-              },
-              {
-                "键": "baseTint",
-                "名": "底图品牌叠加色",
-                "类型": "color",
-                "默认": "#1b1206"
-              },
-              {
-                "键": "revealTint",
-                "名": "揭示图叠加色",
-                "类型": "color",
-                "默认": "#3a2a12"
-              },
-              {
-                "键": "titleText",
-                "名": "标题第一行",
-                "类型": "string",
-                "默认": "Layers hold"
-              },
-              {
-                "键": "subText",
-                "名": "标题第二行",
-                "类型": "string",
-                "默认": "tales of time"
-              },
-              {
-                "键": "btnText",
-                "名": "按钮文字",
-                "类型": "string",
-                "默认": "Start Digging"
-              }
-            ],
-            "效果说明": "鼠标光标处跟随一个柔和圆形光晕，光晕内通过 canvas 径向渐变生成的蒙版揭示藏在主图之下的第二张画面；光晕边缘平滑渐隐，离开后第二张图被重新遮住。适合地理/科普/作品集类叙事型首屏，制造「探索发现」的沉浸感。",
-            "用法": "移动鼠标即可看到揭示；调「探照半径」控制光圈大小，「缓动系数」控制跟随快慢（越小越黏），「锥光中心色」控制光圈亮度；换「底图/揭示图 URL」即可套用自有素材；「两层品牌叠加色」给画面统一色调。可直接把 state+apply()+postMessage 思路搬进 React/Vue。",
-            "提示词": "【效果】鼠标光标处跟随一个柔和圆形光晕，光晕内通过 canvas 径向渐变生成的蒙版揭示藏在主图之下的第二张画面；光晕边缘平滑渐隐，离开后第二张图被重新遮住。适合地理/科普/作品集类叙事型首屏，制造「探索发现」的沉浸感。\n【用法示例】\n- 把第二张图换成你的产品截图：调「揭示图 URL」即可，光晕会自然揭示它。\n- 想要更明显的探索感：把「探照半径」调到 360+，「缓动系数」降到 0.06。\n- 套品牌色：改「按钮色」「锥光中心色」「两层品牌叠加色」。\n【关键参数】\n• 探照半径（px）（slider）：默认 260\n• 缓动系数（slider）：默认 0.1\n• 底图 URL（string）：默认 https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85\n• 揭示图 URL（string）：默认 https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85\n• 锥光中心色（color）：默认 #ffffff\n• 标题色（color）：默认 #ffffff\n• 按钮色（color）：默认 #e8702a\n• 底图品牌叠加色（color）：默认 #1b1206\n• 揭示图叠加色（color）：默认 #3a2a12\n• 标题第一行（string）：默认 Layers hold\n• 标题第二行（string）：默认 tales of time\n• 按钮文字（string）：默认 Start Digging\n【集成步骤】复制下方「代码」字段（零依赖完整 HTML，含 canvas 蒙版 + RAF 平滑跟随 + postMessage 调参），或把 RevealLayer 思路搬进 React（见 Lithos 成品）。",
-            "代码": "<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>光标探照揭示 · 单文件 demo</title>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; }\n  .stage { position: relative; width: 100%; height: 100vh; overflow: hidden; background: #000; }\n  .layer { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; }\n  .base  { z-index: 10; }\n  .tint  { position: absolute; inset: 0; z-index: 20; pointer-events: none; mix-blend-mode: multiply; }\n  .reveal{ z-index: 30; pointer-events: none; }\n  .revealTint { position: absolute; inset: 0; z-index: 35; pointer-events: none; mix-blend-mode: soft-light; }\n  .head  { position: absolute; top: 14%; left: 0; right: 0; z-index: 50; text-align: center; padding: 0 20px; pointer-events: none; }\n  .head h1 { color: #fff; line-height: 0.95; }\n  .head .l1 { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: clamp(40px, 8vw, 96px); }\n  .head .l2 { display: block; font-weight: 400; font-size: clamp(40px, 8vw, 96px); margin-top: -4px; }\n  .blurb { position: absolute; left: 5%; right: 5%; bottom: 8%; z-index: 50; max-width: 300px; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }\n  .blurb p { color: rgba(255,255,255,0.82); line-height: 1.6; font-size: 14px; }\n  .blurb button { border: 0; color: #fff; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 9999px; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }\n  .blurb button:hover { transform: scale(1.03); }\n  .blurb button:active { transform: scale(0.95); }\n  .badge { position: fixed; left: 14px; bottom: 12px; z-index: 90; font-size: 11px; color: rgba(255,255,255,0.55); }\n</style>\n</head>\n<body>\n  <div class=\"stage\" id=\"stage\">\n    <div class=\"layer base\" id=\"base\"></div>\n    <div class=\"tint\" id=\"baseTint\"></div>\n    <canvas id=\"cmask\" style=\"display:none\"></canvas>\n    <div class=\"layer reveal\" id=\"reveal\"></div>\n    <div class=\"revealTint\" id=\"revealTint\"></div>\n    <div class=\"head\">\n      <h1>\n        <span class=\"l1\" id=\"t1\">Layers hold</span>\n        <span class=\"l2\" id=\"t2\">tales of time</span>\n      </h1>\n    </div>\n    <div class=\"blurb\">\n      <p id=\"desc\">移动光标，柔和光晕会揭示藏在底图之下的第二张画面 —— 这是地理叙事站最常用的「探索式首屏」。</p>\n      <button id=\"cta\">Start Digging</button>\n    </div>\n    <div class=\"badge\">光标探照揭示 · postMessage 可调参</div>\n  </div>\n\n<script>\n/* ---------- 可调参数（与弹药库 params 一一对应，12 项、5 颜色） ---------- */\nconst state = {\n  radius: 260,        // 探照半径(px) slider\n  ease: 0.1,          // 缓动系数(0.02~0.3) slider\n  baseImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85',\n  revealImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85',\n  centerColor: '#ffffff',   // 锥光中心色 color\n  headingColor: '#ffffff',  // 标题色 color\n  accentColor: '#e8702a',   // 按钮色 color\n  baseTint: '#1b1206',      // 底图品牌色叠加 color\n  revealTint: '#3a2a12',    // 揭示图叠加 color\n  titleText: 'Layers hold', // 标题第一行 string\n  subText: 'tales of time',  // 标题第二行 string\n  btnText: 'Start Digging'   // 按钮文字 string\n};\n\nconst base = document.getElementById('base');\nconst baseTint = document.getElementById('baseTint');\nconst reveal = document.getElementById('reveal');\nconst revealTint = document.getElementById('revealTint');\nconst canvas = document.getElementById('cmask');\nconst ctx = canvas.getContext('2d');\nconst t1 = document.getElementById('t1');\nconst t2 = document.getElementById('t2');\nconst desc = document.getElementById('desc');\nconst cta = document.getElementById('cta');\n\n/* 鼠标平滑跟随 */\nconst mouse = { x: -999, y: -999 };\nconst smooth = { x: -999, y: -999 };\nconst cur = { x: -999, y: -999 };\nlet raf = null;\n\nfunction hexA(hex, a) {\n  const m = hex.replace('#', '');\n  const n = m.length === 3 ? m.split('').map(c => c + c).join('') : m;\n  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);\n  return `rgba(${r},${g},${b},${a})`;\n}\n\nfunction apply() {\n  base.style.backgroundImage = `url(${state.baseImg})`;\n  reveal.style.backgroundImage = `url(${state.revealImg})`;\n  baseTint.style.background = state.baseTint;\n  revealTint.style.background = state.revealTint;\n  t1.textContent = state.titleText;\n  t2.textContent = state.subText;\n  cta.textContent = state.btnText;\n  t1.style.color = state.headingColor;\n  t2.style.color = state.headingColor;\n  cta.style.background = state.accentColor;\n  cta.style.boxShadow = `0 10px 30px ${hexA(state.accentColor, 0.33)}`;\n  drawMask();\n}\n\nfunction drawMask() {\n  const w = window.innerWidth, h = window.innerHeight;\n  canvas.width = w; canvas.height = h;\n  ctx.clearRect(0, 0, w, h);\n  const r = Math.max(1, state.radius);\n  const g = ctx.createRadialGradient(cur.x, cur.y, 0, cur.x, cur.y, r);\n  const cc = hexA(state.centerColor, 1);\n  g.addColorStop(0, cc);\n  g.addColorStop(0.4, cc);\n  g.addColorStop(0.6, hexA(state.centerColor, 0.75));\n  g.addColorStop(0.75, hexA(state.centerColor, 0.4));\n  g.addColorStop(0.88, hexA(state.centerColor, 0.12));\n  g.addColorStop(1, hexA(state.centerColor, 0));\n  ctx.fillStyle = g;\n  ctx.beginPath();\n  ctx.arc(cur.x, cur.y, r, 0, Math.PI * 2);\n  ctx.fill();\n  const url = canvas.toDataURL();\n  reveal.style.maskImage = `url(${url})`;\n  reveal.style.webkitMaskImage = `url(${url})`;\n  reveal.style.maskSize = '100% 100%';\n  reveal.style.webkitMaskSize = '100% 100%';\n}\n\nwindow.addEventListener('mousemove', e => {\n  mouse.x = e.clientX; mouse.y = e.clientY;\n  if (smooth.x === -999) { smooth.x = e.clientX; smooth.y = e.clientY; }\n});\nwindow.addEventListener('resize', drawMask);\n\nfunction loop() {\n  smooth.x += (mouse.x - smooth.x) * state.ease;\n  smooth.y += (mouse.y - smooth.y) * state.ease;\n  cur.x = smooth.x; cur.y = smooth.y;\n  drawMask();\n  raf = requestAnimationFrame(loop);\n}\nraf = requestAnimationFrame(loop);\n\n/* 外部调参契约（弹药库 iframe 用 postMessage 控制） */\nwindow.addEventListener('message', ev => {\n  const d = ev.data;\n  if (d && d.type === 'param' && d.key in state) {\n    state[d.key] = d.value;\n    apply();\n  }\n});\n\napply();\n<\\/script>\n</body>\n</html>\n",
-            "复用记录": 0
-          },
-  {
-            "id": "v141",
-            "标题": "Interactive Discovery 整站首屏",
-            "分类": "方案",
-            "子类": "整站首屏",
-            "风格": [
-              "沉浸暗色",
-              "叙事感",
-              "品牌首屏",
-              "高级"
-            ],
-            "场景": [
-              "品牌首屏",
-              "作品集",
-              "产品发布",
-              "地理/科普叙事"
-            ],
-            "元素": [
-              "光标跟随",
-              "蒙版揭示",
-              "导航胶囊",
-              "首屏",
-              "品牌色",
-              "入场动画"
-            ],
-            "搭配": [
-              "光标探照揭示 Hero"
-            ],
-            "标签": [
-              "interactive discovery",
-              "整站方案",
-              "hero",
-              "光标",
-              "蒙版",
-              "导航胶囊",
-              "品牌色",
-              "Playfair"
-            ],
-            "来源": "网站拆解：motionsites.ai Interactive Discovery Hero（2026-08-30 提取，整站首屏方案，零依赖实现；与 v140 配套）",
-            "效果演示": "assets/demos/interactive_discovery_hero.html",
-            "参数": [
-              {
-                "键": "baseImg",
-                "名": "底图 URL",
-                "类型": "string",
-                "默认": "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85"
-              },
-              {
-                "键": "revealImg",
-                "名": "揭示图 URL",
-                "类型": "string",
-                "默认": "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85"
-              },
-              {
-                "键": "accent",
-                "名": "强调色",
-                "类型": "color",
-                "默认": "#e8702a"
-              },
-              {
-                "键": "headingColor",
-                "名": "标题色",
-                "类型": "color",
-                "默认": "#ffffff"
-              },
-              {
-                "键": "navBg",
-                "名": "导航底色",
-                "类型": "color",
-                "默认": "#ffffff"
-              },
-              {
-                "键": "baseTint",
-                "名": "底图叠加色",
-                "类型": "color",
-                "默认": "#1b1206"
-              },
-              {
-                "键": "revealTint",
-                "名": "揭示层叠加色",
-                "类型": "color",
-                "默认": "#3a2a12"
-              },
-              {
-                "键": "titleText",
-                "名": "标题第一行",
-                "类型": "string",
-                "默认": "Layers hold"
-              },
-              {
-                "键": "subText",
-                "名": "标题第二行",
-                "类型": "string",
-                "默认": "tales of time"
-              },
-              {
-                "键": "btnText",
-                "名": "按钮文字",
-                "类型": "string",
-                "默认": "Start Digging"
-              },
-              {
-                "键": "leftCopy",
-                "名": "左下文案",
-                "类型": "string",
-                "默认": "Every layer of sediment records a chapter of our planet, from ancient seabeds to drifting ash, layered across millions of years beneath us."
-              },
-              {
-                "键": "radius",
-                "名": "探照半径（px）",
-                "类型": "slider",
-                "最小": 80,
-                "最大": 480,
-                "步长": 10,
-                "默认": 260
-              }
-            ],
-            "效果说明": "一套「交互式发现（Interactive Discovery）」整站首屏的装配方案：底图(z-10)+光标探照揭示层(z-30)+文字按钮(z-50)+固定导航胶囊(z-100)四层叠加；鼠标光晕揭示藏在主图之下的第二张画面（机制见 v140）；固定导航含 Logo+居中胶囊(Course 高亮)+Sign Up+移动端汉堡；标题用 Playfair Display 斜体；入场三类 keyframes(blur-rise/fade-up/Ken Burns zoom)错峰 delay，并尊重 prefers-reduced-motion。参数即「品牌 token」，换图/换色/换文案即可套成你自己的发现式首屏。",
-            "用法": "移动鼠标看揭示；调「探照半径」控光圈，「强调色」改按钮/品牌主色，「标题色/导航底色」改文字与胶囊，「底图叠加色/揭示层叠加色」统一画面色调，「标题第一行/第二行/按钮文字/左下文案」改品牌叙事。直接复制「代码」字段（零依赖完整 HTML），或把结构搬进 React/Vue（见 Lithos 成品）。",
-            "提示词": "【效果】交互式发现整站首屏：四层 z 序（底图/光标探照揭示层/文字按钮/固定导航胶囊），鼠标光晕揭示第二张图，Playfair 斜体大标题，入场三类错峰动画。\n【用法示例】\n- 套自有品牌：改「强调色」(按钮/主色)、「导航底色」(胶囊)、「底图叠加色/揭示层叠加色」(画面色调)。\n- 换素材：改「底图 URL / 揭示图 URL」即可；「探照半径」调光圈。\n- 改叙事：改「标题第一行/第二行/按钮文字/左下文案」。\n【关键参数】\n• 底图 URL / 揭示图 URL（图片）\n• 强调色 / 标题色 / 导航底色 / 底图叠加色 / 揭示层叠加色（颜色，共 5 个自由取色）\n• 标题第一行 / 标题第二行 / 按钮文字 / 左下文案（文本）\n• 探照半径（px）\n【集成步骤】复制下方「代码」字段（零依赖完整 HTML，含 canvas 蒙版 + RAF 平滑 + 入场动画 + 响应式 + postMessage 调参）；或把分层结构搬进 React（RevealLayer 思路）。",
-            "代码": "<!doctype html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" />\n<title>Interactive Discovery Hero（整站方案 · 可调参）</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap\" rel=\"stylesheet\" />\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { font-family: 'Inter', system-ui, sans-serif; background: #000; }\n  .font-playfair { font-family: 'Playfair Display', serif; }\n\n  @keyframes heroReveal { 0% { opacity: 0; transform: translateY(28px); filter: blur(12px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }\n  @keyframes heroFadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }\n  @keyframes heroZoom { 0% { transform: scale(1.12); } 100% { transform: scale(1); } }\n  .hero-anim { opacity: 0; animation-fill-mode: forwards; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }\n  .hero-reveal { animation-name: heroReveal; animation-duration: 1.1s; }\n  .hero-fade { animation-name: heroFadeUp; animation-duration: 1s; }\n  .hero-zoom { animation: heroZoom 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }\n  @media (prefers-reduced-motion: reduce) { .hero-anim, .hero-zoom { animation: none; opacity: 1; } }\n\n  #hero { position: relative; width: 100%; height: 100dvh; overflow: hidden; background: #000; }\n  .layer { position: absolute; inset: 0; background-position: center; background-size: cover; background-repeat: no-repeat; }\n  #base { z-index: 10; }\n  #reveal { z-index: 30; pointer-events: none; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }\n  #mask { position: absolute; inset: 0; pointer-events: none; display: none; }\n\n  #heading { position: absolute; top: 14%; left: 0; right: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px; pointer-events: none; }\n  #heading h1 { color: #fff; line-height: 0.95; }\n  #heading .l1 { display: block; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: 48px; letter-spacing: -0.05em; }\n  #heading .l2 { display: block; font-weight: 400; font-size: 48px; letter-spacing: -0.08em; margin-top: -4px; }\n\n  #leftCopy { position: absolute; bottom: 56px; left: 40px; z-index: 50; max-width: 260px; display: none; }\n  #leftCopy p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }\n\n  #rightBlock { position: absolute; bottom: 40px; left: 20px; right: 20px; z-index: 50; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }\n  #rightBlock p { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; max-width: 260px; }\n  #cta { border: none; cursor: pointer; color: #fff; font-size: 14px; font-weight: 500; padding: 12px 28px; border-radius: 999px; transition: all .25s; }\n  #cta:hover { transform: scale(1.03); }\n  #cta:active { transform: scale(0.95); }\n\n  #nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }\n  #nav .logo { display: flex; align-items: center; gap: 8px; }\n  #nav .word { color: #fff; font-size: 24px; font-family: 'Playfair Display', serif; font-style: italic; }\n  #nav .pill { display: none; position: absolute; left: 50%; transform: translateX(-50%); align-items: center; gap: 4px; padding: 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.3); }\n  #nav .pill button { border: none; background: transparent; color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; padding: 6px 16px; border-radius: 999px; cursor: pointer; }\n  #nav .pill button.active { color: #fff; }\n  #nav .pill button:hover { background: rgba(255,255,255,0.2); color: #fff; }\n  #nav .signup { display: none; background: #fff; color: #111; font-size: 14px; font-weight: 600; padding: 10px 24px; border-radius: 999px; cursor: pointer; }\n  #nav .burger { display: block; background: transparent; border: none; color: #fff; cursor: pointer; }\n\n  @media (min-width: 768px) {\n    #heading .l1, #heading .l2 { font-size: 80px; }\n    #leftCopy { display: block; bottom: 56px; left: 56px; }\n    #rightBlock { left: auto; right: 56px; bottom: 96px; align-items: flex-end; }\n    #rightBlock p { font-size: 14px; }\n    #nav .pill { display: flex; }\n    #nav .signup { display: block; }\n    #nav .burger { display: none; }\n  }\n  @media (min-width: 1024px) {\n    #heading .l1, #heading .l2 { font-size: 96px; }\n  }\n</style>\n</head>\n<body>\n<section id=\"hero\">\n  <div id=\"base\" class=\"layer\"></div>\n  <div id=\"reveal\" class=\"layer\"></div>\n  <canvas id=\"mask\"></canvas>\n\n  <div id=\"heading\">\n    <h1>\n      <span class=\"l1 hero-anim hero-reveal\" id=\"t1\" style=\"animation-delay:.25s;color:#fff\"></span>\n      <span class=\"l2 hero-anim hero-reveal\" id=\"t2\" style=\"animation-delay:.42s;color:#fff\"></span>\n    </h1>\n  </div>\n\n  <div id=\"leftCopy\" class=\"hero-anim hero-fade\" style=\"animation-delay:.7s\"><p id=\"lc\"></p></div>\n\n  <div id=\"rightBlock\" class=\"hero-anim hero-fade\" style=\"animation-delay:.85s\">\n    <p id=\"rc\">Our interactive maps let you peel back the crust to trace how stones, fossils, and deep time combine to shape the ground beneath your feet.</p>\n    <button id=\"cta\">Start Digging</button>\n  </div>\n\n  <nav id=\"nav\">\n    <div class=\"logo\">\n      <svg width=\"26\" height=\"26\" viewBox=\"0 0 256 256\" fill=\"#ffffff\" aria-hidden=\"true\"><path d=\"M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z\" /></svg>\n      <span class=\"word\">Lithos</span>\n    </div>\n    <div class=\"pill\" id=\"pill\">\n      <button class=\"active\">Course</button>\n      <button>Field Guides</button>\n      <button>Geology</button>\n      <button>Plans</button>\n      <button>Live Tour</button>\n    </div>\n    <button class=\"signup\">Sign Up</button>\n    <button class=\"burger\" aria-label=\"menu\">\n      <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M3 6h18M3 12h18M3 18h18\" /></svg>\n    </button>\n  </nav>\n</section>\n\n<script>\n  const state = {\n    baseImg: \"https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85\",\n    revealImg: \"https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85\",\n    accent: \"#e8702a\",\n    headingColor: \"#ffffff\",\n    navBg: \"#ffffff\",\n    baseTint: \"#1b1206\",\n    revealTint: \"#3a2a12\",\n    titleText: \"Layers hold\",\n    subText: \"tales of time\",\n    btnText: \"Start Digging\",\n    leftCopy: \"Every layer of sediment records a chapter of our planet, from ancient seabeds to drifting ash, layered across millions of years beneath us.\",\n    radius: 260\n  };\n\n  const hero = document.getElementById('hero');\n  const base = document.getElementById('base');\n  const reveal = document.getElementById('reveal');\n  const mask = document.getElementById('mask');\n  const t1 = document.getElementById('t1');\n  const t2 = document.getElementById('t2');\n  const lc = document.getElementById('lc');\n  const cta = document.getElementById('cta');\n  const pill = document.getElementById('pill');\n\n  function hexToRgba(hex, a) {\n    const h = hex.replace('#', '');\n    const r = parseInt(h.substring(0, 2), 16);\n    const g = parseInt(h.substring(2, 4), 16);\n    const b = parseInt(h.substring(4, 6), 16);\n    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';\n  }\n\n  // 鼠标平滑：原始坐标 + 缓动坐标 + RAF\n  const mouse = { x: -999, y: -999 };\n  const smooth = { x: -999, y: -999 };\n  const EASE = 0.1;\n  let raf = null;\n\n  function apply() {\n    base.style.backgroundImage = 'linear-gradient(' + hexToRgba(state.baseTint, 0.4) + ',' + hexToRgba(state.baseTint, 0.4) + '), url(\"' + state.baseImg + '\")';\n    reveal.style.backgroundImage = 'linear-gradient(' + hexToRgba(state.revealTint, 0.35) + ',' + hexToRgba(state.revealTint, 0.35) + '), url(\"' + state.revealImg + '\")';\n    t1.textContent = state.titleText;\n    t2.textContent = state.subText;\n    t1.style.color = state.headingColor;\n    t2.style.color = state.headingColor;\n    lc.textContent = state.leftCopy;\n    cta.textContent = state.btnText;\n    cta.style.background = state.accent;\n    pill.style.background = hexToRgba(state.navBg, 0.2);\n  }\n\n  function drawMask() {\n    const w = window.innerWidth, h = window.innerHeight;\n    if (mask.width !== w || mask.height !== h) { mask.width = w; mask.height = h; }\n    const ctx = mask.getContext('2d');\n    ctx.clearRect(0, 0, w, h);\n    const r = state.radius;\n    const g = ctx.createRadialGradient(smooth.x, smooth.y, 0, smooth.x, smooth.y, r);\n    g.addColorStop(0, 'rgba(255,255,255,1)');\n    g.addColorStop(0.4, 'rgba(255,255,255,1)');\n    g.addColorStop(0.6, 'rgba(255,255,255,0.75)');\n    g.addColorStop(0.75, 'rgba(255,255,255,0.4)');\n    g.addColorStop(0.88, 'rgba(255,255,255,0.12)');\n    g.addColorStop(1, 'rgba(255,255,255,0)');\n    ctx.fillStyle = g;\n    ctx.beginPath();\n    ctx.arc(smooth.x, smooth.y, r, 0, Math.PI * 2);\n    ctx.fill();\n    const url = mask.toDataURL();\n    reveal.style.webkitMaskImage = 'url(' + url + ')';\n    reveal.style.maskImage = 'url(' + url + ')';\n  }\n\n  function loop() {\n    smooth.x += (mouse.x - smooth.x) * EASE;\n    smooth.y += (mouse.y - smooth.y) * EASE;\n    drawMask();\n    raf = requestAnimationFrame(loop);\n  }\n\n  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });\n  window.addEventListener('resize', () => { mask.width = window.innerWidth; mask.height = window.innerHeight; });\n\n  apply();\n  loop();\n\n  // 详情页调参契约\n  window.addEventListener('message', ev => {\n    if (ev.data && ev.data.type === 'param' && ev.data.key in state) {\n      state[ev.data.key] = ev.data.value;\n      apply();\n    }\n  });\n<\\/script>\n</body>\n</html>\n",
-            "复用记录": 0
-          },
-  {
-    id: "v142",
-    标题: "悬浮吸顶导航",
-    分类: "组件",
-    子类: "导航栏",
+    id: "v140",
+    标题: "光标探照揭示 Hero",
+    分类: "动画",
+    子类: "光标交互",
     风格: [
-      "克制简约",
-      "通用"
+      "沉浸暗色",
+      "叙事感",
+      "高级"
     ],
     场景: [
-      "长文阅读",
-      "商品列表",
-      "全站通用"
+      "品牌官网",
+      "作品集",
+      "产品发布",
+      "地理/科普叙事"
     ],
     元素: [
-      "吸顶",
-      "卡片"
+      "光标跟随",
+      "蒙版揭示",
+      "图层",
+      "首屏"
     ],
     搭配: [
-      "滚动收缩导航",
-      "锚点导航"
+      "滚动揭示",
+      "文字逐行"
     ],
     标签: [
-      "吸顶",
-      "浮动",
-      "sticky",
-      "导航栏"
+      "光标",
+      "探照",
+      "蒙版",
+      "揭示",
+      "hero",
+      "canvas",
+      "鼠标"
     ],
-    来源: "视频拆解：9 种导航类型（2026-09-02 用户提供，导航栏交互拆解；实现代码自写；巨型菜单导航与 v139 重复已跳过）",
-    效果演示: "assets/demos/悬浮吸顶导航.html",
+    来源: "网站拆解：motionsites.ai Interactive Discovery Hero（2026-08-30 提取，光标探照揭示机制，零依赖实现）",
+    效果演示: "assets/demos/光标探照揭示.html",
     参数: [
       {
-        键: "theme",
-        名: "主题色",
-        类型: "color",
-        默认: "#2563eb"
-      },
-      {
-        键: "bg",
-        名: "底色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
-        键: "text",
-        名: "文字色",
-        类型: "color",
-        默认: "#1f2937"
-      },
-      {
-        键: "hover",
-        名: "项悬浮底色",
-        类型: "color",
-        默认: "#eff6ff"
-      },
-      {
-        键: "floatBg",
-        名: "吸顶卡片底色",
-        类型: "color",
-        默认: "#ffffff"
-      },
-      {
         键: "radius",
-        名: "吸顶圆角（px）",
+        名: "探照半径（px）",
         类型: "slider",
-        最小: 0,
-        最大: 28,
-        步长: 1,
-        默认: 16
-      },
-      {
-        键: "threshold",
-        名: "吸顶触发阈值（px）",
-        类型: "slider",
-        最小: 40,
-        最大: 400,
+        最小: 80,
+        最大: 480,
         步长: 10,
-        默认: 120
+        默认: 260
       },
       {
-        键: "height",
-        名: "导航高度（px）",
+        键: "ease",
+        名: "缓动系数",
         类型: "slider",
-        最小: 44,
-        最大: 88,
-        步长: 2,
-        默认: 60
+        最小: 0.02,
+        最大: 0.3,
+        步长: 0.01,
+        默认: 0.1
       },
       {
-        键: "shadow",
-        名: "吸顶投影浓度",
-        类型: "slider",
-        最小: 0,
-        最大: 0.4,
-        步长: 0.02,
-        默认: 0.16
-      },
-      {
-        键: "fontSize",
-        名: "字号（px）",
-        类型: "slider",
-        最小: 12,
-        最大: 20,
-        步长: 1,
-        默认: 15
-      },
-      {
-        键: "brand",
-        名: "品牌文字",
+        键: "baseImg",
+        名: "底图 URL",
         类型: "string",
-        默认: "Lithos"
+        默认: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85"
       },
       {
-        键: "items",
-        名: "导航项（逗号分隔）",
+        键: "revealImg",
+        名: "揭示图 URL",
         类型: "string",
-        默认: "首页,课程,作品,关于"
+        默认: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85"
+      },
+      {
+        键: "centerColor",
+        名: "锥光中心色",
+        类型: "color",
+        默认: "#ffffff"
+      },
+      {
+        键: "headingColor",
+        名: "标题色",
+        类型: "color",
+        默认: "#ffffff"
+      },
+      {
+        键: "accentColor",
+        名: "按钮色",
+        类型: "color",
+        默认: "#e8702a"
+      },
+      {
+        键: "baseTint",
+        名: "底图品牌叠加色",
+        类型: "color",
+        默认: "#1b1206"
+      },
+      {
+        键: "revealTint",
+        名: "揭示图叠加色",
+        类型: "color",
+        默认: "#3a2a12"
+      },
+      {
+        键: "titleText",
+        名: "标题第一行",
+        类型: "string",
+        默认: "Layers hold"
+      },
+      {
+        键: "subText",
+        名: "标题第二行",
+        类型: "string",
+        默认: "tales of time"
+      },
+      {
+        键: "btnText",
+        名: "按钮文字",
+        类型: "string",
+        默认: "Start Digging"
       }
     ],
-    效果说明: "页面顶部时导航融入内容流；一旦滚动越过阈值，就以圆角卡片形式固定在视口顶部并加投影浮起。核心逻辑是匹配长文/列表类页面「持续下滑又随时要跳转」的需求，让用户不丢导航。",
-    用法: "滚动越过「吸顶触发阈值」即浮起为卡片。调「吸顶圆角/吸顶投影浓度」控卡片气质；调「吸顶触发阈值」控多晚浮起；「导航高度」控初始条高。",
-    提示词: "帮我做\"悬浮吸顶导航\"（纯 HTML/CSS/JS）：\n效果：导航在页面顶部时融入内容流；滚动越过阈值后变成圆角卡片固定在视口顶部并浮起（加投影）。适配长文/商品列表等需持续下滑又随时跳转的页面。\n用法示例：\n<nav id=\"nav\"><div class=\"brand\">站点</div><div class=\"items\">…</div></nav>\n// onscroll: nav.classList.toggle(\"floating\", scrollY>阈值)\n关键参数：\n- theme 主题色 / bg 底色 / text 文字色 / hover 项悬浮底色 / floatBg 吸顶卡片底色 / radius 吸顶圆角（px） / threshold 吸顶触发阈值（px） / height 导航高度（px） / shadow 吸顶投影浓度 / fontSize 字号（px） / brand 品牌文字 / items 导航项（逗号分隔）\n集成步骤：\n1. 复制 assets/demos/悬浮吸顶导航.html 单文件（state+apply+postMessage 骨架）\n2. 导航项换成你的数据；apply() 把主题色/圆角/高度映射到 CSS 变量\n3. 详情页 postMessage({type:\"param\",key,value}) 改 state 实时预览",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>悬浮吸顶导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#2563eb; --bg:#ffffff; --text:#1f2937; --hover:#eff6ff; --floatBg:#ffffff; --radius:16px; --h:60px; --shadow:.16; --fs:15px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; color:var(--text); background:#f5f6f8; }\n  #nav {\n    position:sticky; top:0; z-index:50; height:var(--h);\n    display:flex; align-items:center; gap:22px; padding:0 26px;\n    background:var(--bg); color:var(--text);\n    transition:all .35s cubic-bezier(.16,1,.3,1);\n  }\n  #nav.floating {\n    position:fixed; top:14px; left:50%; transform:translateX(-50%);\n    width:min(960px,92%); border-radius:var(--radius);\n    background:var(--floatBg); box-shadow:0 12px 34px rgba(0,0,0,var(--shadow));\n  }\n  .brand { font-weight:800; font-size:calc(var(--fs) + 3px); color:var(--theme); letter-spacing:.5px; }\n  .items { display:flex; gap:6px; flex:1; }\n  .item { padding:8px 14px; border-radius:10px; font-size:var(--fs); cursor:pointer; transition:background .15s,color .15s; }\n  .item:hover { background:var(--hover); color:var(--theme); }\n  .cta { background:var(--theme); color:#fff; padding:9px 18px; border-radius:10px; font-size:var(--fs); cursor:pointer; }\n  .hero { height:60vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#dbeafe,#eff6ff); font-size:26px; color:#1e40af; font-weight:800; text-align:center; }\n  .sec { padding:60px 26px; max-width:960px; margin:0 auto; }\n  .sec h2 { margin-bottom:12px; color:#111827; }\n  .sec p { color:#6b7280; line-height:1.9; }\n  .spacer { height:120vh; }\n</style>\n</head>\n<body>\n  <nav id=\"nav\">\n    <div class=\"brand\" id=\"brand\">Lithos</div>\n    <div class=\"items\" id=\"items\"></div>\n    <div class=\"cta\">开始</div>\n  </nav>\n  <div class=\"hero\">向下滚动，看导航变成圆角卡片吸顶</div>\n  <div class=\"sec\"><h2>第一段</h2><p>悬浮吸顶导航在页面顶部时融入内容流；一旦滚动越过阈值，就以圆角卡片形式固定在视口顶部，并加投影浮起。适配长文章、商品列表类等需要持续下滑、又随时要能跳转的页面。</p></div>\n  <div class=\"sec\"><h2>第二段</h2><p>继续滚动，卡片一直跟随。调「吸顶触发阈值」可控制它多晚浮起，调「圆角」「投影浓度」控制卡片气质。</p></div>\n  <div class=\"spacer\"></div>\n<script>\n  const state = {\n    theme:\"#2563eb\", bg:\"#ffffff\", text:\"#1f2937\", hover:\"#eff6ff\", floatBg:\"#ffffff\",\n    radius:16, threshold:120, height:60, shadow:0.16, fontSize:15,\n    brand:\"Lithos\", items:\"首页,课程,作品,关于\"\n  };\n  const nav=document.getElementById(\"nav\"), itemsEl=document.getElementById(\"items\"), brandEl=document.getElementById(\"brand\");\n  function renderItems(){\n    itemsEl.innerHTML=\"\";\n    state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"item\"; d.textContent=t; itemsEl.appendChild(d); });\n  }\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--bg\",state.bg); R.setProperty(\"--text\",state.text);\n    R.setProperty(\"--hover\",state.hover); R.setProperty(\"--floatBg\",state.floatBg);\n    R.setProperty(\"--radius\",state.radius+\"px\"); R.setProperty(\"--h\",state.height+\"px\");\n    R.setProperty(\"--shadow\",state.shadow); R.setProperty(\"--fs\",state.fontSize+\"px\");\n    brandEl.textContent=state.brand; renderItems();\n  }\n  function onScroll(){ nav.classList.toggle(\"floating\", window.scrollY > state.threshold); }\n  window.addEventListener(\"scroll\", onScroll);\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); onScroll(); });\n  apply(); onScroll();\n<\\/script>\n</body>\n</html>\n",
-    复用记录: ""
+    效果说明: "鼠标光标处跟随一个柔和圆形光晕，光晕内通过 canvas 径向渐变生成的蒙版揭示藏在主图之下的第二张画面；光晕边缘平滑渐隐，离开后第二张图被重新遮住。适合地理/科普/作品集类叙事型首屏，制造「探索发现」的沉浸感。",
+    用法: "移动鼠标即可看到揭示；调「探照半径」控制光圈大小，「缓动系数」控制跟随快慢（越小越黏），「锥光中心色」控制光圈亮度；换「底图/揭示图 URL」即可套用自有素材；「两层品牌叠加色」给画面统一色调。可直接把 state+apply()+postMessage 思路搬进 React/Vue。",
+    提示词: "【效果】鼠标光标处跟随一个柔和圆形光晕，光晕内通过 canvas 径向渐变生成的蒙版揭示藏在主图之下的第二张画面；光晕边缘平滑渐隐，离开后第二张图被重新遮住。适合地理/科普/作品集类叙事型首屏，制造「探索发现」的沉浸感。\n【用法示例】\n- 把第二张图换成你的产品截图：调「揭示图 URL」即可，光晕会自然揭示它。\n- 想要更明显的探索感：把「探照半径」调到 360+，「缓动系数」降到 0.06。\n- 套品牌色：改「按钮色」「锥光中心色」「两层品牌叠加色」。\n【关键参数】\n• 探照半径（px）（slider）：默认 260\n• 缓动系数（slider）：默认 0.1\n• 底图 URL（string）：默认 https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85\n• 揭示图 URL（string）：默认 https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85\n• 锥光中心色（color）：默认 #ffffff\n• 标题色（color）：默认 #ffffff\n• 按钮色（color）：默认 #e8702a\n• 底图品牌叠加色（color）：默认 #1b1206\n• 揭示图叠加色（color）：默认 #3a2a12\n• 标题第一行（string）：默认 Layers hold\n• 标题第二行（string）：默认 tales of time\n• 按钮文字（string）：默认 Start Digging\n【集成步骤】复制下方「代码」字段（零依赖完整 HTML，含 canvas 蒙版 + RAF 平滑跟随 + postMessage 调参），或把 RevealLayer 思路搬进 React（见 Lithos 成品）。",
+    代码: "<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>光标探照揭示 · 单文件 demo</title>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; }\n  .stage { position: relative; width: 100%; height: 100vh; overflow: hidden; background: #000; }\n  .layer { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; }\n  .base  { z-index: 10; }\n  .tint  { position: absolute; inset: 0; z-index: 20; pointer-events: none; mix-blend-mode: multiply; }\n  .reveal{ z-index: 30; pointer-events: none; }\n  .revealTint { position: absolute; inset: 0; z-index: 35; pointer-events: none; mix-blend-mode: soft-light; }\n  .head  { position: absolute; top: 14%; left: 0; right: 0; z-index: 50; text-align: center; padding: 0 20px; pointer-events: none; }\n  .head h1 { color: #fff; line-height: 0.95; }\n  .head .l1 { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: clamp(40px, 8vw, 96px); }\n  .head .l2 { display: block; font-weight: 400; font-size: clamp(40px, 8vw, 96px); margin-top: -4px; }\n  .blurb { position: absolute; left: 5%; right: 5%; bottom: 8%; z-index: 50; max-width: 300px; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }\n  .blurb p { color: rgba(255,255,255,0.82); line-height: 1.6; font-size: 14px; }\n  .blurb button { border: 0; color: #fff; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 9999px; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }\n  .blurb button:hover { transform: scale(1.03); }\n  .blurb button:active { transform: scale(0.95); }\n</style>\n</head>\n<body>\n  <div class=\"stage\" id=\"stage\">\n    <div class=\"layer base\" id=\"base\"></div>\n    <div class=\"tint\" id=\"baseTint\"></div>\n    <canvas id=\"cmask\" style=\"display:none\"></canvas>\n    <div class=\"layer reveal\" id=\"reveal\"></div>\n    <div class=\"revealTint\" id=\"revealTint\"></div>\n    <div class=\"head\">\n      <h1>\n        <span class=\"l1\" id=\"t1\">Layers hold</span>\n        <span class=\"l2\" id=\"t2\">tales of time</span>\n      </h1>\n    </div>\n    <div class=\"blurb\">\n      <p id=\"desc\">移动光标，柔和光晕会揭示藏在底图之下的第二张画面 —— 这是地理叙事站最常用的「探索式首屏」。</p>\n      <button id=\"cta\">Start Digging</button>\n    </div>\n  </div>\n\n<script>\n/* ---------- 可调参数 ---------- */\nconst state = {\n  radius: 260,        // 探照半径(px) slider\n  ease: 0.1,          // 缓动系数(0.02~0.3) slider\n  baseImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85',\n  revealImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85',\n  centerColor: '#ffffff',   // 锥光中心色 color\n  headingColor: '#ffffff',  // 标题色 color\n  accentColor: '#e8702a',   // 按钮色 color\n  baseTint: '#1b1206',      // 底图品牌色叠加 color\n  revealTint: '#3a2a12',    // 揭示图叠加 color\n  titleText: 'Layers hold', // 标题第一行 string\n  subText: 'tales of time',  // 标题第二行 string\n  btnText: 'Start Digging'   // 按钮文字 string\n};\n\nconst base = document.getElementById('base');\nconst baseTint = document.getElementById('baseTint');\nconst reveal = document.getElementById('reveal');\nconst revealTint = document.getElementById('revealTint');\nconst canvas = document.getElementById('cmask');\nconst ctx = canvas.getContext('2d');\nconst t1 = document.getElementById('t1');\nconst t2 = document.getElementById('t2');\nconst desc = document.getElementById('desc');\nconst cta = document.getElementById('cta');\n\n/* 鼠标平滑跟随 */\nconst mouse = { x: -999, y: -999 };\nconst smooth = { x: -999, y: -999 };\nconst cur = { x: -999, y: -999 };\nlet raf = null;\n\nfunction hexA(hex, a) {\n  const m = hex.replace('#', '');\n  const n = m.length === 3 ? m.split('').map(c => c + c).join('') : m;\n  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);\n  return `rgba(${r},${g},${b},${a})`;\n}\n\nfunction apply() {\n  // 降级保护：图片URL在前、CSS渐变在后——断网时图片加载失败自动回退到品牌渐变，不黑屏\n  const baseFallback = `linear-gradient(135deg, ${state.baseTint} 0%, #2a1a08 55%, #0d0904 100%)`;\n  const revealFallback = `linear-gradient(135deg, ${state.revealTint} 0%, #5a4a2a 55%, #2a2010 100%)`;\n  base.style.backgroundImage = `url(${state.baseImg}), ${baseFallback}`;\n  reveal.style.backgroundImage = `url(${state.revealImg}), ${revealFallback}`;\n  baseTint.style.background = state.baseTint;\n  revealTint.style.background = state.revealTint;\n  t1.textContent = state.titleText;\n  t2.textContent = state.subText;\n  cta.textContent = state.btnText;\n  t1.style.color = state.headingColor;\n  t2.style.color = state.headingColor;\n  cta.style.background = state.accentColor;\n  cta.style.boxShadow = `0 10px 30px ${hexA(state.accentColor, 0.33)}`;\n  drawMask();\n}\n\nfunction drawMask() {\n  const w = window.innerWidth, h = window.innerHeight;\n  canvas.width = w; canvas.height = h;\n  ctx.clearRect(0, 0, w, h);\n  const r = Math.max(1, state.radius);\n  const g = ctx.createRadialGradient(cur.x, cur.y, 0, cur.x, cur.y, r);\n  const cc = hexA(state.centerColor, 1);\n  g.addColorStop(0, cc);\n  g.addColorStop(0.4, cc);\n  g.addColorStop(0.6, hexA(state.centerColor, 0.75));\n  g.addColorStop(0.75, hexA(state.centerColor, 0.4));\n  g.addColorStop(0.88, hexA(state.centerColor, 0.12));\n  g.addColorStop(1, hexA(state.centerColor, 0));\n  ctx.fillStyle = g;\n  ctx.beginPath();\n  ctx.arc(cur.x, cur.y, r, 0, Math.PI * 2);\n  ctx.fill();\n  const url = canvas.toDataURL();\n  reveal.style.maskImage = `url(${url})`;\n  reveal.style.webkitMaskImage = `url(${url})`;\n  reveal.style.maskSize = '100% 100%';\n  reveal.style.webkitMaskSize = '100% 100%';\n}\n\nwindow.addEventListener('mousemove', e => {\n  mouse.x = e.clientX; mouse.y = e.clientY;\n  if (smooth.x === -999) { smooth.x = e.clientX; smooth.y = e.clientY; }\n});\nwindow.addEventListener('resize', drawMask);\n\nfunction loop() {\n  smooth.x += (mouse.x - smooth.x) * state.ease;\n  smooth.y += (mouse.y - smooth.y) * state.ease;\n  cur.x = smooth.x; cur.y = smooth.y;\n  drawMask();\n  raf = requestAnimationFrame(loop);\n}\nraf = requestAnimationFrame(loop);\n\n/* 外部调参 */\nwindow.addEventListener('message', ev => {\n  const d = ev.data;\n  if (d && d.type === 'param' && d.key in state) {\n    state[d.key] = d.value;\n    apply();\n  }\n});\n\napply();\n<\\/script>\n</body>\n</html>\n",
+    复用记录: 0
   },
   {
     id: "v143",
@@ -7363,8 +6685,8 @@ window.WEB_ARSENAL = [
       "文档站"
     ],
     元素: [
-      "侧栏",
-      "折叠"
+      "导航",
+      "导航",
     ],
     搭配: [
       "悬浮吸顶导航",
@@ -7380,91 +6702,91 @@ window.WEB_ARSENAL = [
     效果演示: "assets/demos/侧边栏导航.html",
     参数: [
       {
-        键: "theme",
-        名: "主题色",
-        类型: "color",
-        默认: "#2563eb"
+键: "theme",
+名: "主题色",
+类型: "color",
+默认: "#2563eb"
       },
       {
-        键: "bg",
-        名: "侧栏底色",
-        类型: "color",
-        默认: "#1f2937"
+键: "bg",
+名: "侧栏底色",
+类型: "color",
+默认: "#1f2937"
       },
       {
-        键: "text",
-        名: "文字色",
-        类型: "color",
-        默认: "#e5e7eb"
+键: "text",
+名: "文字色",
+类型: "color",
+默认: "#e5e7eb"
       },
       {
-        键: "hover",
-        名: "项悬浮底色",
-        类型: "color",
-        默认: "#374151"
+键: "hover",
+名: "项悬浮底色",
+类型: "color",
+默认: "#374151"
       },
       {
-        键: "active",
-        名: "当前项底色",
-        类型: "color",
-        默认: "#2563eb"
+键: "active",
+名: "当前项底色",
+类型: "color",
+默认: "#2563eb"
       },
       {
-        键: "widthExpand",
-        名: "展开宽（px）",
-        类型: "slider",
-        最小: 160,
-        最大: 320,
-        步长: 10,
-        默认: 220
+键: "widthExpand",
+名: "展开宽（px）",
+类型: "slider",
+最小: 160,
+最大: 320,
+步长: 10,
+默认: 220
       },
       {
-        键: "widthCollapse",
-        名: "收起宽（px）",
-        类型: "slider",
-        最小: 56,
-        最大: 96,
-        步长: 4,
-        默认: 64
+键: "widthCollapse",
+名: "收起宽（px）",
+类型: "slider",
+最小: 56,
+最大: 96,
+步长: 4,
+默认: 64
       },
       {
-        键: "dur",
-        名: "折叠动画时长（秒）",
-        类型: "slider",
-        最小: 0.1,
-        最大: 0.6,
-        步长: 0.02,
-        默认: 0.3
+键: "dur",
+名: "折叠动画时长（秒）",
+类型: "slider",
+最小: 0.1,
+最大: 0.6,
+步长: 0.02,
+默认: 0.3
       },
       {
-        键: "iconSize",
-        名: "图标大小（px）",
-        类型: "slider",
-        最小: 14,
-        最大: 28,
-        步长: 1,
-        默认: 20
+键: "iconSize",
+名: "图标大小（px）",
+类型: "slider",
+最小: 14,
+最大: 28,
+步长: 1,
+默认: 20
       },
       {
-        键: "fontSize",
-        名: "字号（px）",
-        类型: "slider",
-        最小: 12,
-        最大: 18,
-        步长: 1,
-        默认: 14
+键: "fontSize",
+名: "字号（px）",
+类型: "slider",
+最小: 12,
+最大: 18,
+步长: 1,
+默认: 14
       },
       {
-        键: "brand",
-        名: "品牌文字",
-        类型: "string",
-        默认: "Studio"
+键: "brand",
+名: "品牌文字",
+类型: "string",
+默认: "Studio"
       },
       {
-        键: "items",
-        名: "导航项（逗号分隔）",
-        类型: "string",
-        默认: "概览,项目,素材,设置"
+键: "items",
+名: "导航项（逗号分隔）",
+类型: "string",
+默认: "概览,项目,素材,设置"
       }
     ],
     效果说明: "左侧竖排布局，支持折叠展开：收起后仅显示图标，为后台、编辑器类页面释放内容空间。核心逻辑是常驻导航又不挤占正文宽度，匹配工具类产品的信息密度需求。",
@@ -7488,7 +6810,7 @@ window.WEB_ARSENAL = [
       "深层级网站"
     ],
     元素: [
-      "路径",
+      "导航",
       "层级"
     ],
     搭配: [
@@ -7608,7 +6930,7 @@ window.WEB_ARSENAL = [
     ],
     元素: [
       "悬停",
-      "子菜单"
+      "导航",
     ],
     搭配: [
       "大型菜单",
@@ -7724,7 +7046,7 @@ window.WEB_ARSENAL = [
       "通用"
     ],
     场景: [
-      "移动端",
+      "手机端网页",
       "窄屏",
       "全站通用"
     ],
@@ -7834,7 +7156,7 @@ window.WEB_ARSENAL = [
     效果说明: "移动端经典的三条杠样式，点击后侧边滑出菜单并带遮罩，适配屏幕较窄的移动端场景。核心逻辑是匹配小屏「空间有限、需按需展开」的跳转需求。",
     用法: "点汉堡按钮滑出抽屉、点遮罩关闭。调「滑出方向」换左/右；调「侧栏宽/遮罩浓度/动画时长」定气质；图标色随「汉堡线色」。",
     提示词: "帮我做\"汉堡菜单导航\"（纯 HTML/CSS/JS）：\n效果：移动端三条杠，点击侧边滑出抽屉并带遮罩。适配窄屏。\n用法示例：\n<div class=\"ham\">≡</div><div class=\"overlay\"></div><aside class=\"drawer\">…</aside>\n// ham.click → 抽屉/遮罩加 .open；drawer 用 transform 滑入\n关键参数：\n- theme 主题色 / menuBg 菜单底色 / text 文字色 / hover 项悬浮底色 / barColor 汉堡线色 / overlayOpacity 遮罩浓度 / dur 动画时长（秒） / sideW 侧栏宽（px） / fontSize 字号（px） / from 滑出方向 / brand 品牌文字 / items 菜单项（逗号分隔）\n集成步骤：\n1. 复制 assets/demos/汉堡菜单导航.html 单文件\n2. items csv 换菜单；from 切换左/右滑出\n3. 调「侧栏宽/遮罩浓度/动画时长」",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>汉堡菜单导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#2563eb; --menuBg:#111827; --text:#f9fafb; --hover:#374151; --bar:#111827; --ov:.5; --dur:.3s; --sideW:280px; --fs:16px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; background:#f3f4f6; }\n  .bar { height:60px; display:flex; align-items:center; padding:0 20px; }\n  .ham { width:42px; height:42px; display:flex; flex-direction:column; justify-content:center; gap:5px; cursor:pointer; }\n  .ham span { height:3px; background:var(--bar); border-radius:2px; transition:.3s; }\n  .overlay { position:fixed; inset:0; background:rgba(0,0,0,var(--ov)); opacity:0; pointer-events:none; transition:opacity var(--dur) ease; z-index:40; }\n  .overlay.open { opacity:1; pointer-events:auto; }\n  .drawer { position:fixed; top:0; bottom:0; width:var(--sideW); background:var(--menuBg); color:var(--text); padding:80px 24px; z-index:50; transition:transform var(--dur) cubic-bezier(.16,1,.3,1); display:flex; flex-direction:column; gap:6px; }\n  .drawer.right { right:0; transform:translateX(100%); }\n  .drawer.left { left:0; transform:translateX(-100%); }\n  .drawer.open.right, .drawer.open.left { transform:translateX(0); }\n  .ditem { padding:14px 16px; border-radius:12px; font-size:var(--fs); cursor:pointer; transition:background .15s; }\n  .ditem:hover { background:var(--hover); }\n  .brand { position:fixed; top:22px; left:20px; font-weight:800; color:var(--theme); z-index:60; }\n  .content { padding:80px 26px; max-width:880px; margin:0 auto; }\n  .content h1 { color:#111827; margin-bottom:10px; }\n  .content p { color:#6b7280; line-height:1.9; }\n</style>\n</head>\n<body>\n  <div class=\"bar\"><div class=\"ham\" id=\"ham\"><span></span><span></span><span></span></div></div>\n  <div class=\"brand\" id=\"brand\">Menu</div>\n  <div class=\"overlay\" id=\"overlay\"></div>\n  <aside class=\"drawer right\" id=\"drawer\"><div id=\"ditems\"></div></aside>\n  <div class=\"content\"><h1>汉堡菜单导航</h1><p>移动端经典的三条杠样式，点击后侧边滑出菜单，适配屏幕较窄的移动端场景。点左上角汉堡按钮试试。</p></div>\n<script>\n  const state = {\n    theme:\"#2563eb\", menuBg:\"#111827\", text:\"#f9fafb\", hover:\"#374151\", barColor:\"#111827\",\n    overlayOpacity:0.5, dur:0.3, sideW:280, fontSize:16, from:\"右\",\n    brand:\"Menu\", items:\"首页,作品,关于,联系\"\n  };\n  const ham=document.getElementById(\"ham\"), overlay=document.getElementById(\"overlay\"), drawer=document.getElementById(\"drawer\"), ditems=document.getElementById(\"ditems\"), brandEl=document.getElementById(\"brand\");\n  function render(){ ditems.innerHTML=\"\"; state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"ditem\"; d.textContent=t; ditems.appendChild(d); }); }\n  function setOpen(o){ overlay.classList.toggle(\"open\",o); drawer.classList.toggle(\"open\",o); }\n  ham.onclick=()=> setOpen(!drawer.classList.contains(\"open\"));\n  overlay.onclick=()=> setOpen(false);\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--menuBg\",state.menuBg); R.setProperty(\"--text\",state.text);\n    R.setProperty(\"--hover\",state.hover); R.setProperty(\"--bar\",state.barColor);\n    R.setProperty(\"--ov\",state.overlayOpacity); R.setProperty(\"--dur\",state.dur+\"s\"); R.setProperty(\"--sideW\",state.sideW+\"px\"); R.setProperty(\"--fs\",state.fontSize+\"px\");\n    drawer.classList.remove(\"left\",\"right\"); drawer.classList.add(state.from===\"左\"?\"left\":\"right\");\n    brandEl.textContent=state.brand; render();\n  }\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); });\n  apply();\n<\\/script>\n</body>\n</html>\n",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>汉堡菜单导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#2563eb; --menuBg:#111827; --text:#f9fafb; --hover:#374151; --bar:#111827; --ov:.5; --dur:.3s; --sideW:280px; --fs:16px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; background:#f3f4f6; }\n  .bar { height:60px; display:flex; align-items:center; padding:0 20px; }\n  .ham { width:42px; height:42px; display:flex; flex-direction:column; justify-content:center; gap:5px; cursor:pointer; }\n  .ham span { height:3px; background:var(--bar); border-radius:2px; transition:.3s; }\n  .overlay { position:fixed; inset:0; background:rgba(0,0,0,var(--ov)); opacity:0; pointer-events:none; transition:opacity var(--dur) ease; z-index:40; }\n  .overlay.open { opacity:1; pointer-events:auto; }\n  .drawer { position:fixed; top:0; bottom:0; width:var(--sideW); background:var(--menuBg); color:var(--text); padding:80px 24px; z-index:50; transition:transform var(--dur) cubic-bezier(.16,1,.3,1); display:flex; flex-direction:column; gap:6px; }\n  .drawer.right { right:0; transform:translateX(100%); }\n  .drawer.left { left:0; transform:translateX(-100%); }\n  .drawer.open.right, .drawer.open.left { transform:translateX(0); }\n  .ditem { padding:14px 16px; border-radius:12px; font-size:var(--fs); cursor:pointer; transition:background .15s; }\n  .ditem:hover { background:var(--hover); }\n  .brand { position:fixed; top:22px; left:20px; font-weight:800; color:var(--theme); z-index:60; }\n  .content { padding:80px 26px; max-width:880px; margin:0 auto; }\n  .content h1 { color:#111827; margin-bottom:10px; }\n  .content p { color:#6b7280; line-height:1.9; }\n</style>\n</head>\n<body>\n  <div class=\"bar\"><div class=\"ham\" id=\"ham\"><span></span><span></span><span></span></div></div>\n  <div class=\"brand\" id=\"brand\">Menu</div>\n  <div class=\"overlay\" id=\"overlay\"></div>\n  <aside class=\"drawer right\" id=\"drawer\"><div id=\"ditems\"></div></aside>\n  <div class=\"content\"><h1>汉堡菜单导航</h1><p>移动端经典的三条杠样式，点击后侧边滑出菜单，适配屏幕较窄的移动端场景。点左上角汉堡按钮试试。</p></div>\n<script>\n  const state = {\n    theme:\"#2563eb\", menuBg:\"#111827\", text:\"#f9fafb\", hover:\"#374151\", barColor:\"#111827\",\n    overlayOpacity:0.5, dur:0.3, sideW:280, fontSize:16, from:\"右\",\n    brand:\"Menu\", items:\"首页,作品,关于,联系\"\n  };\n  const ham=document.getElementById(\"ham\"), overlay=document.getElementById(\"overlay\"), drawer=document.getElementById(\"drawer\"), ditems=document.getElementById(\"ditems\"), brandEl=document.getElementById(\"brand\");\n  function render(){ ditems.innerHTML=\"\"; state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"ditem\"; d.textContent=t; ditems.appendChild(d); }); }\n  function setOpen(o){ overlay.classList.toggle(\"open\",o); drawer.classList.toggle(\"open\",o); }\n  ham.onclick=()=> setOpen(!drawer.classList.contains(\"open\"));\n  overlay.onclick=()=> setOpen(false);\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--menuBg\",state.menuBg); R.setProperty(\"--text\",state.text);\n    R.setProperty(\"--hover\",state.hover); R.setProperty(\"--bar\",state.barColor);\n    R.setProperty(\"--ov\",state.overlayOpacity); R.setProperty(\"--dur\",state.dur+\"s\"); R.setProperty(\"--sideW\",state.sideW+\"px\"); R.setProperty(\"--fs\",state.fontSize+\"px\");\n    drawer.classList.remove(\"left\",\"right\"); drawer.classList.add(state.from===\"左\"?\"left\":\"right\");\n    brandEl.textContent=state.brand; render();\n  }\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); });\n  apply();\n  // 自动演示一次开合（让缩略图能看到效果）\n  setTimeout(() => { setOpen(true); setTimeout(() => setOpen(false), 1200); }, 600);\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   },
   {
@@ -7843,7 +7165,7 @@ window.WEB_ARSENAL = [
     分类: "组件",
     子类: "导航栏",
     风格: [
-      "聚焦",
+      "品牌",
       "品牌"
     ],
     场景: [
@@ -7853,7 +7175,7 @@ window.WEB_ARSENAL = [
     ],
     元素: [
       "全屏",
-      "遮罩"
+      "弹窗",
     ],
     搭配: [
       "汉堡菜单导航",
@@ -7957,7 +7279,7 @@ window.WEB_ARSENAL = [
     效果说明: "点开后全屏覆盖、菜单居中大字排列，把全部注意力收拢到导航本身。核心逻辑是匹配作品集、品牌官网等需要强调「我现在在哪、能去哪」的聚焦需求。",
     用法: "点「菜单」全屏展开、点 × 关闭。调「字号/项间距」定视觉重量；调「背景模糊」做毛玻璃；「排列」切居中/分散。",
     提示词: "帮我做\"全屏遮罩导航\"（纯 HTML/CSS/JS）：\n效果：点开全屏覆盖、菜单居中大字排列，聚焦导航。适配作品集/品牌官网。\n用法示例：\n<button class=\"open-btn\">菜单</button><div class=\"full\">…大字菜单…</div>\n// open.click → full.classList.add(\"open\")；close 移除\n关键参数：\n- theme 主题色 / bg 背景色 / text 文字色 / hover 项悬浮色 / closeColor 关闭按钮色 / dur 动画时长（秒） / fontSize 字号（px） / gap 项间距（px） / blur 背景模糊（px） / itemAlign 排列 / brand 品牌文字 / items 菜单项（逗号分隔）\n集成步骤：\n1. 复制 assets/demos/全屏遮罩导航.html 单文件\n2. items csv 换菜单；blur 做毛玻璃\n3. 调「字号/项间距/排列」定视觉重量",
-    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>全屏遮罩导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#2563eb; --bg:#0f172a; --text:#f8fafc; --hover:#38bdf8; --close:#f8fafc; --dur:.4s; --fs:28px; --gap:22px; --blur:0px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; background:#eef2f7; }\n  .open-btn { position:fixed; top:20px; right:24px; z-index:30; background:var(--theme); color:#fff; border:none; padding:12px 22px; border-radius:30px; font-size:15px; cursor:pointer; }\n  .full { position:fixed; inset:0; background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--gap); z-index:50; opacity:0; pointer-events:none; transition:opacity var(--dur) ease; backdrop-filter:blur(var(--blur)); }\n  .full.open { opacity:1; pointer-events:auto; }\n  .ftitle { font-size:14px; letter-spacing:3px; text-transform:uppercase; opacity:.6; margin-bottom:6px; }\n  .fitems { display:flex; flex-direction:column; align-items:center; gap:var(--gap); }\n  .fitem { font-size:var(--fs); font-weight:700; cursor:pointer; transition:color .2s; letter-spacing:1px; }\n  .fitem:hover { color:var(--hover); }\n  .close { position:fixed; top:22px; right:26px; z-index:60; background:none; border:none; color:var(--close); font-size:34px; cursor:pointer; line-height:1; }\n  .content { padding:80px 26px; max-width:880px; margin:0 auto; }\n  .content h1 { color:#111827; margin-bottom:10px; }\n  .content p { color:#6b7280; line-height:1.9; }\n</style>\n</head>\n<body>\n  <button class=\"open-btn\" id=\"open\">菜单</button>\n  <div class=\"full\" id=\"full\"><button class=\"close\" id=\"close\">×</button><div class=\"ftitle\" id=\"ftitle\"></div><div class=\"fitems\" id=\"fitems\"></div></div>\n  <div class=\"content\"><h1>全屏遮罩导航</h1><p>点开全屏覆盖、菜单居中大字排列，聚焦导航本身。适配作品集、品牌官网等需要强调导航的场景。点右上「菜单」试试。</p></div>\n<script>\n  const state = {\n    theme:\"#2563eb\", bg:\"#0f172a\", text:\"#f8fafc\", hover:\"#38bdf8\", closeColor:\"#f8fafc\",\n    dur:0.4, fontSize:28, gap:22, blur:0, itemAlign:\"居中\",\n    brand:\"Portfolio\", items:\"Work,About,Services,Contact\"\n  };\n  const openBtn=document.getElementById(\"open\"), full=document.getElementById(\"full\"), closeBtn=document.getElementById(\"close\"), fitems=document.getElementById(\"fitems\"), ftitle=document.getElementById(\"ftitle\");\n  function render(){\n    fitems.innerHTML=\"\";\n    fitems.style.justifyContent = state.itemAlign===\"分散\"?\"space-between\":\"center\";\n    state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"fitem\"; d.textContent=t; fitems.appendChild(d); });\n  }\n  openBtn.onclick=()=> full.classList.add(\"open\");\n  closeBtn.onclick=()=> full.classList.remove(\"open\");\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--bg\",state.bg); R.setProperty(\"--text\",state.text);\n    R.setProperty(\"--hover\",state.hover); R.setProperty(\"--close\",state.closeColor);\n    R.setProperty(\"--dur\",state.dur+\"s\"); R.setProperty(\"--fs\",state.fontSize+\"px\"); R.setProperty(\"--gap\",state.gap+\"px\"); R.setProperty(\"--blur\",state.blur+\"px\");\n    ftitle.textContent=state.brand; render();\n  }\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); });\n  apply();\n<\\/script>\n</body>\n</html>\n",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>全屏遮罩导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#2563eb; --bg:#0f172a; --text:#f8fafc; --hover:#38bdf8; --close:#f8fafc; --dur:.4s; --fs:28px; --gap:22px; --blur:0px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; background:#eef2f7; }\n  .open-btn { position:fixed; top:20px; right:24px; z-index:30; background:var(--theme); color:#fff; border:none; padding:12px 22px; border-radius:30px; font-size:15px; cursor:pointer; }\n  .full { position:fixed; inset:0; background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--gap); z-index:50; opacity:0; pointer-events:none; transition:opacity var(--dur) ease; backdrop-filter:blur(var(--blur)); }\n  .full.open { opacity:1; pointer-events:auto; }\n  .ftitle { font-size:14px; letter-spacing:3px; text-transform:uppercase; opacity:.6; margin-bottom:6px; }\n  .fitems { display:flex; flex-direction:column; align-items:center; gap:var(--gap); }\n  .fitem { font-size:var(--fs); font-weight:700; cursor:pointer; transition:color .2s; letter-spacing:1px; }\n  .fitem:hover { color:var(--hover); }\n  .close { position:fixed; top:22px; right:26px; z-index:60; background:none; border:none; color:var(--close); font-size:34px; cursor:pointer; line-height:1; }\n  .content { padding:80px 26px; max-width:880px; margin:0 auto; }\n  .content h1 { color:#111827; margin-bottom:10px; }\n  .content p { color:#6b7280; line-height:1.9; }\n</style>\n</head>\n<body>\n  <button class=\"open-btn\" id=\"open\">菜单</button>\n  <div class=\"full\" id=\"full\"><button class=\"close\" id=\"close\">×</button><div class=\"ftitle\" id=\"ftitle\"></div><div class=\"fitems\" id=\"fitems\"></div></div>\n  <div class=\"content\"><h1>全屏遮罩导航</h1><p>点开全屏覆盖、菜单居中大字排列，聚焦导航本身。适配作品集、品牌官网等需要强调导航的场景。点右上「菜单」试试。</p></div>\n<script>\n  const state = {\n    theme:\"#2563eb\", bg:\"#0f172a\", text:\"#f8fafc\", hover:\"#38bdf8\", closeColor:\"#f8fafc\",\n    dur:0.4, fontSize:28, gap:22, blur:0, itemAlign:\"居中\",\n    brand:\"Portfolio\", items:\"Work,About,Services,Contact\"\n  };\n  const openBtn=document.getElementById(\"open\"), full=document.getElementById(\"full\"), closeBtn=document.getElementById(\"close\"), fitems=document.getElementById(\"fitems\"), ftitle=document.getElementById(\"ftitle\");\n  function render(){\n    fitems.innerHTML=\"\";\n    fitems.style.justifyContent = state.itemAlign===\"分散\"?\"space-between\":\"center\";\n    state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"fitem\"; d.textContent=t; fitems.appendChild(d); });\n  }\n  openBtn.onclick=()=> full.classList.add(\"open\");\n  closeBtn.onclick=()=> full.classList.remove(\"open\");\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--bg\",state.bg); R.setProperty(\"--text\",state.text);\n    R.setProperty(\"--hover\",state.hover); R.setProperty(\"--close\",state.closeColor);\n    R.setProperty(\"--dur\",state.dur+\"s\"); R.setProperty(\"--fs\",state.fontSize+\"px\"); R.setProperty(\"--gap\",state.gap+\"px\"); R.setProperty(\"--blur\",state.blur+\"px\");\n    ftitle.textContent=state.brand; render();\n  }\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); });\n  apply();\n  // 自动演示一次开合（让缩略图能看到效果）\n  setTimeout(() => { full.classList.add('open'); setTimeout(() => full.classList.remove('open'), 1400); }, 600);\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   },
   {
@@ -7975,7 +7297,7 @@ window.WEB_ARSENAL = [
       "落地页"
     ],
     元素: [
-      "锚点",
+      "导航",
       "高亮"
     ],
     搭配: [
@@ -8092,13 +7414,13 @@ window.WEB_ARSENAL = [
     分类: "组件",
     子类: "导航栏",
     风格: [
-      "沉浸",
+      "沉浸暗色",
       "品牌"
     ],
     场景: [
-      "官网首页",
-      "hero 大图",
-      "品牌站"
+      "品牌官网",
+      "全屏",
+      "品牌官网",
     ],
     元素: [
       "滚动",
@@ -8209,6 +7531,36 @@ window.WEB_ARSENAL = [
     用法: "滚动越过 40px 即收缩为实色矮条。调「初始不透明度」控首屏通透感；「初始高度/收缩后高度」控伸缩幅度；「滚动后底色」切沉浸→实色。",
     提示词: "帮我做\"滚动收缩导航\"（纯 HTML/CSS/JS）：\n效果：初始透明贴合 hero 大图；下滑后变矮并切实色背景加投影。适配带大图的官网首页。\n用法示例：\n<nav id=\"nav\">…</nav>\n// onscroll: scrolled = scrollY>40; nav.classList.toggle(\"shrunk\",scrolled); 背景按状态切 rgba\n关键参数：\n- theme 主题色 / initBg 初始底色 / scrollBg 滚动后底色 / text 文字色 / shadowColor 阴影色 / initOpacity 初始不透明度 / shrinkH 收缩后高度（px） / initH 初始高度（px） / dur 动画时长（秒） / fontSize 字号（px） / brand 品牌文字 / items 导航项（逗号分隔）\n集成步骤：\n1. 复制 assets/demos/滚动收缩导航.html 单文件\n2. initOpacity 控首屏通透感；initH/shrinkH 控伸缩\n3. 调「滚动后底色」切沉浸→实色",
     代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>滚动收缩导航演示</title>\n<style>\n  * { margin:0; padding:0; box-sizing:border-box; }\n  :root { --theme:#e8702a; --initBg:#111827; --scrollBg:#111827; --text:#ffffff; --shadowC:#000000; --sh:56px; --ih:80px; --dur:.3s; --fs:16px; }\n  body { font-family:system-ui,\"Microsoft YaHei\",sans-serif; }\n  #nav { position:fixed; top:0; left:0; right:0; z-index:50; height:var(--ih); display:flex; align-items:center; gap:22px; padding:0 30px; color:var(--text); transition:height var(--dur) ease, background var(--dur) ease, box-shadow var(--dur) ease; }\n  #nav.shrunk { height:var(--sh); }\n  .brand { font-weight:800; font-size:calc(var(--fs)+3px); color:var(--theme); }\n  .items { display:flex; gap:6px; flex:1; }\n  .item { padding:8px 14px; border-radius:10px; font-size:var(--fs); cursor:pointer; transition:background .15s; }\n  .item:hover { background:rgba(255,255,255,.12); }\n  .cta { background:var(--theme); color:#fff; padding:9px 18px; border-radius:10px; font-size:var(--fs); cursor:pointer; }\n  .hero { height:100vh; background:linear-gradient(135deg,#1f2937,#111827); display:flex; align-items:center; justify-content:center; color:#fff; font-size:30px; font-weight:800; text-align:center; padding:0 20px; }\n  .sec { height:90vh; padding:0 30px; max-width:880px; margin:0 auto; display:flex; align-items:center; }\n  .sec h2 { color:#111827; }\n  .sec p { color:#6b7280; margin-top:10px; line-height:1.9; }\n</style>\n</head>\n<body>\n  <nav id=\"nav\"><div class=\"brand\" id=\"brand\">Lithos</div><div class=\"items\" id=\"items\"></div><div class=\"cta\">开始</div></nav>\n  <div class=\"hero\">向下滚动，看导航从透明大图收缩为实色矮条</div>\n  <div class=\"sec\"><div><h2>关于我们</h2><p>初始透明贴合大图营造沉浸感，下滑后自动变矮并切换实色背景，适配带 hero 大图的官网首页。</p></div></div>\n  <div class=\"sec\" style=\"height:90vh;\"></div>\n<script>\n  const state = {\n    theme:\"#e8702a\", initBg:\"#111827\", scrollBg:\"#111827\", text:\"#ffffff\", shadowColor:\"#000000\",\n    initOpacity:0, shrinkH:56, initH:80, dur:0.3, fontSize:16,\n    brand:\"Lithos\", items:\"首页,课程,作品,关于\"\n  };\n  const nav=document.getElementById(\"nav\"), itemsEl=document.getElementById(\"items\"), brandEl=document.getElementById(\"brand\");\n  function render(){ itemsEl.innerHTML=\"\"; state.items.split(\",\").forEach(t=>{ const d=document.createElement(\"div\"); d.className=\"item\"; d.textContent=t; itemsEl.appendChild(d); }); }\n  function hexA(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return `rgba(${r},${g},${b},${a})`; }\n  function onScroll(){\n    const scrolled = window.scrollY > 40;\n    nav.classList.toggle(\"shrunk\", scrolled);\n    nav.style.background = scrolled ? hexA(state.scrollBg, 1) : hexA(state.initBg, state.initOpacity);\n    nav.style.boxShadow = '0 6px 20px ' + hexA(state.shadowColor, scrolled?0.18:0);\n  }\n  function apply(){\n    const R=document.documentElement.style;\n    R.setProperty(\"--theme\",state.theme); R.setProperty(\"--initBg\",state.initBg); R.setProperty(\"--scrollBg\",state.scrollBg);\n    R.setProperty(\"--text\",state.text); R.setProperty(\"--shadowC\",state.shadowColor);\n    R.setProperty(\"--sh\",state.shrinkH+\"px\"); R.setProperty(\"--ih\",state.initH+\"px\");\n    R.setProperty(\"--dur\",state.dur+\"s\"); R.setProperty(\"--fs\",state.fontSize+\"px\");\n    brandEl.textContent=state.brand; render(); onScroll();\n  }\n  window.addEventListener(\"scroll\", onScroll);\n  window.addEventListener(\"message\", e=>{ const d=e.data; if(!d||d.type!==\"param\")return; state[d.key]=d.value; apply(); });\n  apply();\n<\\/script>\n</body>\n</html>\n",
+    复用记录: ""
+  },
+  {
+    id: "s208",
+    标题: "OpenAI 极简导航栏",
+    分类: "组件",
+    子类: "导航栏",
+    风格: ["极简", "克制", "品牌优先"],
+    场景: ["品牌官网", "SaaS", "AI 产品"],
+    元素: ["字体", "留白", "版面"],
+    标签: ["导航", "Research-first", "OpenAI", "极简"],
+    来源: "参考 openai.com 官网导航（2026-09-04 抓取分析）",
+    效果演示: "assets/demos/OpenAI极简导航.html",
+    参数: [
+      { 键: "firstItem", 名: "导航首项文案（身份宣言）", 类型: "string", 默认: "Research" },
+      { 键: "menuItems", 名: "导航菜单项（逗号分隔）", 类型: "string", 默认: "Research,Products,Business,Safety,API" },
+      { 键: "brandName", 名: "品牌名称", 类型: "string", 默认: "OpenAI" },
+      { 键: "ink", 名: "文字主色", 类型: "color", 默认: "#1a1a1a" },
+      { 键: "accent", 名: "强调色（链接 hover）", 类型: "color", 默认: "#10a37f" },
+      { 键: "bg", 名: "导航栏背景色", 类型: "color", 默认: "#ffffff" },
+      { 键: "height", 名: "导航栏高度（px）", 类型: "slider", 最小: 44, 最大: 80, 步长: 2, 默认: 56 },
+      { 键: "fontSize", 名: "菜单字号（px）", 类型: "slider", 最小: 12, 最大: 18, 步长: 0.5, 默认: 14 },
+      { 键: "gap", 名: "菜单项间距（px）", 类型: "slider", 最小: 16, 最大: 40, 步长: 2, 默认: 24 },
+      { 键: "showRight", 名: "显示右侧操作区", 类型: "switch", 默认: true },
+      { 键: "rightText", 名: "右侧按钮文案", 类型: "string", 默认: "Try ChatGPT" }
+    ],
+    效果说明: "OpenAI 官网风格的极简顶部导航：品牌名在左、菜单居中偏左（首项 = 身份宣言如 Research）、右侧操作区（登录/试用）。无下划线、无图标、纯文字链接 + hover 变色。核心特征：把「我是谁」（Research）放在最前面，而不是把「卖什么」（Products）放最前——这是身份排序而非功能排序。",
+    用法: "改「导航首项文案」为你的品牌关键词；调「菜单项」匹配你的站点结构；「强调色」用品牌色。配合焦点型Hero（s205）使用——导航栏 + 首屏 = OpenAI 式完整门面。",
+    提示词: "帮我做「OpenAI 极简导航栏」（纯 HTML/CSS/JS）：\n效果：极简顶部固定导航栏，品牌名在左、文字菜单在右（首项 = 品牌身份关键词）、最右侧是操作按钮（登录/试用）。无下划线无图标，hover 时文字变色。核心：首项不是「产品」而是「研究/关于」——身份先于功能。\n用法示例：\n<nav class=\"oai-nav\">\n  <span class=\"brand\">Brand</span>\n  <div class=\"menu\">\n    <a href=\"#\">About</a><a href=\"#\">Product</a><a href=\"#\">Pricing</a>\n  </div>\n  <div class=\"right\"><a href=\"#\">Log in</a><a href=\"#\">Try it</a></div>\n</nav>\n关键参数：\n- firstItem 导航首项 / menuItems 菜单列表 / brandName 品牌名 / ink 文字主色 / accent 强调色 / bg 背景色 / height 高度 / fontSize 字号 / gap 间距 / showRight 显示右侧 / rightText 右侧按钮文案\n集成步骤：\n1. 复制 assets/demos/OpenAI极简导航.html 的 nav 结构\n2. 改 firstItem 为你的品牌定位词（如「设计」「研究」「工作室」）\n3. 配合焦点型Hero（s205）组成完整门面",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>OpenAI 极简导航栏演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  :root {\n    --ink: #1a1a1a; --accent: #10a37f; --bg: #ffffff;\n    --h: 56px; --fs: 14px; --gap: 24px;\n  }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #f7f7f5; }\n\n  /* 导航栏 */\n  .oai-nav {\n    position: fixed; top: 0; left: 0; right: 0; z-index: 100;\n    height: var(--h); display: flex; align-items: center; justify-content: space-between;\n    padding: 0 28px; background: var(--bg);\n    border-bottom: 1px solid rgba(0,0,0,.06);\n  }\n  .brand { font-weight: 800; font-size: 16px; color: var(--ink); letter-spacing: .3px; }\n  .menu { display: flex; align-items: center; gap: var(--gap); }\n  .menu a {\n    color: var(--ink); text-decoration: none; font-size: var(--fs); font-weight: 500;\n    transition: color .15s; position: relative;\n  }\n  .menu a:first-child { color: var(--accent); font-weight: 600; } /* 首项 = 身份宣言，用强调色 */\n  .menu a:hover { color: var(--accent); }\n  .right { display: flex; align-items: center; gap: 16px; }\n  .right a {\n    color: var(--ink); text-decoration: none; font-size: var(--fs); font-weight: 500;\n    transition: color .15s;\n  }\n  .right a:hover { color: var(--accent); }\n  .try-btn {\n    background: var(--ink); color: #fff; padding: 7px 16px; border-radius: 999px;\n    font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s;\n  }\n  .try-btn:hover { background: #333; }\n\n  /* 演示内容区 */\n  .demo-content { padding: calc(var(--h) + 40px) 28px 40px; max-width: 880px; margin: 0 auto; }\n  .demo-content h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }\n  .demo-content p { color: #6b6b66; line-height: 1.8; font-size: 14.5px; }\n  .feature-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }\n  .feature-item {\n    background: #fff; border: 1px solid #e8e8e4; border-radius: 10px;\n    padding: 14px 16px; font-size: 13.5px; color: #3d3b36; line-height: 1.6;\n  }\n  .feature-item b { color: var(--accent); }\n</style>\n</head>\n<body>\n<nav class=\"oai-nav\" id=\"nav\">\n  <span class=\"brand\" id=\"brand\">OpenAI</span>\n  <div class=\"menu\" id=\"menu\"></div>\n  <div class=\"right\" id=\"right\"></div>\n</nav>\n\n<div class=\"demo-content\">\n  <h1>OpenAI 极简导航栏</h1>\n  <p>品牌名在左、菜单居中（首项 = 身份宣言）、右侧操作区。无下划线无图标，纯文字 + hover 变色。<br>核心特征：把「我是谁」放在最前，而不是把「卖什么」放最前——身份排序优先于功能排序。</p>\n  <div class=\"feature-list\">\n    <div class=\"feature-item\"><b>首项强调色</b> — Research/About 用品牌色高亮，一眼看到定位</div>\n    <div class=\"feature-item\"><b>零装饰</b> — 无图标无下划线无阴影，靠字重和间距分层</div>\n    <div class=\"feature-item\"><b>右侧引流</b> — Log in（虚）+ Try（实）双按钮，和 Apple 同源</div>\n    <div class=\"feature-item\"><b>固定顶栏</b> — 滚动不消失，始终可触达</div>\n  </div>\n</div>\n\n<script>\n  const state = {\n    firstItem: \"Research\",\n    menuItems: \"Research,Products,Business,Safety,API\",\n    brandName: \"OpenAI\",\n    ink: \"#1a1a1a\",\n    accent: \"#10a37f\",\n    bg: \"#ffffff\",\n    height: 56,\n    fontSize: 14,\n    gap: 24,\n    showRight: true,\n    rightText: \"Try ChatGPT\"\n  };\n\n  const nav = document.getElementById('nav');\n  const brandEl = document.getElementById('brand');\n  const menuEl = document.getElementById('menu');\n  const rightEl = document.getElementById('right');\n\n  function render() {\n    brandEl.textContent = state.brandName;\n\n    // 菜单项\n    menuEl.innerHTML = '';\n    const items = state.menuItems.split(',').map(s => s.trim()).filter(Boolean);\n    items.forEach((item, i) => {\n      const a = document.createElement('a');\n      a.href = '#';\n      a.textContent = item;\n      if (i === 0) a.style.color = 'var(--accent)'; // 首项强调\n      a.addEventListener('mouseenter', () => { a.style.color = 'var(--accent)'; });\n      a.addEventListener('mouseleave', () => { if (i === 0) return; a.style.color = 'var(--ink)'; });\n      menuEl.appendChild(a);\n    });\n\n    // 右侧操作区\n    rightEl.innerHTML = '';\n    if (state.showRight) {\n      const login = document.createElement('a');\n      login.href = '#';\n      login.textContent = 'Log in';\n      rightEl.appendChild(login);\n\n      const tryBtn = document.createElement('a');\n      tryBtn.href = '#';\n      tryBtn.className = 'try-btn';\n      tryBtn.textContent = state.rightText;\n      rightEl.appendChild(tryBtn);\n    }\n  }\n\n  function apply() {\n    const R = document.documentElement.style;\n    R.setProperty('--ink', state.ink);\n    R.setProperty('--accent', state.accent);\n    R.setProperty('--bg', state.bg);\n    R.setProperty('--h', state.height + 'px');\n    R.setProperty('--fs', state.fontSize + 'px');\n    R.setProperty('--gap', state.gap + 'px');\n    render();\n  }\n\n  window.addEventListener('message', e => {\n    const d = e.data;\n    if (!d || d.type !== 'param') return;\n    state[d.key] = d.value;\n    apply();\n  });\n\n  apply();\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   }
 ];

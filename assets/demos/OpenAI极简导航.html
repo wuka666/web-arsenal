@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAI 极简导航栏演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #1a1a1a; --accent: #10a37f; --bg: #ffffff;
+    --h: 56px; --fs: 14px; --gap: 24px;
+  }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #f7f7f5; }
+
+  /* 导航栏 */
+  .oai-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--h); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; background: var(--bg);
+    border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .brand { font-weight: 800; font-size: 16px; color: var(--ink); letter-spacing: .3px; }
+  .menu { display: flex; align-items: center; gap: var(--gap); }
+  .menu a {
+    color: var(--ink); text-decoration: none; font-size: var(--fs); font-weight: 500;
+    transition: color .15s; position: relative;
+  }
+  .menu a:first-child { color: var(--accent); font-weight: 600; } /* 首项 = 身份宣言，用强调色 */
+  .menu a:hover { color: var(--accent); }
+  .right { display: flex; align-items: center; gap: 16px; }
+  .right a {
+    color: var(--ink); text-decoration: none; font-size: var(--fs); font-weight: 500;
+    transition: color .15s;
+  }
+  .right a:hover { color: var(--accent); }
+  .try-btn {
+    background: var(--ink); color: #fff; padding: 7px 16px; border-radius: 999px;
+    font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s;
+  }
+  .try-btn:hover { background: #333; }
+
+  /* 演示内容区 */
+  .demo-content { padding: calc(var(--h) + 40px) 28px 40px; max-width: 880px; margin: 0 auto; }
+  .demo-content h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
+  .demo-content p { color: #6b6b66; line-height: 1.8; font-size: 14.5px; }
+  .feature-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .feature-item {
+    background: #fff; border: 1px solid #e8e8e4; border-radius: 10px;
+    padding: 14px 16px; font-size: 13.5px; color: #3d3b36; line-height: 1.6;
+  }
+  .feature-item b { color: var(--accent); }
+</style>
+</head>
+<body>
+<nav class="oai-nav" id="nav">
+  <span class="brand" id="brand">OpenAI</span>
+  <div class="menu" id="menu"></div>
+  <div class="right" id="right"></div>
+</nav>
+
+<div class="demo-content">
+  <h1>OpenAI 极简导航栏</h1>
+  <p>品牌名在左、菜单居中（首项 = 身份宣言）、右侧操作区。无下划线无图标，纯文字 + hover 变色。<br>核心特征：把「我是谁」放在最前，而不是把「卖什么」放最前——身份排序优先于功能排序。</p>
+  <div class="feature-list">
+    <div class="feature-item"><b>首项强调色</b> — Research/About 用品牌色高亮，一眼看到定位</div>
+    <div class="feature-item"><b>零装饰</b> — 无图标无下划线无阴影，靠字重和间距分层</div>
+    <div class="feature-item"><b>右侧引流</b> — Log in（虚）+ Try（实）双按钮，和 Apple 同源</div>
+    <div class="feature-item"><b>固定顶栏</b> — 滚动不消失，始终可触达</div>
+  </div>
+</div>
+
+<script>
+  const state = {
+    firstItem: "Research",
+    menuItems: "Research,Products,Business,Safety,API",
+    brandName: "OpenAI",
+    ink: "#1a1a1a",
+    accent: "#10a37f",
+    bg: "#ffffff",
+    height: 56,
+    fontSize: 14,
+    gap: 24,
+    showRight: true,
+    rightText: "Try ChatGPT"
+  };
+
+  const nav = document.getElementById('nav');
+  const brandEl = document.getElementById('brand');
+  const menuEl = document.getElementById('menu');
+  const rightEl = document.getElementById('right');
+
+  function render() {
+    brandEl.textContent = state.brandName;
+
+    // 菜单项
+    menuEl.innerHTML = '';
+    const items = state.menuItems.split(',').map(s => s.trim()).filter(Boolean);
+    items.forEach((item, i) => {
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = item;
+      if (i === 0) a.style.color = 'var(--accent)'; // 首项强调
+      a.addEventListener('mouseenter', () => { a.style.color = 'var(--accent)'; });
+      a.addEventListener('mouseleave', () => { if (i === 0) return; a.style.color = 'var(--ink)'; });
+      menuEl.appendChild(a);
+    });
+
+    // 右侧操作区
+    rightEl.innerHTML = '';
+    if (state.showRight) {
+      const login = document.createElement('a');
+      login.href = '#';
+      login.textContent = 'Log in';
+      rightEl.appendChild(login);
+
+      const tryBtn = document.createElement('a');
+      tryBtn.href = '#';
+      tryBtn.className = 'try-btn';
+      tryBtn.textContent = state.rightText;
+      rightEl.appendChild(tryBtn);
+    }
+  }
+
+  function apply() {
+    const R = document.documentElement.style;
+    R.setProperty('--ink', state.ink);
+    R.setProperty('--accent', state.accent);
+    R.setProperty('--bg', state.bg);
+    R.setProperty('--h', state.height + 'px');
+    R.setProperty('--fs', state.fontSize + 'px');
+    R.setProperty('--gap', state.gap + 'px');
+    render();
+  }
+
+  window.addEventListener('message', e => {
+    const d = e.data;
+    if (!d || d.type !== 'param') return;
+    state[d.key] = d.value;
+    apply();
+  });
+
+  apply();
+</script>
+</body>
+</html>
