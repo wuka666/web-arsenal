@@ -70,7 +70,13 @@
 
   const state = {
     count: 2000, size: 1.5, speed: 0.5, scatter: 0.6, rotate: 0.3,
+    bgRatio: 0.1, palette: 'astra', twinkle: 0.6,
     color1: '#6eb5ff', color2: '#ff8c5a', bg: '#000000'
+  }
+  // 调色板 → 主辅色（降级版仅用颜色近似 3D 调色板）
+  const PALETTES = {
+    astra: ['#6eb5ff', '#ff8c5a'], aurora: ['#7CFFB2', '#4D9CFF'],
+    ember: ['#FF7A45', '#FFD166'], ice: ['#9FE8FF', '#5B8DEF'], gold: ['#FFD700', '#FFF1B8']
   }
 
   // 生成星星
@@ -134,9 +140,10 @@
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, W, H)
 
-    // 背景星（小点）
+    // 背景星（小点，数量随 backgroundRatio 联动）
     ctx.fillStyle = '#ffffff30'
-    for (let i = 0; i < 200; i++) {
+    const bgN = Math.round(state.count * state.bgRatio)
+    for (let i = 0; i < bgN; i++) {
       const bx = Math.random() * W, by = Math.random() * H
       const bs = 0.5 + Math.random() * 1
       ctx.globalAlpha = 0.15 + Math.random() * 0.25
@@ -158,8 +165,8 @@
       const x = cx + Math.cos(angle) * r
       const y = cy + Math.sin(angle) * r * 0.55  // 压扁成椭圆
 
-      // 闪烁
-      const twinkle = 0.6 + 0.4 * Math.sin(time * 2 + s.armOffset * 10)
+      // 闪烁（速度随 twinkleSpeed 联动）
+      const twinkle = 0.6 + 0.4 * Math.sin(time * state.twinkle * 3 + s.armOffset * 10)
       const alpha = s.brightness * twinkle
 
       // 颜色
@@ -225,11 +232,23 @@
   document.getElementById('bg').addEventListener('input', e => { state.bg = e.target.value })
 
   // postMessage 调参
+  // 把 s209 方案参数键映射到降级版内部 state：核心参数给可见反馈，3D 专属静默接受
+  const PARAM_MAP = {
+    starCount: 'count', size: 'size', scatter: 'scatter',
+    backgroundRatio: 'bgRatio', rotationDepth: 'rotate',
+    palette: 'palette', flowSpeed: 'speed', twinkleSpeed: 'twinkle'
+  }
+  const IGNORE_3D = ['bloomIntensity','bloomThreshold','intensity','flare','vignette','ambientColor']
   window.addEventListener('message', e => {
     const d = e.data
     if (!d || d.type !== 'param') return
-    state[d.key] = d.value
-    if (d.key === 'count') initStars()
+    if (d.key in PARAM_MAP) {
+      state[PARAM_MAP[d.key]] = d.value
+      if (d.key === 'palette') { const p = PALETTES[d.value] || PALETTES.astra; state.color1 = p[0]; state.color2 = p[1] }
+    } else if (!IGNORE_3D.includes(d.key)) {
+      state[d.key] = d.value
+    }
+    if (d.key === 'starCount' || d.key === 'backgroundRatio') initStars()
   })
 </script>
 </body>

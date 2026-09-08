@@ -3257,72 +3257,366 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     演示页: "assets/demos/方案-Astra暗色发布页.html",
     ThreeJS演示: "assets/demos/粒子星系-ThreeJS.html",
     下载: "assets/库/starflow.js",
-    代码: `<!DOCTYPE html>
+    代码: `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>产品名 · Astra 暗色发布页</title>
+<title>星流/Astra 暗色发布页 · 方案演示</title>
 <style>
-  /* openai-astra tokens */
-  :root{--zhucai:#ffffff;--zhongdian:#7EC8E3;--di:#000000;--zi:#ffffff;--cizi:#ffffff99;--yuanjiao:10px;--jianju:10px;--zihao:17px;--yinying:0;--faguang:0}
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{margin:0;background:var(--di);color:var(--zi);font:400 var(--zihao,17px)/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.01em}
-  .stage{position:fixed;inset:0;z-index:0;background:var(--di)}
-  #astra{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:pan-y pinch-zoom;cursor:grab}
-  .page{position:relative;z-index:1;pointer-events:none}
-  .page a,.page button{pointer-events:auto}
-  .hero{height:100svh}
-  .copy{max-width:669px;margin:0 auto;padding:26vh 24px}
-  .copy h2{margin:0 0 16px;font:500 30px/1.32 var(--font-display,system-ui);letter-spacing:-.01em}
-  .copy p{margin:0 0 24px;color:var(--cizi)}
-  .cue{display:flex;flex-direction:column;align-items:center;gap:16px;padding:18vh 24px}
-  .cue-target{width:min(576px,100%);height:80svh;display:flex;align-items:center;justify-content:center}
-  .caption{margin:0;font:500 14px/1.5 system-ui;letter-spacing:.08em;color:#fafafad9}
-  .cue-note{max-width:440px;margin:0;text-align:center;font-size:14px;line-height:1.7;color:var(--cizi)}
-  .btn{display:inline-flex;align-items:center;min-height:40px;padding:12px 16px;border:0;border-radius:9999px;font:500 14px/1 system-ui;text-decoration:none;cursor:pointer;transition:background-color .3s}
-  .btn-primary{background:var(--zhucai);color:#000}
-  .btn-glass{background:#ffffff1f;color:var(--zi)}
-  .topbar{position:fixed;top:0;left:0;right:0;z-index:3;display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;pointer-events:none}
-  .topbar button{pointer-events:auto;background:#ffffff1f;color:var(--zi);border:0;border-radius:999px;padding:8px 14px;font:500 13px/1 system-ui;cursor:pointer}
+  /* ── openai-astra 设计令牌 ── */
+  :root {
+    --bg: var(--di); --fg: var(--zi); --fg-2: #fafafa; --muted: var(--cizi); --meta: #ffffff70;
+    --accent: #fff; --accent-on: #000;
+    /* 中文字体优先的中文字体栈；拉丁部分保留系统无衬线 */
+    --font-display: "HarmonyOS Sans SC", "MiSans", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: var(--font-display);
+    --text-xs: 13px; --text-sm: 14px; --text-base: 17px; --text-lg: 18px; --text-2xl: 30px; --text-3xl: 48px;
+    --leading-body: 1.65;
+    /* 中文不需要负字距；拉丁标签单独给（见 .label-right） */
+    --tracking-display: 0;
+    --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+    --radius-pill: 9999px;
+    --astra-ambient: #23435f; --astra-ambient-opacity: 0.55;
+    --astra-glass: #ffffff1f; --astra-copy-max: 669px; --astra-shape-max: 576px;
+    --zhucai: #ffffff; --zihao: 17px; --jianju: 10px; --yuanjiao: 10px; --yinying: 0; --faguang: 0;
+    --di: #000000; --zi: #ffffff; --cizi: #ffffff99; --zhongdian: #7EC8E3;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--text-base) / var(--leading-body) var(--font-body); letter-spacing: 0; -webkit-font-smoothing: antialiased; }
+
+  /* ── 布局骨架（固定）：canvas z-0 / 内容 z-1 / 顶栏与提示 z-2 ── */
+  .stage { position: fixed; inset: 0; z-index: 0; background: var(--bg); }
+  #starCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+  /* starflow 库可能自建 canvas 并挂到 body：同样固定全屏、垫在内容之下 */
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 0; }
+  .chrome { position: fixed; inset: 0; z-index: 2; height: 100svh; pointer-events: none; }
+  .chrome .label { position: absolute; top: 50%; transform: translateY(-50%); font: 500 clamp(32px, 5vw, 64px) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); user-select: none; white-space: nowrap; }
+  .chrome .label-left { left: clamp(20px, 4vw, 56px); }
+  .chrome .label-right { right: clamp(20px, 4vw, 56px); letter-spacing: -0.04em; } /* 拉丁单词保留轻微负字距 */
+  .chrome .letter { display: inline-block; opacity: 0; transform: translateX(44px); animation: label-reveal 1s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 1s) forwards; }
+  @keyframes label-reveal { to { opacity: 1; transform: translate(0); } }
+  .chrome .scroll-hint { position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); color: #fafafa99; font-size: var(--text-sm); letter-spacing: 0; }
+
+  .page { position: relative; z-index: 1; pointer-events: none; }
+  .page a, .page button { pointer-events: auto; }
+  .hero { height: 100svh; }
+  .copy { max-width: var(--astra-copy-max); margin: 0 auto; padding: 26vh var(--space-6); }
+  .copy h2 { margin: 0 0 var(--space-4); font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: 0; }
+  .copy p { margin: 0 0 var(--space-6); color: var(--muted); }
+  .cue { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); padding: 18vh var(--space-6); }
+  .cue-target { width: min(var(--astra-shape-max), 100%); height: 80svh; display: flex; align-items: center; justify-content: center; }
+  .cue-target svg { width: 60%; height: 60%; opacity: 0.4; }
+  .caption { margin: 0; font: 500 var(--text-sm) / 1.5 var(--font-body); letter-spacing: 0.08em; color: var(--zhongdian); }
+  .cue-note { max-width: 440px; margin: 0; text-align: center; font-size: var(--text-sm); line-height: 1.7; color: var(--meta); }
+  .copy.tail { padding-bottom: 50vh; text-align: center; }
+  .copy.tail p { color: var(--meta); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); justify-content: center; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 12px 16px; border: 0; border-radius: var(--radius-pill); font: 500 var(--text-sm) / 1 var(--font-body); text-decoration: none; cursor: pointer; transition: background-color .3s; }
+  .btn-primary { background: var(--accent); color: var(--accent-on); box-shadow: 0 6px calc(var(--yinying) * 1px) rgba(0,0,0,.35); text-shadow: 0 0 calc(var(--faguang) * 2px) var(--zhongdian); }
+  .btn-glass { background: var(--astra-glass); color: var(--fg); }
+  .btn-glass:hover { background: #ffffff33; }
+  .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: flex-end; gap: 8px; padding: 16px 20px; pointer-events: none; }
+  .topbar button { pointer-events: auto; background: var(--astra-glass); color: var(--fg); border: 0; border-radius: 999px; padding: 8px 14px; font: 500 13px / 1 var(--font-body); cursor: pointer; }
+
+  /* 调参面板 */
+  .tuner-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 10; width: 36px; height: 36px; border-radius: 999px; background: #ffffff1f; border: 0; color: #ffffffcc; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+  .tuner-panel { position: fixed; right: 16px; bottom: 64px; z-index: 10; width: 260px; background: #111; border: 1px solid #ffffff1a; border-radius: 12px; padding: 16px; display: none; flex-direction: column; gap: 8px; }
+  .tuner-panel.open { display: flex; }
+  .tuner-panel h3 { color: #ffffff99; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin: 4px 0 2px; }
+  .tuner-panel label { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #ffffffcc; font-size: 12px; }
+  .tuner-panel input[type="range"] { width: 100px; accent-color: #fff; }
+  .tuner-panel input[type="color"] { width: 50px; height: 22px; border: 0; background: transparent; cursor: pointer; }
+  .tuner-panel select { background: #222; color: #fff; border: 1px solid #ffffff33; border-radius: 6px; padding: 2px 6px; font-size: 12px; }
+  .tuner-panel .note { color: #ffffff66; font-size: 11px; margin-top: 4px; }
+
+  .notice {
+    position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%);
+    z-index: 3; color: #ffffff60; font-size: 12px; text-align: center; pointer-events: none;
+    line-height: 1.5;
+  }
+  .notice a { color: #ffffff90; pointer-events: auto; }
+  #modeText { color: #ffffff80; }
 </style>
 </head>
 <body>
-<div class="stage"><canvas id="astra"></canvas></div>
-<div class="topbar"><button id="langToggle">EN</button></div>
+<div class="stage"><canvas id="starCanvas"></canvas></div>
+
+<!-- 首屏标签（介绍模块骨架：全屏星系 + 两侧标签逐字入场） -->
+<div class="chrome" id="chrome">
+  <p class="label label-left"><span class="letter" style="--delay:1.0s">星</span><span class="letter" style="--delay:1.1s">流</span></p>
+  <p class="label label-right"><span class="letter" style="--delay:1.5s">Starflow</span></p>
+  <p class="scroll-hint">向下滚动</p>
+</div>
+
+<!-- 顶栏 -->
+<div class="topbar">
+  <button id="langToggle">EN</button>
+</div>
+
+<!-- 调参 -->
+<button class="tuner-toggle" id="tunerToggle">⚙</button>
+<div class="tuner-panel" id="tunerPanel">
+  <h3>方案参数</h3>
+  <label>主色 <input id="zhucai" type="color" value="#ffffff"></label>
+  <label>重点色 <input id="zhongdian" type="color" value="#7EC8E3"></label>
+  <label>页面底色 <input id="di" type="color" value="#000000"></label>
+  <label>正文色 <input id="zi" type="color" value="#ffffff"></label>
+  <label>次要文字色 <input id="cizi" type="color" value="#ffffff99"></label>
+  <label>字号 <b id="v-zihao">17</b><input id="zihao" type="range" min="13" max="22" step="1" value="17"></label>
+  <label>圆角 <b id="v-yuanjiao">10</b><input id="yuanjiao" type="range" min="4" max="20" step="1" value="10"></label>
+  <label>间距 <b id="v-jianju">10</b><input id="jianju" type="range" min="4" max="20" step="1" value="10"></label>
+  <label>阴影强度 <b id="v-yinying">0</b><input id="yinying" type="range" min="0" max="50" step="2" value="0"></label>
+  <label>发光强度 <b id="v-faguang">0</b><input id="faguang" type="range" min="0" max="30" step="1" value="0"></label>
+  <label>星星大小 <b id="v-starSize">1.2</b><input id="starSize" type="range" min="0.5" max="3" step="0.1" value="1.2"></label>
+  <label>星星速度 <b id="v-starSpeed">0.4</b><input id="starSpeed" type="range" min="0" max="1.5" step="0.05" value="0.4"></label>
+  <label>氛围色 <input id="ambient" type="color" value="#23435f"></label>
+  <p class="note">背景为真实 Three.js 3D 版（需 HTTP 服务）；双击打开时自动降级 Canvas 2D<br>在线版 → <a href="https://win-hao.github.io/starflow/" target="_blank" style="color:#ffffff90">win-hao.github.io/starflow</a></p>
+</div>
+
 <div class="page" id="page">
   <section class="hero"></section>
   <section class="copy" data-astra-intro>
-    <h2>标题段</h2>
-    <p>文案：先让位，再出场。真正有用的智能不抢镜头。</p>
-    <p>它退到两侧，把中间留给你的工作。</p>
+    <h2>星流让位，内容登场</h2>
+    <p>首屏是一整片星系——数千颗星沿旋臂缓慢流动。向下滚动时，星系整体翻转、退向两侧，把中央让给内容。</p>
+    <p>星星并没有消失：它们留在各自的旋臂上继续旋转。你需要的时候，它一直在。</p>
+  </section>
+  <section class="copy">
+    <h2>同一片星，不同的形状</h2>
+    <p>继续滚动，星尘从旋臂上散开，在下一个区域重新聚拢成你看到的样子——同一个星场，在不同位置站成不同的形状。</p>
   </section>
   <section class="cue" data-astra-shape="cursor">
-    <div class="cue-target"><svg viewBox="0 0 19 19" fill="none"></svg></div>
-    <p class="caption">它会动手</p>
-    <p class="cue-note">不只回答问题，给它一个目标，它会完成整个流程。</p>
+    <div class="cue-target">
+      <svg viewBox="0 0 19 19" fill="none" stroke="#ffffff80" stroke-width="0.5">
+        <path d="M1 1l6 17 3-7 7-3z"/>
+      </svg>
+    </div>
+    <p class="caption">拖动旋转 · 划过推开星尘</p>
+    <p class="cue-note">星系不是静止的背景：按住拖动可以旋转视角，划过时会把星尘推开。右下角 ⚙ 可调星数、颜色与流动速度，改动实时生效。</p>
   </section>
   <section class="copy tail">
-    <p>到底了。往回滚，一切逆序发生。</p>
-    <div><a class="btn btn-primary" href="#">开始使用</a><a class="btn btn-glass" href="#">了解更多</a></div>
+    <p>到底了。向上滚动，星流逆序合拢，回到首屏的完整星系。</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="#">开始使用</a>
+      <a class="btn btn-glass" href="#">了解更多</a>
+    </div>
   </section>
 </div>
-<script type="module">
-  import {createAstraScene,detectWebGL,renderStaticFallback,PATH_PRESETS} from './assets/库/starflow.js'
-  const canvas=document.getElementById('astra')
-  if(!detectWebGL()){renderStaticFallback(canvas,{type:'galaxy'});document.title+=' (静态回退)';}
-  else{
-    const astra=createAstraScene(canvas,{flowSpeed:.8,bloomIntensity:.7,bloomThreshold:.08,ambientColor:'#23435f',ambientOpacity:.55,vignette:1,introDuration:5.5})
-    astra.setSource({type:'galaxy'},{starCount:4000,scatter:.041,palette:'astra'})
-    const page=document.getElementById('page')
-    let ticking=false
-    window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{ticking=false;const sy=window.scrollY,vh=window.innerHeight,intro=page.querySelector('[data-astra-intro]'),introTop=intro?intro.getBoundingClientRect().top:vh,tilt=Math.max(0,Math.min(1,(vh-introTop+200)/400)),scatter=Math.max(0,Math.min(1,(vh-introTop+300)/500));let shape=null;for(const cue of page.querySelectorAll('[data-astra-shape]')){const r=cue.getBoundingClientRect(),p=1-r.top/(vh*1.2);if(p>0&&p<1){const preset=PATH_PRESETS[cue.dataset.astraShape];if(preset){const s=p<.36?p/.36:1-(p-.36)/.5;shape={id:cue.dataset.astraShape,samples:preset.paths,strength:Math.max(0,Math.min(1,s)),centerNdc:[0,0],sizeNdc:[.4,.4]}}}}
-        astra.setScroll({progress:Math.min(1,sy/800),tiltProgress:tilt,scatterProgress:scatter,shape})});ticking=true}})
-    window.addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')astra.setConfig?.({[d.key]:d.value})})
+
+<div class="notice"><span id="modeText">背景加载中…</span> · <a href="https://win-hao.github.io/starflow/" target="_blank">在线版</a></div>
+
+<script>
+  // ════════════════════════════════════════════════════════════
+  // 双轨背景：优先加载真实 Three.js 3D（../库/starflow.js）
+  //  - HTTP 服务下：import 成功 + 有 WebGL → 真实 3D
+  //  - file:// 双击 / 无 WebGL / 加载失败 → 自动降级 Canvas 2D
+  // 布局骨架固定不变：canvas(z-0) + 内容(z-1) + 顶栏/提示(z-2)
+  // ════════════════════════════════════════════════════════════
+  const canvas = document.getElementById('starCanvas')
+  const modeText = document.getElementById('modeText')
+
+  const state = {
+    zhucai: '#ffffff', zhongdian: '#7EC8E3', di: '#000000', zi: '#ffffff', cizi: '#ffffff99',
+    zihao: 17, yuanjiao: 10, jianju: 10, yinying: 0, faguang: 0,
+    starSize: 1.2, starSpeed: 0.4, ambient: '#23435f'
   }
-</script>
+
+  // ── Canvas 2D 星系（降级模式）──
+  let ctx = null, W = 0, H = 0, stars = [], time = 0, rafId = 0
+
+  function initStars() {
+    stars = []
+    const n = 1500
+    for (let i = 0; i < n; i++) {
+      const r = 0.05 + Math.pow(Math.random(), 0.5) * 0.95
+      const armAngle = r * 7 * Math.PI
+      const spread = (1 - r * 0.6) * 0.4
+      const angle = armAngle + (Math.random() - 0.5) * spread
+      stars.push({
+        x: Math.cos(angle) * r,
+        y: Math.sin(angle) * r * 0.55,
+        size: 0.3 + Math.random() * 0.7,
+        bright: 0.3 + Math.random() * 0.7,
+        phase: Math.random() * Math.PI * 2,
+        mix: Math.random()
+      })
+    }
+  }
+
+  function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight }
+
+  function hexToRgb(h) { const v = parseInt(h.slice(1), 16); return [(v>>16)&255, (v>>8)&255, v&255] }
+
+  function draw2D() {
+    time += 0.016 * state.starSpeed
+    const cx = W / 2, cy = H / 2, scale = Math.min(W, H) * 0.32
+    const rot = time * 0.2
+    const c1 = hexToRgb('#6eb5ff')
+    const c2 = hexToRgb('#ff8c5a')
+
+    ctx.fillStyle = 'rgb(0,0,0)'
+    ctx.fillRect(0, 0, W, H)
+
+    const amb = hexToRgb(state.ambient)
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.6)
+    grad.addColorStop(0, \`rgba(\${amb[0]},\${amb[1]},\${amb[2]},0.25)\`)
+    grad.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, W, H)
+
+    for (let i = 0; i < 150; i++) {
+      const bx = Math.random() * W, by = Math.random() * H
+      ctx.globalAlpha = 0.1 + Math.random() * 0.2
+      ctx.fillStyle = '#fff'
+      ctx.beginPath()
+      ctx.arc(bx, by, 0.3 + Math.random() * 0.8, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.globalAlpha = 1
+
+    for (const s of stars) {
+      const angle = s.x === 0 ? 0 : Math.atan2(s.y, s.x) + rot
+      const r = Math.sqrt(s.x * s.x + s.y * s.y) * scale
+      const x = cx + Math.cos(angle) * r
+      const y = cy + Math.sin(angle) * r * 0.55
+      const twinkle = 0.5 + 0.5 * Math.sin(time * 3 + s.phase)
+      const alpha = s.bright * twinkle * 0.7
+      const sz = s.size * state.starSize * 0.6
+
+      const gr = ctx.createRadialGradient(x, y, 0, x, y, sz * 3)
+      const col = [c1[0] + (c2[0]-c1[0])*s.mix*0.3, c1[1] + (c2[1]-c1[1])*s.mix*0.3, c1[2] + (c2[2]-c1[2])*s.mix*0.3]
+      gr.addColorStop(0, \`rgba(\${col[0]},\${col[1]},\${col[2]},\${alpha*0.5})\`)
+      gr.addColorStop(0.3, \`rgba(\${col[0]},\${col[1]},\${col[2]},\${alpha*0.2})\`)
+      gr.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = gr
+      ctx.beginPath()
+      ctx.arc(x, y, sz * 3, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.fillStyle = \`rgba(255,255,255,\${alpha*0.8})\`
+      ctx.beginPath()
+      ctx.arc(x, y, sz * 0.3, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    rafId = requestAnimationFrame(draw2D)
+  }
+
+  function start2D() {
+    ctx = canvas.getContext('2d')
+    if (!ctx) return
+    resize()
+    addEventListener('resize', resize)
+    initStars()
+    draw2D()
+    modeText.textContent = '背景：Canvas 2D 降级（file:// 或环境无 WebGL）'
+  }
+
+  // ── 真实 Three.js 3D（双轨主轨道）──
+  let astra = null
+
+  async function try3D() {
+    try {
+      const mod = await import('../库/starflow.js')
+      if (mod.detectWebGL && mod.createAstraScene && mod.detectWebGL()) {
+        const scene = mod.createAstraScene(canvas, {
+          flowSpeed: state.starSpeed * 2,
+          bloomIntensity: 0.7, bloomThreshold: 0.08, intensity: 1.35,
+          lensFlare: { intensity: 0.28 },
+          ambientColor: state.ambient, ambientOpacity: 0.55, vignette: 1,
+          twinkleSpeed: 0.62, size: state.starSize * 1.6, introDuration: 3,
+        })
+        try {
+          scene.setSource({ type: 'galaxy' }, {
+            starCount: 4000, scatter: 0.041, size: state.starSize * 1.6,
+            palette: 'astra', backgroundRatio: 0.14, rotationDepth: 1.4,
+          })
+        } catch (e) {
+          scene.dispose?.(); throw e
+        }
+        astra = scene
+        modeText.textContent = '背景：真实 Three.js 3D 版'
+      }
+    } catch (e) {
+      /* import 被拦（file:// 双击）→ 保持 null，走 2D 降级 */
+    }
+    if (!astra) start2D()
+  }
+
+  // ── 调参 ──
+  const panel = document.getElementById('tunerPanel')
+  document.getElementById('tunerToggle').addEventListener('click', () => panel.classList.toggle('open'))
+
+  function applyStyle() {
+    const R = document.documentElement.style
+    R.setProperty('--zhucai', state.zhucai)
+    R.setProperty('--zihao', state.zihao + 'px')
+    R.setProperty('--yuanjiao', state.yuanjiao + 'px')
+    R.setProperty('--jianju', state.jianju + 'px')
+    R.setProperty('--accent', state.zhucai)
+    R.setProperty('--accent-on', state.zhucai === '#ffffff' ? '#000' : '#fff')
+    R.setProperty('--zhongdian', state.zhongdian)
+    R.setProperty('--di', state.di)
+    R.setProperty('--zi', state.zi)
+    R.setProperty('--cizi', state.cizi)
+    R.setProperty('--yinying', state.yinying)
+    R.setProperty('--faguang', state.faguang)
+  }
+
+  function pushTo3D(key, v) {
+    if (!astra) return
+    if (key === 'starSize') astra.setConfig?.({ size: Number(v) * 1.6 })
+    else if (key === 'starSpeed') astra.setConfig?.({ flowSpeed: Number(v) * 2 })
+    else if (key === 'ambient') astra.setConfig?.({ ambientColor: v })
+  }
+
+  const bindings = [
+    { id: 'zhucai', key: 'zhucai', type: 'color' },
+    { id: 'zhongdian', key: 'zhongdian', type: 'color' },
+    { id: 'di', key: 'di', type: 'color' },
+    { id: 'zi', key: 'zi', type: 'color' },
+    { id: 'cizi', key: 'cizi', type: 'color' },
+    { id: 'zihao', key: 'zihao', type: 'range' },
+    { id: 'yuanjiao', key: 'yuanjiao', type: 'range' },
+    { id: 'jianju', key: 'jianju', type: 'range' },
+    { id: 'yinying', key: 'yinying', type: 'range' },
+    { id: 'faguang', key: 'faguang', type: 'range' },
+    { id: 'starSize', key: 'starSize', type: 'range' },
+    { id: 'starSpeed', key: 'starSpeed', type: 'range' },
+    { id: 'ambient', key: 'ambient', type: 'color' },
+  ]
+
+  bindings.forEach(({ id, key, type }) => {
+    const el = document.getElementById(id)
+    const val = document.getElementById('v-' + id)
+    if (!el) return
+    el.addEventListener('input', () => {
+      const v = type === 'color' ? el.value : Number(el.value)
+      state[key] = v
+      if (val) val.textContent = typeof v === 'number' ? v : ''
+      applyStyle()
+      pushTo3D(key, v)
+    })
+  })
+
+  applyStyle()
+
+  // postMessage
+  addEventListener('message', e => {
+    const d = e.data
+    if (!d || d.type !== 'param') return
+    state[d.key] = d.value
+    applyStyle()
+    pushTo3D(d.key, d.value)
+  })
+
+  // ── 启动：先试真实 3D（HTTP 下），失败自动走 2D（file:// 双击也能看）──
+  try3D()
+<\/script>
 </body>
-</html>`,
+</html>
+`,
     片段: `:root{--zhucai:#ffffff;--zhongdian:#7EC8E3;--di:#000000;--zi:#ffffff;--cizi:#ffffff99}
 .stage{position:fixed;inset:0;z-index:0;background:var(--di)}
 #astra{position:absolute;inset:0;display:block;width:100%;height:100%}

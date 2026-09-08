@@ -957,24 +957,13 @@
     });
     return wrap;
   }
-  function copyText(btn, text){
-    const done = ()=>{ btn.textContent="已复制"; btn.classList.add("done"); setTimeout(()=>{ btn.textContent="复制"; btn.classList.remove("done"); }, 1200); };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(done).catch(()=>fallback());
-    } else { fallback(); }
-    function fallback(){
-      const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
-      try{ document.execCommand("copy"); done(); }catch(e){}
-      document.body.removeChild(ta);
-    }
-  }
   function codeBlock(title, text){
     if(!text) return document.createComment("");
     const sec = el("section", "desc code-sec");
     const head = el("div", "code-head");
     head.appendChild(el("h3", null, title));
     const btn = el("button", "copy-btn", "复制");
-    btn.addEventListener("click", (e)=>{ e.stopPropagation(); copyText(btn, text); });
+    btn.addEventListener("click", (e)=>{ e.stopPropagation(); copyText(text, btn); });
     head.appendChild(btn);
     const pre = el("pre", "plan-text"); pre.textContent = text;
     sec.append(head, pre);
