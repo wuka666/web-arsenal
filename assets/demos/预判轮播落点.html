@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>预判轮播落点演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 18px; }
+  .viewport { width: min(320px, 90vw); overflow: hidden; border-radius: 16px; }
+  .track { display: flex; touch-action: pan-y; cursor: grab; }
+  .slide { flex: 0 0 100%; height: 180px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; font-weight: 700; }
+  .dots { display: flex; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; transition: transform .2s, background .2s; }
+  .dot.on { background: var(--accent); transform: scale(1.5); }
+  .dot.predict { background: var(--predict); box-shadow: 0 0 0 3px rgba(224,83,61,.25); }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="viewport" id="vp">
+  <div class="track" id="track"></div>
+</div>
+<div class="dots" id="dots"></div>
+<div class="hint">横滑时提前标注「将停留的位置」，松手前就能看到落点，无需松手后再调整</div>
+<script>
+  const state = { count: 5, gap: 0, accent: "#3d5fd6", predict: "#e0533d", bg: "#fafafa" };
+  const vp = document.getElementById("vp");
+  const track = document.getElementById("track");
+  const dots = document.getElementById("dots");
+  const palette = ["#3d5fd6", "#7c4dff", "#2bb673", "#e0993d", "#e0533d", "#1aa0a0"];
+  let idx = 0, dragX = 0, startX = 0, dragging = false;
+  function build() {
+    track.innerHTML = "";
+    dots.innerHTML = "";
+    for (let i = 0; i < state.count; i++) {
+      const s = document.createElement("div");
+      s.className = "slide"; s.style.background = palette[i % palette.length];
+      s.textContent = "第 " + (i + 1) + " 屏";
+      track.appendChild(s);
+      const d = document.createElement("div"); d.className = "dot"; dots.appendChild(d);
+    }
+    setX(0, false);
+  }
+  function setX(delta, anim) {
+    track.style.transition = anim ? "transform .4s cubic-bezier(.34,1.4,.5,1)" : "none";
+    const step = vp.clientWidth + state.gap;
+    track.style.transform = "translateX(" + (-idx * step + delta) + "px)";
+  }
+  function paint() {
+    const dotsEls = [...dots.children];
+    dotsEls.forEach((d, i) => d.className = "dot" + (i === idx ? " on" : ""));
+  }
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--predict", state.predict);
+    document.body.style.background = state.bg;
+    build();
+  }
+  vp.addEventListener("pointerdown", e => { dragging = true; startX = e.clientX; vp.setPointerCapture(e.pointerId); });
+  vp.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    setX(dx, false);
+    const step = vp.clientWidth + state.gap;
+    const predicted = Math.max(0, Math.min(state.count - 1, idx - Math.round(dx / step)));
+    [...dots.children].forEach((d, i) => d.className = "dot" + (i === predicted ? " predict" : (i === idx ? " on" : "")));
+  });
+  vp.addEventListener("pointerup", e => {
+    if (!dragging) return; dragging = false;
+    const dx = e.clientX - startX;
+    const step = vp.clientWidth + state.gap;
+    idx = Math.max(0, Math.min(state.count - 1, idx - Math.round(dx / step)));
+    setX(0, true); paint();
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

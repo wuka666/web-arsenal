@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工具调用反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 12px; }
+  .panel { width: min(460px, 94vw); height: 300px; background: #0f1115; border-radius: 14px; padding: 14px; overflow: auto; color: #d6d6da; font-size: 12.5px; line-height: 1.7; box-shadow: 0 10px 34px rgba(0,0,0,.2); }
+  .row { white-space: pre-wrap; }
+  .k { color: var(--accent); }
+  .p { color: #ffd27a; }
+  .r { color: #7CFFB2; }
+  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13px; cursor: pointer; font-family: system-ui; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="log"></div>
+<button class="btn" id="btn">运行任务（展示工具调用）</button>
+<div class="hint">适配查资料/计算场景：展示调用了什么工具、传了什么、返回了什么，并保留记录</div>
+<script>
+  const state = { calls: 4, dur: 700, accent: "#5ad1ff", bg: "#fafafa" };
+  const log = document.getElementById("log");
+  const calls = [
+    ['搜索', '{query:"Web 灵感弹药库"}', "命中 12 条素材"],
+    ['读取页面', '{url:"index.html"}', "解析 67 条条目"],
+    ['计算', '{a:8848,b:1.06}', "结果 9379.88"],
+    ['写文件', '{path:"data/素材.js"}', "已写入 22 条"]
+  ];
+  let timer = null;
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    log.innerHTML = "";
+  }
+  btn.addEventListener("click", () => {
+    log.innerHTML = ""; let i = 0;
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (i >= state.calls) { clearInterval(timer); return; }
+      const c = calls[i % calls.length];
+      const div = document.createElement("div"); div.className = "row";
+      div.innerHTML = '<span class="k">→ 调用 ' + c[0] + '</span> <span class="p">' + c[1] + '</span>\n  <span class="r">← 返回 ' + c[2] + '</span>';
+      log.appendChild(div); log.scrollTop = log.scrollHeight; i++;
+    }, state.dur);
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人工授权确认演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 22px; box-shadow: 0 10px 34px rgba(0,0,0,.1); border-top: 4px solid var(--warn); }
+  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+  .impact { margin: 12px 0; font-size: 12.5px; color: #555; line-height: 1.7; background: #fff6f3; border: 1px solid #ffd9cf; border-radius: 10px; padding: 10px 12px; }
+  .impact b { color: var(--warn); }
+  .row { display: flex; gap: 10px; margin-top: 8px; }
+  .btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; }
+  .ok { background: var(--warn); color: #fff; }
+  .no { background: #eee; color: #555; }
+  .status { margin-top: 12px; font-size: 13px; font-weight: 700; min-height: 18px; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="tt">⚠ 即将执行高危操作</div>
+  <div class="impact">操作：<b>覆盖 production 配置文件</b><br>影响：线上 3 个服务将重载；不可自动撤销，需人工回滚。<br>建议：先备份再执行。</div>
+  <div class="row">
+    <button class="btn ok" id="ok">确认执行</button>
+    <button class="btn no" id="no">取消</button>
+  </div>
+  <div class="status" id="st"></div>
+</div>
+<div class="hint">用于发布/覆盖等高影响操作：AI 在关键步骤暂停说明影响，待你确认后再执行</div>
+<script>
+  const state = { accent: "#3d5fd6", warn: "#e0533d", bg: "#fafafa", card: "#ffffff" };
+  const st = document.getElementById("st");
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--warn", state.warn);
+    document.documentElement.style.setProperty("--accent", state.accent);
+  }
+  document.getElementById("ok").addEventListener("click", () => { st.style.color = state.warn; st.textContent = "已授权，正在执行…（完成后回报结果）"; });
+  document.getElementById("no").addEventListener("click", () => { st.style.color = "#888"; st.textContent = "已取消，操作未执行"; });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拖拽排序演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .list { width: min(420px, 92vw); display: flex; flex-direction: column; }
+  .item { color: #fff; padding: 16px 18px; border-radius: 12px; margin: 6px 0; cursor: grab; user-select: none; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.12); touch-action: none; font-size: 15px; transition: box-shadow .2s; }
+  .item .h { opacity: .7; font-size: 12px; }
+  .item.dragging { box-shadow: 0 14px 34px rgba(0,0,0,.28); cursor: grabbing; z-index: 10; position: relative; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="list" id="list"></div>
+<div class="hint">拖动任意条目：其余条目按实时落点以弹簧动效主动让位</div>
+<script>
+  const state = { gap: 12, dragScale: 1.06, radius: 12, accent: "#3d5fd6", accent2: "#7c4dff", count: 6 };
+  const list = document.getElementById("list");
+  const names = ["首页 Banner", "产品列表", "用户评价", "价格方案", "常见问题", "页脚导航", "订阅区块", "关于我们"];
+  let dragEl = null, startY = 0, dy = 0;
+
+  function render() {
+    list.innerHTML = "";
+    for (let i = 0; i < state.count; i++) {
+      const d = document.createElement("div");
+      d.className = "item";
+      d.style.background = i % 2 ? state.accent2 : state.accent;
+      d.style.borderRadius = state.radius + "px";
+      d.style.margin = (state.gap / 2) + "px 0";
+      d.textContent = names[i % names.length];
+      const s = document.createElement("span"); s.className = "h"; s.textContent = "拖 #" + (i + 1);
+      d.appendChild(s);
+      d.addEventListener("pointerdown", start);
+      list.appendChild(d);
+    }
+  }
+
+  function flip(mutate) {
+    const kids = [...list.children];
+    const olds = kids.map(c => c.getBoundingClientRect());
+    mutate();
+    const news = [...list.children].map(c => c.getBoundingClientRect());
+    [...list.children].forEach((c, idx) => {
+      if (c === dragEl) return;
+      const dx = olds[idx].left - news[idx].left;
+      const dyc = olds[idx].top - news[idx].top;
+      if (dx || dyc) {
+        c.style.transition = "none";
+        c.style.transform = "translate(" + dx + "px," + dyc + "px)";
+        requestAnimationFrame(() => {
+          c.style.transition = "transform .42s cubic-bezier(.34,1.56,.64,1)";
+          c.style.transform = "";
+        });
+      }
+    });
+  }
+
+  function start(e) {
+    dragEl = e.currentTarget;
+    dragEl.setPointerCapture(e.pointerId);
+    startY = e.clientY; dy = 0;
+    dragEl.classList.add("dragging");
+  }
+
+  window.addEventListener("pointermove", e => {
+    if (!dragEl) return;
+    dy = e.clientY - startY;
+    dragEl.style.transform = "translateY(" + dy + "px) scale(" + state.dragScale + ")";
+    const rects = [...list.children].map(c => c.getBoundingClientRect());
+    let target = null;
+    for (let i = 0; i < rects.length; i++) {
+      if (list.children[i] === dragEl) continue;
+      const mid = rects[i].top + rects[i].height / 2;
+      if (e.clientY < mid) { target = list.children[i]; break; }
+      target = list.children[i].nextSibling;
+    }
+    if (target !== dragEl && target !== dragEl.nextSibling) {
+      flip(() => list.insertBefore(dragEl, target));
+      startY = e.clientY - dy + 0; // keep grab offset stable
+    }
+  });
+
+  window.addEventListener("pointerup", () => {
+    if (!dragEl) return;
+    dragEl.classList.remove("dragging");
+    dragEl.style.transform = "";
+    dragEl = null;
+  });
+
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; render(); });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>表面粒子化消散演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; gap: 12px; }
+  canvas { display: block; width: min(460px, 92vw); height: min(360px, 70vh); border-radius: 16px; }
+  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #5ad1ff; color: #062; font-size: 14px; cursor: pointer; font-weight: 700; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button class="btn" id="btn">重新消散</button>
+<div class="hint">球体自左向右逐步化成粒子飘走，保留未消散部分，禁止整球弹出</div>
+<script>
+  const state = { density: 5, speed: 0.6, drift: 1.2, size: 1.4, color: "#9b8cff", bg: "#0e1116" };
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, ps = [], front = 0, t = 0;
+  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; }
+  function build() {
+    ps = [];
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.32;
+    for (let y = -R; y <= R; y += state.density * devicePixelRatio) {
+      const w = Math.sqrt(R * R - y * y);
+      for (let x = -w; x <= w; x += state.density * devicePixelRatio) {
+        ps.push({ bx: cx + x, by: cy + y, x: cx + x, y: cy + y, free: false, vx: 0, vy: 0 });
+      }
+    }
+    front = 0; t = 0;
+  }
+  function apply() { resize(); build(); document.body.style.background = state.bg; }
+  function frame() {
+    t += 0.016;
+    front += state.speed * devicePixelRatio * 0.6;
+    ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = state.color;
+    for (const p of ps) {
+      if (!p.free && p.bx <= front) { p.free = true; const a = Math.random() * Math.PI - Math.PI; const s = (0.5 + Math.random()) * state.drift * devicePixelRatio; p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s - state.drift * 0.4 * devicePixelRatio; }
+      if (p.free) { p.x += p.vx; p.y += p.vy; p.vy += 0.02 * devicePixelRatio; p.vx *= 0.99; }
+      ctx.beginPath(); ctx.arc(p.x, p.y, state.size * devicePixelRatio, 0, 7); ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  document.getElementById("btn").addEventListener("click", build);
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply(); frame();
+</script>
+</body>
+</html>

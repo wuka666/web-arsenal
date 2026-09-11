@@ -60,6 +60,6 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 整站首屏探索</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>

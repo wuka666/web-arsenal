@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>主题切换演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .stage { position: relative; width: min(520px, 92vw); height: 340px; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.12); cursor: pointer; --dur: .6s; --maxr: 160%; }
+  .surface { position: absolute; inset: 0; padding: 28px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+  .surface.dark { clip-path: circle(0px at var(--x, 50%) var(--y, 50%)); transition: clip-path var(--dur) cubic-bezier(.4,0,.2,1); }
+  .stage.on .surface.dark { clip-path: circle(var(--maxr) at var(--x, 50%) var(--y, 50%)); }
+  .bar { height: 14px; border-radius: 8px; width: 55%; }
+  .bar.s { width: 80%; height: 10px; opacity: .7; }
+  .card { margin-top: auto; display: flex; gap: 10px; }
+  .chip { width: 64px; height: 64px; border-radius: 14px; }
+  .btn { margin-top: 14px; align-self: flex-start; padding: 10px 18px; border-radius: 10px; border: none; font-size: 14px; cursor: pointer; }
+  .hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; font-size: 12px; opacity: .6; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="surface light" id="light"></div>
+  <div class="surface dark" id="dark"></div>
+  <div class="hint">点任意位置：以触点为中心扩散切换深色模式，底层布局不变形</div>
+</div>
+<script>
+  const state = { dur: .6, maxr: 160, lightBg: "#ffffff", darkBg: "#15171c", lightText: "#1a1a1a", darkText: "#f2f3f5", accent: "#3d5fd6" };
+  const stage = document.getElementById("stage");
+  function build(surface, isDark) {
+    const bg = isDark ? state.darkBg : state.lightBg;
+    const fg = isDark ? state.darkText : state.lightText;
+    surface.style.background = bg;
+    surface.style.color = fg;
+    surface.innerHTML =
+      '<div class="bar" style="background:' + state.accent + '"></div>' +
+      '<div class="bar s" style="background:' + fg + '"></div>' +
+      '<div style="font-size:20px;font-weight:700">灵感弹药库</div>' +
+      '<div class="bar s" style="background:' + fg + '"></div>' +
+      '<div class="card">' +
+        '<div class="chip" style="background:' + state.accent + '"></div>' +
+        '<div class="chip" style="background:' + (isDark ? "#2a2d35" : "#ececf0") + '"></div>' +
+        '<div class="chip" style="background:' + (isDark ? "#2a2d35" : "#ececf0") + '"></div>' +
+      '</div>' +
+      '<button class="btn" style="background:' + state.accent + ';color:#fff">切换主题</button>';
+  }
+  function apply() {
+    stage.style.setProperty("--dur", state.dur + "s");
+    stage.style.setProperty("--maxr", state.maxr + "%");
+    build(document.getElementById("light"), false);
+    build(document.getElementById("dark"), true);
+  }
+  stage.addEventListener("pointerdown", e => {
+    const r = stage.getBoundingClientRect();
+    stage.style.setProperty("--x", (e.clientX - r.left) + "px");
+    stage.style.setProperty("--y", (e.clientY - r.top) + "px");
+    stage.classList.toggle("on");
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

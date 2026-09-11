@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>重试恢复反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 12px; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }
+  .phase { font-size: 13px; line-height: 1.7; }
+  .err { background: #fff6f3; border: 1px solid #ffd9cf; color: #b3402a; border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }
+  .retry { background: #eaf0ff; border: 1px solid #cdddff; color: var(--accent); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }
+  .fallback { background: #e9f9ef; border: 1px solid #c7ecd4; color: var(--done); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }
+  .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="phase">尝试：写入 <code>data/素材.js</code></div>
+  <div class="err" id="err">✗ 失败：文件被占用（EBUSY），第 1 次</div>
+  <div class="retry" id="retry">↻ 自动重试中…（退避 0.5s）</div>
+</div>
+<button class="btn" id="btn">模拟一次完整重试</button>
+<div class="hint">适配任务失败场景：展示失败原因、重试过程与备用方案</div>
+<script>
+  const state = { accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", card: "#ffffff" };
+  const p = document.getElementById("p");
+  const err = document.getElementById("err");
+  const retry = document.getElementById("retry");
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--done", state.done);
+  }
+  document.getElementById("btn").addEventListener("click", () => {
+    err.textContent = "✗ 失败：文件被占用（EBUSY），第 1 次";
+    retry.textContent = "↻ 自动重试中…（退避 0.5s）";
+    retry.className = "retry";
+    setTimeout(() => { retry.textContent = "↻ 第 2 次重试…（退避 1s）"; }, 500);
+    setTimeout(() => {
+      retry.className = "fallback";
+      retry.innerHTML = "✓ 备用方案：写入 <b>data/素材.tmp.js</b> 后原子替换，成功";
+    }, 1600);
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

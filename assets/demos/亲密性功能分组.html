@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亲密性功能分组演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); color: var(--zi); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .wrap { width: min(620px, 94vw); }
+  h2 { font-size: 15px; margin-bottom: 18px; }
+  /* 组间距：组与组之间拉大，形成「内紧外松」——亲密性原则的核心 */
+  .groups { display: flex; flex-direction: column; gap: var(--zujian); }
+  .grp { display: flex; flex-direction: column; gap: var(--zunei); }
+  .grp > .gt { font-size: 12px; letter-spacing: .06em; color: var(--zhucai); }
+  .grp > .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--zunei); }
+  .card { background: var(--kase); border: 1px solid color-mix(in srgb, var(--zi) 8%, transparent);
+    border-radius: var(--yuanjiao); padding: 14px; display: flex; gap: 11px; align-items: flex-start;
+    box-shadow: 0 calc(var(--yinying) * 0.2px) calc(var(--yinying) * 0.6px) rgba(0, 0, 0, .08);
+    transition: filter .18s ease; cursor: default; }
+  .card:hover { filter: brightness(calc(100% + var(--tiliang) * 1%)); }
+  .ico { width: var(--tubiao); height: var(--tubiao); flex: 0 0 auto; border-radius: calc(var(--yuanjiao) * 0.6);
+    background: color-mix(in srgb, var(--zhucai) 16%, transparent); color: var(--zhucai);
+    display: flex; align-items: center; justify-content: center; font-size: calc(var(--tubiao) * 0.5); }
+  .card b { display: block; font-size: 13.5px; }
+  .card span { display: block; margin-top: 4px; font-size: 12px; color: var(--cizi); line-height: 1.5; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>功能按亲密性抱团（组内间距 &lt; 组间距）</h2>
+  <div class="groups">
+    <div class="grp">
+      <div class="gt">对话 / 反馈</div>
+      <div class="cards">
+        <div class="card"><div class="ico">↩</div><div><b>收进 issue</b><span>一句话把反馈变成待办</span></div></div>
+        <div class="card"><div class="ico">◎</div><div><b>自动去重</b><span>同类反馈自动合并</span></div></div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="gt">规划</div>
+      <div class="cards">
+        <div class="card"><div class="ico">▤</div><div><b>周期排期</b><span>目标拆到可执行</span></div></div>
+        <div class="card"><div class="ico">↗</div><div><b>进度可视</b><span>一眼看到卡在哪</span></div></div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="gt">智能体</div>
+      <div class="cards">
+        <div class="card"><div class="ico">✦</div><div><b>agent 当队友</b><span>重复劳动交给它</span></div></div>
+        <div class="card"><div class="ico">⇄</div><div><b>人机共用流程</b><span>同一套工作流</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="hint">亲密性：相关的贴紧、不相关的拉开，看的人不用读文字就知道谁跟谁是一伙</div>
+<script>
+  // 参数状态：键名与 data/素材.js 的「参数」一一对应
+  const state = { zunei: 12, zujian: 40, yuanjiao: 12, yinying: 10, tiliang: 8, tubiao: 24,
+    zhucai: "#5E6AD2", di: "#fafafa", zi: "#1a1a1a", cizi: "#6b6b6b", kase: "#ffffff" };
+  function apply() {
+    const r = document.documentElement.style;
+    r.setProperty("--zunei", state.zunei + "px");
+    r.setProperty("--zujian", state.zujian + "px");
+    r.setProperty("--yuanjiao", state.yuanjiao + "px");
+    r.setProperty("--yinying", state.yinying);
+    r.setProperty("--tiliang", state.tiliang);
+    r.setProperty("--tubiao", state.tubiao + "px");
+    r.setProperty("--zhucai", state.zhucai);
+    r.setProperty("--di", state.di);
+    r.setProperty("--zi", state.zi);
+    r.setProperty("--cizi", state.cizi);
+    r.setProperty("--kase", state.kase);
+  }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

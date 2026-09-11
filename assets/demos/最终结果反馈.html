@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>最终结果反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .check { width: 28px; height: 28px; border-radius: 50%; background: var(--done); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .sum { font-size: 12.5px; color: #555; line-height: 1.7; margin-bottom: 10px; }
+  .arts { font-size: 12.5px; color: #333; line-height: 1.8; }
+  .arts li { margin-left: 18px; }
+  .todo { margin-top: 10px; font-size: 12.5px; color: var(--warn); background: #fff8ec; border: 1px solid #ffe6b8; border-radius: 10px; padding: 9px 12px; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="top"><div class="check">✓</div><div class="tt">任务完成</div></div>
+  <div class="sum">已为「Web 灵感弹药库」新增 22 条素材（15 网页动效 + 7 AI 反馈），全部通过语法校验，演示可离线运行。</div>
+  <div class="arts">产物：
+    <ul class="arts">
+      <li>assets/demos/ 下 22 个演示文件</li>
+      <li>data/素材.js 新增 22 条数据</li>
+      <li>index.html 新增「AI反馈」分类</li>
+    </ul>
+  </div>
+  <div class="todo">待办：README 全库索引计数待更新为 89 条；GitHub Pages 待重新部署。</div>
+</div>
+<div class="hint">适配任务结束节点：汇总完成状态、结论与产物，并标注待办事项</div>
+<script>
+  const state = { accent: "#3d5fd6", done: "#2bb673", warn: "#e0993d", bg: "#fafafa", card: "#ffffff" };
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--done", state.done);
+    document.documentElement.style.setProperty("--warn", state.warn);
+  }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

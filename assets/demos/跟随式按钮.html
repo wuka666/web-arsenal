@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>跟随式按钮演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .zone { position: relative; width: min(420px, 92vw); height: 240px; border: 2px dashed #ddd; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+  .btn { padding: 16px 30px; border: none; border-radius: 14px; background: var(--accent); color: #fff; font-size: 15px; cursor: pointer; user-select: none; touch-action: none; transition: transform .12s ease, box-shadow .12s ease; will-change: transform; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="zone" id="zone">
+  <button class="btn" id="btn">按住拖动我</button>
+</div>
+<div class="hint">按住拖动：按钮随手指移动并渐变深浅，移开自动复位（无需弹窗取消）</div>
+<script>
+  const state = { follow: 0.5, depth: 14, radius: 14, accent: "#3d5fd6", text: "#ffffff" };
+  const btn = document.getElementById("btn");
+  let down = false, cx = 0, cy = 0, ox = 0, oy = 0;
+  function apply() {
+    btn.style.background = state.accent;
+    btn.style.color = state.text;
+    btn.style.borderRadius = state.radius + "px";
+  }
+  btn.addEventListener("pointerdown", e => {
+    down = true; btn.setPointerCapture(e.pointerId);
+    const r = btn.getBoundingClientRect();
+    ox = e.clientX - (r.left + r.width / 2);
+    oy = e.clientY - (r.top + r.height / 2);
+  });
+  window.addEventListener("pointermove", e => {
+    if (!down) return;
+    cx = (e.clientX - ox - btn.parentElement.getBoundingClientRect().left - btn.parentElement.clientWidth / 2 + btn.offsetWidth / 2);
+    cy = (e.clientY - oy - btn.parentElement.getBoundingClientRect().top - btn.parentElement.clientHeight / 2 + btn.offsetHeight / 2);
+    btn.style.transform = "translate(" + (cx * state.follow) + "px," + (cy * state.follow) + "px)";
+    btn.style.boxShadow = "0 " + (state.depth * (1 - state.follow * .3)) + "px " + (state.depth * 2) + "px rgba(0,0,0,.18)";
+    btn.style.filter = "brightness(" + (1.15 - state.follow * .15) + ")";
+  });
+  window.addEventListener("pointerup", () => {
+    if (!down) return; down = false;
+    btn.style.transition = "transform .35s cubic-bezier(.34,1.5,.5,1), box-shadow .35s, filter .35s";
+    btn.style.transform = "translate(0,0)";
+    btn.style.boxShadow = "none";
+    btn.style.filter = "none";
+    setTimeout(() => btn.style.transition = "transform .12s ease, box-shadow .12s ease", 360);
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

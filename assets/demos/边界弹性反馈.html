@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>边界弹性反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 14px; }
+  .box { position: relative; width: min(340px, 92vw); height: 240px; border-radius: 16px; background: #fff; box-shadow: 0 10px 34px rgba(0,0,0,.1); overflow: hidden; touch-action: none; }
+  .rubber { position: absolute; top: 0; left: 0; right: 0; height: 0; background: var(--accent); opacity: .5; transition: height .15s; }
+  .inner { position: absolute; left: 0; right: 0; top: 0; padding: 18px; display: flex; flex-direction: column; gap: 10px; will-change: transform; }
+  .ln { height: 12px; border-radius: 6px; background: #e6e6ea; }
+  .ln.s { width: 70%; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="box" id="box">
+  <div class="rubber" id="rubber"></div>
+  <div class="inner" id="inner">
+    <div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln s"></div>
+    <div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln s"></div>
+  </div>
+</div>
+<div class="hint">列表拉到顶端后可小幅继续拖动，但阻力递增，松手自动回弹</div>
+<script>
+  const state = { resistance: 0.25, over: 80, bounce: .5, accent: "#3d5fd6", bg: "#fafafa" };
+  const box = document.getElementById("box");
+  const inner = document.getElementById("inner");
+  const rubber = document.getElementById("rubber");
+  let sy = 0, ty = 0, dragging = false;
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.body.style.background = state.bg;
+  }
+  box.addEventListener("pointerdown", e => { dragging = true; sy = e.clientY; ty = 0; box.setPointerCapture(e.pointerId); inner.style.transition = "none"; rubber.style.transition = "none"; });
+  box.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    let d = e.clientY - sy;
+    if (d < 0) d = 0;                         // 只允许向下越界
+    if (d > 0) d = Math.min(d, state.over) * (state.resistance + (1 - state.resistance) * (1 - Math.min(d, state.over) / state.over));
+    ty = d;
+    inner.style.transform = "translateY(" + d + "px)";
+    rubber.style.height = d + "px";
+  });
+  box.addEventListener("pointerup", () => {
+    if (!dragging) return; dragging = false;
+    inner.style.transition = "transform " + state.bounce + "s cubic-bezier(.34,1.56,.64,1)";
+    rubber.style.transition = "height " + state.bounce + "s ease";
+    inner.style.transform = "translateY(0)";
+    rubber.style.height = "0px";
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

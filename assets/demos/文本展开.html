@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文本展开演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .card { width: min(440px, 92vw); background: #fff; border-radius: 16px; box-shadow: 0 10px 36px rgba(0,0,0,.1); overflow: hidden; }
+  .head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; user-select: none; }
+  .title { font-size: 16px; font-weight: 700; }
+  .arrow { width: 22px; height: 22px; transition: transform var(--dur) var(--ease); }
+  .body { height: 0; overflow: hidden; transition: height var(--dur) var(--ease); }
+  .body > div { padding: 0 20px 20px; font-size: 14px; line-height: 1.7; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="head" id="head">
+    <div class="title">展开看完整说明</div>
+    <svg class="arrow" id="arrow" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="#1a1a1a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="body" id="body"><div>容器随内容同步调整高度，箭头旋转提示开关状态。当正文很长时，折叠态只露出标题，点击后高度平滑过渡到真实内容高度，不会出现瞬间跳变；再次点击则收回。适合 FAQ、商品详情、评论楼层的局部展开。</div></div>
+</div>
+<div class="hint">点标题：容器高度随内容平滑伸缩，箭头旋转提示开合</div>
+<script>
+  const state = { dur: .45, ease: "ease", radius: 16, text: "#1a1a1a", bg: "#ffffff", open: false };
+  const card = document.getElementById("card");
+  const arrow = document.getElementById("arrow");
+  const body = document.getElementById("body");
+  document.getElementById("head").addEventListener("click", () => { state.open = !state.open; apply(); });
+  function apply() {
+    card.style.borderRadius = state.radius + "px";
+    card.style.background = state.bg;
+    card.querySelector(".title").style.color = state.text;
+    arrow.querySelector("path").setAttribute("stroke", state.text);
+    body.style.setProperty("--dur", state.dur + "s");
+    body.style.setProperty("--ease", state.ease);
+    body.style.height = state.open ? body.firstElementChild.offsetHeight + "px" : "0px";
+    arrow.style.transform = state.open ? "rotate(180deg)" : "rotate(0deg)";
+  }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

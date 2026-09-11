@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>产物预览反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 18px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }
+  .thumb { height: 120px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 700; }
+  .sum { font-size: 12.5px; color: #555; line-height: 1.7; margin: 12px 0; }
+  .row { display: flex; gap: 10px; }
+  .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; }
+  .a { background: var(--accent); color: #fff; }
+  .b { background: #eee; color: #555; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="thumb">report.html 预览</div>
+  <div class="sum">已生成《本周复盘周报》单文件 HTML：含 4 段小结 + 1 张指标图，约 28KB，可直接双击打开。</div>
+  <div class="row">
+    <button class="btn a" id="open">打开预览</button>
+    <button class="btn b" id="copy">复制代码</button>
+    <button class="btn b" id="dl">下载</button>
+  </div>
+</div>
+<div class="hint">适配生成文档/图片场景：先展示产物预览，再给摘要与操作入口</div>
+<script>
+  const state = { accent: "#3d5fd6", accent2: "#7c4dff", bg: "#fafafa", card: "#ffffff" };
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--accent2", state.accent2);
+  }
+  document.getElementById("open").addEventListener("click", () => alert("（演示）打开 report.html 预览"));
+  document.getElementById("copy").addEventListener("click", () => alert("（演示）已复制 HTML 到剪贴板"));
+  document.getElementById("dl").addEventListener("click", () => alert("（演示）开始下载 report.html"));
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

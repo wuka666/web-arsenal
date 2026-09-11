@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分步进度反馈演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 14px; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }
+  .item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid #eee; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 700; flex: none; }
+  .b-wait { background: #eee; color: #999; }
+  .b-run { background: #eaf0ff; color: var(--accent); }
+  .b-done { background: #e6f7ee; color: var(--done); }
+  .name { font-size: 13px; color: #444; }
+  .item.run .name { color: var(--accent); font-weight: 700; }
+  .item.done .name { color: #1a1a1a; }
+  .bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; margin-top: 4px; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  .item.run .bar > i { width: 60%; }
+  .item.done .bar > i { width: 100%; background: var(--done); }
+  .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p"></div>
+<button class="btn" id="btn">开始执行</button>
+<div class="hint">适配连续多步骤任务：制作状态清晰的步骤条，每步显示等待/进行中/完成</div>
+<script>
+  const state = { steps: 4, dur: 1000, accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", card: "#ffffff" };
+  const p = document.getElementById("p");
+  const plan = ["检索素材", "抽取关键参数", "生成可运行代码", "写入弹药库并校验"];
+  let running = false;
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--done", state.done);
+    p.innerHTML = "";
+    for (let i = 0; i < state.steps; i++) {
+      const it = document.createElement("div"); it.className = "item";
+      it.innerHTML = '<span class="badge b-wait">等待</span><div style="flex:1"><div class="name">' + plan[i % plan.length] + '</div><div class="bar"><i></i></div></div>';
+      p.appendChild(it);
+    }
+  }
+  btn.addEventListener("click", () => {
+    if (running) return; running = true; btn.disabled = true; btn.textContent = "执行中…";
+    const items = [...p.children]; let i = 0;
+    (function next() {
+      if (i >= items.length) { btn.textContent = "全部完成 ✓"; return; }
+      const it = items[i]; const b = it.querySelector(".badge");
+      b.className = "badge b-run"; b.textContent = "进行中"; it.classList.add("run");
+      setTimeout(() => { b.className = "badge b-done"; b.textContent = "完成"; it.classList.remove("run"); it.classList.add("done"); i++; next(); }, state.dur);
+    })();
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

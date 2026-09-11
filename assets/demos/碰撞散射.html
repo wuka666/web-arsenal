@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>碰撞散射演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; gap: 12px; }
+  canvas { display: block; width: min(520px, 94vw); height: min(360px, 70vh); border-radius: 16px; }
+  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #ff7a59; color: #fff; font-size: 14px; cursor: pointer; font-weight: 700; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button class="btn" id="btn">重新发射</button>
+<div class="hint">粒子流先向前移动，碰到障碍物后按接触位置反弹/分流，禁止直接穿过障碍</div>
+<script>
+  const state = { count: 220, speed: 2.2, obstacle: 46, size: 1.6, color: "#7CFFB2", obColor: "#ff7a59", bg: "#0e1116" };
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, ps = [], obs = { x: 0, y: 0, r: 0 };
+  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; obs = { x: W * 0.62, y: H / 2, r: state.obstacle * devicePixelRatio }; }
+  function build() {
+    ps = [];
+    for (let i = 0; i < state.count; i++) ps.push(spawn());
+  }
+  function spawn() { return { x: -5, y: Math.random() * H, vx: state.speed * devicePixelRatio, vy: (Math.random() - 0.5) * 0.6 * devicePixelRatio }; }
+  function apply() { resize(); build(); document.body.style.background = state.bg; }
+  function frame() {
+    ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = state.obColor;
+    ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.r, 0, 7); ctx.fill();
+    ctx.fillStyle = state.color;
+    for (const p of ps) {
+      const dx = p.x - obs.x, dy = p.y - obs.y, d = Math.hypot(dx, dy);
+      if (d < obs.r + 2 * devicePixelRatio) {
+        const nx = dx / d, ny = dy / d;
+        const dot = p.vx * nx + p.vy * ny;
+        p.vx -= 2 * dot * nx; p.vy -= 2 * dot * ny;     // 法线反射，不穿透
+        p.x = obs.x + nx * (obs.r + 3 * devicePixelRatio);
+        p.y = obs.y + ny * (obs.r + 3 * devicePixelRatio);
+      }
+      p.x += p.vx; p.y += p.vy;
+      if (p.x > W + 5 || p.y < -5 || p.y > H + 5) Object.assign(p, spawn());
+      ctx.beginPath(); ctx.arc(p.x, p.y, state.size * devicePixelRatio, 0, 7); ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  document.getElementById("btn").addEventListener("click", build);
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply(); frame();
+</script>
+</body>
+</html>

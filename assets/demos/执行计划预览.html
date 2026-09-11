@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>执行计划预览演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }
+  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+  .sub { font-size: 12px; color: #888; margin-bottom: 12px; }
+  .step { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #eee; font-size: 13px; color: #444; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #ccc; flex: none; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #aaa; }
+  .step.run .dot { border-color: var(--accent); color: var(--accent); }
+  .step.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step.done .name { color: #1a1a1a; }
+  .btn { margin-top: 14px; width: 100%; padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="tt">任务：生成本周复盘周报</div>
+  <div class="sub">先展示分步计划，确认后再启动（多步骤长耗时任务适用）</div>
+  <div id="steps"></div>
+  <button class="btn" id="btn">确认计划并启动</button>
+</div>
+<div class="hint">适合多步骤长耗时任务：AI 先展示分步计划，待你确认后再启动执行</div>
+<script>
+  const state = { steps: 4, dur: 900, accent: "#3d5fd6", bg: "#fafafa", card: "#ffffff" };
+  const stepsEl = document.getElementById("steps");
+  const btn = document.getElementById("btn");
+  const plan = ["检索本周 git 提交与笔记", "归纳关键进展与卡点", "生成周报草稿", "本地校验格式并落盘"];
+  let running = false;
+  function apply() {
+    document.documentElement.style.setProperty("--bg", state.bg);
+    document.documentElement.style.setProperty("--card", state.card);
+    document.documentElement.style.setProperty("--accent", state.accent);
+    stepsEl.innerHTML = "";
+    for (let i = 0; i < state.steps; i++) {
+      const s = document.createElement("div"); s.className = "step"; s.dataset.i = i;
+      s.innerHTML = '<div class="dot">' + (i + 1) + '</div><div class="name">' + (plan[i % plan.length]) + '</div>';
+      stepsEl.appendChild(s);
+    }
+  }
+  btn.addEventListener("click", () => {
+    if (running) return; running = true; btn.disabled = true; btn.textContent = "执行中…";
+    let i = 0;
+    (function next() {
+      if (i >= state.steps) { btn.textContent = "已完成 ✓"; return; }
+      const el = stepsEl.children[i];
+      el.classList.add("run"); el.querySelector(".dot").textContent = "…";
+      setTimeout(() => { el.classList.remove("run"); el.classList.add("done"); el.querySelector(".dot").textContent = "✓"; i++; next(); }, state.dur);
+    })();
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

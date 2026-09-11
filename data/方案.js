@@ -107,7 +107,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 大色块分区</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#FF6F61;--zhongdian:#7EC8E3;--di:#1a1a1a;--zi:#ffffff;--yuanjiao:14px;--jianju:10px;}
@@ -282,7 +282,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 图片卡片流</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#E8843C;--zhongdian:#F2C14E;--di:#FBF7F0;--zi:#2a2620;--yuanjiao:16px;--jianju:14px;}
@@ -457,7 +457,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 玻璃拟态风</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#8A8FE5;--zhongdian:#C9B6FF;--di:#F4F3FB;--zi:#26243a;--yuanjiao:18px;--jianju:14px;}
@@ -632,7 +632,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 高密度卡片墙</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#4CC9B0;--zhongdian:#FFD166;--di:#121821;--zi:#eaf0f5;--yuanjiao:12px;--jianju:10px;}
@@ -807,7 +807,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 杂志排版风</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#C0392B;--zhongdian:#1a1a1a;--di:#FBF6EE;--zi:#1f1b16;--yuanjiao:6px;--jianju:12px;}
@@ -981,7 +981,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 深色压顶风</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#FF5C8A;--zhongdian:#FFD166;--di:#0E0E14;--zi:#ffffff;--yuanjiao:14px;--jianju:12px;}
@@ -1156,7 +1156,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 暖调留白型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#C2683F;--zhongdian:#E0A96D;--di:#FBF4EC;--zi:#3a2e25;--yuanjiao:20px;--jianju:16px;}
@@ -1331,7 +1331,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 强对比视觉型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#FFE600;--zhongdian:#111111;--di:#0a0a0a;--zi:#ffffff;--yuanjiao:4px;--jianju:12px;}
@@ -1507,7 +1507,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 冷调科技型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#39D0D8;--zhongdian:#5B8CFF;--di:#0A0E1A;--zi:#e8f4f8;--yuanjiao:12px;--jianju:12px;}
@@ -1682,7 +1682,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 自然有机型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#5B8C5A;--zhongdian:#A7C957;--di:#F3F1E7;--zi:#2c3326;--yuanjiao:22px;--jianju:16px;}
@@ -1857,7 +1857,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 复古胶片型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#C77B3B;--zhongdian:#E8A85C;--di:#2A211A;--zi:#F2E9DD;--yuanjiao:8px;--jianju:12px;}
@@ -2032,7 +2032,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 中式水墨型</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#9E2B25;--zhongdian:#1c1c1c;--di:#F5F1E8;--zi:#23201a;--yuanjiao:4px;--jianju:14px;}
@@ -2213,7 +2213,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 双按钮</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#1a1a1a;--zhongdian:#ddd8ce;--di:#ffffff;--zi:#1a1a1a;--yuanjiao:12px;--jianju:12px;}
@@ -2388,7 +2388,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 视觉重量</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#2D6CDF;--zhongdian:#E8C547;--di:#F7F8FA;--zi:#1d2330;--yuanjiao:14px;--jianju:14px;}
@@ -2563,7 +2563,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 首页动线</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#6D5BD0;--zhongdian:#A78BFA;--di:#FFFFFF;--zi:#1d1a2b;--yuanjiao:14px;--jianju:14px;}
@@ -2737,7 +2737,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 动效节奏</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#FF7A59;--zhongdian:#7C5CFF;--di:#0D0B14;--zi:#F3EEFF;--yuanjiao:14px;--jianju:12px;}
@@ -2822,7 +2822,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
         "类型": "slider",
         "最小": 0,
         "最大": 100,
-        "步长": 2,
+        "步长": 1,
         "默认": 35
       }
     ],
@@ -2911,7 +2911,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 整站首屏探索</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#E8702A;--zhongdian:#1b1206;--di:#12100c;--zi:#FBF4E9;--yuanjiao:10px;--jianju:14px;}
@@ -3091,7 +3091,7 @@ body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zho
     </section>
     <footer class="foot"><span>© 2026 焦点型 Hero</span><span>隐私 · 条款 · 联系</span></footer>
   </div>
-<script>addEventListener('message',e=>{const d=e.data;if(d&&d.type==='param')document.documentElement.style.setProperty('--'+d.key,d.value)});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>`,
     片段: `:root{--zhucai:#FF4D6D;--zhongdian:#FFD6A5;--di:#16121A;--zi:#ffffff;--yuanjiao:16px;--jianju:14px;}
@@ -3176,7 +3176,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
         "类型": "slider",
         "最小": 0,
         "最大": 100,
-        "步长": 2,
+        "步长": 1,
         "默认": 25
       }
     ],
@@ -3640,5 +3640,25 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
       { "键": "faguang", "名": "发光强度(%)", "类型": "slider", "最小": 0, "最大": 30, "步长": 1, "默认": 0 }
     ],
     来源: "GitHub Win-Hao/starflow（MIT）+ OpenAI GPT-6 Astra 发布页设计系统（2026-09-07 入库）"
+  },
+  {
+    id: "s207",
+    风格名: "定义型首屏",
+    骨架: "定义型首屏（左文右留白）",
+    配色: {"深底(画布)":"60%","文字与留白":"30%","强调色(CTA/图标)":"10%"},
+    布局骨架: "顶部极窄导航 + 公告胶囊 + 首屏左文右留白：左侧 H1 定义句 + 副文 + 单一 CTA，右侧大片留白做呼吸区；下方功能按亲密性分三组",
+    重色落点: "强调色只落在主 CTA、公告标签、功能组小标与图标（合计约 10%），其余层级全靠字号与留白",
+    第一屏内容: "H1 一句定义（我们是什么）+ 一句副文（为谁、解决什么）+ 一个主 CTA",
+    删减元素: "去首屏配图、去轮播、去第二个实心按钮、去装饰色块",
+    适用: "工具 / SaaS 官网、需要先让人「听懂你是谁」的新品类产品",
+    禁忌: "已有知名度的品牌（不用再自我介绍）、强促销页（要的是转化不是认知）",
+    参考站: ["Linear","Height","Arc"],
+    我的说明: "先下定义，再给动作。与 s205 焦点型 Hero 的分工：焦点型是居中一句话 + 双按钮（转化优先），定义型是左对齐下定义 + 功能三组（认知优先）。",
+    Agent提示词: "【定义型首屏 · 设计语言宪法】\n效力声明：本文件为本方案的唯一设计权威，采用 Google Stitch DESIGN.md 范式。优先级：本宪法 > 具体需求描述 > 通用审美经验。任何冲突一律以本宪法为准，不得自行更改取值或添加风格。\n\n第一章 总纲 · 设计哲学\n先下定义，再给动作。第一屏不卖功能清单，只卖一个品类位置——让人在 3 秒内知道「你是谁」。深色底（沉浸、舞台感）+ 单一强调色（那 10%）+ 大量留白（呼吸区），所有注意力留给那句定义。\n\n第二章 设计 Token 法典（取值唯一，禁止近似值）\n2.1 颜色 colors\n  底 --di #08090A（页面唯一画布色，近黑）\n  主文字 --zi #F7F8F8\n  次级文字 --cizi #8A8F98（副文、导航、页脚）\n  强调 --zhucai #5E6AD2（仅用于主 CTA 与「New」标签）\n  重点 --zhongdian #8B93F8（仅用于 H1 中的一个词、功能组小标、柔光晕）\n  强调色总面积守住 10%：CTA 一块 + 图标若干，禁止铺色块、禁止渐变按钮\n2.2 字体 typography\n  字体栈：system-ui / PingFang SC / Microsoft YaHei\n  H1 display：clamp(32px, 5vw, 56px)，字重 800，行高 1.1，字距 -0.6px\n  副文 body：16–17px，行高 1.6，最大宽度 46ch\n  导航 / 小标 caption：13–14px，字重 600\n2.3 圆角 rounded：控件 10px，胶囊（公告条）9999px，卡片 12px\n2.4 间距 spacing：8 / 16 / 24 / 32 / 48 / 64 刻度；首屏左文右留白，右侧留白占 32%\n2.5 动效 motion：入场错峰 120ms（H1 → 副文 → 按钮 → 功能组），单元素 700ms，缓动 cubic-bezier(.16,1,.3,1)；全站只此一处动效，其余静止\n2.6 层级 layout：导航 → 公告胶囊 → H1 → 副文 → CTA → 功能三组；右侧留白区保持为空\n\n第三章 组件规范 components（全部引用第二章 token）\n  导航 nav：极窄单行，logo + 5–6 个文字项，右侧 Log in / Sign up（Sign up 是唯一实心按钮）\n  公告胶囊 pill：描边胶囊，New 标签用强调底，右侧箭头悬停右移 4px\n  主按钮 btn-primary：底 --zhucai、字 #fff、圆角 10px；同屏只允许出现一个实心主按钮\n  次按钮 btn-ghost：透明底 + 20% 白描边，仅作陪衬\n  功能组 group：组间距 40px、组内 12px，组标用 --zhongdian，图标淡底 16% 强调色\n\n第四章 布局法 layout\n  栅格：内容最宽 1040px 居中；首屏左右分栏，左文宽 68%、右留白 32%\n  留白哲学：右侧留白是「呼吸区」不是待填区，禁止塞配图、插画、轮播\n  内容落点：视线第一落点是 H1 的强调词，第二落点是主 CTA\n\n第五章 深度与层级 depth\n  surface-1 = 页面底 --di；surface-2 = 卡片 color-mix(zi 4%)；surface-3 = 弹层 #121316\n  阴影仅用于主按钮与卡片，强度 20 以内，禁止彩色阴影\n\n第六章 该做 / 不该做\n  该做：H1 用一句完整定义句（我们是什么品类）；同一句价值主张在页内重复出现；抽象定义（system）配具体动作（三条功能）互撑；首屏末尾留一个下探钩子\n  不该做：不堆功能清单到首屏；不放大段产品截图抢戏；不用第二个实心按钮；不给 H1 加渐变或描边特效；不在首屏放轮播\n  反例警示：Linear 原站把定义讲完就收，没有下探钩子——这叫动线断裂，第一考核不是好不好看，是「你愿不愿意滚下去」\n\n第七章 文案规则（本方案独有的占位式写法）\n  占位式文案：不跟竞品比功能，直接定义自己是什么品类（「面向团队与智能体的产品开发系统」）\n  human + agent 话术：把「人机一起干活」写进产品定义，是 2026 年工具站的共同签名\n\n第八章 响应式行为\n  断点 1024 / 768 / 480：1024 以下右侧留白收掉改上下堆叠；768 以下导航折成汉堡；触控目标 ≥ 44px\n\n第九章 Agent 提示词指南\n  配色卡：底 #08090A / 主文 #F7F8F8 / 次文 #8A8F98 / 强调 #5E6AD2 / 重点 #8B93F8（60-30-10）\n  字号卡：H1 clamp(32,5vw,56) / 副文 17 / 导航 14 / 小标 13\n  即拿即用：把内容套进以上设计语言，输出一个完整 HTML 定义型首屏——导航 + 公告胶囊 + 左文右留白首屏 + 功能三组 + 下探钩子，零依赖可离线打开。",
+    演示页: "assets/demos/方案-定义型首屏.html",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>方案·定义型首屏（Linear）</title>\n<style>\n:root{--zhucai:#5E6AD2;--zhongdian:#8B93F8;--di:#08090A;--zi:#F7F8F8;--cizi:#8A8F98;--yuanjiao:10px;--jianju:16px;--zihao:16px;--yinying:20;--faguang:18}\n*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,\"Microsoft YaHei\",sans-serif;}\nbody{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}\n.wrap{max-width:1040px;margin:0 auto;padding:var(--jianju) calc(var(--jianju)*1.5) calc(var(--jianju)*3);}\n.nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);padding:calc(var(--jianju)*0.8) 0;font-size:14px;color:var(--cizi);}\n.logo{font-weight:800;font-size:17px;color:var(--zi);}\n.nav a{color:inherit;text-decoration:none;}\n.nav .right{margin-left:auto;display:flex;align-items:center;gap:var(--jianju);}\n.signup{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:7px 16px;font-size:13.5px;font-weight:700;cursor:pointer;}\n/* 公告胶囊：线性官网首屏那一条「New Loops →」，把新消息塞进最小面积 */\n.pill{display:inline-flex;align-items:center;gap:8px;margin-top:calc(var(--jianju)*2);padding:5px 12px 5px 8px;border:1px solid color-mix(in srgb,var(--zi) 14%,transparent);border-radius:999px;font-size:13px;color:var(--cizi);background:color-mix(in srgb,var(--zi) 4%,transparent);cursor:pointer;}\n.pill b{background:var(--zhucai);color:#fff;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;}\n.pill .arw{transition:transform .2s ease;}\n.pill:hover .arw{transform:translateX(4px);}\n.hero{display:flex;gap:calc(var(--jianju)*2);margin-top:calc(var(--jianju)*1.6);align-items:flex-start;}\n.hero-l{min-width:0;}\nh1{font-size:calc(var(--zihao)*2.6);line-height:1.1;letter-spacing:-.6px;font-weight:800;}\nh1 em{font-style:normal;color:var(--zhongdian);}\n.sub{margin-top:calc(var(--jianju)*0.9);font-size:calc(var(--zihao)*1.05);color:var(--cizi);max-width:46ch;}\n.btns{margin-top:calc(var(--jianju)*1.8);display:flex;gap:var(--jianju);align-items:center;}\n.btn{border-radius:var(--yuanjiao);padding:11px 24px;font-size:14.5px;font-weight:700;cursor:pointer;border:1px solid transparent;}\n.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.9px) rgba(0,0,0,.4);}\n.btn.ghost{border-color:color-mix(in srgb,var(--zi) 20%,transparent);color:var(--zi);background:transparent;}\n/* 右侧留白区：定义型首屏的「呼吸区」，留白占比由参数控制 */\n.void{min-height:200px;border-radius:calc(var(--yuanjiao)*1.5);}\nbody[data-glow=\"1\"] .void{background:radial-gradient(circle at 40% 30%,color-mix(in srgb,var(--zhongdian) calc(var(--faguang)*1%),transparent),transparent 65%);}\n.groups{margin-top:calc(var(--jianju)*3);display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.6);}\n.grp h4{font-size:13px;color:var(--zhongdian);margin-bottom:calc(var(--jianju)*0.6);}\n.grp p{font-size:13.5px;color:var(--cizi);}\n/* 下探钩子：关掉就是 Linear 原版「讲完定义就收」的动线断裂 */\n.hook{margin-top:calc(var(--jianju)*3);padding-top:calc(var(--jianju)*1.4);border-top:1px solid color-mix(in srgb,var(--zi) 10%,transparent);display:flex;align-items:center;justify-content:space-between;color:var(--cizi);font-size:13.5px;}\n.hook .down{color:var(--zhucai);font-size:18px;}\nbody[data-hook=\"0\"] .hook{display:none;}\n.tip{margin-top:calc(var(--jianju)*2);font-size:12px;color:var(--cizi);opacity:.8;}\n/* 入场：H1→副文→按钮→功能组，错峰 120ms，是全站唯一的高音 */\n.in{opacity:0;transform:translateY(18px);}\n.in.run{animation:up .7s cubic-bezier(.16,1,.3,1) forwards;}\n@keyframes up{to{opacity:1;transform:none;}}\n</style>\n</head>\n<body data-glow=\"1\" data-hook=\"1\">\n  <div class=\"wrap\">\n    <nav class=\"nav\"><span class=\"logo\">Linear</span><a>Product</a><a>Resources</a><a>Customers</a><a>Pricing</a><a>Now</a><span class=\"right\"><a>Log in</a><button class=\"signup\">Sign up</button></span></nav>\n    <div class=\"pill in\"><b>New</b>Loops 上线：把反馈直接变成任务<span class=\"arw\">→</span></div>\n    <header class=\"hero\">\n      <div class=\"hero-l\" id=\"hl\">\n        <h1 class=\"in\">面向团队与<em>智能体</em>的产品开发系统</h1>\n        <p class=\"sub in\">为规划与构建产品而生，为 AI 时代而设计。</p>\n        <div class=\"btns in\"><button class=\"btn solid\">免费开始</button><button class=\"btn ghost\">看它怎么跑</button></div>\n      </div>\n      <div class=\"void\"></div>\n    </header>\n    <section class=\"groups in\">\n      <div class=\"grp\"><h4>对话 / 反馈 → issue</h4><p>一句话把散落的反馈收进待办</p></div>\n      <div class=\"grp\"><h4>idea → launch</h4><p>从一个想法走到上线，路径不断</p></div>\n      <div class=\"grp\"><h4>部署 agent 当队友</h4><p>把重复劳动交给智能体执行</p></div>\n    </section>\n    <div class=\"hook\"><span>往下看：三分钟搞懂它替你做了什么</span><span class=\"down\">↓</span></div>\n    <p class=\"tip\">来源：linear.app 首屏拆解（2026-09-10）· 定义型首屏＝先下定义再给动作；关掉「下探钩子」即可复现原站的动线断裂</p>\n  </div>\n<script>\n  // 参数状态：键名与 data/方案.js 的「参数」一致，改哪个都能实时看到\n  const state = { zhucai:\"#5E6AD2\", zhongdian:\"#8B93F8\", di:\"#08090A\", zi:\"#F7F8F8\", cizi:\"#8A8F98\",\n    yuanjiao:10, jianju:16, zihao:16, yinying:20, faguang:18, liubai:32, gouzi:1 };\n  function apply(){\n    const r = document.documentElement.style;\n    r.setProperty(\"--zhucai\", state.zhucai);\n    r.setProperty(\"--zhongdian\", state.zhongdian);\n    r.setProperty(\"--di\", state.di);\n    r.setProperty(\"--zi\", state.zi);\n    r.setProperty(\"--cizi\", state.cizi);\n    r.setProperty(\"--yuanjiao\", state.yuanjiao + \"px\");\n    r.setProperty(\"--jianju\", state.jianju + \"px\");\n    r.setProperty(\"--zihao\", state.zihao + \"px\");\n    r.setProperty(\"--yinying\", state.yinying);\n    r.setProperty(\"--faguang\", state.faguang);\n    document.body.dataset.glow = state.faguang > 0 ? \"1\" : \"0\";\n    document.body.dataset.hook = String(state.gouzi);\n    // 留白占比：左侧文字区宽度 = 100% - 留白%，右侧是纯呼吸区（不放东西）\n    document.getElementById(\"hl\").style.width = (100 - state.liubai) + \"%\";\n  }\n  // 入场错峰：把「先看什么后看什么」排成时间序列，克制设计里这是唯一的高音\n  function play(){\n    document.querySelectorAll(\".in\").forEach((el,i)=>{\n      el.classList.remove(\"run\");\n      void el.offsetWidth;\n      el.style.animationDelay = (i * 0.12) + \"s\";\n      el.classList.add(\"run\");\n    });\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); play();\n  setInterval(play, 6000);\n<\\/script>\n</body>\n</html>\n",
+    片段: "<!-- 定义型首屏最小骨架：先下定义，再给动作 -->\n<header class=\"hero\">\n  <div class=\"hero-l\">\n    <h1>面向团队与<em>智能体</em>的产品开发系统</h1>\n    <p class=\"sub\">为规划与构建产品而生，为 AI 时代而设计。</p>\n    <div class=\"btns\"><button class=\"btn solid\">免费开始</button><button class=\"btn ghost\">看它怎么跑</button></div>\n  </div>\n  <div class=\"void\"></div><!-- 右侧 32% 是呼吸区，别塞东西 -->\n</header>",
+    参数: [{"键":"zhucai","名":"主色","类型":"color","默认":"#5E6AD2"},{"键":"zhongdian","名":"重点色","类型":"color","默认":"#8B93F8"},{"键":"di","名":"页面底色","类型":"color","默认":"#08090A"},{"键":"zi","名":"正文色","类型":"color","默认":"#F7F8F8"},{"键":"cizi","名":"次要文字色","类型":"color","默认":"#8A8F98"},{"键":"yuanjiao","名":"圆角(px)","类型":"slider","最小":0,"最大":24,"步长":1,"默认":10},{"键":"jianju","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},{"键":"zihao","名":"基础字号(px)","类型":"slider","最小":13,"最大":20,"步长":1,"默认":16},{"键":"yinying","名":"阴影强度","类型":"slider","最小":0,"最大":60,"步长":2,"默认":20},{"键":"faguang","名":"柔光强度(%)","类型":"slider","最小":0,"最大":60,"步长":2,"默认":18},{"键":"liubai","名":"右侧留白占比(%)","类型":"slider","最小":0,"最大":60,"步长":2,"默认":32},{"键":"gouzi","名":"下探钩子(0关/1开)","类型":"slider","最小":0,"最大":1,"步长":1,"默认":1}],
+    来源: "网站拆解：Linear（linear.app）首屏，2026-09-10 入库；文案与结构仅作手法参考，代码自写"
   }
 ];

@@ -9,16 +9,19 @@ const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
 
-// —— 加载素材数据（复用与校验脚本相同的加载方式）——
+// —— 加载数据（复用与校验脚本相同的加载方式）——
 const DATA_PATH = path.join(__dirname, '..', 'data', '素材.js');
-function loadArsenal() {
-  const code = fs.readFileSync(DATA_PATH, 'utf8');
+const SCHEME_PATH = path.join(__dirname, '..', 'data', '方案.js');
+function loadData(file, varName) {
+  const code = fs.readFileSync(file, 'utf8');
   const sandbox = {};
-  // 素材.js 末尾把数组挂到 window.WEB_ARSENAL
+  // 数据文件末尾把数组挂到 window.WEB_ARSENAL / window.WEB_SCHEMES
   new Function('window', code)(sandbox);
-  return sandbox.WEB_ARSENAL || [];
+  return sandbox[varName] || [];
 }
-const ARSENAL = loadArsenal();
+const ARSENAL = loadData(DATA_PATH, 'WEB_ARSENAL');
+// 方案库：排除 skeleton-01（纯文档条目，无演示页与代码）
+const SCHEMES = loadData(SCHEME_PATH, 'WEB_SCHEMES').filter(s => s.id !== 'skeleton-01');
 
 const server = new McpServer({
   name: 'web-arsenal',
@@ -45,11 +48,14 @@ server.tool(
         [it.标题, (it.标签 || []).join(' '), it.效果说明 || ''].join(' ').toLowerCase().includes(k)
       );
     }
-    if (风格) list = list.filter(it => (it.风格 || []).includes(风格));
-    if (场景) list = list.filter(it => (it.场景 || []).includes(场景));
-    if (元素) list = list.filter(it => (it.元素 || []).includes(元素));
+    // 风格/场景/元素用「包含」匹配，避免调用方写「数据看板」匹配不到「后台·数据看板」
+    const hit = (arr, v) => (arr || []).some(x => String(x).includes(v));
+    if (风格) list = list.filter(it => hit(it.风格, 风格));
+    if (场景) list = list.filter(it => hit(it.场景, 场景));
+    if (元素) list = list.filter(it => hit(it.元素, 元素));
     if (子类) list = list.filter(it => it.子类 === 子类);
-    list = list.slice(0, limit);
+    const n = Math.min(Math.max(1, Math.floor(limit) || 20), 50); // 上限 50，防止一次拉全库
+    list = list.slice(0, n);
     const text = list.length
       ? list.map(it =>
           `【${it.id}】${it.标题}（${it.分类}）\n  标签：${(it.标签 || []).join('、')}\n  说明：${it.效果说明 || ''}`
@@ -113,9 +119,11 @@ server.tool(
   { 风格: z.string().optional(), 场景: z.string().optional() },
   ({ 风格, 场景 }) => {
     let list = ARSENAL;
-    if (风格) list = list.filter(it => (it.风格 || []).includes(风格));
-    if (场景) list = list.filter(it => (it.场景 || []).includes(场景));
-    if (!list.length) list = ARSENAL;
+    const hit = (arr, v) => (arr || []).some(x => String(x).includes(v));
+    if (风格) list = list.filter(it => hit(it.风格, 风格));
+    if (场景) list = list.filter(it => hit(it.场景, 场景));
+    if (!list.length) list = ARSENAL;                       // 条件太苛刻 → 回退全库
+    if (!list.length) return { content: [{ type: 'text', text: '弹药库为空，请检查 data/素材.js。' }] };
     const it = list[Math.floor(Math.random() * list.length)];
     return {
       content: [{
@@ -126,10 +134,65 @@ server.tool(
   }
 );
 
+// 工具 6：搜索方案（整站视觉皮肤）
+server.tool(
+  'search_schemes',
+  '搜索方案库（整站视觉皮肤方案）。可按关键词或风格名过滤。返回方案摘要：id、风格名、骨架、重色落点、适用场景。',
+  {
+    keyword: z.string().optional().describe('模糊关键词，匹配 风格名/骨架/布局骨架/重色落点/适用/来源'),
+    骨架: z.string().optional().describe('骨架关键词，如 四宫格 / 卡片墙 / 杂志'),
+    limit: z.number().optional().describe('最多返回条数，默认 20，上限 50'),
+  },
+  ({ keyword, 骨架, limit = 20 }) => {
+    let list = SCHEMES;
+    if (keyword) {
+      const k = keyword.toLowerCase();
+      list = list.filter(s => [s.风格名, s.骨架, s.布局骨架, s.重色落点, s.适用, s.来源]
+        .filter(Boolean).join(' ').toLowerCase().includes(k));
+    }
+    if (骨架) list = list.filter(s => String(s.骨架 || '').includes(骨架));
+    const n = Math.min(Math.max(1, Math.floor(limit) || 20), 50);
+    list = list.slice(0, n);
+    const text = list.length
+      ? list.map(s => `【${s.id}】${s.风格名}（骨架：${s.骨架 || '-'}）\n  重色落点：${s.重色落点 || ''}\n  适用：${s.适用 || ''}`).join('\n\n')
+      : '没有匹配的方案。';
+    return { content: [{ type: 'text', text }] };
+  }
+);
+
+// 工具 7：取方案完整信息
+server.tool(
+  'get_scheme',
+  '按 id 取一套方案的完整内容：配色占比、布局骨架、重色落点、第一屏内容、删减元素、适用与禁忌、可调参数、Agent 提示词（若有）、完整模板代码、可复用片段。',
+  { id: z.string().describe('方案 id，如 f001 / s207') },
+  ({ id }) => {
+    const s = SCHEMES.find(x => x.id === id);
+    if (!s) return { content: [{ type: 'text', text: `找不到方案 id=${id}。方案 id 形如 f001 / s203 / s207。` }] };
+    const params = (s.参数 || []).map(p => `- ${p.键}（${p.名}，${p.类型}）默认=${JSON.stringify(p.默认)}`).join('\n');
+    const color = Object.entries(s.配色 || {}).map(([k, v]) => `${k} ${v}`).join(' / ');
+    const text = [
+      `# ${s.风格名} [${s.id}]`,
+      `\n## 配色占比（60-30-10）\n${color || '无'}`,
+      `\n## 布局骨架\n${s.布局骨架 || ''}`,
+      `\n## 重色落点\n${s.重色落点 || ''}`,
+      `\n## 第一屏内容\n${s.第一屏内容 || ''}`,
+      `\n## 删减元素\n${s.删减元素 || ''}`,
+      `\n## 适用\n${s.适用 || ''}`,
+      `\n## 禁忌\n${s.禁忌 || ''}`,
+      `\n## 参考站\n${(s.参考站 || []).join('、') || '无'}`,
+      `\n## 可调参数（${(s.参数 || []).length} 个）\n${params || '无'}`,
+      s.Agent提示词 ? `\n## Agent 提示词（可直接喂给 AI）\n${s.Agent提示词}` : '\n## Agent 提示词\n（该方案暂无）',
+      `\n## 完整模板代码（可直接拷贝用）\n\`\`\`html\n${s.代码 || ''}\n\`\`\``,
+      `\n## 可复用片段\n\`\`\`html\n${s.片段 || ''}\n\`\`\``,
+    ].join('\n');
+    return { content: [{ type: 'text', text }] };
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // 不往 stdout 打日志（会污染 MCP 协议），仅 stderr
-  console.error(`[web-arsenal MCP] 已加载 ${ARSENAL.length} 条素材，stdio 已连接`);
+  console.error(`[web-arsenal MCP] 已加载 ${ARSENAL.length} 条素材 + ${SCHEMES.length} 套方案，stdio 已连接`);
 }
 main().catch(e => { console.error('启动失败:', e); process.exit(1); });

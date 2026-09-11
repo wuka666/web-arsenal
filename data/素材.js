@@ -3,7 +3,7 @@
 //   ① file:// 直接双击 index.html 就能读（fetch JSON 会被浏览器 CORS 拦）
 //   ② 零依赖，符合"10 月前不引依赖"的规矩
 //   ③ 阶段 0 不需要后端；等接单流水线 / 多人协作 / 要历史版本时，再迁 SQLite 或后端
-// 分类（v5，2026-09-07 全量重打标）：文字动画 / 动效 / 组件 / 背景 / 布局骨架
+// 分类（v5，2026-09-07 全量重打标；2026-09-10 新增 AI反馈）：文字动画 / 动效 / 组件 / 背景 / 布局骨架 / AI反馈（AI Agent 执行反馈示意，非网页动效，配示意 demo）
 // 风格 9 类：极简 / 科技 / 暗色 / 国风 / 轻盈 / 品牌 / 叙事仪式 / 信息型 / 通用
 // 场景 10 类：全站通用 / 落地页·发布页 / 官网·品牌站 / 工具·SaaS / 内容·阅读 / 电商·预订 / 后台·数据看板 / 作品集·叙事 / 移动端 / 通用模块区
 // 元素 6 组：视觉 / 动效 / 构成 / 反馈 / 3D·粒子 / 布局
@@ -27,7 +27,7 @@ window.WEB_ARSENAL = [
       "粒子",
       "标题"
     ],
-    来源: "自建：个人学习工作台（从 ReactBits 移植思路，未引 React）",
+    来源: "自建：个人学习工作台（从 ReactBits 移植思路，未引 React；2026-08 入库）",
     效果演示: "assets/demos/粒子文字.html",
     参数: [
       {
@@ -117,7 +117,7 @@ window.WEB_ARSENAL = [
     标签: [
       "氛围"
     ],
-    来源: "自建：个人学习工作台",
+    来源: "自建：个人学习工作台（2026-08 入库）",
     效果演示: "assets/demos/细雨意境.html",
     参数: [
       {
@@ -207,7 +207,7 @@ window.WEB_ARSENAL = [
     标签: [
       "过渡"
     ],
-    来源: "自建：个人学习工作台",
+    来源: "自建：个人学习工作台（2026-08 入库）",
     效果演示: "assets/demos/页面切换过渡.html",
     参数: [
       {
@@ -316,7 +316,7 @@ window.WEB_ARSENAL = [
       "点击反馈",
       "水墨"
     ],
-    来源: "自建：个人学习工作台",
+    来源: "自建：个人学习工作台（2026-08 入库）",
     效果演示: "assets/demos/墨渍揭示按钮.html",
     参数: [
       {
@@ -425,7 +425,7 @@ window.WEB_ARSENAL = [
       "鼠标悬停",
       "微交互"
     ],
-    来源: "自建：个人学习工作台",
+    来源: "自建：个人学习工作台（2026-08 入库）",
     效果演示: "assets/demos/hover微交互.html",
     参数: [
       {
@@ -510,7 +510,7 @@ window.WEB_ARSENAL = [
       "3D",
       "氛围"
     ],
-    来源: "自建：个人学习工作台（正式版用 three.js + GLB 模型）",
+    来源: "自建：个人学习工作台（演示版为自写降级版，完整版 three.js + GLB 未入库；2026-08 入库）",
     效果演示: "assets/demos/3D背景.html",
     参数: [
       {
@@ -698,9 +698,7 @@ window.WEB_ARSENAL = [
     风格: ["科技"],
     场景: ["落地页·发布页"],
     元素: ["视觉", "动效"],
-    搭配: [
-      "视觉重量"
-    ],
+    搭配: [],
     标签: [
       "渐变",
       "背景"
@@ -983,7 +981,7 @@ window.WEB_ARSENAL = [
       "图片",
       "视差"
     ],
-    来源: "ReactBits 官网 MaskedHeading 组件（MIT 许可；演示为原生 JS 重写版，未引 React/gsap）",
+    来源: "ReactBits 官网 MaskedHeading 组件（MIT 许可；演示为原生 JS 重写版，未引 React/gsap；2026-08 入库）",
     效果演示: "assets/demos/文字遮罩.html",
     参数: [
       {
@@ -2356,7 +2354,7 @@ window.WEB_ARSENAL = [
         类型: "slider",
         最小: 0.15,
         最大: 0.8,
-        步长: 0.05,
+        步长: 0.01,
         默认: 0.38
       },
       {
@@ -2484,7 +2482,7 @@ window.WEB_ARSENAL = [
         类型: "slider",
         最小: 0.3,
         最大: 1,
-        步长: 0.05,
+        步长: 0.01,
         默认: 0.72
       },
       {
@@ -2951,7 +2949,7 @@ window.WEB_ARSENAL = [
         类型: "slider",
         最小: 0.3,
         最大: 1,
-        步长: 0.05,
+        步长: 0.01,
         默认: 0.72
       },
       {
@@ -3032,9 +3030,7 @@ window.WEB_ARSENAL = [
     风格: ["叙事仪式"],
     场景: ["移动端", "落地页·发布页"],
     元素: ["动效"],
-    搭配: [
-      "页面切换过渡"
-    ],
+    搭配: [],
     标签: [
       "转场",
       "衔接"
@@ -3048,7 +3044,7 @@ window.WEB_ARSENAL = [
         类型: "slider",
         最小: 0.15,
         最大: 0.8,
-        步长: 0.05,
+        步长: 0.01,
         默认: 0.38
       },
       {
@@ -3344,7 +3340,7 @@ window.WEB_ARSENAL = [
     ],
     效果说明: "构图笔记：靠反馈的强弱、方向与一致性建立操作可信度，每一次点击都该让用户「感觉得到」结果。\n无法估算时长的任务（上传、同步、AI 生成）不假装有百分比，只用光条来回流动告诉用户「系统在跑」。诚实且安心。\n能怎么改：拖滑杆调「流动速度（秒/圈）、光条数量、光条间隔（px）」即可实时改观，换风格改 CSS 主色与字号；更多调法见右侧「用法」面板。",
     用法: "拖滑杆调流动速度、光条数量、粗细、圆角，点色块换主色；条数多了像波浪、少了更安静。",
-    提示词: "帮我做一个\"模糊进度条\"（纯 HTML/CSS/JS）：\n效果：用于无法估算等待时长的任务，光条来回流动，仅告知用户系统在运行，不显示百分比。\n用法示例：\n<div class=\"rail\"><div class=\"indet\"></div></div>\n// .indet 在 .rail 里从 -40% 滑到 100%，无限循环\n关键参数：\n- speed 流动速度 / count 光条数量 / thick 粗细 / round 圆角 / color 主色\n集成步骤：\n1. 复制 assets/demos/模糊进度.html 的样式和 JS\n2. 套到上传/同步/AI 生成等不确定时长的任务\n3. 光条颜色换品牌色",
+    提示词: "帮我做一个\"模糊进度条\"（纯 HTML/CSS/JS）：\n效果：用于无法估算等待时长的任务，光条来回流动，仅告知用户系统在运行，不显示百分比。\n用法示例：\n<div class=\"rail\"><div class=\"indet\"></div></div>\n// .indet 在 .rail 里从 -40% 滑到 100%，无限循环\n关键参数：\n- speed 流动速度 / count 光条数量 / thick 轨道粗细 / round 圆角 / color 光条颜色 / gap 光条间隔(px) / width 轨道宽度(px) / opa 光条透明度 / glow 是否发光 / track 轨道底色\n集成步骤：\n1. 复制 assets/demos/模糊进度.html 的样式和 JS\n2. 套到上传/同步/AI 生成等不确定时长的任务\n3. 光条颜色换品牌色",
     代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>模糊进度条演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;\n    background: #fff; font-family: system-ui, \"Microsoft YaHei\", sans-serif; color: #1a1a1a;\n  }\n  .hint { font-size: 13px; color: #999; }\n  .rail {\n    position: relative;\n    width: var(--width, 300px);\n    height: var(--thick, 6px);\n    border-radius: var(--round, 6px);\n    background: var(--track, #eee);\n    overflow: hidden;\n  }\n  .indet {\n    position: absolute; top: 0; height: 100%;\n    width: calc(100% / var(--count, 2) - var(--gap, 4px));\n    border-radius: var(--round, 6px);\n    background: var(--color, #1a1a1a);\n    opacity: var(--opa, 1);\n    box-shadow: var(--glow, 0 0 0 transparent);\n    animation: indetSlide var(--speed, 1.6s) ease-in-out infinite;\n  }\n  @keyframes indetSlide {\n    0%   { left: calc(-1 * (100% / var(--count, 2))); }\n    100% { left: calc(100%); }\n  }\n</style>\n</head>\n<body>\n<div class=\"rail\" id=\"rail\"></div>\n<p class=\"hint\">无法估算时长的任务：光条来回流动，只说「在运行」，不假装有进度</p>\n<script>\n  // 默认参数（父页面详情页可调）\n  const state = {\n    speed: 1.6,        // 流动速度（秒）\n    count: 2,          // 光条数量（条）\n    thick: 6,          // 粗细（px）\n    round: 6,          // 圆角（px）\n    width: 300,        // 轨道宽度（px）\n    gap: 4,            // 光条间隔（px）\n    opa: 1,            // 透明度（0-1）\n    glow: false,       // 是否发光\n    color: \"#1a1a1a\",  // 光条主色\n    track: \"#eee\"      // 轨道底色\n  };\n  const rail = document.getElementById(\"rail\");\n\n  function apply() {\n    const root = document.documentElement;\n    root.style.setProperty(\"--speed\", state.speed + \"s\");\n    root.style.setProperty(\"--thick\", state.thick + \"px\");\n    root.style.setProperty(\"--round\", state.round + \"px\");\n    root.style.setProperty(\"--width\", state.width + \"px\");\n    root.style.setProperty(\"--gap\", state.gap + \"px\");\n    root.style.setProperty(\"--opa\", state.opa);\n    root.style.setProperty(\"--color\", state.color);\n    root.style.setProperty(\"--track\", state.track);\n    root.style.setProperty(\"--count\", state.count);\n    root.style.setProperty(\"--glow\", state.glow\n      ? (\"0 0 \" + Math.max(8, state.thick * 2) + \"px \" + state.color + \"66\")\n      : \"0 0 0 transparent\");\n    // 按条数重建光条（错开延迟，像波浪）\n    rail.innerHTML = \"\";\n    for (let i = 0; i < state.count; i++) {\n      const b = document.createElement(\"div\");\n      b.className = \"indet\";\n      if (i > 0) b.style.animationDelay = (-state.speed * i / state.count) + \"s\";\n      rail.appendChild(b);\n    }\n  }\n\n  window.addEventListener(\"message\", (e) => {\n    const d = e.data;\n    if (!d || d.type !== \"param\") return;\n    state[d.key] = d.value;\n    apply();\n  });\n  apply();\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   },
@@ -3846,11 +3842,47 @@ window.WEB_ARSENAL = [
         名: "旋转图标头色",
         类型: "string",
         默认: "#ffffff"
+      },
+      {
+        键: "minW",
+        名: "最小宽度（px）",
+        类型: "slider",
+        最小: 120,
+        最大: 320,
+        步长: 4,
+        默认: 180
+      },
+      {
+        键: "letter",
+        名: "字间距（px）",
+        类型: "slider",
+        最小: 0,
+        最大: 8,
+        步长: 0.5,
+        默认: 2
+      },
+      {
+        键: "sSize",
+        名: "旋转图标大小（px）",
+        类型: "slider",
+        最小: 10,
+        最大: 28,
+        步长: 1,
+        默认: 16
+      },
+      {
+        键: "sThick",
+        名: "旋转图标粗细（px）",
+        类型: "slider",
+        最小: 1,
+        最大: 5,
+        步长: 0.5,
+        默认: 2
       }
     ],
     效果说明: "构图笔记：靠反馈的强弱、方向与一致性建立操作可信度，每一次点击都该让用户「感觉得到」结果。\n提交、生成类按钮点击后进入加载态：转圈 + 禁点，防止用户疯狂点重复提交。完成后恢复或进入成功态。\n能怎么改：拖滑杆调「转一圈秒数、模拟处理时长（秒）、按钮圆角（px）」即可实时改观，换风格改 CSS 主色与字号；更多调法见右侧「用法」面板。",
     用法: "拖滑杆调转圈速度、加载时长、圆角，点色块换主色；加载期间 pointer-events:none 是防重复的关键；想接成功态就配 v121 状态收尾。",
-    提示词: "帮我做\"按钮加载\"状态（纯 HTML/CSS/JS）：\n效果：用户点击提交、生成等操作后，按钮进入加载状态（转圈 + 禁点），防止重复点击。\n用法示例：\n<button class=\"btn loading\"><span class=\"spinner\"></span>处理中</button>\n// .loading 时显示转圈 + pointer-events:none，完成后再恢复\n关键参数：\n- dur 转一圈秒数 / wait 模拟处理时长 / radius 按钮圆角 / height 按钮高度 / fontSize 字号 / label 默认文案 / loadingLabel 加载中文案 / doneLabel 完成文案 / color 按钮背景色 / txtColor 按钮文字色 / sTrack 旋转图标轨色 / sHead 旋转图标头色\n集成步骤：\n1. 复制 assets/demos/按钮加载.html 的结构\n2. 加载逻辑接真实请求，成功/失败都要恢复按钮\n3. 配状态收尾（v121）把成功反馈也做了",
+    提示词: "帮我做\"按钮加载\"状态（纯 HTML/CSS/JS）：\n效果：用户点击提交、生成等操作后，按钮进入加载状态（转圈 + 禁点），防止重复点击。\n用法示例：\n<button class=\"btn loading\"><span class=\"spinner\"></span>处理中</button>\n// .loading 时显示转圈 + pointer-events:none，完成后再恢复\n关键参数：\n- dur 转一圈秒数 / wait 模拟处理时长 / radius 按钮圆角 / height 按钮高度 / fontSize 字号 / label 默认文案 / loadingLabel 加载中文案 / doneLabel 完成文案 / color 按钮背景色 / txtColor 按钮文字色 / sTrack 旋转图标轨色 / sHead 旋转图标头色 / minW 最小宽度 / letter 字间距 / sSize 旋转图标大小 / sThick 旋转图标粗细\n集成步骤：\n1. 复制 assets/demos/按钮加载.html 的结构\n2. 加载逻辑接真实请求，成功/失败都要恢复按钮\n3. 配状态收尾（v121）把成功反馈也做了",
     代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>按钮加载演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;\n    background: #fff; font-family: system-ui, \"Microsoft YaHei\", sans-serif; color: #1a1a1a;\n  }\n  .hint { font-size: 13px; color: #999; }\n  .btn {\n    position: relative; cursor: pointer; user-select: none; border: none; outline: none;\n    background: var(--color, #1a1a1a); color: var(--txtColor, #fff);\n    font-size: var(--fontSize, 16px); font-weight: 700; letter-spacing: var(--letter, 2px);\n    min-width: var(--minW, 180px); height: var(--height, 48px);\n    border-radius: var(--radius, 12px);\n    display: flex; align-items: center; justify-content: center; gap: 10px;\n    transition: background .2s ease, opacity .2s ease;\n  }\n  .btn:active:not(.loading) { transform: scale(.97); }\n  .btn.loading { opacity: .75; cursor: default; pointer-events: none; }\n  .spinner {\n    display: none; width: var(--sSize, 16px); height: var(--sSize, 16px); border-radius: 50%;\n    border: var(--sThick, 2px) solid var(--sTrack, rgba(255,255,255,.35));\n    border-top-color: var(--sHead, #fff);\n    animation: spin var(--dur, .9s) linear infinite;\n  }\n  .btn.loading .spinner { display: inline-block; }\n  @keyframes spin { to { transform: rotate(360deg); } }\n</style>\n</head>\n<body>\n<button class=\"btn\" id=\"btn\">\n  <span class=\"spinner\"></span>\n  <span class=\"txt\" id=\"txt\">提交</span>\n</button>\n<p class=\"hint\">点一下：进入加载态（转圈 + 禁点），完成后恢复</p>\n<script>\n  // 默认参数（父页面详情页可调）\n  const state = {\n    dur: 0.9,          // 旋转一圈秒数\n    wait: 1.8,          // 模拟后端处理时长（秒）\n    label: \"提交\",      // 按钮文案\n    loadingLabel: \"处理中\", // 加载中文案\n    doneLabel: \"已提交 ✓\",  // 完成文案\n    radius: 12,         // 圆角（px）\n    height: 48,         // 按钮高度（px）\n    minW: 180,          // 最小宽度（px）\n    fontSize: 16,       // 字号（px）\n    letter: 2,          // 字间距（px）\n    sSize: 16,          // 旋转图标大小（px）\n    sThick: 2,          // 旋转图标粗细（px）\n    color: \"#1a1a1a\",   // 按钮背景\n    txtColor: \"#ffffff\",// 按钮文字\n    sTrack: \"rgba(255,255,255,.35)\", // 旋转图标轨色\n    sHead: \"#ffffff\"    // 旋转图标头色\n  };\n  const btn = document.getElementById(\"btn\");\n  const txt = document.getElementById(\"txt\");\n\n  function apply() {\n    const root = document.documentElement;\n    root.style.setProperty(\"--dur\", state.dur + \"s\");\n    root.style.setProperty(\"--color\", state.color);\n    root.style.setProperty(\"--txtColor\", state.txtColor);\n    root.style.setProperty(\"--radius\", state.radius + \"px\");\n    root.style.setProperty(\"--height\", state.height + \"px\");\n    root.style.setProperty(\"--minW\", state.minW + \"px\");\n    root.style.setProperty(\"--fontSize\", state.fontSize + \"px\");\n    root.style.setProperty(\"--letter\", state.letter + \"px\");\n    root.style.setProperty(\"--sSize\", state.sSize + \"px\");\n    root.style.setProperty(\"--sThick\", state.sThick + \"px\");\n    root.style.setProperty(\"--sTrack\", state.sTrack);\n    root.style.setProperty(\"--sHead\", state.sHead);\n    if (!btn.classList.contains(\"loading\")) txt.textContent = state.label;\n  }\n\n  btn.addEventListener(\"click\", () => {\n    if (btn.classList.contains(\"loading\")) return;\n    btn.classList.add(\"loading\");\n    txt.textContent = state.loadingLabel;\n    setTimeout(() => {\n      txt.textContent = state.doneLabel;\n      setTimeout(() => {\n        btn.classList.remove(\"loading\");\n        txt.textContent = state.label;\n      }, 900);\n    }, state.wait * 1000);\n  });\n\n  window.addEventListener(\"message\", (e) => {\n    const d = e.data;\n    if (!d || d.type !== \"param\") return;\n    state[d.key] = d.value;\n    apply();\n  });\n  apply();\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   },
@@ -3975,11 +4007,47 @@ window.WEB_ARSENAL = [
           "#e5e7eb"
         ],
         默认: "#eeeeee"
+      },
+      {
+        键: "letter",
+        名: "标字母距（px）",
+        类型: "slider",
+        最小: 0,
+        最大: 12,
+        步长: 0.5,
+        默认: 4
+      },
+      {
+        键: "gap",
+        名: "内部元素间距（px）",
+        类型: "slider",
+        最小: 8,
+        最大: 48,
+        步长: 2,
+        默认: 22
+      },
+      {
+        键: "barW",
+        名: "进度条宽度（px）",
+        类型: "slider",
+        最小: 80,
+        最大: 320,
+        步长: 10,
+        默认: 160
+      },
+      {
+        键: "tipSize",
+        名: "提示字号（px）",
+        类型: "slider",
+        最小: 11,
+        最大: 20,
+        步长: 1,
+        默认: 13
       }
     ],
     效果说明: "构图笔记：靠反馈的强弱、方向与一致性建立操作可信度，每一次点击都该让用户「感觉得到」结果。\n首次打开页面或核心内容没就绪时，全屏加载层（logo + 光条）先顶上，就绪后整体淡出露出页面。适合重交互应用。\n能怎么改：拖滑杆调「加载层显示时长（秒）、淡出时长（秒）、内部光条速度（秒）」即可实时改观，换风格改 CSS 主色与字号；更多调法见右侧「用法」面板。",
     用法: "拖滑杆调加载时长、淡出时长、光条速度，点色块换主色；加载逻辑接真实的资源就绪回调，别死等。",
-    提示词: "帮我做\"页面加载\"（纯 HTML/CSS/JS）：\n效果：适配首次打开页面或核心内容未加载完成的场景，全屏加载层就绪后整体淡出。\n用法示例：\n<div class=\"loader\"><div class=\"logo\">…</div><div class=\"loader-bar\">…</div></div>\n// 资源就绪后给 .loader 加 .hide（opacity 0 + visibility hidden）\n关键参数：\n- wait 加载层显示时长 / dur 淡出时长 / speed 内部光条速度 / logoSize Logo 字号 / barH 光条粗细 / showTip 显示底部提示 / spinnerOnly 只用光条不用Logo / brand Logo/品牌文字 / tip 提示文案 / bg 加载层背景色 / color 主色 / track 光条轨道色\n集成步骤：\n1. 复制 assets/demos/页面加载.html 的结构\n2. 加载逻辑接真实的资源就绪回调，别死等\n3. 配骨架落位（v108）做内容区的渐进式加载",
+    提示词: "帮我做\"页面加载\"（纯 HTML/CSS/JS）：\n效果：适配首次打开页面或核心内容未加载完成的场景，全屏加载层就绪后整体淡出。\n用法示例：\n<div class=\"loader\"><div class=\"logo\">…</div><div class=\"loader-bar\">…</div></div>\n// 资源就绪后给 .loader 加 .hide（opacity 0 + visibility hidden）\n关键参数：\n- wait 加载层显示时长 / dur 淡出时长 / speed 内部光条速度 / logoSize Logo 字号 / barH 光条粗细 / showTip 显示底部提示 / spinnerOnly 只用光条不用Logo / brand Logo/品牌文字 / tip 提示文案 / bg 加载层背景色 / color 主色 / track 光条轨道色 / letter 标字母距 / gap 内部元素间距 / barW 进度条宽度 / tipSize 提示字号\n集成步骤：\n1. 复制 assets/demos/页面加载.html 的结构\n2. 加载逻辑接真实的资源就绪回调，别死等\n3. 配骨架落位（v108）做内容区的渐进式加载",
     代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>页面加载演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    min-height: 100vh; font-family: system-ui, \"Microsoft YaHei\", sans-serif; color: #1a1a1a;\n    overflow: hidden;\n  }\n  .loader {\n    position: fixed; inset: 0; background: var(--bg, #fff); z-index: 10;\n    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--gap, 22px);\n    transition: opacity var(--dur, .5s) ease, visibility var(--dur, .5s) ease;\n  }\n  .loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }\n  .logo { font-size: var(--logoSize, 30px); font-weight: 900; letter-spacing: var(--letter, 4px); color: var(--color, #1a1a1a); }\n  .logo span { opacity: 0; animation: popIn .5s ease forwards; display: inline-block; }\n  .logo span:nth-child(1) { animation-delay: .1s; }\n  .logo span:nth-child(2) { animation-delay: .2s; }\n  .logo span:nth-child(3) { animation-delay: .3s; }\n  .logo span:nth-child(4) { animation-delay: .4s; }\n  @keyframes popIn { to { opacity: 1; } }\n  .loader-bar {\n    width: var(--barW, 160px); height: var(--barH, 4px); border-radius: var(--barH, 4px); background: var(--track, #eee); overflow: hidden;\n  }\n  .loader-fill {\n    height: 100%; width: 40%; border-radius: var(--barH, 4px);\n    background: var(--color, #1a1a1a);\n    animation: fillSlide var(--speed, 1.2s) ease-in-out infinite;\n  }\n  @keyframes fillSlide {\n    0%   { transform: translateX(-100%); }\n    100% { transform: translateX(400%); }\n  }\n  .loader-tip { font-size: var(--tipSize, 13px); color: #999; }\n  .page {\n    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;\n    padding: 40px; text-align: center;\n  }\n  .page h2 { font-size: 28px; }\n  .page p { font-size: 14px; color: #666; max-width: 420px; line-height: 1.8; }\n  .btn {\n    cursor: pointer; user-select: none; border: none; outline: none;\n    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;\n    padding: 10px 24px; border-radius: 8px;\n  }\n</style>\n</head>\n<body>\n<div class=\"loader\" id=\"loader\">\n  <div class=\"logo\" id=\"logo\"><span id=\"logoText\"></span></div>\n  <div class=\"loader-bar\"><div class=\"loader-fill\"></div></div>\n  <div class=\"loader-tip\" id=\"tip\">页面内容准备中…</div>\n</div>\n<div class=\"page\">\n  <h2>页面主体</h2>\n  <p>首次打开或核心内容未加载完成时，先展示全屏加载层；就绪后整体淡出，露出页面主体。</p>\n  <button class=\"btn\" id=\"btn\">重播加载</button>\n</div>\n<script>\n  // 默认参数（父页面详情页可调）\n  const state = {\n    wait: 2,            // 加载层显示时长（秒）\n    dur: 0.5,           // 淡出时长（秒）\n    speed: 1.2,         // 内部进度条跑动速度（秒）\n    letter: 4,          // 标字母距（px）\n    gap: 22,            // 内部元素间距（px）\n    logoSize: 30,       // Logo 字号（px）\n    barW: 160,          // 进度条宽度（px）\n    barH: 4,            // 进度条粗细（px）\n    tipSize: 13,        // 提示字号（px）\n    showTip: true,      // 是否显示底部提示\n    spinnerOnly: false, // 是否只用旋转图标（不用进度条）\n    brand: \"加载完成\",  // 品牌名/Logo 文字\n    tip: \"页面内容准备中…\", // 提示文案\n    bg: \"#ffffff\",      // 加载层底色\n    color: \"#1a1a1a\",   // 主色\n    track: \"#eeeeee\"    // 进度条轨道色\n  };\n  const loader = document.getElementById(\"loader\");\n  const logoText = document.getElementById(\"logoText\");\n  const tipEl = document.getElementById(\"tip\");\n\n  function apply() {\n    const root = document.documentElement;\n    root.style.setProperty(\"--dur\", state.dur + \"s\");\n    root.style.setProperty(\"--speed\", state.speed + \"s\");\n    root.style.setProperty(\"--color\", state.color);\n    root.style.setProperty(\"--bg\", state.bg);\n    root.style.setProperty(\"--track\", state.track);\n    root.style.setProperty(\"--logoSize\", state.logoSize + \"px\");\n    root.style.setProperty(\"--letter\", state.letter + \"px\");\n    root.style.setProperty(\"--gap\", state.gap + \"px\");\n    root.style.setProperty(\"--barW\", state.barW + \"px\");\n    root.style.setProperty(\"--barH\", state.barH + \"px\");\n    root.style.setProperty(\"--tipSize\", state.tipSize + \"px\");\n    logoText.innerHTML = \"\";\n    for (const ch of state.brand) {\n      const s = document.createElement(\"span\");\n      s.textContent = ch;\n      logoText.appendChild(s);\n    }\n    tipEl.textContent = state.tip;\n    tipEl.style.display = state.showTip ? \"block\" : \"none\";\n    document.querySelector(\".loader-bar\").style.display = state.spinnerOnly ? \"none\" : \"block\";\n  }\n\n  function play() {\n    loader.classList.remove(\"hide\");\n    setTimeout(() => loader.classList.add(\"hide\"), state.wait * 1000);\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", play);\n\n  window.addEventListener(\"message\", (e) => {\n    const d = e.data;\n    if (!d || d.type !== \"param\") return;\n    state[d.key] = d.value;\n    apply();\n  });\n  apply();\n  play();\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   },
@@ -4362,8 +4430,8 @@ window.WEB_ARSENAL = [
     场景: ["全站通用", "落地页·发布页"],
     元素: ["动效"],
     搭配: [
-      "大序号分章",
-      "文字逐行"
+      "编辑型大序号分章",
+      "文字逐行揭示"
     ],
     标签: [
       "滚动揭示",
@@ -4423,7 +4491,7 @@ window.WEB_ARSENAL = [
         类型: "slider",
         最小: 0,
         最大: 1,
-        步长: 0.05,
+        步长: 0.01,
         默认: 0.12
       },
       {
@@ -4588,7 +4656,7 @@ window.WEB_ARSENAL = [
     元素: ["视觉", "动效"],
     搭配: [
       "滚动揭示入场",
-      "英雄区排版"
+      "英雄区大字号排版"
     ],
     标签: [
       "大序号",
@@ -4996,7 +5064,7 @@ window.WEB_ARSENAL = [
     场景: ["落地页·发布页", "通用模块区", "全站通用"],
     元素: ["视觉", "动效"],
     搭配: [
-      "英雄区排版",
+      "英雄区大字号排版",
       "滚动揭示入场"
     ],
     标签: [
@@ -5103,7 +5171,7 @@ window.WEB_ARSENAL = [
     元素: ["视觉", "动效"],
     搭配: [
       "文字逐行揭示",
-      "大序号分章"
+      "编辑型大序号分章"
     ],
     标签: [
       "英雄区",
@@ -5215,7 +5283,7 @@ window.WEB_ARSENAL = [
     元素: ["构成", "反馈"],
     搭配: [
       "分组下拉",
-      "搜索组合框"
+      "可搜索组合框"
     ],
     标签: [
       "下拉",
@@ -5674,8 +5742,7 @@ window.WEB_ARSENAL = [
     场景: ["通用模块区", "电商·预订", "后台·数据看板"],
     元素: ["构成"],
     搭配: [
-      "普通单选下拉",
-      "范围选择"
+      "普通单选下拉"
     ],
     标签: [
       "日期",
@@ -6122,8 +6189,8 @@ window.WEB_ARSENAL = [
     场景: ["官网·品牌站", "作品集·叙事", "落地页·发布页"],
     元素: ["动效", "反馈", "视觉", "布局"],
     搭配: [
-      "滚动揭示",
-      "文字逐行"
+      "滚动揭示入场",
+      "文字逐行揭示"
     ],
     标签: [
       "光标",
@@ -6231,7 +6298,6 @@ window.WEB_ARSENAL = [
     场景: ["后台·数据看板", "工具·SaaS", "内容·阅读"],
     元素: ["构成"],
     搭配: [
-      "悬浮吸顶导航",
       "面包屑导航"
     ],
     标签: [
@@ -6680,8 +6746,7 @@ window.WEB_ARSENAL = [
     场景: ["作品集·叙事", "官网·品牌站", "通用模块区"],
     元素: ["布局", "构成"],
     搭配: [
-      "汉堡菜单导航",
-      "悬浮吸顶导航"
+      "汉堡菜单导航"
     ],
     标签: [
       "全屏遮罩",
@@ -6909,7 +6974,6 @@ window.WEB_ARSENAL = [
     场景: ["官网·品牌站", "通用模块区"],
     元素: ["动效", "布局"],
     搭配: [
-      "悬浮吸顶导航",
       "全屏遮罩导航"
     ],
     标签: [
@@ -7053,7 +7117,10 @@ window.WEB_ARSENAL = [
     风格: ["暗色", "科技", "轻盈"],
     场景: ["落地页·发布页", "官网·品牌站", "通用模块区"],
     元素: ["3D·粒子"],
-    搭配: ["文字遮罩", "滚动揭示", "焦点型Hero"],
+    搭配: [
+      "文字遮罩",
+      "滚动揭示入场"
+    ],
     标签: ["粒子", "星系", "星空", "Three.js", "OpenAI", "Astra", "GPT-6", "发布页", "背景"],
     来源: "GitHub Win-Hao/starflow（MIT），参考 OpenAI GPT-6 Astra 发布页粒子效果，代码独立实现（2026-09-07 入库）",
     效果演示: "assets/demos/粒子星系.html",
@@ -7077,7 +7144,7 @@ window.WEB_ARSENAL = [
     ],
     效果说明: "构图笔记：用色块、粒子或光影铺底制造氛围层次，关键是让主体内容始终清晰可读，背景只做衬托不做主角。\n基于 Three.js 的螺旋星系粒子系统（4000 颗星星沿 5 条手绘螺旋曲线分布，带 Bloom 辉光、镜头光晕、氛围色和暗角），效果来自 OpenAI GPT-6 Astra 发布页。演示文件分两层：Canvas 2D 预览（双击直接看）和 Three.js 完整版。\n能怎么改：拖滑杆调「星数、星星大小、星带宽度」即可实时改观，换风格改 CSS 主色与字号；更多调法见右侧「用法」面板。",
     用法: "复制下方代码里的 starflow.js 引擎 + 集成代码，用 HTTP 服务打开看完整 3D 效果。也支持滚动编排（星轨散开→聚成形状），见方案 s206「星流/Astra 暗色发布页」。",
-    提示词: "帮我做「粒子星系动态背景」（基于 Three.js）：\n效果：4000 颗星星组成的螺旋星系，带 Bloom 辉光、镜头光晕、氛围色和暗角。可拖拽旋转，划过推开星尘。5 套调色板可选。\n用法示例：\n<canvas id=\"sky\"></canvas>\n<script type=\"module\">\n  import { createAstraScene } from './starflow.js'\n  const astra = createAstraScene(document.querySelector('#sky'))\n  astra.setSource({ type: 'galaxy' }, { starCount: 4000, palette: 'astra' })\n</script>\n关键参数：\n- starCount 星数(800-12000) / size 星星大小 / scatter 星带宽度 / palette 调色板(astra/aurora/ember/ice/gold)\n- bloomIntensity Bloom强度 / bloomThreshold Bloom阈值 / intensity 亮度 / flare 光晕 / flowSpeed 流动速度\n集成步骤：\n1. 复制 assets/库/starflow.js 到项目目录\n2. 建一个 <canvas>，import { createAstraScene } from './starflow.js'\n3. 调参数匹配你的品牌色（氛围色用品牌色，暗角调深）\n4. 上面叠文字内容，canvas 做背景\n5. 想加滚动编排：在 scroll 事件里调 astra.setScroll({ progress, tiltProgress, scatterProgress, shape })\n\n",
+    提示词: "帮我做「粒子星系动态背景」（基于 Three.js）：\n效果：4000 颗星星组成的螺旋星系，带 Bloom 辉光、镜头光晕、氛围色和暗角。可拖拽旋转，划过推开星尘。5 套调色板可选。\n用法示例：\n<canvas id=\"sky\"></canvas>\n<script type=\"module\">\n  import { createAstraScene } from './starflow.js'\n  const astra = createAstraScene(document.querySelector('#sky'))\n  astra.setSource({ type: 'galaxy' }, { starCount: 4000, palette: 'astra' })\n</script>\n关键参数：\n- starCount 星数(800-12000) / size 星星大小 / scatter 星带宽度 / palette 调色板(astra/aurora/ember/ice/gold)\n- bloomIntensity Bloom强度 / bloomThreshold Bloom阈值 / intensity 亮度 / flare 光晕 / flowSpeed 流动速度\n- backgroundRatio 背景星比例 / rotationDepth 厚度(Z向起伏) / ambientColor 氛围色 / vignette 暗角 / twinkleSpeed 闪烁速度\n集成步骤：\n1. 复制 assets/库/starflow.js 到项目目录\n2. 建一个 <canvas>，import { createAstraScene } from './starflow.js'\n3. 调参数匹配你的品牌色（氛围色用品牌色，暗角调深）\n4. 上面叠文字内容，canvas 做背景\n5. 想加滚动编排：在 scroll 事件里调 astra.setScroll({ progress, tiltProgress, scatterProgress, shape })\n\n",
     代码: `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -7210,6 +7277,1694 @@ window.WEB_ARSENAL = [
 <\/script>
 </body>
 </html>`,
+    复用记录: ""
+  },
+  {
+  id: "v150",
+  标题: "主题切换",
+  分类: "组件",
+  子类: "主题切换",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "通用模块区"
+  ],
+  元素: [
+    "动效",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "深色模式",
+    "扩散",
+    "触点"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/主题切换.html",
+  参数: [
+    {
+      键: "dur",
+      名: "切换时长（秒）",
+      类型: "slider",
+      最小: 0.2,
+      最大: 1.5,
+      步长: 0.05,
+      默认: 0.6
+    },
+    {
+      键: "maxr",
+      名: "扩散半径（%）",
+      类型: "slider",
+      最小: 110,
+      最大: 220,
+      步长: 5,
+      默认: 160
+    },
+    {
+      键: "lightBg",
+      名: "浅色背景",
+      类型: "color",
+      默认: "#ffffff"
+    },
+    {
+      键: "darkBg",
+      名: "深色背景",
+      类型: "color",
+      默认: "#15171c"
+    },
+    {
+      键: "lightText",
+      名: "浅色文字",
+      类型: "color",
+      默认: "#1a1a1a"
+    },
+    {
+      键: "darkText",
+      名: "深色文字",
+      类型: "color",
+      默认: "#f2f3f5"
+    },
+    {
+      键: "accent",
+      名: "强调色",
+      类型: "color",
+      默认: "#3d5fd6"
+    }
+  ],
+  效果说明: "以触点为中心用圆形 clip-path 扩散切换深色模式，底层页面布局不动、不变形。\n好处：切换有明确的空间来历（从你点的地方漫开），比整屏硬切更有「控制感」，也避免了布局抖动带来的眩晕。\n能怎么改：拖滑杆调「切换时长、扩散半径」，换颜色改浅/深双套配色与强调色。",
+  用法: "点演示任意位置即可触发；详情页调「切换时长、扩散半径」看节奏，换「浅色背景/深色背景/强调色」改双主题配色。",
+  提示词: "做一个「以触点扩散的深色模式切换」（纯 HTML/CSS/JS）：\n效果：点击页面任意处，从一个圆形 clip-path 从该点向外扩大，把浅色主题切换为深色主题，底层布局不位移。\n用法示例：\n<div class=\"surface dark\" style=\"clip-path:circle(0 at var(--x) var(--y))\"></div>\n关键参数：dur 切换时长 / maxr 扩散半径 / lightBg 浅色背景 / darkBg 深色背景 / lightText 浅色文字 / darkText 深色文字 / accent 强调色\n集成步骤：1. 复制 assets/demos/主题切换.html 的双层 surface 结构 2. 点击时记录触点坐标写入 --x/--y 并加 .on 类 3. 改两套 CSS 变量配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>主题切换演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { height: 100%; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; overflow: hidden; }\n  .stage { position: relative; width: min(520px, 92vw); height: 340px; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.12); cursor: pointer; --dur: .6s; --maxr: 160%; }\n  .surface { position: absolute; inset: 0; padding: 28px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }\n  .surface.dark { clip-path: circle(0px at var(--x, 50%) var(--y, 50%)); transition: clip-path var(--dur) cubic-bezier(.4,0,.2,1); }\n  .stage.on .surface.dark { clip-path: circle(var(--maxr) at var(--x, 50%) var(--y, 50%)); }\n  .bar { height: 14px; border-radius: 8px; width: 55%; }\n  .bar.s { width: 80%; height: 10px; opacity: .7; }\n  .card { margin-top: auto; display: flex; gap: 10px; }\n  .chip { width: 64px; height: 64px; border-radius: 14px; }\n  .btn { margin-top: 14px; align-self: flex-start; padding: 10px 18px; border-radius: 10px; border: none; font-size: 14px; cursor: pointer; }\n  .hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; font-size: 12px; opacity: .6; }\n</style>\n</head>\n<body>\n<div class=\"stage\" id=\"stage\">\n  <div class=\"surface light\" id=\"light\"></div>\n  <div class=\"surface dark\" id=\"dark\"></div>\n  <div class=\"hint\">点任意位置：以触点为中心扩散切换深色模式，底层布局不变形</div>\n</div>\n<script>\n  const state = { dur: .6, maxr: 160, lightBg: \"#ffffff\", darkBg: \"#15171c\", lightText: \"#1a1a1a\", darkText: \"#f2f3f5\", accent: \"#3d5fd6\" };\n  const stage = document.getElementById(\"stage\");\n  function build(surface, isDark) {\n    const bg = isDark ? state.darkBg : state.lightBg;\n    const fg = isDark ? state.darkText : state.lightText;\n    surface.style.background = bg;\n    surface.style.color = fg;\n    surface.innerHTML =\n      '<div class=\"bar\" style=\"background:' + state.accent + '\"></div>' +\n      '<div class=\"bar s\" style=\"background:' + fg + '\"></div>' +\n      '<div style=\"font-size:20px;font-weight:700\">灵感弹药库</div>' +\n      '<div class=\"bar s\" style=\"background:' + fg + '\"></div>' +\n      '<div class=\"card\">' +\n        '<div class=\"chip\" style=\"background:' + state.accent + '\"></div>' +\n        '<div class=\"chip\" style=\"background:' + (isDark ? \"#2a2d35\" : \"#ececf0\") + '\"></div>' +\n        '<div class=\"chip\" style=\"background:' + (isDark ? \"#2a2d35\" : \"#ececf0\") + '\"></div>' +\n      '</div>' +\n      '<button class=\"btn\" style=\"background:' + state.accent + ';color:#fff\">切换主题</button>';\n  }\n  function apply() {\n    stage.style.setProperty(\"--dur\", state.dur + \"s\");\n    stage.style.setProperty(\"--maxr\", state.maxr + \"%\");\n    build(document.getElementById(\"light\"), false);\n    build(document.getElementById(\"dark\"), true);\n  }\n  stage.addEventListener(\"pointerdown\", e => {\n    const r = stage.getBoundingClientRect();\n    stage.style.setProperty(\"--x\", (e.clientX - r.left) + \"px\");\n    stage.style.setProperty(\"--y\", (e.clientY - r.top) + \"px\");\n    stage.classList.toggle(\"on\");\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v151",
+  标题: "拖拽排序",
+  分类: "组件",
+  子类: "拖拽排序",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "通用模块区",
+    "后台·数据看板"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "拖拽",
+    "排序",
+    "弹簧"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/拖拽排序.html",
+  参数: [
+    {
+      键: "gap",
+      名: "行间距（px）",
+      类型: "slider",
+      最小: 4,
+      最大: 28,
+      步长: 1,
+      默认: 12
+    },
+    {
+      键: "dragScale",
+      名: "拖起放大",
+      类型: "slider",
+      最小: 1,
+      最大: 1.3,
+      步长: 0.01,
+      默认: 1.06
+    },
+    {
+      键: "radius",
+      名: "圆角（px）",
+      类型: "slider",
+      最小: 0,
+      最大: 28,
+      步长: 2,
+      默认: 12
+    },
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "accent2",
+      名: "次色",
+      类型: "color",
+      默认: "#7c4dff"
+    },
+    {
+      键: "count",
+      名: "条目数",
+      类型: "slider",
+      最小: 3,
+      最大: 8,
+      步长: 1,
+      默认: 6
+    }
+  ],
+  效果说明: "拖动某一条目时，其余条目按实时落点索引主动让位，用带回弹的弹簧曲线重新排布。\n好处：拖到哪、东西就让到哪，位置反馈即时且「有弹性」，比生硬瞬移更能显出操作被接收。\n能怎么改：拖滑杆调「行间距、拖起放大、圆角」，换颜色改奇偶条目配色。",
+  用法: "按住条目上下拖；详情页调「行间距、拖起放大」看让位幅度，换「主色/次色」改条目配色。",
+  提示词: "做一个「拖拽排序 + 其余条目弹簧让位」（纯 HTML/CSS/JS）：\n效果：拖动条目时，其他条目根据实时落点索引用 FLIP + 回弹缓动（cubic-bezier(.34,1.56,.64,1)）重新排布，被拖条目跟随指针并轻微放大。\n用法示例：用 insertBefore 移动 DOM 节点，移动前后用 getBoundingClientRect 记录位置差做 transform 过渡。\n关键参数：gap 行间距 / dragScale 拖起放大 / radius 圆角 / accent 主色 / accent2 次色 / count 条目数\n集成步骤：1. 复制 assets/demos/拖拽排序.html 的 flip() 逻辑 2. pointermove 计算落点并 insertBefore 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>拖拽排序演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .list { width: min(420px, 92vw); display: flex; flex-direction: column; }\n  .item { color: #fff; padding: 16px 18px; border-radius: 12px; margin: 6px 0; cursor: grab; user-select: none; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.12); touch-action: none; font-size: 15px; transition: box-shadow .2s; }\n  .item .h { opacity: .7; font-size: 12px; }\n  .item.dragging { box-shadow: 0 14px 34px rgba(0,0,0,.28); cursor: grabbing; z-index: 10; position: relative; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"list\" id=\"list\"></div>\n<div class=\"hint\">拖动任意条目：其余条目按实时落点以弹簧动效主动让位</div>\n<script>\n  const state = { gap: 12, dragScale: 1.06, radius: 12, accent: \"#3d5fd6\", accent2: \"#7c4dff\", count: 6 };\n  const list = document.getElementById(\"list\");\n  const names = [\"首页 Banner\", \"产品列表\", \"用户评价\", \"价格方案\", \"常见问题\", \"页脚导航\", \"订阅区块\", \"关于我们\"];\n  let dragEl = null, startY = 0, dy = 0;\n\n  function render() {\n    list.innerHTML = \"\";\n    for (let i = 0; i < state.count; i++) {\n      const d = document.createElement(\"div\");\n      d.className = \"item\";\n      d.style.background = i % 2 ? state.accent2 : state.accent;\n      d.style.borderRadius = state.radius + \"px\";\n      d.style.margin = (state.gap / 2) + \"px 0\";\n      d.textContent = names[i % names.length];\n      const s = document.createElement(\"span\"); s.className = \"h\"; s.textContent = \"拖 #\" + (i + 1);\n      d.appendChild(s);\n      d.addEventListener(\"pointerdown\", start);\n      list.appendChild(d);\n    }\n  }\n\n  function flip(mutate) {\n    const kids = [...list.children];\n    const olds = kids.map(c => c.getBoundingClientRect());\n    mutate();\n    const news = [...list.children].map(c => c.getBoundingClientRect());\n    [...list.children].forEach((c, idx) => {\n      if (c === dragEl) return;\n      const dx = olds[idx].left - news[idx].left;\n      const dyc = olds[idx].top - news[idx].top;\n      if (dx || dyc) {\n        c.style.transition = \"none\";\n        c.style.transform = \"translate(\" + dx + \"px,\" + dyc + \"px)\";\n        requestAnimationFrame(() => {\n          c.style.transition = \"transform .42s cubic-bezier(.34,1.56,.64,1)\";\n          c.style.transform = \"\";\n        });\n      }\n    });\n  }\n\n  function start(e) {\n    dragEl = e.currentTarget;\n    dragEl.setPointerCapture(e.pointerId);\n    startY = e.clientY; dy = 0;\n    dragEl.classList.add(\"dragging\");\n  }\n\n  window.addEventListener(\"pointermove\", e => {\n    if (!dragEl) return;\n    dy = e.clientY - startY;\n    dragEl.style.transform = \"translateY(\" + dy + \"px) scale(\" + state.dragScale + \")\";\n    const rects = [...list.children].map(c => c.getBoundingClientRect());\n    let target = null;\n    for (let i = 0; i < rects.length; i++) {\n      if (list.children[i] === dragEl) continue;\n      const mid = rects[i].top + rects[i].height / 2;\n      if (e.clientY < mid) { target = list.children[i]; break; }\n      target = list.children[i].nextSibling;\n    }\n    if (target !== dragEl && target !== dragEl.nextSibling) {\n      flip(() => list.insertBefore(dragEl, target));\n      startY = e.clientY - dy + 0; // keep grab offset stable\n    }\n  });\n\n  window.addEventListener(\"pointerup\", () => {\n    if (!dragEl) return;\n    dragEl.classList.remove(\"dragging\");\n    dragEl.style.transform = \"\";\n    dragEl = null;\n  });\n\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; render(); });\n  render();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v152",
+  标题: "文本展开",
+  分类: "组件",
+  子类: "文本展开",
+  风格: [
+    "轻盈"
+  ],
+  场景: [
+    "内容·阅读",
+    "通用模块区"
+  ],
+  元素: [
+    "动效"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "折叠",
+    "展开",
+    "高度"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/文本展开.html",
+  参数: [
+    {
+      键: "dur",
+      名: "展开时长（秒）",
+      类型: "slider",
+      最小: 0.15,
+      最大: 1,
+      步长: 0.05,
+      默认: 0.45
+    },
+    {
+      键: "ease",
+      名: "缓动",
+      类型: "select",
+      选项: [
+        "ease",
+        "ease-in-out",
+        "linear"
+      ],
+      默认: "ease"
+    },
+    {
+      键: "radius",
+      名: "卡片圆角（px）",
+      类型: "slider",
+      最小: 0,
+      最大: 28,
+      步长: 2,
+      默认: 16
+    },
+    {
+      键: "text",
+      名: "文字色",
+      类型: "color",
+      默认: "#1a1a1a"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#ffffff"
+    },
+    {
+      键: "open",
+      名: "默认展开",
+      类型: "switch",
+      默认: false
+    }
+  ],
+  效果说明: "容器高度随内容同步伸缩，箭头旋转提示开合状态，没有瞬间跳变。\n好处：折叠态只露标题、展开态平滑过渡，长文/FAQ/商品详情的局部展开不会打断阅读节奏。\n能怎么改：拖滑杆调「展开时长、卡片圆角」，换缓动改手感，换颜色改主题。",
+  用法: "点标题切换；详情页调「展开时长、缓动」看节奏，换「文字色/背景色」改配色，开「默认展开」看初始态。",
+  提示词: "做一个「文本展开 + 箭头旋转」（纯 HTML/CSS/JS）：\n效果：点标题时容器 height 从 0 过渡到 scrollHeight，箭头 rotate(180deg)，提示开合。\n用法示例：body.style.height = open ? body.firstElementChild.offsetHeight+'px' : '0px';\n关键参数：dur 展开时长 / ease 缓动 / radius 卡片圆角 / text 文字色 / bg 背景色 / open 默认展开\n集成步骤：1. 复制 assets/demos/文本展开.html 的 height 过渡 2. 点标题切 open 并旋转箭头 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>文本展开演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .card { width: min(440px, 92vw); background: #fff; border-radius: 16px; box-shadow: 0 10px 36px rgba(0,0,0,.1); overflow: hidden; }\n  .head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; user-select: none; }\n  .title { font-size: 16px; font-weight: 700; }\n  .arrow { width: 22px; height: 22px; transition: transform var(--dur) var(--ease); }\n  .body { height: 0; overflow: hidden; transition: height var(--dur) var(--ease); }\n  .body > div { padding: 0 20px 20px; font-size: 14px; line-height: 1.7; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"card\" id=\"card\">\n  <div class=\"head\" id=\"head\">\n    <div class=\"title\">展开看完整说明</div>\n    <svg class=\"arrow\" id=\"arrow\" viewBox=\"0 0 24 24\"><path d=\"M6 9l6 6 6-6\" fill=\"none\" stroke=\"#1a1a1a\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>\n  </div>\n  <div class=\"body\" id=\"body\"><div>容器随内容同步调整高度，箭头旋转提示开关状态。当正文很长时，折叠态只露出标题，点击后高度平滑过渡到真实内容高度，不会出现瞬间跳变；再次点击则收回。适合 FAQ、商品详情、评论楼层的局部展开。</div></div>\n</div>\n<div class=\"hint\">点标题：容器高度随内容平滑伸缩，箭头旋转提示开合</div>\n<script>\n  const state = { dur: .45, ease: \"ease\", radius: 16, text: \"#1a1a1a\", bg: \"#ffffff\", open: false };\n  const card = document.getElementById(\"card\");\n  const arrow = document.getElementById(\"arrow\");\n  const body = document.getElementById(\"body\");\n  document.getElementById(\"head\").addEventListener(\"click\", () => { state.open = !state.open; apply(); });\n  function apply() {\n    card.style.borderRadius = state.radius + \"px\";\n    card.style.background = state.bg;\n    card.querySelector(\".title\").style.color = state.text;\n    arrow.querySelector(\"path\").setAttribute(\"stroke\", state.text);\n    body.style.setProperty(\"--dur\", state.dur + \"s\");\n    body.style.setProperty(\"--ease\", state.ease);\n    body.style.height = state.open ? body.firstElementChild.offsetHeight + \"px\" : \"0px\";\n    arrow.style.transform = state.open ? \"rotate(180deg)\" : \"rotate(0deg)\";\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v153",
+  标题: "步骤条",
+  分类: "组件",
+  子类: "步骤条",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS",
+    "通用模块区"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "进度",
+    "步骤",
+    "超调"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/步骤条.html",
+  参数: [
+    {
+      键: "steps",
+      名: "步骤数",
+      类型: "slider",
+      最小: 2,
+      最大: 6,
+      步长: 1,
+      默认: 4
+    },
+    {
+      键: "dur",
+      名: "单步时长（秒）",
+      类型: "slider",
+      最小: 0.2,
+      最大: 1,
+      步长: 0.05,
+      默认: 0.5
+    },
+    {
+      键: "accent",
+      名: "进行色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "done",
+      名: "完成色",
+      类型: "color",
+      默认: "#2bb673"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "ease",
+      名: "缓动",
+      类型: "select",
+      选项: [
+        "ease",
+        "ease-in-out",
+        "linear"
+      ],
+      默认: "ease"
+    }
+  ],
+  效果说明: "进度走到最后一步完成时，节点先超调放大再回弹，强化「完成」的真实感。\n好处：普通进度条只填空，超调回弹给了一个明确的「成了」的物理反馈，比平铺直叙更让人安心。\n能怎么改：拖滑杆调「步骤数、单步时长」，换颜色改进行/完成两态。",
+  用法: "点「下一步」推进；详情页调「步骤数、单步时长」看节奏，换「进行色/完成色」改语义色。",
+  提示词: "做一个「步骤条 + 完成超调回弹」（纯 HTML/CSS/JS）：\n效果：N 个节点连成进度条，最后一步完成时节点用 scale(1→1.35→1) 的关键帧超调回弹。\n用法示例：完成时 node.classList.add('finish')，CSS @keyframes pop 做 scale 超调。\n关键参数：steps 步骤数 / dur 单步时长 / accent 进行色 / done 完成色 / bg 背景色 / ease 缓动\n集成步骤：1. 复制 assets/demos/步骤条.html 的 track+fill 2. 完成时加 finish 类触发超调 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>步骤条演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 24px; }\n  .wrap { width: min(520px, 92vw); }\n  .track { display: flex; align-items: center; justify-content: space-between; position: relative; }\n  .line { position: absolute; left: 0; right: 0; top: 18px; height: 4px; background: #e3e3e6; border-radius: 2px; z-index: 0; }\n  .fill { position: absolute; left: 0; top: 18px; height: 4px; background: var(--accent); border-radius: 2px; z-index: 1; transition: width var(--dur) var(--ease); }\n  .node { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 3px solid #e3e3e6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #aaa; z-index: 2; transition: transform .4s cubic-bezier(.34,1.7,.5,1), background var(--dur), border-color var(--dur), color var(--dur); }\n  .node.on { background: var(--accent); border-color: var(--accent); color: #fff; }\n  .node.done { background: var(--done); border-color: var(--done); color: #fff; }\n  .node.finish { animation: pop .5s cubic-bezier(.34,1.7,.5,1); }\n  @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }\n  .btn { padding: 10px 22px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n  <div class=\"track\" id=\"track\">\n    <div class=\"line\"></div><div class=\"fill\" id=\"fill\"></div>\n  </div>\n</div>\n<button class=\"btn\" id=\"btn\">下一步</button>\n<div class=\"hint\">点「下一步」：进度完成时先超调再回弹，强化真实感</div>\n<script>\n  const state = { steps: 4, dur: .5, overshoot: 1, accent: \"#3d5fd6\", done: \"#2bb673\", bg: \"#fafafa\", ease: \"ease\" };\n  const track = document.getElementById(\"track\");\n  const fill = document.getElementById(\"fill\");\n  const btn = document.getElementById(\"btn\");\n  let cur = 0;\n  function build() {\n    track.querySelectorAll(\".node\").forEach(n => n.remove());\n    for (let i = 0; i < state.steps; i++) {\n      const n = document.createElement(\"div\");\n      n.className = \"node\";\n      n.textContent = i + 1;\n      track.appendChild(n);\n    }\n  }\n  function apply() {\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--done\", state.done);\n    document.body.style.background = state.bg;\n    track.style.setProperty(\"--dur\", state.dur + \"s\");\n    track.style.setProperty(\"--ease\", state.ease);\n    const nodes = track.querySelectorAll(\".node\");\n    nodes.forEach((n, i) => {\n      n.className = \"node\" + (i < cur ? \" done\" : i === cur ? \" on\" : \"\");\n    });\n    const pct = state.steps > 1 ? (cur / (state.steps - 1)) * 100 : 0;\n    fill.style.width = pct + \"%\";\n  }\n  btn.addEventListener(\"click\", () => {\n    if (cur < state.steps) {\n      cur++;\n      const last = track.querySelectorAll(\".node\")[cur - 1];\n      if (cur === state.steps && last) last.classList.add(\"finish\");\n      apply();\n      if (cur >= state.steps) { btn.textContent = \"重置\"; }\n    } else { cur = 0; btn.textContent = \"下一步\"; apply(); }\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; build(); apply(); });\n  build(); apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v154",
+  标题: "卡片堆叠",
+  分类: "动效",
+  子类: "入场出场",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "通用模块区"
+  ],
+  元素: [
+    "动效",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "卡片",
+    "堆叠",
+    "浏览量"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/卡片堆叠.html",
+  参数: [
+    {
+      键: "gap",
+      名: "层间距（px）",
+      类型: "slider",
+      最小: 4,
+      最大: 30,
+      步长: 1,
+      默认: 14
+    },
+    {
+      键: "compress",
+      名: "压缩率",
+      类型: "slider",
+      最小: 0,
+      最大: 0.25,
+      步长: 0.01,
+      默认: 0.12
+    },
+    {
+      键: "radius",
+      名: "圆角（px）",
+      类型: "slider",
+      最小: 0,
+      最大: 28,
+      步长: 2,
+      默认: 16
+    },
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "card2",
+      名: "次色",
+      类型: "color",
+      默认: "#7c4dff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "顶部卡片被后续卡片逐层堆叠压缩，越往后层越扁越小，直观展示浏览量在累积。\n好处：用「物理堆叠」把抽象数字变成看得见的厚度，比单纯数字 +1 更有体量感。\n能怎么改：拖滑杆调「层间距、压缩率、圆角」，换颜色改卡片双色。",
+  用法: "点「浏览+1」加一层；详情页调「层间距、压缩率」看堆叠挤压幅度，换「主色/次色」改卡片配色。",
+  提示词: "做一个「卡片堆叠展示浏览量」（纯 HTML/CSS/JS）：\n效果：每新增一张卡片叠到顶部，旧卡向下偏移并按 compress 比例缩小，形成越压越扁的堆叠。\n用法示例：每张卡 translateY(back*gap*(1-back*compress)) scale(1-back*compress)，back 为距顶层的层数。\n关键参数：gap 层间距 / compress 压缩率 / radius 圆角 / accent 主色 / card2 次色 / bg 背景色\n集成步骤：1. 复制 assets/demos/卡片堆叠.html 的 layout() 2. 点按钮 n++ 重排 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>卡片堆叠演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 20px; }\n  .stage { position: relative; width: 220px; height: 260px; }\n  .card { position: absolute; left: 0; top: 0; width: 220px; height: 200px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.16); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; transition: transform .4s cubic-bezier(.34,1.4,.5,1); transform-origin: center bottom; }\n  .btn { padding: 10px 22px; border: none; border-radius: 10px; background: #3d5fd6; color: #fff; font-size: 14px; cursor: pointer; }\n  .cnt { font-size: 13px; color: #777; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"stage\" id=\"stage\"></div>\n<div class=\"cnt\" id=\"cnt\">浏览量：0</div>\n<button class=\"btn\" id=\"btn\">浏览 +1</button>\n<div class=\"hint\">后续卡片逐层堆叠压缩顶部卡片，直观展示浏览量累积</div>\n<script>\n  const state = { gap: 14, compress: 0.12, radius: 16, accent: \"#3d5fd6\", card2: \"#7c4dff\", bg: \"#ffffff\" };\n  const stage = document.getElementById(\"stage\");\n  const cnt = document.getElementById(\"cnt\");\n  let n = 0;\n  function apply() {\n    stage.style.background = \"transparent\";\n    cnt.textContent = \"浏览量：\" + n;\n    while (stage.children.length < n) {\n      const c = document.createElement(\"div\");\n      c.className = \"card\";\n      c.textContent = \"内容 #\" + (stage.children.length + 1);\n      stage.appendChild(c);\n      requestAnimationFrame(() => layout());\n    }\n    while (stage.children.length > n) stage.lastChild.remove();\n    layout();\n  }\n  function layout() {\n    const total = stage.children.length;\n    [...stage.children].forEach((c, i) => {\n      const back = total - 1 - i;            // 越靠后(旧)越被压\n      const y = back * state.gap * (1 - back * state.compress);\n      const sc = 1 - back * state.compress;\n      c.style.background = i % 2 ? state.card2 : state.accent;\n      c.style.borderRadius = state.radius + \"px\";\n      c.style.transform = \"translateY(\" + y + \"px) scale(\" + Math.max(sc, .5) + \")\";\n      c.style.zIndex = i;\n    });\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", () => { n = Math.min(n + 1, 8); apply(); });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v155",
+  标题: "标签选择",
+  分类: "组件",
+  子类: "标签选择",
+  风格: [
+    "轻盈"
+  ],
+  场景: [
+    "通用模块区",
+    "后台·数据看板"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "标签",
+    "选中",
+    "挤开"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/标签选择.html",
+  参数: [
+    {
+      键: "count",
+      名: "标签数",
+      类型: "slider",
+      最小: 3,
+      最大: 9,
+      步长: 1,
+      默认: 7
+    },
+    {
+      键: "scale",
+      名: "选中放大",
+      类型: "slider",
+      最小: 1,
+      最大: 1.5,
+      步长: 0.01,
+      默认: 1.25
+    },
+    {
+      键: "gap",
+      名: "间距（px）",
+      类型: "slider",
+      最小: 4,
+      最大: 24,
+      步长: 1,
+      默认: 10
+    },
+    {
+      键: "radius",
+      名: "圆角（px）",
+      类型: "slider",
+      最小: 8,
+      最大: 999,
+      步长: 1,
+      默认: 999
+    },
+    {
+      键: "accent",
+      名: "选中色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "sub",
+      名: "未选底色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "选中标签放大，其余标签主动挤开腾出空间，形成清晰的「谁被选中」焦点。\n好处：选中态不是孤立变色，而是带动周围一起让位，选择意图一眼可见，减少误读。\n能怎么改：拖滑杆调「标签数、选中放大、间距、圆角」，换颜色改选中/未选配色。",
+  用法: "点标签切换选中；详情页调「选中放大、间距」看让位幅度，换「选中色/未选底色」改配色。",
+  提示词: "做一个「标签选择：选中放大、其余挤开」（纯 HTML/CSS/JS）：\n效果：点中的标签 scale 放大并加边距，其它标签自动缩小、间距回弹，腾出焦点空间。\n用法示例：选中态 transform:scale(var(--scale)); margin 加大；未选态 scale(1)。\n关键参数：count 标签数 / scale 选中放大 / gap 间距 / radius 圆角 / accent 选中色 / sub 未选底色\n集成步骤：1. 复制 assets/demos/标签选择.html 的 apply() 2. 点选切 .on 并调 transform/margin 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>标签选择演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .row { width: min(560px, 94vw); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }\n  .tag { padding: 10px 18px; border-radius: 999px; background: var(--sub); color: #555; font-size: 14px; cursor: pointer; user-select: none; border: 1px solid #e0e0e4; transition: transform .35s cubic-bezier(.34,1.5,.5,1), margin .35s cubic-bezier(.34,1.5,.5,1), background .25s, color .25s, box-shadow .25s; }\n  .tag.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 6px 18px rgba(61,95,214,.35); }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"row\" id=\"row\"></div>\n<div class=\"hint\">点标签：选中放大，其余标签主动挤开腾出空间</div>\n<script>\n  const state = { count: 7, scale: 1.25, gap: 10, radius: 999, accent: \"#3d5fd6\", sub: \"#ffffff\" };\n  const row = document.getElementById(\"row\");\n  const labels = [\"全部\", \"前端\", \"动效\", \"AI\", \"设计\", \"后端\", \"数据\", \"产品\", \"运营\"];\n  let sel = 0;\n  function build() {\n    row.innerHTML = \"\";\n    for (let i = 0; i < state.count; i++) {\n      const t = document.createElement(\"div\");\n      t.className = \"tag\" + (i === sel ? \" on\" : \"\");\n      t.textContent = labels[i % labels.length];\n      t.addEventListener(\"click\", () => { sel = i; apply(); });\n      row.appendChild(t);\n    }\n  }\n  function apply() {\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--sub\", state.sub);\n    [...row.children].forEach((t, i) => {\n      t.style.borderRadius = state.radius + \"px\";\n      if (i === sel) {\n        t.classList.add(\"on\");\n        t.style.transform = \"scale(\" + state.scale + \")\";\n        t.style.margin = \"0 \" + (state.gap + 6) + \"px\";\n      } else {\n        t.classList.remove(\"on\");\n        t.style.transform = \"scale(1)\";\n        t.style.margin = \"0 \" + (state.gap / 2) + \"px\";\n      }\n    });\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; build(); apply(); });\n  build(); apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v156",
+  标题: "跟随式按钮",
+  分类: "组件",
+  子类: "按钮",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "移动端",
+    "通用模块区"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "按钮",
+    "跟随",
+    "按压"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/跟随式按钮.html",
+  参数: [
+    {
+      键: "follow",
+      名: "跟随强度",
+      类型: "slider",
+      最小: 0.1,
+      最大: 1,
+      步长: 0.05,
+      默认: 0.5
+    },
+    {
+      键: "depth",
+      名: "按压深度",
+      类型: "slider",
+      最小: 0,
+      最大: 30,
+      步长: 1,
+      默认: 14
+    },
+    {
+      键: "radius",
+      名: "圆角（px）",
+      类型: "slider",
+      最小: 0,
+      最大: 28,
+      步长: 2,
+      默认: 14
+    },
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "text",
+      名: "文字色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "按住按钮后它随手指移动并渐变深浅，移开自动复位，无需弹窗取消，避免误触。\n好处：按钮像被「捏住」跟着走，松手即回，操作可逆且无需额外确认层，移动端尤其顺手。\n能怎么改：拖滑杆调「跟随强度、按压深度、圆角」，换颜色改按钮与文字色。",
+  用法: "按住拖动看跟随；详情页调「跟随强度、按压深度」看手感，换「主色/文字色」改配色。",
+  提示词: "做一个「跟随式按钮」（纯 HTML/CSS/JS）：\n效果：pointerdown 后按钮按 follow 比例跟随指针位移并加深，pointerup 用回弹缓动复位，不弹取消层。\n用法示例：pointermove 设 transform:translate(dx*follow,dy*follow) 与 brightness；pointerup 归零。\n关键参数：follow 跟随强度 / depth 按压深度 / radius 圆角 / accent 主色 / text 文字色\n集成步骤：1. 复制 assets/demos/跟随式按钮.html 的 pointer 逻辑 2. 调 follow/depth 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>跟随式按钮演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .zone { position: relative; width: min(420px, 92vw); height: 240px; border: 2px dashed #ddd; border-radius: 18px; display: flex; align-items: center; justify-content: center; }\n  .btn { padding: 16px 30px; border: none; border-radius: 14px; background: var(--accent); color: #fff; font-size: 15px; cursor: pointer; user-select: none; touch-action: none; transition: transform .12s ease, box-shadow .12s ease; will-change: transform; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"zone\" id=\"zone\">\n  <button class=\"btn\" id=\"btn\">按住拖动我</button>\n</div>\n<div class=\"hint\">按住拖动：按钮随手指移动并渐变深浅，移开自动复位（无需弹窗取消）</div>\n<script>\n  const state = { follow: 0.5, depth: 14, radius: 14, accent: \"#3d5fd6\", text: \"#ffffff\" };\n  const btn = document.getElementById(\"btn\");\n  let down = false, cx = 0, cy = 0, ox = 0, oy = 0;\n  function apply() {\n    btn.style.background = state.accent;\n    btn.style.color = state.text;\n    btn.style.borderRadius = state.radius + \"px\";\n  }\n  btn.addEventListener(\"pointerdown\", e => {\n    down = true; btn.setPointerCapture(e.pointerId);\n    const r = btn.getBoundingClientRect();\n    ox = e.clientX - (r.left + r.width / 2);\n    oy = e.clientY - (r.top + r.height / 2);\n  });\n  window.addEventListener(\"pointermove\", e => {\n    if (!down) return;\n    cx = (e.clientX - ox - btn.parentElement.getBoundingClientRect().left - btn.parentElement.clientWidth / 2 + btn.offsetWidth / 2);\n    cy = (e.clientY - oy - btn.parentElement.getBoundingClientRect().top - btn.parentElement.clientHeight / 2 + btn.offsetHeight / 2);\n    btn.style.transform = \"translate(\" + (cx * state.follow) + \"px,\" + (cy * state.follow) + \"px)\";\n    btn.style.boxShadow = \"0 \" + (state.depth * (1 - state.follow * .3)) + \"px \" + (state.depth * 2) + \"px rgba(0,0,0,.18)\";\n    btn.style.filter = \"brightness(\" + (1.15 - state.follow * .15) + \")\";\n  });\n  window.addEventListener(\"pointerup\", () => {\n    if (!down) return; down = false;\n    btn.style.transition = \"transform .35s cubic-bezier(.34,1.5,.5,1), box-shadow .35s, filter .35s\";\n    btn.style.transform = \"translate(0,0)\";\n    btn.style.boxShadow = \"none\";\n    btn.style.filter = \"none\";\n    setTimeout(() => btn.style.transition = \"transform .12s ease, box-shadow .12s ease\", 360);\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v157",
+  标题: "动作优先级判定",
+  分类: "动效",
+  子类: "手势",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "移动端"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "手势",
+    "冲突",
+    "方向"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/动作优先级判定.html",
+  参数: [
+    {
+      键: "threshold",
+      名: "触发阈值（px）",
+      类型: "slider",
+      最小: 8,
+      最大: 60,
+      步长: 2,
+      默认: 24
+    },
+    {
+      键: "hColor",
+      名: "横滑色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "vColor",
+      名: "竖拉色",
+      类型: "color",
+      默认: "#e0533d"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    }
+  ],
+  效果说明: "横滑翻页与竖拉关闭冲突时，以「初始滑动方向」判定执行哪一个动作，并实时高亮将被执行的动作。\n好处：手势意图在滑动一开始就锁定，不会滑到一半变了卦，冲突场景不再误触发。\n能怎么改：拖滑杆调「触发阈值」，换颜色改横滑/竖拉/卡片三色。",
+  用法: "在卡片上斜着滑；详情页调「触发阈值」看判定灵敏度，换「横滑色/竖拉色/卡片色」改配色。",
+  提示词: "做一个「手势冲突按初始方向判定」（纯 HTML/CSS/JS）：\n效果：pointerdown 记录起点，pointermove 一旦位移超过 6px 就按 |dx|>|dy| 锁定为横滑或竖拉，并高亮对应动作，超过阈值才真正执行。\n关键参数：threshold 触发阈值 / hColor 横滑色 / vColor 竖拉色 / card 卡片色 / bg 背景色\n集成步骤：1. 复制 assets/demos/动作优先级判定.html 的 axis 判定 2. 调阈值与配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>动作优先级判定演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 16px; }\n  .card { width: min(360px, 90vw); height: 220px; border-radius: 18px; background: var(--card); box-shadow: 0 10px 34px rgba(0,0,0,.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; touch-action: none; cursor: grab; transition: transform .2s; user-select: none; }\n  .card .big { font-size: 18px; font-weight: 700; color: #1a1a1a; }\n  .badge { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; transition: background .2s; }\n  .legend { display: flex; gap: 20px; font-size: 13px; color: #666; }\n  .legend b { color: #1a1a1a; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"card\" id=\"card\">\n  <div class=\"big\">在卡片上滑动</div>\n  <div class=\"badge\" id=\"badge\">初始方向判定执行动作</div>\n</div>\n<div class=\"legend\">横滑=翻页（<b id=\"h\">—</b>）　竖拉=关闭（<b id=\"v\">—</b>）</div>\n<div class=\"hint\">横滑与竖拉冲突时，以「初始滑动方向」判定执行哪一个动作</div>\n<script>\n  const state = { threshold: 24, hColor: \"#3d5fd6\", vColor: \"#e0533d\", card: \"#ffffff\", bg: \"#fafafa\" };\n  const card = document.getElementById(\"card\");\n  const badge = document.getElementById(\"badge\");\n  const h = document.getElementById(\"h\"), v = document.getElementById(\"v\");\n  let sx = 0, sy = 0, axis = null, moved = 0;\n  function apply() {\n    card.style.background = state.card;\n    document.body.style.background = state.bg;\n    h.style.color = state.hColor; v.style.color = state.vColor;\n    badge.style.background = \"#eee\"; badge.style.color = \"#444\";\n    badge.textContent = \"初始方向判定执行动作\";\n  }\n  card.addEventListener(\"pointerdown\", e => { sx = e.clientX; sy = e.clientY; axis = null; moved = 0; card.setPointerCapture(e.pointerId); });\n  card.addEventListener(\"pointermove\", e => {\n    const dx = e.clientX - sx, dy = e.clientY - sy;\n    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));\n    if (!axis && Math.abs(dx) + Math.abs(dy) > 6) axis = Math.abs(dx) > Math.abs(dy) ? \"h\" : \"v\";\n    if (axis === \"h\") { card.style.transform = \"translateX(\" + dx + \"px)\"; badge.style.background = state.hColor; badge.style.color = \"#fff\"; badge.textContent = \"已判定：横滑翻页\"; }\n    else if (axis === \"v\") { card.style.transform = \"translateY(\" + dy + \"px)\"; badge.style.background = state.vColor; badge.style.color = \"#fff\"; badge.textContent = \"已判定：竖拉关闭\"; }\n  });\n  card.addEventListener(\"pointerup\", e => {\n    const dx = e.clientX - sx, dy = e.clientY - sy;\n    if (axis === \"h\" && Math.abs(dx) > state.threshold) flash(\"执行：翻到下一页\");\n    else if (axis === \"v\" && Math.abs(dy) > state.threshold) flash(\"执行：关闭卡片\");\n    else flash(\"位移不足，未触发动作\");\n    card.style.transform = \"translate(0,0)\";\n  });\n  function flash(t) { badge.textContent = t; badge.style.background = \"#1a1a1a\"; badge.style.color = \"#fff\"; }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v158",
+  标题: "可拦截卡片",
+  分类: "动效",
+  子类: "入场出场",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "移动端",
+    "通用模块区"
+  ],
+  元素: [
+    "动效"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "卡片",
+    "拦截",
+    "动画中"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/可拦截卡片.html",
+  参数: [
+    {
+      键: "dur",
+      名: "飞出时长（ms）",
+      类型: "slider",
+      最小: 300,
+      最大: 1600,
+      步长: 50,
+      默认: 900
+    },
+    {
+      键: "dist",
+      名: "飞出距离（px）",
+      类型: "slider",
+      最小: 200,
+      最大: 480,
+      步长: 10,
+      默认: 360
+    },
+    {
+      键: "rot",
+      名: "旋转（deg）",
+      类型: "slider",
+      最小: 0,
+      最大: 45,
+      步长: 1,
+      默认: 22
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "threshold",
+      名: "拦截阈值（px）",
+      类型: "slider",
+      最小: 100,
+      最大: 360,
+      步长: 10,
+      默认: 200
+    }
+  ],
+  效果说明: "卡片飞出去的动画播放中，可用手指按住它「拦截」停住，而非等动画播完才响应操作。\n好处：用户随时能夺回控制权（暂停/拖回），动画不再「霸占」交互，误飞可救。\n能怎么改：拖滑杆调「飞出时长、飞出距离、旋转、拦截阈值」，换颜色改卡片/背景。",
+  用法: "点「让卡片飞出」后用手指按住飞行中的卡片拦截；详情页调「飞出时长/距离/旋转」看飞行，换「卡片色/背景色」改配色。",
+  提示词: "做一个「可拦截的飞出卡片」（纯 HTML/CSS/JS）：\n效果：卡片用 rAF 飞出（位移到屏外+旋转+淡出），飞行中 pointerdown 即 cancelAnimationFrame 暂停，可拖动，松手若已过阈值继续飞、否则弹回。\n关键参数：dur 飞出时长 / dist 飞出距离 / rot 旋转 / card 卡片色 / bg 背景色 / threshold 拦截阈值\n集成步骤：1. 复制 assets/demos/可拦截卡片.html 的 flyOut+pointer 拦截 2. 调参数与配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>可拦截卡片演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 18px; }\n  .stage { position: relative; width: 300px; height: 200px; }\n  .card { position: absolute; inset: 0; border-radius: 18px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.16); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; cursor: grab; touch-action: none; user-select: none; will-change: transform, opacity; }\n  .btn { padding: 10px 22px; border: none; border-radius: 10px; background: #3d5fd6; color: #fff; font-size: 14px; cursor: pointer; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"stage\" id=\"stage\">\n  <div class=\"card\" id=\"card\">飞出去的卡片</div>\n</div>\n<button class=\"btn\" id=\"fly\">让卡片飞出</button>\n<div class=\"hint\">卡片飞出过程中，可用手指按住它「拦截」停住，而非等动画播完才响应</div>\n<script>\n  const state = { dur: 900, dist: 360, rot: 22, card: \"#3d5fd6\", bg: \"#fafafa\", threshold: 200 };\n  const stage = document.getElementById(\"stage\");\n  const card = document.getElementById(\"card\");\n  let raf = null, flying = false, dragging = false, px = 0, py = 0, sx = 0, sy = 0, t0 = 0;\n\n  function apply() {\n    card.style.background = state.card;\n    document.body.style.background = state.bg;\n  }\n  function flyOut() {\n    flying = true; t0 = performance.now();\n    const fromX = 0, fromR = 0;\n    (function step(now) {\n      if (!flying) return;\n      const p = Math.min((now - t0) / state.dur, 1);\n      const e = 1 - Math.pow(1 - p, 3);\n      const x = fromX + state.dist * e;\n      const r = fromR + state.rot * e;\n      card.style.transform = \"translate(\" + x + \"px,\" + (40 * e) + \"px) rotate(\" + r + \"deg)\";\n      card.style.opacity = 1 - p;\n      if (p < 1) raf = requestAnimationFrame(step);\n      else { flying = false; card.style.opacity = 0; }\n    })(t0);\n  }\n  card.addEventListener(\"pointerdown\", e => {\n    if (raf) cancelAnimationFrame(raf);\n    flying = false; dragging = true;\n    card.setPointerCapture(e.pointerId);\n    sx = e.clientX; sy = e.clientY;\n    const m = new DOMMatrixReadOnly(getComputedStyle(card).transform);\n    px = m.m41; py = m.m42;\n    card.style.cursor = \"grabbing\";\n    card.style.opacity = 1;\n  });\n  card.addEventListener(\"pointermove\", e => {\n    if (!dragging) return;\n    card.style.transform = \"translate(\" + (px + e.clientX - sx) + \"px,\" + (py + e.clientY - sy) + \"px)\";\n  });\n  card.addEventListener(\"pointerup\", e => {\n    if (!dragging) return; dragging = false; card.style.cursor = \"grab\";\n    const m = new DOMMatrixReadOnly(getComputedStyle(card).transform);\n    if (m.m41 > state.threshold) flyOut();\n    else { // 弹回原位\n      card.style.transition = \"transform .4s cubic-bezier(.34,1.5,.5,1)\";\n      card.style.transform = \"translate(0,0) rotate(0deg)\";\n      setTimeout(() => card.style.transition = \"\", 420);\n    }\n  });\n  document.getElementById(\"fly\").addEventListener(\"click\", () => { card.style.opacity = 1; card.style.transition = \"\"; card.style.transform = \"translate(0,0)\"; flyOut(); });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v159",
+  标题: "预判轮播落点",
+  分类: "组件",
+  子类: "轮播",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "移动端",
+    "电商·预订"
+  ],
+  元素: [
+    "动效",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "轮播",
+    "预判",
+    "落点"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/预判轮播落点.html",
+  参数: [
+    {
+      键: "count",
+      名: "屏数",
+      类型: "slider",
+      最小: 3,
+      最大: 7,
+      步长: 1,
+      默认: 5
+    },
+    {
+      键: "gap",
+      名: "间距（px）",
+      类型: "slider",
+      最小: 0,
+      最大: 40,
+      步长: 2,
+      默认: 0
+    },
+    {
+      键: "accent",
+      名: "当前色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "predict",
+      名: "预判色",
+      类型: "color",
+      默认: "#e0533d"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    }
+  ],
+  效果说明: "横滑卡片时提前标注「将停留的位置」（高亮预测圆点），无需松手后再调整。\n好处：落点在拖动过程中就可见，用户对最终停靠心中有数，减少松手后的二次微调。\n能怎么改：拖滑杆调「屏数、间距」，换颜色改当前/预判两态指示色。",
+  用法: "横滑看圆点实时预判；详情页调「屏数、间距」看轮播密度，换「当前色/预判色」改指示色。",
+  提示词: "做一个「预判轮播落点」（纯 HTML/CSS/JS）：\n效果：拖动 track 时按位移 round(dx/step) 实时算出目标索引，高亮对应圆点（predict 态），松手 snap 到该索引。\n关键参数：count 屏数 / gap 间距 / accent 当前色 / predict 预判色 / bg 背景色\n集成步骤：1. 复制 assets/demos/预判轮播落点.html 的 pointermove 预判 2. 调参数与配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>预判轮播落点演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 18px; }\n  .viewport { width: min(320px, 90vw); overflow: hidden; border-radius: 16px; }\n  .track { display: flex; touch-action: pan-y; cursor: grab; }\n  .slide { flex: 0 0 100%; height: 180px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; font-weight: 700; }\n  .dots { display: flex; gap: 8px; }\n  .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; transition: transform .2s, background .2s; }\n  .dot.on { background: var(--accent); transform: scale(1.5); }\n  .dot.predict { background: var(--predict); box-shadow: 0 0 0 3px rgba(224,83,61,.25); }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"viewport\" id=\"vp\">\n  <div class=\"track\" id=\"track\"></div>\n</div>\n<div class=\"dots\" id=\"dots\"></div>\n<div class=\"hint\">横滑时提前标注「将停留的位置」，松手前就能看到落点，无需松手后再调整</div>\n<script>\n  const state = { count: 5, gap: 0, accent: \"#3d5fd6\", predict: \"#e0533d\", bg: \"#fafafa\" };\n  const vp = document.getElementById(\"vp\");\n  const track = document.getElementById(\"track\");\n  const dots = document.getElementById(\"dots\");\n  const palette = [\"#3d5fd6\", \"#7c4dff\", \"#2bb673\", \"#e0993d\", \"#e0533d\", \"#1aa0a0\"];\n  let idx = 0, dragX = 0, startX = 0, dragging = false;\n  function build() {\n    track.innerHTML = \"\";\n    dots.innerHTML = \"\";\n    for (let i = 0; i < state.count; i++) {\n      const s = document.createElement(\"div\");\n      s.className = \"slide\"; s.style.background = palette[i % palette.length];\n      s.textContent = \"第 \" + (i + 1) + \" 屏\";\n      track.appendChild(s);\n      const d = document.createElement(\"div\"); d.className = \"dot\"; dots.appendChild(d);\n    }\n    setX(0, false);\n  }\n  function setX(delta, anim) {\n    track.style.transition = anim ? \"transform .4s cubic-bezier(.34,1.4,.5,1)\" : \"none\";\n    const step = vp.clientWidth + state.gap;\n    track.style.transform = \"translateX(\" + (-idx * step + delta) + \"px)\";\n  }\n  function paint() {\n    const dotsEls = [...dots.children];\n    dotsEls.forEach((d, i) => d.className = \"dot\" + (i === idx ? \" on\" : \"\"));\n  }\n  function apply() {\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--predict\", state.predict);\n    document.body.style.background = state.bg;\n    build();\n  }\n  vp.addEventListener(\"pointerdown\", e => { dragging = true; startX = e.clientX; vp.setPointerCapture(e.pointerId); });\n  vp.addEventListener(\"pointermove\", e => {\n    if (!dragging) return;\n    const dx = e.clientX - startX;\n    setX(dx, false);\n    const step = vp.clientWidth + state.gap;\n    const predicted = Math.max(0, Math.min(state.count - 1, idx - Math.round(dx / step)));\n    [...dots.children].forEach((d, i) => d.className = \"dot\" + (i === predicted ? \" predict\" : (i === idx ? \" on\" : \"\")));\n  });\n  vp.addEventListener(\"pointerup\", e => {\n    if (!dragging) return; dragging = false;\n    const dx = e.clientX - startX;\n    const step = vp.clientWidth + state.gap;\n    idx = Math.max(0, Math.min(state.count - 1, idx - Math.round(dx / step)));\n    setX(0, true); paint();\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v160",
+  标题: "边界弹性反馈",
+  分类: "动效",
+  子类: "手势",
+  风格: [
+    "通用"
+  ],
+  场景: [
+    "移动端"
+  ],
+  元素: [
+    "动效",
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "越界",
+    "弹性",
+    "回弹"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/边界弹性反馈.html",
+  参数: [
+    {
+      键: "resistance",
+      名: "阻力强度",
+      类型: "slider",
+      最小: 0.1,
+      最大: 0.6,
+      步长: 0.01,
+      默认: 0.25
+    },
+    {
+      键: "over",
+      名: "可越界量（px）",
+      类型: "slider",
+      最小: 30,
+      最大: 160,
+      步长: 5,
+      默认: 80
+    },
+    {
+      键: "bounce",
+      名: "回弹时长（秒）",
+      类型: "slider",
+      最小: 0.2,
+      最大: 1,
+      步长: 0.05,
+      默认: 0.5
+    },
+    {
+      键: "accent",
+      名: "弹性色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    }
+  ],
+  效果说明: "列表拉到顶端后可小幅继续拖动，但阻力递增，松手自动回弹，给出「到头了」的弹性反馈。\n好处：越界拖动的阻尼+回弹是物理直觉，比硬性卡死更顺、更知道边界在哪。\n能怎么改：拖滑杆调「阻力强度、可越界量、回弹时长」，换颜色改弹性提示色。",
+  用法: "在框内向下拉到顶继续拖；详情页调「阻力强度、可越界量、回弹时长」看手感，换「弹性色」改提示色。",
+  提示词: "做一个「边界弹性反馈」（纯 HTML/CSS/JS）：\n效果：向下越界拖动时位移按 resistance 递减（阻力递增），松手用回弹缓动归零，顶部露出 accent 色橡皮筋。\n关键参数：resistance 阻力强度 / over 可越界量 / bounce 回弹时长 / accent 弹性色 / bg 背景色\n集成步骤：1. 复制 assets/demos/边界弹性反馈.html 的 pointermove 阻尼 2. 调参数与配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>边界弹性反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 14px; }\n  .box { position: relative; width: min(340px, 92vw); height: 240px; border-radius: 16px; background: #fff; box-shadow: 0 10px 34px rgba(0,0,0,.1); overflow: hidden; touch-action: none; }\n  .rubber { position: absolute; top: 0; left: 0; right: 0; height: 0; background: var(--accent); opacity: .5; transition: height .15s; }\n  .inner { position: absolute; left: 0; right: 0; top: 0; padding: 18px; display: flex; flex-direction: column; gap: 10px; will-change: transform; }\n  .ln { height: 12px; border-radius: 6px; background: #e6e6ea; }\n  .ln.s { width: 70%; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"box\" id=\"box\">\n  <div class=\"rubber\" id=\"rubber\"></div>\n  <div class=\"inner\" id=\"inner\">\n    <div class=\"ln\"></div><div class=\"ln s\"></div><div class=\"ln\"></div><div class=\"ln s\"></div>\n    <div class=\"ln\"></div><div class=\"ln s\"></div><div class=\"ln\"></div><div class=\"ln s\"></div>\n  </div>\n</div>\n<div class=\"hint\">列表拉到顶端后可小幅继续拖动，但阻力递增，松手自动回弹</div>\n<script>\n  const state = { resistance: 0.25, over: 80, bounce: .5, accent: \"#3d5fd6\", bg: \"#fafafa\" };\n  const box = document.getElementById(\"box\");\n  const inner = document.getElementById(\"inner\");\n  const rubber = document.getElementById(\"rubber\");\n  let sy = 0, ty = 0, dragging = false;\n  function apply() {\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.body.style.background = state.bg;\n  }\n  box.addEventListener(\"pointerdown\", e => { dragging = true; sy = e.clientY; ty = 0; box.setPointerCapture(e.pointerId); inner.style.transition = \"none\"; rubber.style.transition = \"none\"; });\n  box.addEventListener(\"pointermove\", e => {\n    if (!dragging) return;\n    let d = e.clientY - sy;\n    if (d < 0) d = 0;                         // 只允许向下越界\n    if (d > 0) d = Math.min(d, state.over) * (state.resistance + (1 - state.resistance) * (1 - Math.min(d, state.over) / state.over));\n    ty = d;\n    inner.style.transform = \"translateY(\" + d + \"px)\";\n    rubber.style.height = d + \"px\";\n  });\n  box.addEventListener(\"pointerup\", () => {\n    if (!dragging) return; dragging = false;\n    inner.style.transition = \"transform \" + state.bounce + \"s cubic-bezier(.34,1.56,.64,1)\";\n    rubber.style.transition = \"height \" + state.bounce + \"s ease\";\n    inner.style.transform = \"translateY(0)\";\n    rubber.style.height = \"0px\";\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v161",
+  标题: "流场运动",
+  分类: "背景",
+  子类: "粒子",
+  风格: [
+    "科技"
+  ],
+  场景: [
+    "落地页·发布页",
+    "官网·品牌站"
+  ],
+  元素: [
+    "3D·粒子",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "粒子",
+    "流场",
+    "曲线"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/流场运动.html",
+  参数: [
+    {
+      键: "count",
+      名: "粒子数",
+      类型: "slider",
+      最小: 60,
+      最大: 500,
+      步长: 10,
+      默认: 240
+    },
+    {
+      键: "speed",
+      名: "速度",
+      类型: "slider",
+      最小: 0.3,
+      最大: 4,
+      步长: 0.1,
+      默认: 1.4
+    },
+    {
+      键: "field",
+      名: "场强",
+      类型: "slider",
+      最小: 0.001,
+      最大: 0.01,
+      步长: 0.001,
+      默认: 0.004
+    },
+    {
+      键: "trail",
+      名: "拖尾",
+      类型: "slider",
+      最小: 0.02,
+      最大: 0.2,
+      步长: 0.01,
+      默认: 0.06
+    },
+    {
+      键: "size",
+      名: "粒子大小",
+      类型: "slider",
+      最小: 0.8,
+      最大: 4,
+      步长: 0.1,
+      默认: 1.6
+    },
+    {
+      键: "color",
+      名: "粒子色",
+      类型: "color",
+      默认: "#5ad1ff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#0e1116"
+    }
+  ],
+  效果说明: "粒子沿连续弯曲的流场路线前进，相邻轨迹自然衔接，避免各自乱飞。\n好处：用统一场（角度=位置的正弦组合+时间）让所有粒子朝同一「风向」流动，整体是流动的纹理而非噪点。\n能怎么改：拖滑杆调「粒子数、速度、场强、拖尾、粒子大小」，换颜色改粒子/背景。",
+  用法: "直接看流动；详情页调「场强、速度、拖尾」改流线形态，换「粒子色/背景色」改配色。",
+  提示词: "用 canvas 做一个「流场运动」粒子背景（纯 JS）：\n效果：每个粒子按 angle(x,y,t)=cos(x*field+t)+sin(y*field*1.3-t) 的方向移动，出界重置，半透明叠底形成拖尾流线。\n关键参数：count 粒子数 / speed 速度 / field 场强 / trail 拖尾 / size 粒子大小 / color 粒子色 / bg 背景色\n集成步骤：1. 复制 assets/demos/流场运动.html 的 frame() 2. 调场强与拖尾 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>流场运动演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { height: 100%; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; }\n  canvas { display: block; width: min(560px, 94vw); height: min(420px, 80vh); border-radius: 16px; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }\n</style>\n</head>\n<body>\n<canvas id=\"c\"></canvas>\n<div class=\"hint\">粒子沿连续弯曲的流场路线前进，相邻轨迹自然衔接，避免各自乱飞</div>\n<script>\n  const state = { count: 240, speed: 1.4, field: 0.004, trail: 0.06, size: 1.6, color: \"#5ad1ff\", bg: \"#0e1116\" };\n  const canvas = document.getElementById(\"c\");\n  const ctx = canvas.getContext(\"2d\");\n  let W = 0, H = 0, ps = [];\n  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; }\n  function angle(x, y, t) { return (Math.cos(x * state.field + t) + Math.sin(y * state.field * 1.3 - t)) * Math.PI; }\n  function build() {\n    ps = [];\n    for (let i = 0; i < state.count; i++) ps.push({ x: Math.random() * W, y: Math.random() * H });\n  }\n  function apply() { resize(); build(); document.body.style.background = state.bg; }\n  let t = 0;\n  function frame() {\n    t += 0.005;\n    ctx.fillStyle = state.bg; ctx.globalAlpha = state.trail; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;\n    ctx.fillStyle = state.color;\n    for (const p of ps) {\n      const a = angle(p.x, p.y, t);\n      p.x += Math.cos(a) * state.speed * devicePixelRatio;\n      p.y += Math.sin(a) * state.speed * devicePixelRatio;\n      if (p.x < 0 || p.x > W || p.y < 0 || p.y > H) { p.x = Math.random() * W; p.y = Math.random() * H; }\n      ctx.beginPath(); ctx.arc(p.x, p.y, state.size * devicePixelRatio, 0, 7); ctx.fill();\n    }\n    requestAnimationFrame(frame);\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); frame();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v162",
+  标题: "涡旋卷入",
+  分类: "背景",
+  子类: "粒子",
+  风格: [
+    "科技"
+  ],
+  场景: [
+    "落地页·发布页"
+  ],
+  元素: [
+    "3D·粒子",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "粒子",
+    "涡旋",
+    "螺旋"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/涡旋卷入.html",
+  参数: [
+    {
+      键: "count",
+      名: "粒子数",
+      类型: "slider",
+      最小: 80,
+      最大: 500,
+      步长: 10,
+      默认: 320
+    },
+    {
+      键: "spin",
+      名: "旋速",
+      类型: "slider",
+      最小: 0.01,
+      最大: 0.15,
+      步长: 0.01,
+      默认: 0.05
+    },
+    {
+      键: "pull",
+      名: "吸入速度",
+      类型: "slider",
+      最小: 0.2,
+      最大: 1.5,
+      步长: 0.05,
+      默认: 0.6
+    },
+    {
+      键: "core",
+      名: "中心大小",
+      类型: "slider",
+      最小: 4,
+      最大: 20,
+      步长: 1,
+      默认: 8
+    },
+    {
+      键: "size",
+      名: "粒子大小",
+      类型: "slider",
+      最小: 1,
+      最大: 5,
+      步长: 0.1,
+      默认: 2.4
+    },
+    {
+      键: "color",
+      名: "粒子色",
+      类型: "color",
+      默认: "#ffb24d"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#0e1116"
+    }
+  ],
+  效果说明: "粒子沿螺旋路径卷向中心，而非直飞中心；越靠近中心活动范围越小、越慢。\n好处：螺旋+近心减速制造「被吸入」的纵深感，比直接聚拢更有漩涡张力。\n能怎么改：拖滑杆调「粒子数、旋速、吸入速度、中心大小、粒子大小」，换颜色改粒子/背景。",
+  用法: "直接看卷入；详情页调「旋速、吸入速度」看漩涡快慢，换「粒子色/背景色」改配色。",
+  提示词: "用 canvas 做一个「涡旋卷入」粒子背景（纯 JS）：\n效果：每颗粒子持角度 a 与半径 r，a+=spin 旋转、r-=pull*(1-r/R) 螺旋内收（近心更慢），到中心则重生到外圈。\n关键参数：count 粒子数 / spin 旋速 / pull 吸入速度 / core 中心大小 / size 粒子大小 / color 粒子色 / bg 背景色\n集成步骤：1. 复制 assets/demos/涡旋卷入.html 的 frame() 2. 调旋速与吸入 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>涡旋卷入演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { height: 100%; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; }\n  canvas { display: block; width: min(520px, 94vw); height: min(520px, 88vh); border-radius: 16px; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }\n</style>\n</head>\n<body>\n<canvas id=\"c\"></canvas>\n<div class=\"hint\">粒子沿螺旋路径卷向中心，而非直飞中心；越靠近中心活动范围越小</div>\n<script>\n  const state = { count: 320, spin: 0.05, pull: 0.6, core: 8, size: 2.4, color: \"#ffb24d\", bg: \"#0e1116\" };\n  const canvas = document.getElementById(\"c\");\n  const ctx = canvas.getContext(\"2d\");\n  let W = 0, H = 0, ps = [];\n  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; }\n  function build() {\n    ps = [];\n    for (let i = 0; i < state.count; i++) {\n      const ang = Math.random() * 7, r = (40 + Math.random() * Math.min(W, H) * 0.45) * devicePixelRatio;\n      ps.push({ a: ang, r: r });\n    }\n  }\n  function apply() { resize(); build(); document.body.style.background = state.bg; }\n  function frame() {\n    ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);\n    const cx = W / 2, cy = H / 2;\n    ctx.fillStyle = state.color;\n    for (const p of ps) {\n      p.a += state.spin;                       // 沿螺旋旋转\n      p.r -= state.pull * devicePixelRatio * (1 - p.r / (Math.min(W, H) * 0.45 * devicePixelRatio)); // 越近越慢\n      if (p.r < state.core * devicePixelRatio) { p.r = (40 + Math.random() * Math.min(W, H) * 0.45) * devicePixelRatio; p.a = Math.random() * 7; }\n      const x = cx + Math.cos(p.a) * p.r;\n      const y = cy + Math.sin(p.a) * p.r;\n      const size = Math.max(0.6, (p.r / (Math.min(W, H) * 0.45)) * state.size) * devicePixelRatio;\n      ctx.beginPath(); ctx.arc(x, y, size, 0, 7); ctx.fill();\n    }\n    requestAnimationFrame(frame);\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); frame();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v163",
+  标题: "表面粒子化消散",
+  分类: "背景",
+  子类: "粒子",
+  风格: [
+    "科技"
+  ],
+  场景: [
+    "落地页·发布页",
+    "作品集·叙事"
+  ],
+  元素: [
+    "3D·粒子",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "粒子",
+    "消散",
+    "球体"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/表面粒子化消散.html",
+  参数: [
+    {
+      键: "density",
+      名: "采样间隔",
+      类型: "slider",
+      最小: 3,
+      最大: 10,
+      步长: 1,
+      默认: 5
+    },
+    {
+      键: "speed",
+      名: "消散速度",
+      类型: "slider",
+      最小: 0.2,
+      最大: 1.5,
+      步长: 0.1,
+      默认: 0.6
+    },
+    {
+      键: "drift",
+      名: "漂移强度",
+      类型: "slider",
+      最小: 0.4,
+      最大: 2.5,
+      步长: 0.1,
+      默认: 1.2
+    },
+    {
+      键: "size",
+      名: "粒子大小",
+      类型: "slider",
+      最小: 0.8,
+      最大: 3,
+      步长: 0.1,
+      默认: 1.4
+    },
+    {
+      键: "color",
+      名: "粒子色",
+      类型: "color",
+      默认: "#9b8cff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#0e1116"
+    }
+  ],
+  效果说明: "球体自左向右逐步化成粒子飘走，保留未消散部分，禁止整球弹出。\n好处：用一条「消散前线」从左到右推进，已化部分飘散、未化部分仍是实心球，过渡可解读。\n能怎么改：拖滑杆调「采样间隔、消散速度、漂移强度、粒子大小」，换颜色改球体/背景。",
+  用法: "点「重新消散」重播；详情页调「消散速度、漂移强度」看飘散，换「粒子色/背景色」改配色。",
+  提示词: "用 canvas 做一个「表面粒子化消散」效果（纯 JS）：\n效果：在圆内按 density 采样出粒子，一条 front 线从左到右推进，bx<=front 的粒子变 free 并按随机角+重力飘走，其余保持原位。\n关键参数：density 采样间隔 / speed 消散速度 / drift 漂移强度 / size 粒子大小 / color 粒子色 / bg 背景色\n集成步骤：1. 复制 assets/demos/表面粒子化消散.html 的 build+frame 2. 调消散速度与漂移 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>表面粒子化消散演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { height: 100%; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; gap: 12px; }\n  canvas { display: block; width: min(460px, 92vw); height: min(360px, 70vh); border-radius: 16px; }\n  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #5ad1ff; color: #062; font-size: 14px; cursor: pointer; font-weight: 700; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }\n</style>\n</head>\n<body>\n<canvas id=\"c\"></canvas>\n<button class=\"btn\" id=\"btn\">重新消散</button>\n<div class=\"hint\">球体自左向右逐步化成粒子飘走，保留未消散部分，禁止整球弹出</div>\n<script>\n  const state = { density: 5, speed: 0.6, drift: 1.2, size: 1.4, color: \"#9b8cff\", bg: \"#0e1116\" };\n  const canvas = document.getElementById(\"c\");\n  const ctx = canvas.getContext(\"2d\");\n  let W = 0, H = 0, ps = [], front = 0, t = 0;\n  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; }\n  function build() {\n    ps = [];\n    const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.32;\n    for (let y = -R; y <= R; y += state.density * devicePixelRatio) {\n      const w = Math.sqrt(R * R - y * y);\n      for (let x = -w; x <= w; x += state.density * devicePixelRatio) {\n        ps.push({ bx: cx + x, by: cy + y, x: cx + x, y: cy + y, free: false, vx: 0, vy: 0 });\n      }\n    }\n    front = 0; t = 0;\n  }\n  function apply() { resize(); build(); document.body.style.background = state.bg; }\n  function frame() {\n    t += 0.016;\n    front += state.speed * devicePixelRatio * 0.6;\n    ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);\n    ctx.fillStyle = state.color;\n    for (const p of ps) {\n      if (!p.free && p.bx <= front) { p.free = true; const a = Math.random() * Math.PI - Math.PI; const s = (0.5 + Math.random()) * state.drift * devicePixelRatio; p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s - state.drift * 0.4 * devicePixelRatio; }\n      if (p.free) { p.x += p.vx; p.y += p.vy; p.vy += 0.02 * devicePixelRatio; p.vx *= 0.99; }\n      ctx.beginPath(); ctx.arc(p.x, p.y, state.size * devicePixelRatio, 0, 7); ctx.fill();\n    }\n    requestAnimationFrame(frame);\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", build);\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); frame();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v164",
+  标题: "碰撞散射",
+  分类: "背景",
+  子类: "粒子",
+  风格: [
+    "科技"
+  ],
+  场景: [
+    "落地页·发布页"
+  ],
+  元素: [
+    "3D·粒子",
+    "视觉"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "粒子",
+    "碰撞",
+    "散射"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/碰撞散射.html",
+  参数: [
+    {
+      键: "count",
+      名: "粒子数",
+      类型: "slider",
+      最小: 80,
+      最大: 500,
+      步长: 10,
+      默认: 220
+    },
+    {
+      键: "speed",
+      名: "速度",
+      类型: "slider",
+      最小: 0.6,
+      最大: 4,
+      步长: 0.1,
+      默认: 2.2
+    },
+    {
+      键: "obstacle",
+      名: "障碍半径（px）",
+      类型: "slider",
+      最小: 20,
+      最大: 90,
+      步长: 2,
+      默认: 46
+    },
+    {
+      键: "size",
+      名: "粒子大小",
+      类型: "slider",
+      最小: 0.8,
+      最大: 4,
+      步长: 0.1,
+      默认: 1.6
+    },
+    {
+      键: "color",
+      名: "粒子色",
+      类型: "color",
+      默认: "#7CFFB2"
+    },
+    {
+      键: "obColor",
+      名: "障碍色",
+      类型: "color",
+      默认: "#ff7a59"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#0e1116"
+    }
+  ],
+  效果说明: "粒子流先向前移动，碰到障碍物后按接触位置反射/分流，禁止直接穿过障碍。\n好处：用圆法线做速度反射，粒子绕开障碍而非穿模，碰撞「可信」且能分流成两股。\n能怎么改：拖滑杆调「粒子数、速度、障碍半径、粒子大小」，换颜色改粒子/障碍/背景。",
+  用法: "点「重新发射」重播；详情页调「速度、障碍半径」看散射，换「粒子色/障碍色」改配色。",
+  提示词: "用 canvas 做一个「碰撞散射」粒子流（纯 JS）：\n效果：粒子向右飞，距障碍圆心 < r 时按法线反射速度（v-=2(v·n)n）并贴到表面外，禁止穿过；出界则重生。\n关键参数：count 粒子数 / speed 速度 / obstacle 障碍半径 / size 粒子大小 / color 粒子色 / obColor 障碍色 / bg 背景色\n集成步骤：1. 复制 assets/demos/碰撞散射.html 的 frame() 2. 调速度与障碍 3. 换配色",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>碰撞散射演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  html, body { height: 100%; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; gap: 12px; }\n  canvas { display: block; width: min(520px, 94vw); height: min(360px, 70vh); border-radius: 16px; }\n  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #ff7a59; color: #fff; font-size: 14px; cursor: pointer; font-weight: 700; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }\n</style>\n</head>\n<body>\n<canvas id=\"c\"></canvas>\n<button class=\"btn\" id=\"btn\">重新发射</button>\n<div class=\"hint\">粒子流先向前移动，碰到障碍物后按接触位置反弹/分流，禁止直接穿过障碍</div>\n<script>\n  const state = { count: 220, speed: 2.2, obstacle: 46, size: 1.6, color: \"#7CFFB2\", obColor: \"#ff7a59\", bg: \"#0e1116\" };\n  const canvas = document.getElementById(\"c\");\n  const ctx = canvas.getContext(\"2d\");\n  let W = 0, H = 0, ps = [], obs = { x: 0, y: 0, r: 0 };\n  function resize() { W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; obs = { x: W * 0.62, y: H / 2, r: state.obstacle * devicePixelRatio }; }\n  function build() {\n    ps = [];\n    for (let i = 0; i < state.count; i++) ps.push(spawn());\n  }\n  function spawn() { return { x: -5, y: Math.random() * H, vx: state.speed * devicePixelRatio, vy: (Math.random() - 0.5) * 0.6 * devicePixelRatio }; }\n  function apply() { resize(); build(); document.body.style.background = state.bg; }\n  function frame() {\n    ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);\n    ctx.fillStyle = state.obColor;\n    ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.r, 0, 7); ctx.fill();\n    ctx.fillStyle = state.color;\n    for (const p of ps) {\n      const dx = p.x - obs.x, dy = p.y - obs.y, d = Math.hypot(dx, dy);\n      if (d < obs.r + 2 * devicePixelRatio) {\n        const nx = dx / d, ny = dy / d;\n        const dot = p.vx * nx + p.vy * ny;\n        p.vx -= 2 * dot * nx; p.vy -= 2 * dot * ny;     // 法线反射，不穿透\n        p.x = obs.x + nx * (obs.r + 3 * devicePixelRatio);\n        p.y = obs.y + ny * (obs.r + 3 * devicePixelRatio);\n      }\n      p.x += p.vx; p.y += p.vy;\n      if (p.x > W + 5 || p.y < -5 || p.y > H + 5) Object.assign(p, spawn());\n      ctx.beginPath(); ctx.arc(p.x, p.y, state.size * devicePixelRatio, 0, 7); ctx.fill();\n    }\n    requestAnimationFrame(frame);\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", build);\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); frame();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v165",
+  标题: "执行计划预览",
+  分类: "AI反馈",
+  子类: "计划预览",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "计划",
+    "确认"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/执行计划预览.html",
+  参数: [
+    {
+      键: "steps",
+      名: "步骤数",
+      类型: "slider",
+      最小: 2,
+      最大: 6,
+      步长: 1,
+      默认: 4
+    },
+    {
+      键: "dur",
+      名: "单步时长（ms）",
+      类型: "slider",
+      最小: 400,
+      最大: 1600,
+      步长: 100,
+      默认: 900
+    },
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "适合多步骤长耗时任务：AI 先展示分步计划，待你确认后再启动执行。\n好处：把「要干嘛、分几步」先摊开给你看并要授权，避免 AI 自作主张跑一长串操作；可控、可喊停。\n能怎么改：拖滑杆调「步骤数、单步时长」，换颜色改面板配色。",
+  用法: "点「确认计划并启动」逐步执行；详情页调「步骤数」看计划长度，换「主色/背景色/卡片色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：多步骤长耗时任务前，先列出分步计划（每步做什么、预计多久），等你确认再执行；任一步可暂停。\n用法示例：你发「帮我生成周报」→ AI 先回「计划：1 检索提交 2 归纳 3 起草 4 校验，确认后开始？」\n关键参数：steps 步骤数 / dur 单步时长 / accent 主色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/执行计划预览.html 作为 UI 参考，把计划数组换成你的任务步骤",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>执行计划预览演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }\n  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }\n  .sub { font-size: 12px; color: #888; margin-bottom: 12px; }\n  .step { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #eee; font-size: 13px; color: #444; }\n  .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #ccc; flex: none; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #aaa; }\n  .step.run .dot { border-color: var(--accent); color: var(--accent); }\n  .step.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }\n  .step.done .name { color: #1a1a1a; }\n  .btn { margin-top: 14px; width: 100%; padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\">\n  <div class=\"tt\">任务：生成本周复盘周报</div>\n  <div class=\"sub\">先展示分步计划，确认后再启动（多步骤长耗时任务适用）</div>\n  <div id=\"steps\"></div>\n  <button class=\"btn\" id=\"btn\">确认计划并启动</button>\n</div>\n<div class=\"hint\">适合多步骤长耗时任务：AI 先展示分步计划，待你确认后再启动执行</div>\n<script>\n  const state = { steps: 4, dur: 900, accent: \"#3d5fd6\", bg: \"#fafafa\", card: \"#ffffff\" };\n  const stepsEl = document.getElementById(\"steps\");\n  const btn = document.getElementById(\"btn\");\n  const plan = [\"检索本周 git 提交与笔记\", \"归纳关键进展与卡点\", \"生成周报草稿\", \"本地校验格式并落盘\"];\n  let running = false;\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    stepsEl.innerHTML = \"\";\n    for (let i = 0; i < state.steps; i++) {\n      const s = document.createElement(\"div\"); s.className = \"step\"; s.dataset.i = i;\n      s.innerHTML = '<div class=\"dot\">' + (i + 1) + '</div><div class=\"name\">' + (plan[i % plan.length]) + '</div>';\n      stepsEl.appendChild(s);\n    }\n  }\n  btn.addEventListener(\"click\", () => {\n    if (running) return; running = true; btn.disabled = true; btn.textContent = \"执行中…\";\n    let i = 0;\n    (function next() {\n      if (i >= state.steps) { btn.textContent = \"已完成 ✓\"; return; }\n      const el = stepsEl.children[i];\n      el.classList.add(\"run\"); el.querySelector(\".dot\").textContent = \"…\";\n      setTimeout(() => { el.classList.remove(\"run\"); el.classList.add(\"done\"); el.querySelector(\".dot\").textContent = \"✓\"; i++; next(); }, state.dur);\n    })();\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v166",
+  标题: "工具调用反馈",
+  分类: "AI反馈",
+  子类: "调用记录",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "工具",
+    "记录"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/工具调用反馈.html",
+  参数: [
+    {
+      键: "calls",
+      名: "调用次数",
+      类型: "slider",
+      最小: 2,
+      最大: 8,
+      步长: 1,
+      默认: 4
+    },
+    {
+      键: "dur",
+      名: "间隔（ms）",
+      类型: "slider",
+      最小: 300,
+      最大: 1200,
+      步长: 50,
+      默认: 700
+    },
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#5ad1ff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    }
+  ],
+  效果说明: "适配查资料、计算等场景：展示调用了什么工具、传了什么参数、返回了什么，并保留记录。\n好处：AI 的「思考过程」透明可查，出错能定位是哪一步工具/参数不对，也方便你复核。\n能怎么改：拖滑杆调「调用次数、间隔」，换颜色改主色。",
+  用法: "点「运行任务」看调用流；详情页调「调用次数、间隔」看节奏，换「主色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：每调用一次工具，就显示「→ 调用 X，参数 {...} ← 返回 {...}」并保留在历史里，不隐藏中间过程。\n用法示例：查资料/算数时实时滚出调用记录，你随时能回看传了什么、回了什么。\n关键参数：calls 调用次数 / dur 间隔 / accent 主色 / bg 背景色\n集成步骤：复制 assets/demos/工具调用反馈.html 作为 UI 参考，把 calls 数组换成你的工具名",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>工具调用反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: ui-monospace, \"SFMono-Regular\", Consolas, monospace; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 12px; }\n  .panel { width: min(460px, 94vw); height: 300px; background: #0f1115; border-radius: 14px; padding: 14px; overflow: auto; color: #d6d6da; font-size: 12.5px; line-height: 1.7; box-shadow: 0 10px 34px rgba(0,0,0,.2); }\n  .row { white-space: pre-wrap; }\n  .k { color: var(--accent); }\n  .p { color: #ffd27a; }\n  .r { color: #7CFFB2; }\n  .btn { padding: 9px 20px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13px; cursor: pointer; font-family: system-ui; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"log\"></div>\n<button class=\"btn\" id=\"btn\">运行任务（展示工具调用）</button>\n<div class=\"hint\">适配查资料/计算场景：展示调用了什么工具、传了什么、返回了什么，并保留记录</div>\n<script>\n  const state = { calls: 4, dur: 700, accent: \"#5ad1ff\", bg: \"#fafafa\" };\n  const log = document.getElementById(\"log\");\n  const calls = [\n    ['搜索', '{query:\"Web 灵感弹药库\"}', \"命中 12 条素材\"],\n    ['读取页面', '{url:\"index.html\"}', \"解析 67 条条目\"],\n    ['计算', '{a:8848,b:1.06}', \"结果 9379.88\"],\n    ['写文件', '{path:\"data/素材.js\"}', \"已写入 22 条\"]\n  ];\n  let timer = null;\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    log.innerHTML = \"\";\n  }\n  btn.addEventListener(\"click\", () => {\n    log.innerHTML = \"\"; let i = 0;\n    clearInterval(timer);\n    timer = setInterval(() => {\n      if (i >= state.calls) { clearInterval(timer); return; }\n      const c = calls[i % calls.length];\n      const div = document.createElement(\"div\"); div.className = \"row\";\n      div.innerHTML = '<span class=\"k\">→ 调用 ' + c[0] + '</span> <span class=\"p\">' + c[1] + '</span>\\n  <span class=\"r\">← 返回 ' + c[2] + '</span>';\n      log.appendChild(div); log.scrollTop = log.scrollHeight; i++;\n    }, state.dur);\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v167",
+  标题: "人工授权确认",
+  分类: "AI反馈",
+  子类: "授权确认",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "授权",
+    "高危"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/人工授权确认.html",
+  参数: [
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "warn",
+      名: "警示色",
+      类型: "color",
+      默认: "#e0533d"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "用于发布、覆盖等高影响操作：AI 在关键步骤暂停，说明影响，待你确认后再执行。\n好处：高危动作不被自动执行，先讲清「会动到什么、能否撤销」，把最终决定权留给你。\n能怎么改：换颜色改主色/警示色/面板配色。",
+  用法: "点「确认执行 / 取消」看两种走向；详情页换「主色/警示色/卡片色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：遇到发布、覆盖、删除等高影响操作，先暂停并说明「操作是什么、影响范围、能否撤销、建议」，等你点确认再执行。\n用法示例：AI 回「即将覆盖 production 配置，影响 3 个服务，不可自动撤销——确认执行 / 取消？」\n关键参数：accent 主色 / warn 警示色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/人工授权确认.html 作为 UI 参考，把影响文案换成你的操作",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>人工授权确认演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 22px; box-shadow: 0 10px 34px rgba(0,0,0,.1); border-top: 4px solid var(--warn); }\n  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }\n  .impact { margin: 12px 0; font-size: 12.5px; color: #555; line-height: 1.7; background: #fff6f3; border: 1px solid #ffd9cf; border-radius: 10px; padding: 10px 12px; }\n  .impact b { color: var(--warn); }\n  .row { display: flex; gap: 10px; margin-top: 8px; }\n  .btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; }\n  .ok { background: var(--warn); color: #fff; }\n  .no { background: #eee; color: #555; }\n  .status { margin-top: 12px; font-size: 13px; font-weight: 700; min-height: 18px; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\">\n  <div class=\"tt\">⚠ 即将执行高危操作</div>\n  <div class=\"impact\">操作：<b>覆盖 production 配置文件</b><br>影响：线上 3 个服务将重载；不可自动撤销，需人工回滚。<br>建议：先备份再执行。</div>\n  <div class=\"row\">\n    <button class=\"btn ok\" id=\"ok\">确认执行</button>\n    <button class=\"btn no\" id=\"no\">取消</button>\n  </div>\n  <div class=\"status\" id=\"st\"></div>\n</div>\n<div class=\"hint\">用于发布/覆盖等高影响操作：AI 在关键步骤暂停说明影响，待你确认后再执行</div>\n<script>\n  const state = { accent: \"#3d5fd6\", warn: \"#e0533d\", bg: \"#fafafa\", card: \"#ffffff\" };\n  const st = document.getElementById(\"st\");\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--warn\", state.warn);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n  }\n  document.getElementById(\"ok\").addEventListener(\"click\", () => { st.style.color = state.warn; st.textContent = \"已授权，正在执行…（完成后回报结果）\"; });\n  document.getElementById(\"no\").addEventListener(\"click\", () => { st.style.color = \"#888\"; st.textContent = \"已取消，操作未执行\"; });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v168",
+  标题: "分步进度反馈",
+  分类: "AI反馈",
+  子类: "步骤进度",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "进度",
+    "状态"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/分步进度反馈.html",
+  参数: [
+    {
+      键: "steps",
+      名: "步骤数",
+      类型: "slider",
+      最小: 2,
+      最大: 6,
+      步长: 1,
+      默认: 4
+    },
+    {
+      键: "dur",
+      名: "单步时长（ms）",
+      类型: "slider",
+      最小: 400,
+      最大: 1600,
+      步长: 100,
+      默认: 1000
+    },
+    {
+      键: "accent",
+      名: "进行色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "done",
+      名: "完成色",
+      类型: "color",
+      默认: "#2bb673"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "适配连续多步骤任务：制作状态清晰的步骤条，每步显示等待 / 进行中 / 完成。\n好处：长任务不再黑盒，你能随时看见卡在第几步、卡了多久，焦虑感低、也方便接手。\n能怎么改：拖滑杆调「步骤数、单步时长」，换颜色改进行/完成两态。",
+  用法: "点「开始执行」看逐步推进；详情页调「步骤数」看长度，换「进行色/完成色」改语义色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：连续多步骤任务时，给一个步骤条，每步明确标「等待 / 进行中 / 完成」三态，不只用一句「处理中」。\n用法示例：检索→抽取→生成→校验，逐个点亮，进行中的那步显示进度条。\n关键参数：steps 步骤数 / dur 单步时长 / accent 进行色 / done 完成色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/分步进度反馈.html 作为 UI 参考，把步骤名换成你的流程",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>分步进度反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 14px; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }\n  .item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid #eee; }\n  .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 700; flex: none; }\n  .b-wait { background: #eee; color: #999; }\n  .b-run { background: #eaf0ff; color: var(--accent); }\n  .b-done { background: #e6f7ee; color: var(--done); }\n  .name { font-size: 13px; color: #444; }\n  .item.run .name { color: var(--accent); font-weight: 700; }\n  .item.done .name { color: #1a1a1a; }\n  .bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; margin-top: 4px; }\n  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }\n  .item.run .bar > i { width: 60%; }\n  .item.done .bar > i { width: 100%; background: var(--done); }\n  .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\"></div>\n<button class=\"btn\" id=\"btn\">开始执行</button>\n<div class=\"hint\">适配连续多步骤任务：制作状态清晰的步骤条，每步显示等待/进行中/完成</div>\n<script>\n  const state = { steps: 4, dur: 1000, accent: \"#3d5fd6\", done: \"#2bb673\", bg: \"#fafafa\", card: \"#ffffff\" };\n  const p = document.getElementById(\"p\");\n  const plan = [\"检索素材\", \"抽取关键参数\", \"生成可运行代码\", \"写入弹药库并校验\"];\n  let running = false;\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--done\", state.done);\n    p.innerHTML = \"\";\n    for (let i = 0; i < state.steps; i++) {\n      const it = document.createElement(\"div\"); it.className = \"item\";\n      it.innerHTML = '<span class=\"badge b-wait\">等待</span><div style=\"flex:1\"><div class=\"name\">' + plan[i % plan.length] + '</div><div class=\"bar\"><i></i></div></div>';\n      p.appendChild(it);\n    }\n  }\n  btn.addEventListener(\"click\", () => {\n    if (running) return; running = true; btn.disabled = true; btn.textContent = \"执行中…\";\n    const items = [...p.children]; let i = 0;\n    (function next() {\n      if (i >= items.length) { btn.textContent = \"全部完成 ✓\"; return; }\n      const it = items[i]; const b = it.querySelector(\".badge\");\n      b.className = \"badge b-run\"; b.textContent = \"进行中\"; it.classList.add(\"run\");\n      setTimeout(() => { b.className = \"badge b-done\"; b.textContent = \"完成\"; it.classList.remove(\"run\"); it.classList.add(\"done\"); i++; next(); }, state.dur);\n    })();\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v169",
+  标题: "产物预览反馈",
+  分类: "AI反馈",
+  子类: "产物预览",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS",
+    "内容·阅读"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "预览",
+    "产物"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/产物预览反馈.html",
+  参数: [
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "accent2",
+      名: "次色",
+      类型: "color",
+      默认: "#7c4dff"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "适配生成文档、图片等场景：先展示产物预览，再给摘要与操作入口（打开/复制/下载）。\n好处：交付前让你「先看一眼」，再决定下一步动作，避免直接甩一个大文件过来不知所谓。\n能怎么改：换颜色改渐变/面板配色。",
+  用法: "点「打开预览/复制代码/下载」看操作入口；详情页换「主色/次色/卡片色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：生成完文档/图片后，先给一张产物预览缩略图 + 一句话摘要，再给「打开 / 复制 / 下载」等操作入口。\n用法示例：AI 回「已生成 report.html（约 28KB）[预览] 打开·复制·下载」。\n关键参数：accent 主色 / accent2 次色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/产物预览反馈.html 作为 UI 参考，把预览与摘要换成你的产物",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>产物预览反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 18px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }\n  .thumb { height: 120px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 700; }\n  .sum { font-size: 12.5px; color: #555; line-height: 1.7; margin: 12px 0; }\n  .row { display: flex; gap: 10px; }\n  .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; }\n  .a { background: var(--accent); color: #fff; }\n  .b { background: #eee; color: #555; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\">\n  <div class=\"thumb\">report.html 预览</div>\n  <div class=\"sum\">已生成《本周复盘周报》单文件 HTML：含 4 段小结 + 1 张指标图，约 28KB，可直接双击打开。</div>\n  <div class=\"row\">\n    <button class=\"btn a\" id=\"open\">打开预览</button>\n    <button class=\"btn b\" id=\"copy\">复制代码</button>\n    <button class=\"btn b\" id=\"dl\">下载</button>\n  </div>\n</div>\n<div class=\"hint\">适配生成文档/图片场景：先展示产物预览，再给摘要与操作入口</div>\n<script>\n  const state = { accent: \"#3d5fd6\", accent2: \"#7c4dff\", bg: \"#fafafa\", card: \"#ffffff\" };\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--accent2\", state.accent2);\n  }\n  document.getElementById(\"open\").addEventListener(\"click\", () => alert(\"（演示）打开 report.html 预览\"));\n  document.getElementById(\"copy\").addEventListener(\"click\", () => alert(\"（演示）已复制 HTML 到剪贴板\"));\n  document.getElementById(\"dl\").addEventListener(\"click\", () => alert(\"（演示）开始下载 report.html\"));\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v170",
+  标题: "重试恢复反馈",
+  分类: "AI反馈",
+  子类: "失败重试",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "重试",
+    "失败"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/重试恢复反馈.html",
+  参数: [
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "done",
+      名: "成功色",
+      类型: "color",
+      默认: "#2bb673"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "适配任务失败场景：展示失败原因、自动重试过程与备用方案，不静默失败。\n好处：出错时把「为什么失败、在重试几次、兜底是什么」讲清楚，你不用猜，也更信任系统会自救。\n能怎么改：换颜色改主色/成功色/面板配色。",
+  用法: "点「模拟一次完整重试」看 失败→重试→备用 流程；详情页换「主色/成功色/卡片色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：任务失败时，先说清失败原因，再展示自动重试（含退避策略），若仍失败给出备用方案，不悄悄放弃。\n用法示例：AI 回「✗ 文件被占用(EBUSY) → ↻ 重试中(退避0.5s) → ✓ 备用：原子替换成功」。\n关键参数：accent 主色 / done 成功色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/重试恢复反馈.html 作为 UI 参考，把原因与兜底换成你的场景",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>重试恢复反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 12px; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }\n  .phase { font-size: 13px; line-height: 1.7; }\n  .err { background: #fff6f3; border: 1px solid #ffd9cf; color: #b3402a; border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }\n  .retry { background: #eaf0ff; border: 1px solid #cdddff; color: var(--accent); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }\n  .fallback { background: #e9f9ef; border: 1px solid #c7ecd4; color: var(--done); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }\n  .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\">\n  <div class=\"phase\">尝试：写入 <code>data/素材.js</code></div>\n  <div class=\"err\" id=\"err\">✗ 失败：文件被占用（EBUSY），第 1 次</div>\n  <div class=\"retry\" id=\"retry\">↻ 自动重试中…（退避 0.5s）</div>\n</div>\n<button class=\"btn\" id=\"btn\">模拟一次完整重试</button>\n<div class=\"hint\">适配任务失败场景：展示失败原因、重试过程与备用方案</div>\n<script>\n  const state = { accent: \"#3d5fd6\", done: \"#2bb673\", bg: \"#fafafa\", card: \"#ffffff\" };\n  const p = document.getElementById(\"p\");\n  const err = document.getElementById(\"err\");\n  const retry = document.getElementById(\"retry\");\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--done\", state.done);\n  }\n  document.getElementById(\"btn\").addEventListener(\"click\", () => {\n    err.textContent = \"✗ 失败：文件被占用（EBUSY），第 1 次\";\n    retry.textContent = \"↻ 自动重试中…（退避 0.5s）\";\n    retry.className = \"retry\";\n    setTimeout(() => { retry.textContent = \"↻ 第 2 次重试…（退避 1s）\"; }, 500);\n    setTimeout(() => {\n      retry.className = \"fallback\";\n      retry.innerHTML = \"✓ 备用方案：写入 <b>data/素材.tmp.js</b> 后原子替换，成功\";\n    }, 1600);\n  });\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+  id: "v171",
+  标题: "最终结果反馈",
+  分类: "AI反馈",
+  子类: "结果汇总",
+  风格: [
+    "信息型"
+  ],
+  场景: [
+    "工具·SaaS"
+  ],
+  元素: [
+    "反馈"
+  ],
+  搭配: [
+
+  ],
+  标签: [
+    "AI反馈",
+    "汇总",
+    "待办"
+  ],
+  来源: "视频拆解：抖音高级交互设计合集（2026-09-10 用户提供；交互模式为通用设计手法，实现代码自写）",
+  效果演示: "assets/demos/最终结果反馈.html",
+  参数: [
+    {
+      键: "accent",
+      名: "主色",
+      类型: "color",
+      默认: "#3d5fd6"
+    },
+    {
+      键: "done",
+      名: "成功色",
+      类型: "color",
+      默认: "#2bb673"
+    },
+    {
+      键: "warn",
+      名: "待办色",
+      类型: "color",
+      默认: "#e0993d"
+    },
+    {
+      键: "bg",
+      名: "背景色",
+      类型: "color",
+      默认: "#fafafa"
+    },
+    {
+      键: "card",
+      名: "卡片色",
+      类型: "color",
+      默认: "#ffffff"
+    }
+  ],
+  效果说明: "适配任务结束节点：汇总完成状态、结论与产物，并标注待办事项。\n好处：一轮结束有一份「收口报告」——做成了什么、产出了什么、还有什么没做，后续接手不迷路。\n能怎么改：换颜色改语义三色/面板配色。",
+  用法: "直接看汇总卡；详情页换「主色/成功色/待办色/卡片色」改配色。",
+  提示词: "给 AI 的反馈指令模板（大白话）：\n效果：任务结束时给一份汇总：完成状态、一句话结论、产物清单、待办事项（标黄），不只有「搞定」。\n用法示例：AI 回「✓ 完成：新增 22 条素材；产物：22 演示+数据；待办：README 计数待更新」。\n关键参数：accent 主色 / done 成功色 / warn 待办色 / bg 背景色 / card 卡片色\n集成步骤：复制 assets/demos/最终结果反馈.html 作为 UI 参考，把汇总内容换成你的结果",
+  代码: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>最终结果反馈演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }\n  .panel { width: min(420px, 92vw); background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 34px rgba(0,0,0,.1); }\n  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }\n  .check { width: 28px; height: 28px; border-radius: 50%; background: var(--done); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; }\n  .tt { font-size: 15px; font-weight: 700; color: #1a1a1a; }\n  .sum { font-size: 12.5px; color: #555; line-height: 1.7; margin-bottom: 10px; }\n  .arts { font-size: 12.5px; color: #333; line-height: 1.8; }\n  .arts li { margin-left: 18px; }\n  .todo { margin-top: 10px; font-size: 12.5px; color: var(--warn); background: #fff8ec; border: 1px solid #ffe6b8; border-radius: 10px; padding: 9px 12px; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }\n</style>\n</head>\n<body>\n<div class=\"panel\" id=\"p\">\n  <div class=\"top\"><div class=\"check\">✓</div><div class=\"tt\">任务完成</div></div>\n  <div class=\"sum\">已为「Web 灵感弹药库」新增 22 条素材（15 网页动效 + 7 AI 反馈），全部通过语法校验，演示可离线运行。</div>\n  <div class=\"arts\">产物：\n    <ul class=\"arts\">\n      <li>assets/demos/ 下 22 个演示文件</li>\n      <li>data/素材.js 新增 22 条数据</li>\n      <li>index.html 新增「AI反馈」分类</li>\n    </ul>\n  </div>\n  <div class=\"todo\">待办：README 全库索引计数待更新为 89 条；GitHub Pages 待重新部署。</div>\n</div>\n<div class=\"hint\">适配任务结束节点：汇总完成状态、结论与产物，并标注待办事项</div>\n<script>\n  const state = { accent: \"#3d5fd6\", done: \"#2bb673\", warn: \"#e0993d\", bg: \"#fafafa\", card: \"#ffffff\" };\n  function apply() {\n    document.documentElement.style.setProperty(\"--bg\", state.bg);\n    document.documentElement.style.setProperty(\"--card\", state.card);\n    document.documentElement.style.setProperty(\"--accent\", state.accent);\n    document.documentElement.style.setProperty(\"--done\", state.done);\n    document.documentElement.style.setProperty(\"--warn\", state.warn);\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\/script>\n</body>\n</html>\n",
+  复用记录: ""
+  },
+  {
+    id: "v172",
+    标题: "入场时间层级",
+    分类: "动效",
+    子类: "入场序列",
+    风格: ["极简"],
+    场景: ["官网·品牌站","工具·SaaS"],
+    元素: ["动效"],
+    搭配: [],
+    标签: ["首屏","错峰","入场","层级"],
+    来源: "网站拆解：Linear（linear.app）首屏，2026-09-10；入场排队属通用设计手法，实现代码自写",
+    效果演示: "assets/demos/入场时间层级.html",
+    参数: [{"键":"jiange","名":"错峰间隔(ms)","类型":"slider","最小":0,"最大":500,"步长":20,"默认":120},{"键":"shichang","名":"单个时长(ms)","类型":"slider","最小":200,"最大":1600,"步长":50,"默认":700},{"键":"weiyi","名":"上移距离(px)","类型":"slider","最小":0,"最大":60,"步长":2,"默认":18},{"键":"huandong","名":"缓动","类型":"select","选项":["平滑","回弹","匀速"],"默认":"平滑"},{"键":"chongbo","名":"自动重播","类型":"switch","默认":true},{"键":"zhucai","名":"强调色","类型":"color","默认":"#5E6AD2"},{"键":"di","名":"页面底色","类型":"color","默认":"#fafafa"},{"键":"zi","名":"标题色","类型":"color","默认":"#1a1a1a"},{"键":"cizi","名":"副文色","类型":"color","默认":"#6b6b6b"},{"键":"kase","名":"卡片色","类型":"color","默认":"#ffffff"}],
+    效果说明: "首屏元素不一起出现，而是按重要性排队入场：标签 → 大标题 → 副文 → 按钮 → 功能卡，晚一拍进场的天然就是次要信息。\n好处：用时间代替层级线——不加框、不加粗、不换色，观众也知道先看什么后看什么；在整站几乎不动的克制页面里，这一段入场就是唯一的高音，所以特别提神（反例是全站到处都在动，动画就变成噪音）。\n能怎么改：错峰间隔调松紧（0 = 整块一起冒出来，越大越像主持人报幕）；位移与缓动调气质（回弹活泼、平滑克制）。",
+    用法: "详情页调「错峰间隔」看排队松紧，「时长 / 上移距离 / 缓动」调气质；「自动重播」关掉就只播一次，适合正式上线。换强调色 / 底色 / 卡片色改成你自己的配色。",
+    提示词: "给 AI 的提示词（直接复制）：\n效果：做一个首屏入场序列——页面加载后元素按重要性依次浮现（小标签 → 大标题 → 副文 → 按钮组 → 功能卡），每个元素从下方上移并淡入，不要一起出现。\n用法示例：工具站首屏，进页面 1.5 秒内全部到位，主标题先到，功能卡最后到。\n关键参数：jiange 错峰间隔 120ms（0–500）／ shichang 单个时长 700ms（200–1600）／ weiyi 上移距离 18px（0–60）／ huandong 缓动 平滑｜回弹｜匀速 ／ chongbo 自动重播 开 ／ zhucai 强调色 #5E6AD2 ／ di 页面底色 #fafafa ／ zi 标题色 #1a1a1a ／ cizi 副文色 #6b6b6b ／ kase 卡片色 #ffffff\n集成步骤：复制 assets/demos/入场时间层级.html，把里面的文案换成你的；给需要排队的元素加 class=\"seq\"，脚本会自动按序号 × 错峰间隔排延迟；上线时把 chongbo 关掉，只播一次。",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>入场时间层级演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--di); color: var(--zi); display: flex; align-items: center; justify-content: center; min-height: 100vh; }\n  .stage { width: min(560px, 92vw); }\n  .seq { opacity: 0; transform: translateY(var(--weiyi)); }\n  .seq.run { animation: rise var(--shichang) var(--ease) forwards; }\n  @keyframes rise { to { opacity: 1; transform: none; } }\n  .tag { display: inline-block; font-size: 12px; letter-spacing: .08em; color: var(--zhucai); border: 1px solid var(--zhucai); border-radius: 999px; padding: 3px 10px; }\n  h1 { margin-top: 14px; font-size: 34px; line-height: 1.2; letter-spacing: -.5px; }\n  .sub { margin-top: 10px; font-size: 15px; color: var(--cizi); }\n  .row { margin-top: 20px; display: flex; gap: 12px; }\n  .btn { border: none; border-radius: 8px; padding: 11px 22px; font-size: 14px; font-weight: 700; cursor: pointer; background: var(--zhucai); color: #fff; }\n  .btn.ghost { background: transparent; color: var(--zi); border: 1px solid color-mix(in srgb, var(--zi) 20%, transparent); }\n  .cards { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }\n  .card { background: var(--kase); border: 1px solid color-mix(in srgb, var(--zi) 8%, transparent); border-radius: 12px; padding: 14px; }\n  .card b { display: block; font-size: 13.5px; }\n  .card span { display: block; margin-top: 5px; font-size: 12px; color: var(--cizi); }\n  .order { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi); }\n</style>\n</head>\n<body>\n<div class=\"stage\">\n  <div class=\"tag seq\">第 1 层 · 先看身份</div>\n  <h1 class=\"seq\">一句话说清你是什么</h1>\n  <p class=\"sub seq\">副文解释给谁用、解决什么，比标题低一级。</p>\n  <div class=\"row seq\"><button class=\"btn\">主要动作</button><button class=\"btn ghost\">次要动作</button></div>\n  <div class=\"cards\">\n    <div class=\"card seq\"><b>功能一</b><span>最后才轮到细节</span></div>\n    <div class=\"card seq\"><b>功能二</b><span>晚 1 拍进场</span></div>\n    <div class=\"card seq\"><b>功能三</b><span>晚 2 拍进场</span></div>\n  </div>\n</div>\n<div class=\"order\">入场时间层级：错峰间隔决定「谁先被看到」，克制页面里这是唯一的高音</div>\n<script>\n  // 参数状态：键名与 data/素材.js 的「参数」一一对应\n  const state = { jiange: 120, shichang: 700, weiyi: 18, huandong: \"平滑\", chongbo: true,\n    zhucai: \"#5E6AD2\", di: \"#fafafa\", zi: \"#1a1a1a\", cizi: \"#6b6b6b\", kase: \"#ffffff\" };\n  const EASE = { \"平滑\": \"cubic-bezier(.16,1,.3,1)\", \"回弹\": \"cubic-bezier(.34,1.56,.64,1)\", \"匀速\": \"linear\" };\n  let timer = null;\n  function apply() {\n    const r = document.documentElement.style;\n    r.setProperty(\"--zhucai\", state.zhucai);\n    r.setProperty(\"--di\", state.di);\n    r.setProperty(\"--zi\", state.zi);\n    r.setProperty(\"--cizi\", state.cizi);\n    r.setProperty(\"--kase\", state.kase);\n    r.setProperty(\"--weiyi\", state.weiyi + \"px\");\n    r.setProperty(\"--shichang\", state.shichang + \"ms\");\n    r.setProperty(\"--ease\", EASE[state.huandong] || EASE[\"平滑\"]);\n  }\n  // 逐个排队入场：延迟 = 序号 × 错峰间隔，改间隔就能看出层级松紧\n  function play() {\n    document.querySelectorAll(\".seq\").forEach((el, i) => {\n      el.classList.remove(\"run\");\n      void el.offsetWidth;\n      el.style.animationDelay = (i * state.jiange) + \"ms\";\n      el.classList.add(\"run\");\n    });\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply(); play();\n  // 自动重播：卡片缩略图里也能看到动效，关掉就只播一次\n  timer = setInterval(() => { if (state.chongbo) play(); }, 4200);\n<\\/script>\n</body>\n</html>\n",
+    复用记录: ""
+  },
+  {
+    id: "v173",
+    标题: "更新公告胶囊",
+    分类: "组件",
+    子类: "提示条",
+    风格: ["极简"],
+    场景: ["官网·品牌站","工具·SaaS"],
+    元素: ["视觉","构成"],
+    搭配: [],
+    标签: ["公告","胶囊","更新","首屏"],
+    来源: "网站拆解：Linear（linear.app）首屏公告条「New Loops →」，2026-09-10；公告条属通用设计模式，实现代码自写",
+    效果演示: "assets/demos/更新公告胶囊.html",
+    参数: [{"键":"yuanjiao","名":"圆角(px)","类型":"slider","最小":0,"最大":999,"步长":1,"默认":999},{"键":"neibian","名":"内边距(px)","类型":"slider","最小":4,"最大":20,"步长":1,"默认":8},{"键":"zihao","名":"字号(px)","类型":"slider","最小":11,"最大":20,"步长":1,"默认":13},{"键":"jianto","名":"箭头悬停位移(px)","类型":"slider","最小":0,"最大":14,"步长":1,"默认":5},{"键":"tiliang","名":"悬停提亮(%)","类型":"slider","最小":0,"最大":40,"步长":2,"默认":12},{"键":"dian","名":"强调色(标签/箭头)","类型":"color","默认":"#5E6AD2"},{"键":"kadi","名":"胶囊底色","类型":"color","默认":"#ffffff"},{"键":"bianse","名":"边框色","类型":"color","默认":"#e6e6e6"},{"键":"zi","名":"文字色","类型":"color","默认":"#1a1a1a"},{"键":"di","名":"页面底色","类型":"color","默认":"#fafafa"}],
+    效果说明: "一条胶囊状的公告条：左边是「New」小标签或强调色圆点，中间一句话说清更新了什么，右边一个箭头。用最小的面积承载一条新消息，不抢首屏主角（大标题）的戏。\n好处：它比横幅 banner 轻、比弹窗客气，却能把「我们还在更新」这件事一直挂在首屏；箭头在悬停时右移，是最小成本的「点得动」暗示。\n能怎么改：圆角拉到最大就是胶囊、拉到 0 变成方正条；实心版（底色用强调色）适合重要的大版本，描边版适合日常更新。",
+    用法: "详情页调「圆角」在胶囊与方条之间切换，「内边距 / 字号」调体量，「箭头位移 / 悬停提亮」调交互反馈强度；换「强调色 / 胶囊底色 / 边框色」配成你的品牌色。",
+    提示词: "给 AI 的提示词（直接复制）：\n效果：做一条圆角公告胶囊——左边「New」小标签（或强调色圆点）+ 中间一句更新文案 + 右边箭头；悬停时整条轻微提亮、箭头向右移动。要描边版、圆点版、实心版三种样子。\n用法示例：首屏大标题上方放一条「New：某某功能上线 →」，点进去跳更新日志。\n关键参数：yuanjiao 圆角 999px（0–999）／ neibian 内边距 8px（4–20）／ zihao 字号 13px（11–20）／ jianto 箭头悬停位移 5px（0–14）／ tiliang 悬停提亮 12%（0–40）／ dian 强调色 #5E6AD2 ／ kadi 胶囊底色 #ffffff ／ bianse 边框色 #e6e6e6 ／ zi 文字色 #1a1a1a ／ di 页面底色 #fafafa\n集成步骤：复制 assets/demos/更新公告胶囊.html，把文案换成你的更新内容，外层包一个 <a> 指向更新日志页；重要版本用 .pill.solid（实心），日常更新用描边版。",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>更新公告胶囊演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--di); color: var(--zi); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 18px; }\n  /* 公告胶囊：用最小面积塞一条新消息，不抢首屏主角 */\n  .pill { display: inline-flex; align-items: center; gap: 8px; padding: var(--neibian) calc(var(--neibian) * 1.6);\n    background: var(--kadi); border: 1px solid var(--bianse); border-radius: var(--yuanjiao);\n    font-size: var(--zihao); color: var(--zi); cursor: pointer; transition: filter .18s ease; }\n  .pill .new { background: var(--dian); color: #fff; border-radius: 6px; padding: 1px 7px; font-size: calc(var(--zihao) - 1.5px); font-weight: 700; }\n  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dian); }\n  .pill .arw { color: var(--dian); transition: transform .2s ease; }\n  .pill:hover { filter: brightness(calc(100% + var(--tiliang) * 1%)); }\n  .pill:hover .arw { transform: translateX(var(--jianto)); }\n  .pill.solid { background: var(--dian); color: #fff; border-color: var(--dian); }\n  .pill.solid .new { background: #fff; color: var(--dian); }\n  .pill.solid .arw, .pill.solid .dot { color: #fff; background: #fff; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi, #999); }\n</style>\n</head>\n<body>\n  <div class=\"pill\" id=\"a\"><span class=\"new\">New</span>Loops 上线：反馈直接变成任务<span class=\"arw\">→</span></div>\n  <div class=\"pill\" id=\"b\"><span class=\"dot\"></span>小圆点版：更低调的日常公告<span class=\"arw\">→</span></div>\n  <div class=\"pill solid\" id=\"c\"><span class=\"new\">New</span>实心版：想让这条消息更跳一点</div>\n  <div class=\"hint\">更新公告胶囊：最小面积承载一条新消息，箭头右移暗示「点得动」</div>\n<script>\n  // 参数状态：键名与 data/素材.js 的「参数」一一对应\n  const state = { yuanjiao: 999, neibian: 8, zihao: 13, jianto: 5, tiliang: 12,\n    dian: \"#5E6AD2\", kadi: \"#ffffff\", bianse: \"#e6e6e6\", zi: \"#1a1a1a\", di: \"#fafafa\" };\n  function apply() {\n    const r = document.documentElement.style;\n    r.setProperty(\"--yuanjiao\", state.yuanjiao + \"px\");\n    r.setProperty(\"--neibian\", state.neibian + \"px\");\n    r.setProperty(\"--zihao\", state.zihao + \"px\");\n    r.setProperty(\"--jianto\", state.jianto + \"px\");\n    r.setProperty(\"--tiliang\", state.tiliang);\n    r.setProperty(\"--dian\", state.dian);\n    r.setProperty(\"--kadi\", state.kadi);\n    r.setProperty(\"--bianse\", state.bianse);\n    r.setProperty(\"--zi\", state.zi);\n    r.setProperty(\"--di\", state.di);\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\\/script>\n</body>\n</html>\n",
+    复用记录: ""
+  },
+  {
+    id: "v174",
+    标题: "亲密性功能分组",
+    分类: "布局骨架",
+    子类: "分组卡组",
+    风格: ["极简","信息型"],
+    场景: ["官网·品牌站","工具·SaaS"],
+    元素: ["布局","构成"],
+    搭配: [],
+    标签: ["亲密性","分组","间距","功能卡"],
+    来源: "网站拆解：Linear（linear.app）首屏功能三组抱团，2026-09-10；「内紧外松」属通用排版原则，实现代码自写",
+    效果演示: "assets/demos/亲密性功能分组.html",
+    参数: [{"键":"zunei","名":"组内间距(px)","类型":"slider","最小":4,"最大":32,"步长":2,"默认":12},{"键":"zujian","名":"组间距(px)","类型":"slider","最小":12,"最大":80,"步长":2,"默认":40},{"键":"yuanjiao","名":"卡片圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":12},{"键":"yinying","名":"阴影强度","类型":"slider","最小":0,"最大":40,"步长":2,"默认":10},{"键":"tiliang","名":"悬停提亮(%)","类型":"slider","最小":0,"最大":30,"步长":2,"默认":8},{"键":"tubiao","名":"图标大小(px)","类型":"slider","最小":16,"最大":44,"步长":2,"默认":24},{"键":"zhucai","名":"强调色(图标/组标)","类型":"color","默认":"#5E6AD2"},{"键":"di","名":"页面底色","类型":"color","默认":"#fafafa"},{"键":"zi","名":"标题色","类型":"color","默认":"#1a1a1a"},{"键":"cizi","名":"正文色","类型":"color","默认":"#6b6b6b"},{"键":"kase","名":"卡片色","类型":"color","默认":"#ffffff"}],
+    效果说明: "把功能按「谁跟谁是一伙」分组：同一组的卡片贴紧（组内间距小），组与组之间拉开（组间距大），组上再给一个小标题。\n好处：不用读文字、不用加分隔线，看一眼间距就知道这是三块事而不是六块事——亲密性原则省掉的是读者的理解成本；强调色只落在组标和图标上，信息层级靠间距而不是靠颜色堆。\n能怎么改：把组间距调到接近组内间距，立刻变回「六张一样的卡」的散装感（这是反面示范）；图标放大、阴影加深会从「工具」变「营销页」。",
+    用法: "详情页把「组间距」从 40 拖到 12，看分组感怎么消失——这一下最能体会亲密性；「组内间距」调卡片呼吸，「图标大小 / 强调色」调气质。",
+    提示词: "给 AI 的提示词（直接复制）：\n效果：把功能介绍按亲密性分组展示——每 2–3 张相关卡片抱成一团并配一个小标题，组内卡片贴紧、组与组之间拉开明显距离；卡片左上角用淡底强调色图标，悬停时整卡轻微提亮。\n用法示例：工具站首屏下面放三组功能「对话/反馈 → issue」「规划」「智能体」，让人一眼看出这是三块能力而不是六条卖点。\n关键参数：zunei 组内间距 12px（4–32）／ zujian 组间距 40px（12–80）／ yuanjiao 圆角 12px（0–28）／ yinying 阴影 10（0–40）／ tiliang 悬停提亮 8%（0–30）／ tubiao 图标 24px（16–44）／ zhucai 强调色 #5E6AD2 ／ di 页面底色 #fafafa ／ zi 标题色 #1a1a1a ／ cizi 正文色 #6b6b6b ／ kase 卡片色 #ffffff\n集成步骤：复制 assets/demos/亲密性功能分组.html，改组标题与卡片文案；铁律是组间距 ≥ 组内间距的 2–3 倍，否则分组感就没了。",
+    代码: "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>亲密性功能分组演示</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body { font-family: system-ui, \"Microsoft YaHei\", sans-serif; background: var(--di); color: var(--zi); display: flex; align-items: center; justify-content: center; min-height: 100vh; }\n  .wrap { width: min(620px, 94vw); }\n  h2 { font-size: 15px; margin-bottom: 18px; }\n  /* 组间距：组与组之间拉大，形成「内紧外松」——亲密性原则的核心 */\n  .groups { display: flex; flex-direction: column; gap: var(--zujian); }\n  .grp { display: flex; flex-direction: column; gap: var(--zunei); }\n  .grp > .gt { font-size: 12px; letter-spacing: .06em; color: var(--zhucai); }\n  .grp > .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--zunei); }\n  .card { background: var(--kase); border: 1px solid color-mix(in srgb, var(--zi) 8%, transparent);\n    border-radius: var(--yuanjiao); padding: 14px; display: flex; gap: 11px; align-items: flex-start;\n    box-shadow: 0 calc(var(--yinying) * 0.2px) calc(var(--yinying) * 0.6px) rgba(0, 0, 0, .08);\n    transition: filter .18s ease; cursor: default; }\n  .card:hover { filter: brightness(calc(100% + var(--tiliang) * 1%)); }\n  .ico { width: var(--tubiao); height: var(--tubiao); flex: 0 0 auto; border-radius: calc(var(--yuanjiao) * 0.6);\n    background: color-mix(in srgb, var(--zhucai) 16%, transparent); color: var(--zhucai);\n    display: flex; align-items: center; justify-content: center; font-size: calc(var(--tubiao) * 0.5); }\n  .card b { display: block; font-size: 13.5px; }\n  .card span { display: block; margin-top: 4px; font-size: 12px; color: var(--cizi); line-height: 1.5; }\n  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi); }\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n  <h2>功能按亲密性抱团（组内间距 &lt; 组间距）</h2>\n  <div class=\"groups\">\n    <div class=\"grp\">\n      <div class=\"gt\">对话 / 反馈</div>\n      <div class=\"cards\">\n        <div class=\"card\"><div class=\"ico\">↩</div><div><b>收进 issue</b><span>一句话把反馈变成待办</span></div></div>\n        <div class=\"card\"><div class=\"ico\">◎</div><div><b>自动去重</b><span>同类反馈自动合并</span></div></div>\n      </div>\n    </div>\n    <div class=\"grp\">\n      <div class=\"gt\">规划</div>\n      <div class=\"cards\">\n        <div class=\"card\"><div class=\"ico\">▤</div><div><b>周期排期</b><span>目标拆到可执行</span></div></div>\n        <div class=\"card\"><div class=\"ico\">↗</div><div><b>进度可视</b><span>一眼看到卡在哪</span></div></div>\n      </div>\n    </div>\n    <div class=\"grp\">\n      <div class=\"gt\">智能体</div>\n      <div class=\"cards\">\n        <div class=\"card\"><div class=\"ico\">✦</div><div><b>agent 当队友</b><span>重复劳动交给它</span></div></div>\n        <div class=\"card\"><div class=\"ico\">⇄</div><div><b>人机共用流程</b><span>同一套工作流</span></div></div>\n      </div>\n    </div>\n  </div>\n</div>\n<div class=\"hint\">亲密性：相关的贴紧、不相关的拉开，看的人不用读文字就知道谁跟谁是一伙</div>\n<script>\n  // 参数状态：键名与 data/素材.js 的「参数」一一对应\n  const state = { zunei: 12, zujian: 40, yuanjiao: 12, yinying: 10, tiliang: 8, tubiao: 24,\n    zhucai: \"#5E6AD2\", di: \"#fafafa\", zi: \"#1a1a1a\", cizi: \"#6b6b6b\", kase: \"#ffffff\" };\n  function apply() {\n    const r = document.documentElement.style;\n    r.setProperty(\"--zunei\", state.zunei + \"px\");\n    r.setProperty(\"--zujian\", state.zujian + \"px\");\n    r.setProperty(\"--yuanjiao\", state.yuanjiao + \"px\");\n    r.setProperty(\"--yinying\", state.yinying);\n    r.setProperty(\"--tiliang\", state.tiliang);\n    r.setProperty(\"--tubiao\", state.tubiao + \"px\");\n    r.setProperty(\"--zhucai\", state.zhucai);\n    r.setProperty(\"--di\", state.di);\n    r.setProperty(\"--zi\", state.zi);\n    r.setProperty(\"--cizi\", state.cizi);\n    r.setProperty(\"--kase\", state.kase);\n  }\n  window.addEventListener(\"message\", e => { const d = e.data; if (!d || d.type !== \"param\") return; state[d.key] = d.value; apply(); });\n  apply();\n<\\/script>\n</body>\n</html>\n",
     复用记录: ""
   }
 ];

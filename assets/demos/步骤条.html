@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>步骤条演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 24px; }
+  .wrap { width: min(520px, 92vw); }
+  .track { display: flex; align-items: center; justify-content: space-between; position: relative; }
+  .line { position: absolute; left: 0; right: 0; top: 18px; height: 4px; background: #e3e3e6; border-radius: 2px; z-index: 0; }
+  .fill { position: absolute; left: 0; top: 18px; height: 4px; background: var(--accent); border-radius: 2px; z-index: 1; transition: width var(--dur) var(--ease); }
+  .node { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 3px solid #e3e3e6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #aaa; z-index: 2; transition: transform .4s cubic-bezier(.34,1.7,.5,1), background var(--dur), border-color var(--dur), color var(--dur); }
+  .node.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .node.done { background: var(--done); border-color: var(--done); color: #fff; }
+  .node.finish { animation: pop .5s cubic-bezier(.34,1.7,.5,1); }
+  @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .btn { padding: 10px 22px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="track" id="track">
+    <div class="line"></div><div class="fill" id="fill"></div>
+  </div>
+</div>
+<button class="btn" id="btn">下一步</button>
+<div class="hint">点「下一步」：进度完成时先超调再回弹，强化真实感</div>
+<script>
+  const state = { steps: 4, dur: .5, overshoot: 1, accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", ease: "ease" };
+  const track = document.getElementById("track");
+  const fill = document.getElementById("fill");
+  const btn = document.getElementById("btn");
+  let cur = 0;
+  function build() {
+    track.querySelectorAll(".node").forEach(n => n.remove());
+    for (let i = 0; i < state.steps; i++) {
+      const n = document.createElement("div");
+      n.className = "node";
+      n.textContent = i + 1;
+      track.appendChild(n);
+    }
+  }
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--done", state.done);
+    document.body.style.background = state.bg;
+    track.style.setProperty("--dur", state.dur + "s");
+    track.style.setProperty("--ease", state.ease);
+    const nodes = track.querySelectorAll(".node");
+    nodes.forEach((n, i) => {
+      n.className = "node" + (i < cur ? " done" : i === cur ? " on" : "");
+    });
+    const pct = state.steps > 1 ? (cur / (state.steps - 1)) * 100 : 0;
+    fill.style.width = pct + "%";
+  }
+  btn.addEventListener("click", () => {
+    if (cur < state.steps) {
+      cur++;
+      const last = track.querySelectorAll(".node")[cur - 1];
+      if (cur === state.steps && last) last.classList.add("finish");
+      apply();
+      if (cur >= state.steps) { btn.textContent = "重置"; }
+    } else { cur = 0; btn.textContent = "下一步"; apply(); }
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; build(); apply(); });
+  build(); apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动作优先级判定演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 16px; }
+  .card { width: min(360px, 90vw); height: 220px; border-radius: 18px; background: var(--card); box-shadow: 0 10px 34px rgba(0,0,0,.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; touch-action: none; cursor: grab; transition: transform .2s; user-select: none; }
+  .card .big { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+  .badge { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; transition: background .2s; }
+  .legend { display: flex; gap: 20px; font-size: 13px; color: #666; }
+  .legend b { color: #1a1a1a; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="big">在卡片上滑动</div>
+  <div class="badge" id="badge">初始方向判定执行动作</div>
+</div>
+<div class="legend">横滑=翻页（<b id="h">—</b>）　竖拉=关闭（<b id="v">—</b>）</div>
+<div class="hint">横滑与竖拉冲突时，以「初始滑动方向」判定执行哪一个动作</div>
+<script>
+  const state = { threshold: 24, hColor: "#3d5fd6", vColor: "#e0533d", card: "#ffffff", bg: "#fafafa" };
+  const card = document.getElementById("card");
+  const badge = document.getElementById("badge");
+  const h = document.getElementById("h"), v = document.getElementById("v");
+  let sx = 0, sy = 0, axis = null, moved = 0;
+  function apply() {
+    card.style.background = state.card;
+    document.body.style.background = state.bg;
+    h.style.color = state.hColor; v.style.color = state.vColor;
+    badge.style.background = "#eee"; badge.style.color = "#444";
+    badge.textContent = "初始方向判定执行动作";
+  }
+  card.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; axis = null; moved = 0; card.setPointerCapture(e.pointerId); });
+  card.addEventListener("pointermove", e => {
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+    if (!axis && Math.abs(dx) + Math.abs(dy) > 6) axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    if (axis === "h") { card.style.transform = "translateX(" + dx + "px)"; badge.style.background = state.hColor; badge.style.color = "#fff"; badge.textContent = "已判定：横滑翻页"; }
+    else if (axis === "v") { card.style.transform = "translateY(" + dy + "px)"; badge.style.background = state.vColor; badge.style.color = "#fff"; badge.textContent = "已判定：竖拉关闭"; }
+  });
+  card.addEventListener("pointerup", e => {
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (axis === "h" && Math.abs(dx) > state.threshold) flash("执行：翻到下一页");
+    else if (axis === "v" && Math.abs(dy) > state.threshold) flash("执行：关闭卡片");
+    else flash("位移不足，未触发动作");
+    card.style.transform = "translate(0,0)";
+  });
+  function flash(t) { badge.textContent = t; badge.style.background = "#1a1a1a"; badge.style.color = "#fff"; }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

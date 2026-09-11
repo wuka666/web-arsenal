@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>卡片堆叠演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; gap: 20px; }
+  .stage { position: relative; width: 220px; height: 260px; }
+  .card { position: absolute; left: 0; top: 0; width: 220px; height: 200px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.16); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; transition: transform .4s cubic-bezier(.34,1.4,.5,1); transform-origin: center bottom; }
+  .btn { padding: 10px 22px; border: none; border-radius: 10px; background: #3d5fd6; color: #fff; font-size: 14px; cursor: pointer; }
+  .cnt { font-size: 13px; color: #777; }
+  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"></div>
+<div class="cnt" id="cnt">浏览量：0</div>
+<button class="btn" id="btn">浏览 +1</button>
+<div class="hint">后续卡片逐层堆叠压缩顶部卡片，直观展示浏览量累积</div>
+<script>
+  const state = { gap: 14, compress: 0.12, radius: 16, accent: "#3d5fd6", card2: "#7c4dff", bg: "#ffffff" };
+  const stage = document.getElementById("stage");
+  const cnt = document.getElementById("cnt");
+  let n = 0;
+  function apply() {
+    stage.style.background = "transparent";
+    cnt.textContent = "浏览量：" + n;
+    while (stage.children.length < n) {
+      const c = document.createElement("div");
+      c.className = "card";
+      c.textContent = "内容 #" + (stage.children.length + 1);
+      stage.appendChild(c);
+      requestAnimationFrame(() => layout());
+    }
+    while (stage.children.length > n) stage.lastChild.remove();
+    layout();
+  }
+  function layout() {
+    const total = stage.children.length;
+    [...stage.children].forEach((c, i) => {
+      const back = total - 1 - i;            // 越靠后(旧)越被压
+      const y = back * state.gap * (1 - back * state.compress);
+      const sc = 1 - back * state.compress;
+      c.style.background = i % 2 ? state.card2 : state.accent;
+      c.style.borderRadius = state.radius + "px";
+      c.style.transform = "translateY(" + y + "px) scale(" + Math.max(sc, .5) + ")";
+      c.style.zIndex = i;
+    });
+  }
+  document.getElementById("btn").addEventListener("click", () => { n = Math.min(n + 1, 8); apply(); });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>
