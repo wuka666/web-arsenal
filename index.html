@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web 灵感弹药库</title>
 <style>
-  /* ---- 基础（明亮风格） ---- */
+  
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     color-scheme: light;
@@ -33,7 +33,7 @@
 
   .app { display: flex; min-height: 100vh; }
 
-  /* ---- 左侧导航栏 ---- */
+  
   .sidebar {
     width: 256px; flex-shrink: 0;
     position: sticky; top: 0; height: 100vh; overflow-y: auto;
@@ -56,7 +56,7 @@
   .filter.active { background: var(--ink); color: #fff; }
   .filter .n { font-size: 11.5px; opacity: .6; }
   .filter.dim { opacity: .32; pointer-events: none; }
-  /* 标签区限高滚动：标签很多时（场景 44+/元素 28+）不撑爆侧边栏 */
+  
   .chip-row { display: flex; flex-wrap: wrap; gap: 6px; max-height: 148px; overflow-y: auto; padding-right: 4px; }
   .chip-row::-webkit-scrollbar { width: 6px; }
   .chip-row::-webkit-scrollbar-thumb { background: #dcdcd5; border-radius: 3px; }
@@ -71,20 +71,20 @@
   .fchip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
   .fchip.dim { opacity: .3; }
 
-  /* ---- 右侧内容区 ---- */
+  
   .content { flex: 1; min-width: 0; padding: 26px 34px 80px; }
   .content-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
   .content-head .t { display: flex; align-items: baseline; gap: 12px; }
   .content-head h2 { font-size: 22px; font-weight: 800; }
   .content-head span { font-size: 13px; color: var(--muted); }
-  /* 分类 + 子类固定冻在 main 顶部；只要滚动就吸顶，不随页面移动 */
+  
   .content-tools {
     display: flex; flex-direction: column; gap: 10px;
     padding: 12px 0 14px;
     border-bottom: 1px dashed var(--line);
     margin-bottom: 14px;
     position: sticky; top: 0; z-index: 10;
-    background: var(--bg); /* 不透明背景：粘住时不穿透卡片 */
+    background: var(--bg); 
   }
   .tools-row { display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
   .tools-row .tools-label { font-size: 13px; font-weight: 700; color: var(--ink); min-width: 44px; padding-top: 6px; flex-shrink: 0; }
@@ -103,7 +103,7 @@
   .tools-row .chip.on .chip-n { opacity: .7; }
   .tools-row .chip-n { font-size: 11px; opacity: .55; font-variant-numeric: tabular-nums; }
 
-  /* 购物车按钮 */
+  
   .cart-btn {
     position: relative; border: 1px solid var(--line); background: var(--card); color: var(--ink);
     padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600;
@@ -116,7 +116,7 @@
   }
   .cart-btn .badge:empty { display: none; }
 
-  /* ---- 卡片网格 ---- */
+  
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
   .card {
     background: var(--card); border: 1px solid var(--line); border-radius: 14px;
@@ -126,8 +126,10 @@
   .card:hover { border-color: #d4d4cd; box-shadow: 0 8px 22px rgba(26,26,26,.06); transform: translateY(-2px); }
   .card.open { grid-column: 1 / -1; cursor: default; transform: none; }
 
-  .thumb { position: relative; aspect-ratio: 16 / 10; background: #efefeb; }
-  .thumb iframe { width: 100%; height: 100%; border: 0; display: block; }
+  /* iframe 必须绝对定位：fitThumbFrame 会把它设成 1000px 宽再 scale，
+     若留在文档流里会把靠 aspect-ratio 定高的 .thumb 撑爆（卡片只剩空白） */
+  .thumb { position: relative; aspect-ratio: 16 / 10; background: #efefeb; overflow: hidden; }
+  .thumb iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; transform-origin: 0 0; }
   .thumb .loading {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: var(--muted); font-size: 12px; pointer-events: none;
@@ -172,14 +174,15 @@
   .tag.style { color: #7c3aed; background: #f2eafe; }
   .tag.scene { color: #0d9488; background: #e2f4f1; }
   .hint { margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
+  .hint:empty { display: none; }
 
-  /* ---- 展开详情 ---- */
+  
   .detail { border-top: 1px dashed var(--line); display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; padding: 16px; }
   .detail[hidden] { display: none; }
   @media (max-width: 900px) { .detail { grid-template-columns: 1fr; } }
 
-  .demo-big { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
-  .demo-big iframe { width: 100%; height: 360px; border: 0; display: block; background: #fff; }
+  .demo-big { position: relative; align-self: start; height: 420px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+  .demo-big iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; transform-origin: 0 0; }
 
   .info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
   .info h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -220,7 +223,7 @@
   .meta b { color: #4b4842; font-weight: 600; }
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
 
-  /* ---- 方案库（独立视图） ---- */
+  
   .colorbars { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
   .cbar-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
   .cbar { height: 13px; border-radius: 4px; min-width: 4%; background: linear-gradient(90deg, var(--accent), #b9a6ff); }
@@ -236,7 +239,7 @@
   .copy-btn:hover { background: #e9e7e0; }
   .copy-btn.done { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  /* ---- 购物车面板 ---- */
+  
   .cart-panel {
     position: fixed; top: 0; right: 0; width: 320px; height: 100vh; z-index: 40;
     background: var(--card); border-left: 1px solid var(--line); box-shadow: -10px 0 30px rgba(0,0,0,.08);
@@ -264,7 +267,7 @@
   .btn.ghost:hover { background: #e9e7e0; }
   .cart-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
 
-  /* ---- 弹窗 ---- */
+  
   .modal-mask {
     position: fixed; inset: 0; z-index: 50; background: rgba(20,20,20,.4);
     display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -289,201 +292,7 @@
   }
   .preview-frame { width: 100%; height: 420px; border: 1px solid var(--line); border-radius: 10px; }
 
-  /* ---- 画布：右下角悬浮按钮 + 全屏白底浮层 ---- */
-  #cvFab { position: fixed; right: 22px; bottom: 22px; z-index: 60;
-    display: inline-flex; align-items: center; gap: 7px;
-    font: inherit; font-size: 14px; font-weight: 500;
-    padding: 12px 20px; border: 0; border-radius: 999px;
-    background: var(--accent); color: #fff; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(123,92,255,.32); }
-  #cvFab:hover { filter: brightness(1.07); }
-  #cvFab .n { background: rgba(255,255,255,.24); border-radius: 999px; padding: 0 7px; font-size: 12px; min-width: 18px; text-align: center; }
-  #cvFab .n:empty { display: none; }
-
-  .cv-mask { position: fixed; inset: 0; z-index: 70; background: rgba(18,18,20,.45);
-    display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .cv-mask[hidden] { display: none; }
-  .cv-panel { width: min(1520px, 96vw); height: min(950px, 93vh); background: #fff;
-    border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
-    box-shadow: 0 24px 70px rgba(0,0,0,.3); }
-  .cv-panel-head { display: flex; align-items: baseline; gap: 12px; padding: 13px 18px;
-    border-bottom: 1px solid var(--line); flex-shrink: 0; }
-  .cv-panel-head h2 { font-size: 16px; font-weight: 500; margin: 0; }
-  .cv-panel-head p { font-size: 12.5px; color: var(--muted); margin: 0; flex: 1; }
-  .cv-close { font: inherit; font-size: 20px; line-height: 1; width: 32px; height: 32px;
-    border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); cursor: pointer; }
-  .cv-close:hover { border-color: var(--c-bg); }
-
-  .cv-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 248px minmax(0, 1fr) 194px; }
-
-  .cv-side { border-right: 1px solid var(--line); display: flex; flex-direction: column;
-    min-height: 0; background: #fcfcfa; }
-  .cv-side-block { padding: 11px 12px; border-bottom: 1px solid var(--line); }
-  .cv-side-block h3 { font-size: 12px; color: var(--muted); font-weight: 500; margin: 0 0 8px; display: flex; justify-content: space-between; }
-  .cv-side-grow { flex: 1; min-height: 0; display: flex; flex-direction: column; border-bottom: 0; }
-  .cv-fline { font-size: 11px; color: var(--muted); margin: 6px 0 5px; }
-  .cv-chips { display: flex; flex-wrap: wrap; gap: 5px; max-height: 92px; overflow-y: auto; }
-  .cv-chip { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid var(--line);
-    border-radius: 999px; background: #fff; color: var(--ink); cursor: pointer; }
-  .cv-chip:hover { border-color: var(--c-bg); }
-  .cv-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .cv-search { width: 100%; font: inherit; font-size: 12.5px; padding: 5px 9px;
-    border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); margin-bottom: 7px; }
-  .cv-list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
-  .cv-item { text-align: left; font: inherit; font-size: 12.5px; padding: 6px 9px;
-    border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); cursor: pointer; }
-  .cv-item:hover { border-color: var(--c-bg); }
-  .cv-item.on { border-color: var(--c-bg); background: var(--c-bg-bg); }
-  .cv-item .r { color: var(--muted); font-size: 11px; margin-left: 4px; }
-  .cv-hint { font-size: 11.5px; color: var(--muted); padding: 6px 2px; }
-
-  .cv-stage { display: flex; flex-direction: column; min-height: 0; background: #fff; }
-  .cv-toolbar { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; padding: 8px 12px;
-    border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); flex-shrink: 0; }
-  .cv-toolbar .sp { flex: 1 1 auto; }
-  .cv-toolbar label { display: inline-flex; align-items: center; gap: 5px; }
-  .cv-toolbar select { font: inherit; font-size: 12.5px; border: 1px solid var(--line);
-    border-radius: 7px; padding: 3px 6px; background: #fff; color: var(--ink); }
-
-  /* 画框：全白，一层层把素材叠成一张网页 */
-  .cv-frame { flex: 1; min-height: 0; overflow-y: auto; background: #fff; position: relative; }
-  .cv-frame-empty { padding: 76px 20px; text-align: center; color: var(--muted); font-size: 13.5px; line-height: 2.05; white-space: pre-line; }
-  .cv-layer { position: relative; }
-  .cv-layer-head { display: flex; align-items: center; gap: 6px; padding: 5px 10px;
-    background: #fafaf8; border-bottom: 1px solid var(--line); font-size: 11.5px; color: var(--muted); }
-  .cv-layer-head .role { font-weight: 500; color: var(--ink); }
-  .cv-layer-head .sp { flex: 1; }
-  .cv-layer-head button { font: inherit; font-size: 11px; padding: 1px 7px; border: 1px solid var(--line);
-    border-radius: 5px; background: #fff; color: var(--ink); cursor: pointer; }
-  .cv-layer-head button:hover { border-color: var(--c-bg); }
-  .cv-layer-body { position: relative; overflow: hidden; }
-  .cv-layer-body iframe { position: absolute; left: 0; top: 0; transform-origin: 0 0; border: 0; display: block; background: #fff; }
-
-  .cv-bg { position: absolute; inset: 0; z-index: 0; }
-  .cv-bg .cv-layer { height: 100%; }
-  .cv-bg .cv-layer-head { position: absolute; left: 10px; top: 10px; z-index: 6;
-    background: rgba(0,0,0,.55); color: #fff; border: 0; border-radius: 6px; padding: 2px 8px; }
-  .cv-bg .cv-layer-head .role { color: #fff; }
-  .cv-bg .cv-layer-head button { background: rgba(255,255,255,.92); border-color: transparent; }
-  .cv-bg .cv-layer-body { height: 100%; }
-
-  .cv-flow { position: relative; z-index: 1; display: flex; flex-direction: column; }
-  .cv-flow-row { display: grid; gap: 0; }
-  .cv-flow .cv-layer { border-bottom: 1px solid var(--line); }
-  .cv-flow .cv-layer:last-child { border-bottom: 0; }
-
-  .cv-float { position: absolute; right: 14px; bottom: 14px; z-index: 8; width: 320px;
-    box-shadow: 0 6px 24px rgba(0,0,0,.16); border-radius: 10px; overflow: hidden; background: #fff; }
-  .cv-float .cv-layer { border: 0; }
-
-  .cv-theme-panel { border-left: 1px solid var(--line); padding: 12px; overflow-y: auto; background: #fcfcfa; }
-  .cv-theme-panel h3 { font-size: 12px; color: var(--muted); font-weight: 500; margin: 0 0 9px; }
-  .cv-trow { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; margin-bottom: 7px; }
-  .cv-trow input[type="color"] { width: 36px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: #fff; }
-  .cv-trow input[type="range"] { width: 78px; }
-  .cv-trow b { font-weight: 500; min-width: 22px; text-align: right; color: var(--muted); }
-  .cv-note { font-size: 11px; color: var(--muted); line-height: 1.55; margin: 10px 0 0; }
-
-  .cv-foot { border-top: 1px solid var(--line); padding: 10px 16px; flex-shrink: 0;
-    max-height: 28vh; display: flex; flex-direction: column; }
-  .cv-foot-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
-  .cv-foot-head h3 { font-size: 12px; color: var(--muted); font-weight: 500; margin: 0; }
-  .cv-foot pre { margin: 0; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
-    font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.6; color: #555; }
-
-  @media (max-width: 1080px) {
-    .cv-main { grid-template-columns: 210px minmax(0, 1fr); }
-    .cv-theme-panel { display: none; }
-  }
-
-  /* ---- 防变形 / 防抖动 ----
-     ① 滚动条常驻：内容从不满一屏变到超过一屏时，可用宽度不再抖动
-     ② 卡片 contain：任何一张卡片的尺寸变化不会引发全网格重排
-     ③ thumb 里的 iframe 用「虚拟宽度 + 缩放」渲染：demo 始终按桌面宽度排版，
-        不会被挤成窄屏布局（这是「素材看起来变形」的根因）                      */
-  html { overflow-y: scroll; scrollbar-gutter: stable; }
-  .content { min-width: 0; }
-  .card { contain: layout style; }
-  .thumb { contain: layout paint; }
-  .thumb iframe { position: absolute; left: 0; top: 0; transform-origin: 0 0; z-index: 0; }
-  .thumb .loading { z-index: 2; }
-  .thumb .add-btn { z-index: 3; }
-
-  /* ---- 窄屏 ---- */
-  @media (max-width: 900px) {
-    .app { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: static; padding: 14px 16px; }
-    .content { padding: 20px 16px 70px; }
-  }
-
-  /* ---- 键盘聚焦可见（卡片可 Tab 到，必须有焦点样式）---- */
-  .card:focus-visible { outline: 2px solid var(--c-bg); outline-offset: 2px; }
-
-  /* ---- 尊重系统「减少动态效果」---- */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: .01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-
-  /* ---- 画布 v4：自由拼接 + 可调面板 + 可拖按钮 ---- */
-  .cv-panel { width: min(1180px, 94vw); height: min(780px, 92vh); position: relative; }
-  .cv-rs { position: absolute; width: 20px; height: 20px; z-index: 40; }
-  .cv-rs-nw { left: 0; top: 0; cursor: nwse-resize; }
-  .cv-rs-ne { right: 0; top: 0; cursor: nesw-resize; }
-  .cv-rs-sw { left: 0; bottom: 0; cursor: nesw-resize; }
-  .cv-rs-se { right: 0; bottom: 0; cursor: nwse-resize; }
-  .cv-rs::after { content: ""; position: absolute; inset: 5px; border: 2px solid #d9d9e3; border-radius: 3px; }
-  .cv-rs:hover::after { border-color: #7b5cff; }
-  #cvFab { font-size: 14px; padding: 13px 19px; transform-origin: 100% 100%; cursor: grab; touch-action: none; }
-  #cvFab:active { cursor: grabbing; }
-  #cvFab.dragging { opacity: .82; }
-  #cvFabRs { position: absolute; right: 0; bottom: 0; width: 15px; height: 15px; cursor: nwse-resize; }
-  #cvFabRs::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 7px; height: 7px;
-    border-right: 2px solid rgba(255,255,255,.85); border-bottom: 2px solid rgba(255,255,255,.85); }
-  .cv-frame { overflow: hidden; }
-  .cv-block { position: absolute; margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px;
-    overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(20,20,40,.07); touch-action: none; }
-  .cv-block.sel { border-color: #7b5cff; box-shadow: 0 0 0 2px rgba(123,92,255,.28), 0 6px 18px rgba(20,20,40,.13); }
-  .cv-block.drag { opacity: .78; }
-  .cv-block-head { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-bottom: 1px solid var(--line);
-    font-size: 12px; cursor: grab; user-select: none; touch-action: none; background: #fafafc; }
-  .cv-block-head:active { cursor: grabbing; }
-  .cv-block-head .role { color: #7b5cff; font-weight: 500; flex: none; }
-  .cv-block-head .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cv-block-head button { font: inherit; font-size: 11px; padding: 2px 6px; border: 1px solid var(--line);
-    border-radius: 5px; background: #fff; color: var(--ink); cursor: pointer; flex: none; }
-  .cv-block-head button:hover { border-color: #7b5cff; }
-  .cv-block-body { flex: 1; min-height: 0; position: relative; overflow: hidden; background: #fff; }
-  .cv-block-body iframe { position: absolute; border: 0; display: block; background: #fff; transform-origin: 0 0; }
-  .cv-block-rs { position: absolute; right: 0; bottom: 0; width: 17px; height: 17px; cursor: nwse-resize; z-index: 5; }
-  .cv-block-rs::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
-    border-right: 2px solid #c9c9d8; border-bottom: 2px solid #c9c9d8; }
-  .cv-block-rs:hover::after { border-color: #7b5cff; }
-  .cv-sel-panel { border-top: 1px dashed var(--line); margin-top: 12px; padding-top: 10px; }
-  .cv-sel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-  .cv-sel-head h3 { font-size: 12.5px; margin: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cv-sel-panel .controls { padding: 0; margin: 0; }
-  .cv-sel-panel .controls h3 { display: none; }
-  .cv-sel-panel .controls-row { flex-direction: column; align-items: stretch; gap: 8px; }
-
-  /* ---- 画布 v5：无限画布相机（平移/缩放/拖放添加）---- */
-  .cv-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
-  .cv-frame.panning { cursor: grabbing; }
-  .cv-frame.dragover { outline: 2px dashed #7b5cff; outline-offset: -6px; }
-  .cv-zoombar { position: absolute; right: 12px; bottom: 12px; z-index: 500; display: flex;
-    align-items: center; gap: 2px; background: #fff; border: 1px solid var(--line); border-radius: 9px;
-    padding: 3px 6px; font-size: 12px; box-shadow: 0 2px 10px rgba(20,20,40,.09); }
-  .cv-zoombar button { font: inherit; font-size: 13px; width: 26px; height: 24px; border: 0; background: none;
-    border-radius: 6px; cursor: pointer; color: var(--ink); }
-  .cv-zoombar button:hover { background: #f0f0f5; }
-  .cv-zoombar button.wide { width: auto; padding: 0 8px; font-size: 12px; }
-  .cv-zoombar b { min-width: 44px; text-align: center; font-weight: 500; color: var(--muted); }
-  .cv-item { cursor: grab; }
-  .cv-item:active { cursor: grabbing; }
+  
 </style>
 </head>
 <body>
@@ -491,7 +300,6 @@
   <aside class="sidebar">
     <div class="brand">
       <h1>Web 灵感弹药库</h1>
-      <p>效果即代码 · 共 <span id="count">0</span> 条</p>
     </div>
 
     <div>
@@ -530,81 +338,18 @@
         <div class="tools-label">子类<span class="sel-count" id="subSel"></span></div>
         <div class="chip-row" id="subChips"></div>
       </div>
-      <!-- 风格 / 场景 / 元素 已搬回左栏；contentTools 只保留 catRow + subRow 两行 -->
+      
     </div>
 
     <div class="grid" id="grid"></div>
   </main>
 </div>
 
-<!-- 画布：右下角悬浮按钮 + 全屏浮层（不占主视图的位置） -->
-<button id="cvFab" title="打开画布：把素材组装成一页（按住可拖动，右下角把手可调大小）">
-  画布<span class="n" id="cvFabN"></span><span id="cvFabRs" title="拖拽调大小"></span>
-</button>
 
-<div class="cv-mask" id="cvMask" hidden>
-  <section class="cv-panel">
-      <span class="cv-rs cv-rs-nw" data-d="nw" title="拖拽调大小"></span>
-      <span class="cv-rs cv-rs-ne" data-d="ne" title="拖拽调大小"></span>
-      <span class="cv-rs cv-rs-sw" data-d="sw" title="拖拽调大小"></span>
-      <span class="cv-rs cv-rs-se" data-d="se" title="拖拽调大小"></span>
-    <header class="cv-panel-head">
-      <h2>画布</h2>
-      <p>自由拼接：拖标题栏移动 · 拖右下角调大小 · 点标题栏选中后单独调参</p>
-      <button class="btn ghost" id="cvCopy" title="生成拼装提示词并复制（不占用页面空间）">复制提示词</button>
-      <button class="cv-close" id="cvClose" title="关闭（Esc）">×</button>
-    </header>
-    <div class="cv-main">
-      <aside class="cv-side">
-        <div class="cv-side-block">
-          <h3><span>筛选素材</span><button class="cv-chip" id="cvResetFilters">清空</button></h3>
-          <div class="cv-fline">风格</div><div class="cv-chips" id="cvStyleChips"></div>
-          <div class="cv-fline">场景</div><div class="cv-chips" id="cvSceneChips"></div>
-          <div class="cv-fline">元素</div><div class="cv-chips" id="cvElemChips"></div>
-          <div class="cv-fline">分类</div><div class="cv-chips" id="cvCatChips"></div>
-        </div>
-        <div class="cv-side-block cv-side-grow">
-          <h3><span>素材候选</span><span id="cvPickCount"></span></h3>
-          <input class="cv-search" id="cvSearch" placeholder="搜索标题 / 标签…">
-          <div class="cv-list" id="cvList"></div>
-        </div>
-      </aside>
-      <main class="cv-stage">
-        <div class="cv-toolbar">
-          <span class="sp"></span>
-          <button class="btn ghost" id="cvTidy" title="按素材类型重新归位">一键整理</button>
-          <button class="btn ghost" id="cvCartTo" title="把购物车里的素材一次铺到画布上">用购物车生成</button>
-          <button class="btn ghost" id="cvAllToCart" title="把画布上的素材全部存进购物车">全部存入购物车</button>
-          <button class="btn ghost" id="cvClear">清空画布</button>
-        </div>
-        <div class="cv-frame" id="cvFrame">
-          <div class="cv-world" id="cvWorld"></div>
-          <div class="cv-zoombar">
-            <button id="cvZoomOut" title="缩小（也可 Ctrl+滚轮）">−</button>
-            <b id="cvZoomVal">100%</b>
-            <button id="cvZoomIn" title="放大（也可 Ctrl+滚轮）">＋</button>
-            <button id="cvFit" class="wide" title="缩放到正好看到全部素材">适应</button>
-            <button id="cvZoomReset" class="wide" title="回到 100%">1:1</button>
-          </div>
-        </div>
-      </main>
-      <aside class="cv-theme-panel">
-        <h3>统一主题</h3>
-        <div class="cv-trow"><span>主色</span><input type="color" id="cvT-zhucai" value="#7b5cff"></div>
-        <div class="cv-trow"><span>重点色</span><input type="color" id="cvT-zhongdian" value="#2563eb"></div>
-        <div class="cv-trow"><span>页面底色</span><input type="color" id="cvT-di" value="#f7f7f5"></div>
-        <div class="cv-trow"><span>圆角</span><input type="range" id="cvT-yuanjiao" min="0" max="32" step="2" value="14"><b id="cvT-yuanjiao-v">14</b></div>
-        <div class="cv-trow"><span>基础字号</span><input type="range" id="cvT-zihao" min="12" max="22" step="1" value="15"><b id="cvT-zihao-v">15</b></div>
-        <div class="cv-trow"><span>阴影强度</span><input type="range" id="cvT-yinying" min="0" max="60" step="2" value="20"><b id="cvT-yinying-v">20</b></div>
-        <div class="cv-trow"><span>发光强度</span><input type="range" id="cvT-faguang" min="0" max="60" step="2" value="0"><b id="cvT-faguang-v">0</b></div>
-        <p class="cv-note">这里改一处，画框里所有素材一起变 —— 它会把值发给每个素材自己能接的参数（主色映射到 <code>zhucai</code>/<code>color</code>/<code>accent</code> 等，圆角映射到 <code>yuanjiao</code>/<code>radius</code>，按素材自己支持的键发，没有的自动跳过）。</p>
-        <div id="cvSelPanel" class="cv-sel-panel"></div>
-      </aside>
-    </div>
-  </section>
-</div>
+<button id="cvFab" class="btn primary" style="position:fixed;right:22px;bottom:22px;z-index:60">画布</button>
 
-<!-- 购物车面板 -->
+
+
 <aside class="cart-panel" id="cartPanel">
   <div class="cart-head">
     <h3>已选素材</h3>
@@ -620,7 +365,7 @@
   </div>
 </aside>
 
-<!-- 生成方案弹窗 -->
+
 <div class="modal-mask" id="planMask" hidden>
   <div class="modal">
     <div class="modal-head">
@@ -638,17 +383,17 @@
 <script src="data/素材.js"></script>
 <script src="data/方案.js"></script>
 <script>
-  // ---- 数据 ----
+
   const ITEMS = (window.WEB_ARSENAL || []).slice();
   const SCHEMES = (window.WEB_SCHEMES || []).slice();
-  const CATS = ["文字动画", "动效", "组件", "背景", "布局骨架", "AI反馈"]; // “方案”分类已并入方案库（顶部视图切换），素材库不再显示；AI反馈=AI Agent 执行反馈示意（2026-09-10 新增）
-  let view = "arsenal"; // 视图：arsenal(素材库) / schemes(风格方案库)
+  const CATS = ["文字动画", "动效", "组件", "背景", "布局骨架", "AI反馈"];
+  let view = "arsenal";
 
-  // ---- 筛选状态 ----
+
   const filter = { 分类: "全部", 子类: "全部", 风格: new Set(), 场景: new Set(), 元素: new Set() };
 
-  // ---- 购物车 ----
-  let cart = []; // 存素材 id
+
+  let cart = [];
 
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -679,7 +424,7 @@
 
   const byId = id => ITEMS.find(it => it.id === id);
 
-  // ---- 素材是否通过当前筛选 ----
+
   function matches(it, ignore) {
     if (filter.分类 !== "全部" && it.分类 !== filter.分类) return false;
     if (filter.子类 !== "全部" && it.子类 !== filter.子类) return false;
@@ -693,7 +438,7 @@
     return true;
   }
 
-  // ---- 交叉筛选：算某维度选项在当前其他筛选下还剩几条素材 ----
+
   function dimCount(dim) {
     const map = new Map();
     ITEMS.forEach(it => {
@@ -713,9 +458,9 @@
     return [...s];
   }
 
-  // ---- 渲染筛选器（5 维平铺，全部默认展开）----
+
   function renderFilters() {
-    // 1) 分类（单选）
+
     const catBox = document.getElementById("catChips");
     catBox.innerHTML = "";
     const catCounts = dimCount("分类");
@@ -726,7 +471,7 @@
       c.type = "button";
       if (catCounts.has(v)) c.append(el("span", "chip-n", " · " + catCounts.get(v)));
       c.addEventListener("click", () => {
-        if (filter.分类 === v) return; // 同项再点不取消（保持"全部"始终可回到默认）
+        if (filter.分类 === v) return;
         filter.分类 = v; filter.子类 = "全部";
         renderFilters(); applyFilter();
       });
@@ -734,7 +479,7 @@
     });
     document.getElementById("catSel").textContent = filter.分类 !== "全部" ? "1" : "";
 
-    // 2) 子类（单选，随分类过滤）
+
     const subBox = document.getElementById("subChips");
     subBox.innerHTML = "";
     let subs = uniqVals("子类");
@@ -755,13 +500,13 @@
     });
     document.getElementById("subSel").textContent = filter.子类 !== "全部" ? "1" : "";
 
-    // 3) 风格 / 场景 / 元素（多选）— 渲染到左栏
+
     renderSideChips("styleSideChips", "风格", "styleSelSide");
     renderSideChips("sceneSideChips", "场景", "sceneSelSide");
     renderSideChips("elemSideChips", "元素", "elemSelSide");
   }
 
-  // 渲染到左栏（用 .fchip 胶囊样式）：标签多到可竖滚，多选
+
   function renderSideChips(boxId, dim, countId) {
     const box = document.getElementById(boxId);
     if (!box) return;
@@ -785,7 +530,7 @@
     }
   }
 
-  // ---- 应用筛选 ----
+
   // 筛选无结果时的空态提示（先查再插，避免重复节点）
   function setEmptyHint(gridBox, show) {
     const old = gridBox.querySelector(".empty-filter");
@@ -812,11 +557,11 @@
       card.style.display = matches(byId(card.dataset.id)) ? "" : "none";
     });
     setEmptyHint(gridBox, shown.length === 0);
-    // 交叉关联：已选数 + chip dim 状态（renderFilters 会处理场景/元素 chip）
+
     renderFilters();
   }
 
-  // 卡片里的 demo 按「虚拟桌面宽度」渲染再等比缩放 —— 这样 demo 永远呈现它设计好的布局，
+
   // 不会因为卡片变窄而被挤成手机版（既不糊也不变形）
   const THUMB_VW = 1000;
   function fitThumbFrame(frame) {
@@ -829,8 +574,7 @@
     frame.style.height = Math.round(h / s) + "px";
     frame.style.transform = "scale(" + s + ")";
   }
-  // 画布块专用：cover 模式（灵感库站点 object-fit:cover 的 iframe 版）
-  // 演示永远按固定设计尺寸（1000×640）渲染，等比缩放到盖满块、居中裁切 —— 绝不拉伸变形
+
   const BLOCK_VW = 1000, BLOCK_VH = 640;
   function fitBlockFrame(frame) {
     const holder = frame.parentElement;
@@ -847,7 +591,7 @@
   let fitTimer = null;
   function fitAllThumbs() {
     document.querySelectorAll(".thumb iframe").forEach(f => { if (f.src) fitThumbFrame(f); });
-    document.querySelectorAll("#cvFrame iframe").forEach(f => { if (f.src) fitThumbFrame(f); });
+    document.querySelectorAll(".demo-big iframe").forEach(f => { if (f.src) fitThumbFrame(f); });
   }
   window.addEventListener("resize", () => {
     clearTimeout(fitTimer);
@@ -865,7 +609,7 @@
     });
   }, { rootMargin: "240px" });
 
-  // ---- 购物车 ----
+
   function syncCart() {
     document.querySelectorAll(".add-btn").forEach(btn => {
       btn.classList.toggle("in", cart.includes(btn.dataset.id));
@@ -907,640 +651,17 @@
     document.getElementById("cartPanel").classList.remove("show");
     openPlan();
   });
-  // 购物车 → 画布：把已选素材铺开，进画布可视化调整
+
   document.getElementById("cartCanvas").addEventListener("click", () => {
     document.getElementById("cartPanel").classList.remove("show");
-    if (cvCartToCanvas()) cvOpen();
+    window.open("assets/canvas.html", "_blank");
   });
 
-  // ---- 画布（cv-）v4：自由拼接 —— 块可拖到任意位置、可调大小、点选后单独调参 ----
-  const CV_KEY = "arsenal-canvas";
-  const CV_FAB_KEY = "arsenal-cvfab";      // 悬浮按钮 { x, y, s }
-  const CV_PANEL_KEY = "arsenal-cvpanel";  // 面板 { w, h }
-  let canvasBlocks = [];   // [{ id, x, y, w, h, role?, z?, params?:{键:值} }] 坐标 px，相对画框
-  let cvSel = -1;          // 当前选中的块下标
-  let cvZ = 100;           // 置顶计数
-  let cvNodes = [];        // 与 canvasBlocks 对齐的 DOM 节点（复用，绝不无故重载 iframe）
-  const canvasTheme = { zhucai: "#7b5cff", zhongdian: "#2563eb", di: "#f7f7f5", yuanjiao: 14, zihao: 15, yinying: 20, faguang: 0 };
-  // 主题键 → 素材里可能用到的参数键（各素材命名不统一，按「键」或「中文名」匹配）
-  const CV_THEME_KEYS = {
-    zhucai: ["zhucai", "theme", "accent", "accentColor", "mainColor", "primary", "color1", "color"],
-    zhongdian: ["zhongdian", "accent2", "card2", "dian", "secondary", "color2", "highlight"],
-    di: ["di", "bg", "background", "pageBg", "bgColor", "base"],
-    yuanjiao: ["yuanjiao", "radius", "round"],
-    zihao: ["zihao", "fontSize", "sizeScale"],
-    yinying: ["yinying", "shadow"],
-    faguang: ["faguang", "glow"],
-  };
-  const CV_COLOR_KEYS = ["zhucai", "zhongdian", "di"];
-  const CV_NUM_KEYS = ["yuanjiao", "zihao", "yinying", "faguang"];
 
-  // ---- 画布自己的筛选（独立于主界面，只作用于「素材候选」）----
-  const cvFilter = { 分类: "全部", 风格: new Set(), 场景: new Set(), 元素: new Set() };
-  function cvMatchPick(it) {
-    if (cvFilter.分类 !== "全部" && it.分类 !== cvFilter.分类) return false;
-    for (const dim of ["风格", "场景", "元素"]) {
-      const set = cvFilter[dim];
-      if (set.size && !(it[dim] || []).some(v => set.has(v))) return false;
-    }
-    return true;
-  }
-  function cvRenderChips() {
-    const mk = (boxId, dim) => {
-      const box = document.getElementById(boxId);
-      if (!box) return;
-      box.innerHTML = "";
-      const pool = dim === "分类" ? ITEMS.map(i => i.分类) : ITEMS.flatMap(i => i[dim] || []);
-      ["全部", ...[...new Set(pool)]].forEach(v => {
-        const on = dim === "分类" ? cvFilter.分类 === v : cvFilter[dim].has(v);
-        const b = el("button", "cv-chip" + (on ? " on" : ""), v);
-        b.type = "button";
-        b.addEventListener("click", () => {
-          if (dim === "分类") cvFilter.分类 = v;
-          else if (cvFilter[dim].has(v)) cvFilter[dim].delete(v); else cvFilter[dim].add(v);
-          cvRenderChips(); cvRenderList();
-        });
-        box.appendChild(b);
-      });
-    };
-    mk("cvCatChips", "分类");
-    mk("cvStyleChips", "风格");
-    mk("cvSceneChips", "场景");
-    mk("cvElemChips", "元素");
-  }
-  function cvIsOpen() { return !document.getElementById("cvMask").hidden; }
-  function cvFabCount() {
-    const n = document.getElementById("cvFabN");
-    if (n) n.textContent = canvasBlocks.length ? String(canvasBlocks.length) : "";
-  }
-  function cvOpen() {
-    document.getElementById("cvMask").hidden = false;
-    document.getElementById("cvFab").style.display = "none";
-    cvRenderChips();
-    cvRenderList();
-    cvRender();
-    cvApplyCam();
-    // 从没用过相机（无存档）→ 自动适应内容，第一次看到的就是排好的画面
-    if (!localStorage.getItem(CV_CAM_KEY)) setTimeout(cvFitContent, 60);
-  }
-  function cvClosePanel() {
-    document.getElementById("cvMask").hidden = true;
-    document.getElementById("cvFab").style.display = "";
-    cvFabCount();
-  }
-
-  // ---- 角色：按素材的「分类 / 子类」判断它新加进来时该落在哪 ----
-  const CV_ROLE_ORDER = ["背景", "导航", "首屏", "内容", "浮层"];
-  const CV_ROLE_LABEL = { 背景: "背景 · 铺满", 导航: "导航 · 贴顶", 首屏: "首屏", 内容: "内容流", 浮层: "浮层 · 悬浮" };
-  function cvRoleOf(it) {
-    if (!it) return "内容";
-    const c = it.分类 || "", s = it.子类 || "";
-    if (c === "背景") return "背景";
-    if (s === "弹窗抽屉" || s === "提示条") return "浮层";
-    if (s === "导航") return "导航";
-    if (s === "首屏Hero") return "首屏";
-    return "内容";
-  }
-  function cvRoleOfBlock(b) {
-    if (b && b.role && CV_ROLE_ORDER.indexOf(b.role) >= 0) return b.role;
-    return cvRoleOf(byId(b && b.id));
-  }
-  function cvMatchTheme(p) {
-    for (const k in CV_THEME_KEYS) if (CV_THEME_KEYS[k].includes(p.键)) return k;
-    const n = p.名 || "";
-    if (/主色|强调色|主题色|进行色|当前色|选中色/.test(n)) return "zhucai";
-    if (/次色|副色|辅色|点缀色|重点色/.test(n)) return "zhongdian";
-    if (/^(页面底色|背景色|底色|页面背景色)$/.test(n)) return "di";
-    if (/圆角/.test(n)) return "yuanjiao";
-    if (/字号/.test(n)) return "zihao";
-    if (/阴影/.test(n)) return "yinying";
-    if (/发光|柔光/.test(n)) return "faguang";
-    return null;
-  }
-  function cvApplyThemeToFrame(frame, it) {
-    if (!frame || !frame.contentWindow || !it) return;
-    (it.参数 || []).forEach(p => {
-      const k = cvMatchTheme(p);
-      if (!k) return;
-      const isColorParam = p.类型 === "color" || (p.类型 === "string" && /色/.test(p.名 || ""));
-      const isNumParam = p.类型 === "slider" || p.类型 === "number";
-      if (isColorParam && CV_COLOR_KEYS.includes(k)) sendParam(frame, p.键, canvasTheme[k]);
-      else if (isNumParam && CV_NUM_KEYS.includes(k)) sendParam(frame, p.键, Number(canvasTheme[k]));
-    });
-  }
-  function cvApplyToFrame(frame, b) {
-    // 统一主题 + 该块的私人参数（私人参数后发，覆盖主题）
-    const it = byId(b && b.id);
-    if (!frame || !frame.contentWindow || !it) return;
-    cvApplyThemeToFrame(frame, it);
-    const ps = b && b.params ? b.params : {};
-    Object.keys(ps).forEach(k => sendParam(frame, k, ps[k]));
-  }
-  function cvApplyThemeAll() {
-    cvNodes.forEach((n, i) => { if (n) cvApplyToFrame(n.querySelector("iframe"), canvasBlocks[i]); });
-  }
-
-  // ---- 无限画布相机：场景坐标与视口分离（Excalidraw/tldraw 的标准做法）----
-  // 世界层 transform: translate(cam.x, cam.y) scale(cam.z)，元素只存场景坐标
-  const CV_CAM_KEY = "arsenal-cvcam";
-  const cvCam = { x: 0, y: 0, z: 1 };
-  function cvApplyCam() {
-    const w = document.getElementById("cvWorld");
-    if (w) w.style.transform = "translate(" + cvCam.x + "px," + cvCam.y + "px) scale(" + cvCam.z + ")";
-    const v = document.getElementById("cvZoomVal");
-    if (v) v.textContent = Math.round(cvCam.z * 100) + "%";
-    if (cvNodes.length) cvLayoutAll();
-  }
-  function cvCamSave() { try { localStorage.setItem(CV_CAM_KEY, JSON.stringify(cvCam)); } catch (e) {} }
-  function cvCamLoad() {
-    try {
-      const c = JSON.parse(localStorage.getItem(CV_CAM_KEY) || "null");
-      if (c && typeof c.z === "number") { cvCam.x = c.x || 0; cvCam.y = c.y || 0; cvCam.z = Math.min(2.5, Math.max(0.2, c.z)); }
-    } catch (e) {}
-    cvApplyCam();
-  }
-  // 屏幕 → 场景坐标
-  function cvToScene(clientX, clientY) {
-    const r = document.getElementById("cvFrame").getBoundingClientRect();
-    return { x: (clientX - r.left - cvCam.x) / cvCam.z, y: (clientY - r.top - cvCam.y) / cvCam.z };
-  }
-  // 以屏幕点为锚缩放（保持鼠标下的场景点不动）
-  function cvZoomAt(clientX, clientY, factor) {
-    const r = document.getElementById("cvFrame").getBoundingClientRect();
-    const sx = clientX - r.left, sy = clientY - r.top;
-    const sceneX = (sx - cvCam.x) / cvCam.z, sceneY = (sy - cvCam.y) / cvCam.z;
-    cvCam.z = Math.min(2.5, Math.max(0.2, cvCam.z * factor));
-    cvCam.x = sx - sceneX * cvCam.z;
-    cvCam.y = sy - sceneY * cvCam.z;
-    cvApplyCam(); cvCamSave();
-  }
-  // 适应内容：把所有块的包围盒缩放平移到正好铺满视口
-  function cvFitContent() {
-    if (!canvasBlocks.length) { cvCam.x = 0; cvCam.y = 0; cvCam.z = 1; cvApplyCam(); cvCamSave(); return; }
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    // 背景块永远铺满视口，不参与「内容」包围盒（否则适应永远缩不到 100%）
-    canvasBlocks.forEach((b) => { if (cvRoleOfBlock(b) === "背景") return; x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h); });
-    const f = document.getElementById("cvFrame");
-    const z = Math.min(1.5, Math.max(0.2, Math.min(f.clientWidth / (x1 - x0 + 80), f.clientHeight / (y1 - y0 + 80))));
-    cvCam.z = z;
-    cvCam.x = (f.clientWidth - (x1 - x0) * z) / 2 - x0 * z;
-    cvCam.y = (f.clientHeight - (y1 - y0) * z) / 2 - y0 * z;
-    cvApplyCam(); cvCamSave();
-  }
-
-  // ---- 自动落位：新块按角色给一个合理起点，之后用户随便拖 ----
-  function cvAutoPos(role) {
-    const f = document.getElementById("cvFrame");
-    const fw = f.clientWidth || 900, fh = f.clientHeight || 480;
-    if (role === "背景") return { x: 0, y: 0, w: fw, h: fh };
-    if (role === "导航") return { x: 0, y: 0, w: fw, h: 76 };
-    if (role === "首屏") return { x: 0, y: 82, w: fw, h: Math.max(260, Math.round(fh * 0.42)) };
-    if (role === "浮层") return { x: Math.round(fw * 0.60), y: Math.max(fh - 190, 90), w: Math.round(fw * 0.34), h: 170 };
-    const n = canvasBlocks.filter(x => cvRoleOfBlock(x) === "内容").length;
-    const col = n % 2, row = Math.floor(n / 2);
-    const topY = 82 + Math.max(260, Math.round(fh * 0.42)) + 24;
-    return { x: Math.round(fw * (col ? 0.52 : 0.05)), y: topY + row * 230, w: Math.round(fw * 0.43), h: Math.round(fw * 0.43 * 0.62) };
-  }
-
-  // ---- 存档 ----
-  function cvSave() {
-    try { localStorage.setItem(CV_KEY, JSON.stringify({ blocks: canvasBlocks, theme: canvasTheme })); } catch (e) {}
-  }
-  function cvLoad() {
-    try {
-      const d = JSON.parse(localStorage.getItem(CV_KEY) || "null");
-      if (!d) return;
-      if (Array.isArray(d.blocks)) canvasBlocks = d.blocks.filter(b => b && byId(b.id));
-      if (d.theme) Object.assign(canvasTheme, d.theme);
-    } catch (e) {}
-  }
-
-  // ---- 块 DOM：创建一次反复复用 ----
-  function cvBlockEl(b) {
-    const it = byId(b.id);
-    const box = el("div", "cv-block");
-    box._bref = b;
-    const head = el("div", "cv-block-head");
-    const roleEl = el("span", "role", CV_ROLE_LABEL[cvRoleOfBlock(b)] || "");
-    head.appendChild(roleEl);
-    head.appendChild(el("span", "n", it.标题));
-    const roleBtn = el("button", null, "换层");
-    roleBtn.title = "换个自动位置：背景 → 导航 → 首屏 → 内容 → 浮层";
-    roleBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const idx = CV_ROLE_ORDER.indexOf(cvRoleOfBlock(b));
-      b.role = CV_ROLE_ORDER[(idx + 1) % CV_ROLE_ORDER.length];
-      Object.assign(b, cvAutoPos(b.role));
-      roleEl.textContent = CV_ROLE_LABEL[b.role] || "";
-      cvSave(); cvLayoutAll();
-    });
-    const star = el("button", null, cart.includes(b.id) ? "★" : "☆");
-    star.title = "加入 / 移出购物车";
-    star.addEventListener("click", (e) => {
-      e.stopPropagation(); toggleCart(b.id);
-      star.textContent = cart.includes(b.id) ? "★" : "☆";
-      cvRenderList();
-    });
-    const del = el("button", null, "×");
-    del.title = "从画布移除";
-    del.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const i = canvasBlocks.indexOf(b);
-      if (i >= 0) canvasBlocks.splice(i, 1);
-      cvSave(); cvRender(); cvRenderList();
-    });
-    head.append(roleBtn, star, del);
-    const body = el("div", "cv-block-body");
-    const frame = document.createElement("iframe");
-    frame.title = it.标题 + " 预览";
-    frame.dataset.src = it.效果演示 || "";
-    frame.addEventListener("load", () => { fitBlockFrame(frame); cvApplyToFrame(frame, b); });
-    body.appendChild(frame);
-    const rs = el("span", "cv-block-rs");
-    rs.title = "拖右下角调大小";
-    box.append(head, body, rs);
-    head.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; cvStartMove(e, b); });
-    rs.addEventListener("pointerdown", (e) => cvStartSize(e, b));
-    return box;
-  }
-  function cvLayout(i) {
-    const b = canvasBlocks[i], n = cvNodes[i];
-    if (!n) return;
-    // 背景块永远盖满当前可视区（跟相机走，像真网页的 body 背景）
-    if (cvRoleOfBlock(b) === "背景") {
-      const f = document.getElementById("cvFrame");
-      const z = cvCam.z || 1;
-      const vw = f.clientWidth / z, vh = f.clientHeight / z;
-      const vx = -cvCam.x / z, vy = -cvCam.y / z;
-      b.x = Math.round(vx); b.y = Math.round(vy); b.w = Math.round(vw); b.h = Math.round(vh);
-    }
-    n.style.left = b.x + "px"; n.style.top = b.y + "px";
-    n.style.width = b.w + "px"; n.style.height = b.h + "px";
-    // 背景层永远垫底（后加的背景也不能盖住内容）
-    n.style.zIndex = cvRoleOfBlock(b) === "背景" ? 1 : (b.z || (10 + i));
-    n.classList.toggle("sel", cvSel === i);
-  }
-  function cvLayoutAll() { cvNodes.forEach((n, i) => n && cvLayout(i)); }
-  function cvSelect(i) {
-    cvSel = i;
-    if (i >= 0 && canvasBlocks[i]) canvasBlocks[i].z = ++cvZ;
-    cvLayoutAll();
-    cvRenderSel();
-  }
-  function cvStartMove(e, b) {
-    e.preventDefault();
-    const i = canvasBlocks.indexOf(b);
-    cvSelect(i);
-    const f = document.getElementById("cvFrame");
-    const n = cvNodes[i];
-    const sx = e.clientX, sy = e.clientY, ox = b.x, oy = b.y;
-    n.classList.add("drag");
-    const mv = (ev) => {
-      const k = cvCam.z || 1;
-      b.x = Math.round(ox + (ev.clientX - sx) / k);
-      b.y = Math.round(oy + (ev.clientY - sy) / k);
-      n.style.left = b.x + "px"; n.style.top = b.y + "px";
-    };
-    const up = () => { n.classList.remove("drag"); window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); cvSave(); };
-    window.addEventListener("pointermove", mv);
-    window.addEventListener("pointerup", up);
-  }
-  function cvStartSize(e, b) {
-    e.preventDefault(); e.stopPropagation();
-    const i = canvasBlocks.indexOf(b);
-    cvSelect(i);
-    const f = document.getElementById("cvFrame");
-    const n = cvNodes[i];
-    const sx = e.clientX, sy = e.clientY, ow = b.w, oh = b.h;
-    const mv = (ev) => {
-      const k = cvCam.z || 1;
-      b.w = Math.round(Math.max(150, ow + (ev.clientX - sx) / k));
-      b.h = Math.round(Math.max(90, oh + (ev.clientY - sy) / k));
-      n.style.width = b.w + "px"; n.style.height = b.h + "px";
-      const fr = n.querySelector("iframe");
-      if (fr && fr.src) fitBlockFrame(fr);
-    };
-    const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); cvSave(); };
-    window.addEventListener("pointermove", mv);
-    window.addEventListener("pointerup", up);
-  }
-  function cvRender() {
-    const f = document.getElementById("cvFrame");
-    const world = document.getElementById("cvWorld");
-    const old = cvNodes;
-    cvNodes = canvasBlocks.map((b) => {
-      let n = old.find((x) => x && x._bref === b);
-      if (!n) { n = cvBlockEl(b); world.appendChild(n); }
-      return n;
-    });
-    old.forEach((n) => { if (n && !cvNodes.includes(n)) n.remove(); });
-    // 旧存档 / 新块没有坐标 → 自动落位
-    let dirty = false;
-    canvasBlocks.forEach((b) => { if (b.x == null || b.w == null) { Object.assign(b, cvAutoPos(cvRoleOfBlock(b))); dirty = true; } });
-    if (dirty) cvSave();
-    const hint = f.querySelector(".cv-frame-empty");
-    if (!canvasBlocks.length) {
-      if (!hint) f.appendChild(el("div", "cv-frame-empty", "画布还是空的。\n从左边「素材候选」点素材加进来 —— 先按类型自动归位，然后随便拖、随便拼：\n拖标题栏移动 · 拖右下角调大小 · 点标题栏选中后可在右侧单独调它的参数。"));
-    } else if (hint) hint.remove();
-    if (cvSel >= canvasBlocks.length) cvSel = -1;
-    cvLayoutAll();
-    cvRenderSel();
-    // 同步加载（fitThumbFrame 同步读布局，不必等下一帧；rAF 在部分预览环境不触发）
-    cvNodes.forEach((n) => {
-      const fr = n.querySelector("iframe");
-      if (fr && !fr.src && fr.dataset.src) { fitBlockFrame(fr); fr.src = fr.dataset.src; }
-    });
-    cvFabCount();
-  }
-  function cvRenderList() {
-    const box = document.getElementById("cvList");
-    const kw = (document.getElementById("cvSearch").value || "").trim().toLowerCase();
-    const on = new Set(canvasBlocks.map(b => b.id));
-    box.innerHTML = "";
-    const hit = ITEMS.filter(cvMatchPick)
-      .filter(it => !kw || (it.标题 + " " + it.分类 + " " + (it.子类 || "") + " " + (it.标签 || []).join(" ")).toLowerCase().includes(kw));
-    const cnt = document.getElementById("cvPickCount");
-    if (cnt) cnt.textContent = hit.length + " 条";
-    if (!hit.length) { box.appendChild(el("span", "cv-hint", "当前筛选下没有素材")); return; }
-    hit.forEach(it => {
-      const role = cvRoleOf(it);
-      const b = el("button", "cv-item" + (on.has(it.id) ? " on" : ""), it.标题);
-      b.appendChild(el("span", "r", "· " + role));
-      b.title = it.分类 + (it.子类 ? " · " + it.子类 : "") + "（可拖到画布任意位置）";
-      b.draggable = true;
-      b.addEventListener("click", () => {
-        canvasBlocks.push({ id: it.id });
-        cvSave(); cvRender(); cvRenderList();
-      });
-      // 拖放到画布：落在鼠标松开的位置（Excalidraw 的「拖进画布」范式）
-      b.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/plain", it.id);
-        e.dataTransfer.effectAllowed = "copy";
-      });
-      box.appendChild(b);
-    });
-  }
-
-  // ---- 选中素材的私人参数（右侧面板）----
-  function cvRenderSel() {
-    const box = document.getElementById("cvSelPanel");
-    if (!box) return;
-    box.innerHTML = "";
-    if (cvSel < 0 || !canvasBlocks[cvSel]) {
-      box.appendChild(el("p", "cv-note", "点画布里某个素材的标题栏选中它，就能在这里单独调它自己的参数（统一主题照常对全部素材生效）。"));
-      return;
-    }
-    const b = canvasBlocks[cvSel], it = byId(b.id);
-    const head = el("div", "cv-sel-head");
-    head.appendChild(el("h3", null, "选中：" + it.标题));
-    const un = el("button", "cv-chip", "取消选中");
-    un.addEventListener("click", () => { cvSel = -1; cvLayoutAll(); cvRenderSel(); });
-    head.appendChild(un);
-    box.appendChild(head);
-    const ps = it.参数 || [];
-    if (!ps.length) { box.appendChild(el("p", "cv-note", "这个素材没有可调参数。")); return; }
-    if (!b.params) b.params = {};
-    const iframe = cvNodes[cvSel] ? cvNodes[cvSel].querySelector("iframe") : null;
-    // 已调过的值直接显示进控件：克隆参数表，把默认值换成用户调过的值
-    const patched = Object.assign({}, it, {
-      参数: ps.map(p => (p.键 in b.params) ? Object.assign({}, p, { 默认: b.params[p.键] }) : p),
-    });
-    const ctl = makeControls(patched, iframe, b.params, cvSave);
-    if (ctl) box.appendChild(ctl);
-  }
-
-  // ---- 提示词（不占页面，点「复制提示词」直接进剪贴板）----
-  function cvBuildPrompt() {
-    if (!canvasBlocks.length) return "（画布是空的。）";
-    const f = document.getElementById("cvFrame");
-    const fw = f.clientWidth || 900, fh = f.clientHeight || 480;
-    const styles = [...new Set(canvasBlocks.flatMap((b) => (byId(b.id) || {}).风格 || []))];
-    let out = "帮我做一个网页。画布比例约 " + Math.round(fw) + "×" + Math.round(fh) + "（做成响应式，按下面的比例布局）。";
-    if (styles.length) out += "整体风格：" + styles.join("、") + "。";
-    out += "\n\n【页面结构】素材按下面的位置自由拼接（坐标为相对页面的百分比）：\n";
-    canvasBlocks.forEach((b, i) => {
-      const it = byId(b.id);
-      if (!it) return;
-      const px = Math.round(b.x / fw * 100), py = Math.round(b.y / fh * 100);
-      const pw = Math.round(b.w / fw * 100), ph = Math.round(b.h / fh * 100);
-      let pos;
-      if (pw >= 95 && ph >= 95) pos = "铺满整个视口（z-index:0，垫在所有内容之下）";
-      else if (py <= 5 && pw >= 95) pos = "贴顶通栏，高约 " + Math.round(b.h) + "px";
-      else if (px >= 55 && py + ph >= 75 && pw <= 55) pos = "悬浮在右下角（position:absolute，盖在内容之上）";
-      else pos = "位于页面上 " + py + "%、左 " + px + "% 处，宽约 " + pw + "%、高约 " + ph + "%（绝对定位）";
-      out += "\n" + (i + 1) + ". " + it.标题 + "（" + (it.子类 || it.分类) + "）—— " + pos;
-    });
-    out += "\n\n【统一主题】主色 " + canvasTheme.zhucai + " / 重点色 " + canvasTheme.zhongdian + " / 页面底色 " + canvasTheme.di
-      + " / 圆角 " + canvasTheme.yuanjiao + "px / 基础字号 " + canvasTheme.zihao + "px / 阴影强度 " + canvasTheme.yinying + " / 发光强度 " + canvasTheme.faguang
-      + "\n所有区块的 CSS 变量统一用这一套（--zhucai / --zhongdian / --di / --yuanjiao / --zihao / --yinying / --faguang），不要各自为政。\n";
-    out += "\n【各素材的实现要求】\n";
-    canvasBlocks.forEach((b, i) => {
-      const it = byId(b.id);
-      if (!it) return;
-      out += "\n### " + (i + 1) + ". " + it.标题 + "\n" + (it.提示词 || it.效果说明 || "") + "\n";
-      const ps = (it.参数 || []).map((p) => {
-        const k = cvMatchTheme(p);
-        const v = (b.params && (p.键 in b.params)) ? b.params[p.键] : (k ? canvasTheme[k] : p.默认);
-        return p.名 + " = " + v;
-      });
-      if (ps.length) out += "当前参数：" + ps.join("；") + "\n";
-    });
-    out += "\n【交付要求】输出单个可直接运行的 HTML 文件（含 <!DOCTYPE html>）；素材按【页面结构】给出的位置与大小绝对定位拼接，背景垫底、不挤占内容；所有区块共用那套 CSS 变量；不要引入外部依赖。";
-    return out;
-  }
-  function cvCartToCanvas() {
-    if (!cart.length) { alert("购物车是空的 —— 先在素材库点几颗 ☆ 选素材。"); return false; }
-    const exist = new Set(canvasBlocks.map(b => b.id));
-    cart.forEach(id => { if (!exist.has(id)) { canvasBlocks.push({ id }); exist.add(id); } });
-    cvSave(); cvRender(); cvRenderList();
-    return true;
-  }
-  function cvAllToCart() {
-    const exist = new Set(cart);
-    let n = 0;
-    canvasBlocks.forEach(b => { if (!exist.has(b.id)) { cart.push(b.id); exist.add(b.id); n++; } });
-    syncCart();
-    return n;
-  }
-  function cvBind() {
-    ["zhucai", "zhongdian", "di"].forEach(k => {
-      const inp = document.getElementById("cvT-" + k);
-      inp.value = canvasTheme[k];
-      inp.addEventListener("input", () => { canvasTheme[k] = inp.value; cvSave(); cvApplyThemeAll(); });
-    });
-    CV_NUM_KEYS.forEach(k => {
-      const inp = document.getElementById("cvT-" + k);
-      const lab = document.getElementById("cvT-" + k + "-v");
-      inp.value = canvasTheme[k];
-      lab.textContent = canvasTheme[k];
-      inp.addEventListener("input", () => {
-        canvasTheme[k] = Number(inp.value);
-        lab.textContent = inp.value;
-        cvSave(); cvApplyThemeAll();
-      });
-    });
-    // 一键整理：全部回到按类型自动归位
-    document.getElementById("cvTidy").addEventListener("click", function () {
-      canvasBlocks.forEach(b => { delete b.role; });
-      canvasBlocks.forEach(b => Object.assign(b, cvAutoPos(cvRoleOfBlock(b))));
-      cvSel = -1;
-      cvSave(); cvRender();
-      this.textContent = "已归位";
-      setTimeout(() => { this.textContent = "一键整理"; }, 1400);
-    });
-    document.getElementById("cvSearch").addEventListener("input", cvRenderList);
-    document.getElementById("cvCartTo").addEventListener("click", cvCartToCanvas);
-    document.getElementById("cvAllToCart").addEventListener("click", function () {
-      const n = cvAllToCart();
-      this.textContent = n ? "已存入 " + n + " 个" : "都已在购物车里";
-      setTimeout(() => { this.textContent = "全部存入购物车"; }, 1600);
-    });
-    document.getElementById("cvClear").addEventListener("click", () => {
-      if (canvasBlocks.length && !confirm("清空画布？（购物车不受影响）")) return;
-      canvasBlocks = []; cvSel = -1;
-      cvSave(); cvRender(); cvRenderList();
-    });
-    document.getElementById("cvCopy").addEventListener("click", function () {
-      copyText(cvBuildPrompt(), this);
-    });
-    // 面板：四角自由拉伸（像调浏览器窗口一样）
-    const panel = document.querySelector(".cv-panel");
-    try {
-      const ps = JSON.parse(localStorage.getItem(CV_PANEL_KEY) || "null");
-      if (ps && ps.w) { panel.style.width = ps.w + "px"; panel.style.height = ps.h + "px"; }
-    } catch (e) {}
-    document.querySelectorAll(".cv-rs").forEach((h) => {
-      h.addEventListener("pointerdown", (e) => {
-        e.preventDefault(); e.stopPropagation();
-        const d = h.dataset.d, sx = e.clientX, sy = e.clientY, sw = panel.offsetWidth, sh = panel.offsetHeight;
-        const mv = (ev) => {
-          let w = sw, hh = sh;
-          if (d.indexOf("e") >= 0) w = sw + ev.clientX - sx;
-          if (d.indexOf("s") >= 0) hh = sh + ev.clientY - sy;
-          if (d.indexOf("w") >= 0) w = sw - (ev.clientX - sx);
-          if (d.indexOf("n") >= 0) hh = sh - (ev.clientY - sy);
-          w = Math.max(560, Math.min(w, window.innerWidth * 0.97));
-          hh = Math.max(400, Math.min(hh, window.innerHeight * 0.96));
-          panel.style.width = w + "px"; panel.style.height = hh + "px";
-          if (cvNodes.length) { cvLayoutAll(); }
-        };
-        const up = () => {
-          window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up);
-          try { localStorage.setItem(CV_PANEL_KEY, JSON.stringify({ w: panel.offsetWidth, h: panel.offsetHeight })); } catch (err) {}
-        };
-        window.addEventListener("pointermove", mv);
-        window.addEventListener("pointerup", up);
-      });
-    });
-    // FAB：按住拖到任意位置 · 右下角把手调大小 · 单击打开
-    const fab = document.getElementById("cvFab");
-    const fabScale = () => { const m = /scale\(([\d.]+)\)/.exec(fab.style.transform || ""); return m ? parseFloat(m[1]) : 1; };
-    try {
-      const fs = JSON.parse(localStorage.getItem(CV_FAB_KEY) || "null");
-      if (fs) {
-        if (fs.x != null) { fab.style.left = fs.x + "px"; fab.style.top = fs.y + "px"; fab.style.right = "auto"; fab.style.bottom = "auto"; }
-        if (fs.s) fab.style.transform = "scale(" + fs.s + ")";
-      }
-    } catch (e) {}
-    const fabSave = () => { try { localStorage.setItem(CV_FAB_KEY, JSON.stringify({ x: fab.offsetLeft, y: fab.offsetTop, s: fabScale() })); } catch (err) {} };
-    let fabMoved = false;
-    fab.addEventListener("pointerdown", (e) => {
-      if (e.target.id === "cvFabRs") return;
-      const sx = e.clientX, sy = e.clientY, ol = fab.offsetLeft, ot = fab.offsetTop;
-      fabMoved = false;
-      const mv = (ev) => {
-        const dx = ev.clientX - sx, dy = ev.clientY - sy;
-        if (!fabMoved && Math.hypot(dx, dy) < 6) return;
-        fabMoved = true;
-        fab.classList.add("dragging");
-        fab.style.left = Math.max(0, Math.min(ol + dx, window.innerWidth - fab.offsetWidth)) + "px";
-        fab.style.top = Math.max(0, Math.min(ot + dy, window.innerHeight - fab.offsetHeight)) + "px";
-        fab.style.right = "auto"; fab.style.bottom = "auto";
-      };
-      const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); fab.classList.remove("dragging"); if (fabMoved) fabSave(); };
-      window.addEventListener("pointermove", mv);
-      window.addEventListener("pointerup", up);
-    });
-    document.getElementById("cvFabRs").addEventListener("pointerdown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      const sx = e.clientX, sy = e.clientY, s0 = fabScale();
-      const mv = (ev) => {
-        const sc = Math.max(0.8, Math.min(2.2, s0 + (ev.clientX - sx + ev.clientY - sy) / 300));
-        fab.style.transform = "scale(" + sc.toFixed(2) + ")";
-      };
-      const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); fabSave(); };
-      window.addEventListener("pointermove", mv);
-      window.addEventListener("pointerup", up);
-    });
-    fab.addEventListener("click", () => { if (!fabMoved) cvOpen(); fabMoved = false; });
-    // ---- 无限画布交互 ----
-    const frame = document.getElementById("cvFrame");
-    // 拖空白处平移（Excalidraw 的「抓手」）
-    frame.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".cv-block") || e.target.closest(".cv-zoombar")) return;
-      const sx = e.clientX, sy = e.clientY, cx = cvCam.x, cy = cvCam.y;
-      frame.classList.add("panning");
-      const mv = (ev) => { cvCam.x = cx + (ev.clientX - sx); cvCam.y = cy + (ev.clientY - sy); cvApplyCam(); };
-      const up = () => { frame.classList.remove("panning"); window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); cvCamSave(); };
-      window.addEventListener("pointermove", mv);
-      window.addEventListener("pointerup", up);
-    });
-    // 滚轮平移；Ctrl/⌘+滚轮以鼠标为中心缩放
-    frame.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      if (e.ctrlKey || e.metaKey) cvZoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 1 / 1.12);
-      else { cvCam.x -= e.deltaX; cvCam.y -= e.deltaY; cvApplyCam(); cvCamSave(); }
-    }, { passive: false });
-    // 缩放条
-    document.getElementById("cvZoomIn").addEventListener("click", () => { const r = frame.getBoundingClientRect(); cvZoomAt(r.left + r.width / 2, r.top + r.height / 2, 1.2); });
-    document.getElementById("cvZoomOut").addEventListener("click", () => { const r = frame.getBoundingClientRect(); cvZoomAt(r.left + r.width / 2, r.top + r.height / 2, 1 / 1.2); });
-    document.getElementById("cvFit").addEventListener("click", cvFitContent);
-    document.getElementById("cvZoomReset").addEventListener("click", () => { cvCam.z = 1; cvCam.x = 0; cvCam.y = 0; cvApplyCam(); cvCamSave(); });
-    // 从素材候选拖进来：落在松手的位置
-    frame.addEventListener("dragover", (e) => { e.preventDefault(); frame.classList.add("dragover"); });
-    frame.addEventListener("dragleave", () => frame.classList.remove("dragover"));
-    frame.addEventListener("drop", (e) => {
-      e.preventDefault();
-      frame.classList.remove("dragover");
-      const id = e.dataTransfer.getData("text/plain");
-      if (!id || !byId(id)) return;
-      const p = cvToScene(e.clientX, e.clientY);
-      const tmp = { id };
-      const pos = cvAutoPos(cvRoleOf(byId(id)));
-      canvasBlocks.push(Object.assign(tmp, pos, { x: Math.round(p.x - pos.w / 2), y: Math.round(p.y - pos.h / 2) }));
-      cvSel = canvasBlocks.length - 1;
-      cvSave(); cvRender(); cvRenderList();
-    });
-    // 双击标题栏 = 最大化 / 还原
-    document.querySelector(".cv-panel-head").addEventListener("dblclick", () => {
-      const panel = document.querySelector(".cv-panel");
-      if (panel.dataset.max === "1") {
-        panel.dataset.max = "";
-        panel.style.width = panel.dataset.pw + "px"; panel.style.height = panel.dataset.ph + "px";
-      } else {
-        panel.dataset.pw = panel.offsetWidth; panel.dataset.ph = panel.offsetHeight;
-        panel.dataset.max = "1";
-        panel.style.width = window.innerWidth + "px"; panel.style.height = window.innerHeight + "px";
-      }
-      cvApplyCam(); // 尺寸变了：背景块重新盖满、缩放条刷新
-    });
-    document.getElementById("cvClose").addEventListener("click", cvClosePanel);
-    document.getElementById("cvMask").addEventListener("click", (e) => { if (e.target === e.currentTarget) cvClosePanel(); });
-    document.getElementById("cvResetFilters").addEventListener("click", () => {
-      cvFilter.分类 = "全部";
-      ["风格", "场景", "元素"].forEach(d => cvFilter[d].clear());
-      cvRenderChips(); cvRenderList();
-    });
-  }
-  cvLoad();
-  cvCamLoad();
-  cvBind();
-
-  // ---- 卡片 ----
   function makeCard(it) {
     const card = el("article", "card");
     card.dataset.id = it.id;
-    // 键盘可达：卡片本身是「展开/收起」的主入口，需可聚焦 + 可回车触发
+
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-expanded", "false");
@@ -1575,9 +696,9 @@
     (it.标签 || []).forEach(t => tags.appendChild(el("span", "tag", t)));
     (it.风格 || []).forEach(t => tags.appendChild(el("span", "tag style", t)));
     (it.场景 || []).forEach(t => tags.appendChild(el("span", "tag scene", t)));
-    const hint = el("p", "hint", "点卡片展开：调参数 + 说明 + 提示词");
+    const hint = el("p", "hint", "");
     body.append(top, h2, tags, hint);
-    // 下载按钮：有 下载 字段的素材，卡片标题下方提供下载
+
     if (it.下载) {
       const dlBtn = el("a", "dl-btn", "⬇ 下载 3D 模型文件");
       dlBtn.href = it.下载;
@@ -1614,12 +735,14 @@
     if (open) {
       thumb.style.display = "none";
       demoBig.appendChild(iframe);
-      hint.textContent = "点击卡片上部收起 ↑";
+      fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
+      hint.textContent = "";
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
       thumb.style.display = "";
       thumb.appendChild(iframe);
-      hint.textContent = "点卡片展开：调参数 + 说明 + 提示词";
+      fitThumbFrame(iframe);
+      hint.textContent = "";
     }
   }
 
@@ -1652,7 +775,7 @@
         input.addEventListener("change", () => { current[p.键] = input.checked; sendParam(iframe, p.键, input.checked); refresh(); });
         label.appendChild(input);
       } else if (p.类型 === "color") {
-        // 颜色控件：快选色块 + HTML5 取色器 + 十六进制输入（三件套，颜色完全自由）
+
         const wrap = el("span", "ctl-color-wrap");
         const picker = document.createElement("input");
         picker.type = "color";
@@ -1662,7 +785,7 @@
         hex.type = "text";
         hex.value = (p.默认 || "#000000").toUpperCase();
         hex.className = "ctl-color-hex";
-        hex.maxLength = 9; // 支持 #RRGGBBAA
+        hex.maxLength = 9;
         const swatches = el("span", "ctl-colors");
         (p.选项 || []).forEach(c => {
           const sw = el("span", "swatch" + (c.toLowerCase() === (p.默认||"").toLowerCase() ? " on" : ""));
@@ -1728,7 +851,7 @@
     return sec;
   }
 
-  // ---- 参数值格式化（用于联动提示词/代码） ----
+
   function jsVal(v) { return typeof v === "string" ? JSON.stringify(v) : String(v); }
   function humanVal(v) { return typeof v === "boolean" ? (v ? "开" : "关") : String(v); }
   function stateLiteral(current) {
@@ -1759,7 +882,7 @@
     const controls = makeControls(it, iframe, current, refresh);
     if (controls) info.appendChild(controls);
 
-    // 提示词区块（随参数联动）
+
     const promptSec = el("section");
     const pH3 = el("h3", null, "提示词");
     const pBtn = el("button", "copy-btn", "复制提示词");
@@ -1768,7 +891,7 @@
     promptSec.append(pH3, pPre);
     pBtn.addEventListener("click", (e) => { e.stopPropagation(); copyText(buildPrompt(it, current), pBtn); });
 
-    // 代码区块（完整可运行，随参数联动）
+
     const codeSec = el("section");
     const cH3 = el("h3", null, "代码（完整可运行 · 含当前参数）");
     const cBtn = el("button", "copy-btn", "复制代码");
@@ -1794,7 +917,7 @@
     return info;
   }
 
-  // ---- 生成方案 ----
+
   let planText = "";
   function openPlan() {
     const body = document.getElementById("planBody");
@@ -1813,7 +936,7 @@
     const mask = document.getElementById("planMask");
     mask.hidden = false;
     const firstBtn = mask.querySelector("button");
-    if (firstBtn) firstBtn.focus();   // 焦点移入弹窗，键盘用户不必先 Tab 一圈
+    if (firstBtn) firstBtn.focus();
   }
   function buildPlanPrompt() {
     const chosen = cart.map(byId).filter(Boolean);
@@ -1822,7 +945,7 @@
     const groups = { "视觉": [], "动效": [], "构成": [], "反馈": [], "布局": [], "3D·粒子": [], "其他": [] };
     chosen.forEach(it => {
       const hit = (it.元素 || []).filter(e => groups[e]);
-      if (!hit.length) groups["其他"].push(it);        // 兜底：元素取值出现新词时也不丢素材
+      if (!hit.length) groups["其他"].push(it);
       hit.forEach(e => groups[e].push(it));
     });
     let out = "帮我做一个网页，";
@@ -1879,7 +1002,6 @@
     if (mask && !mask.hidden) mask.hidden = true;
     const cartPanel = document.getElementById("cartPanel");
     if (cartPanel && cartPanel.classList.contains("show")) cartPanel.classList.remove("show");
-    if (cvIsOpen()) cvClosePanel();
   });
 
   // ---- 方案库（独立视图） ----
@@ -1902,11 +1024,9 @@
     if (v === "schemes") {
       dimFilters.style.display = "none";
       contentTools.style.display = "none";
-      document.getElementById("count").textContent = SCHEMES.filter(s => s.id !== "skeleton-01").length;
     } else {
       dimFilters.style.display = "";
       contentTools.style.display = "";
-      document.getElementById("count").textContent = ITEMS.length;
       renderFilters();
     }
     applyFilter();
@@ -2009,12 +1129,14 @@
     if (open) {
       thumb.style.display = "none";
       demoBig.appendChild(iframe);
-      hint.textContent = "点击卡片上部收起 ↑";
+      fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
+      hint.textContent = "";
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
       thumb.style.display = "";
       thumb.appendChild(iframe);
-      hint.textContent = "点卡片展开：配色占比 + 调参数 + 重色落点";
+      fitThumbFrame(iframe);   // 收回缩略图，重新按缩略图尺寸适配
+      hint.textContent = "";
     }
   }
   function makeSchemeCard(s) {
@@ -2044,7 +1166,7 @@
     const tags = el("div", "tags");
     if (s.骨架) tags.appendChild(el("span", "tag", "骨架 " + s.骨架));
     if (s.重色落点) tags.appendChild(el("span", "tag style", s.重色落点));
-    const hint = el("p", "hint", "点卡片展开：配色占比 + 调参数 + 重色落点");
+    const hint = el("p", "hint", "");
     body.append(top, h2, tags, hint);
 
     const detail = el("div", "detail");
@@ -2068,7 +1190,6 @@
 
   // ---- 启动 ----
   renderViewFilters();
-  document.getElementById("count").textContent = ITEMS.length;
   if (!ITEMS.length) {
     document.getElementById("grid").appendChild(el("p", "empty", "没有数据：请检查 data/素材.js 是否存在。"));
   } else {
@@ -2098,12 +1219,8 @@
   // 首屏卡片铺好后补一次尺寸计算（懒加载是异步的，时机可能早于布局稳定）
   requestAnimationFrame(() => setTimeout(fitAllThumbs, 80));
 
-  // 画布初始化（浮层默认关闭，点右下角「画布」按钮才展开）
-  // 旧启动块（cvLoad/cvBind 曾在此重复执行，导致所有监听器注册两份：
-  // 拖放一次掉两个块、双击最大化被立刻还原、滚轮一次缩两格）——只保留 UI 刷新
-  cvRenderChips();
-  cvRenderList();
-  cvFabCount();
+  // 画布启动器：右下角「画布」按钮打开独立设计器 assets/canvas.html（与画廊解耦）
+  document.getElementById("cvFab").addEventListener("click", () => window.open("assets/canvas.html", "_blank"));
 </script>
 </body>
 </html>

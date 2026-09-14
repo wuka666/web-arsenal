@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>画布 · 可交互页面设计器（M3E Canvas 形态）</title>
+<style>
+/* ============================================================
+   画布 v1.4 —— 独立可交互页面设计器
+   架构：单文件零依赖；状态在 CVS，组件注册表在 PARTS。
+   版本要点：
+   - v1.2 兼容旧 localStorage（补 w/h/kind/parts）、防御 NaN 缩放、舞台 flex 布局
+   - v1.3 接入首页购物车（共用 localStorage['arsenal-cart']）
+   - v1.4 开场先选画布类型；屏按类型独立命名（屏幕N / 手机N）；--accent 与主题种子色解绑
+   ============================================================ */
+:root{
+  --c-primary:#6750A4; --c-on-primary:#fff; --c-surface:#fff;
+  --c-surface-variant:#E7E0EC; --c-outline:#79747E; --c-on-surface:#1C1B1F;
+  --c-secondary:#625B71; --c-on-surface-variant:#49454F;
+  --radius:16px; --font:"Roboto","Microsoft YaHei",system-ui,sans-serif;
+  --motion:340ms; --line:#e5e5e7; --muted:#7a7a82; --accent:#6750A4;
+  --cv-bg:#f4f4f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--c-on-surface);background:var(--cv-bg);display:flex;flex-direction:column;overflow:hidden}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar h1{font-size:15px;font-weight:600}
+.topbar .sp{flex:1}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{background:#fafafb}
+
+/* 屏幕标签 */
+.screens{display:flex;align-items:center;gap:6px;overflow-x:auto;max-width:42vw}
+.screen-tab{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.screen-tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.screen-tab .x{opacity:.6;cursor:pointer}
+.screen-tab input{border:0;background:transparent;color:inherit;font:inherit;width:64px;outline:none}
+
+/* 三栏 */
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:228px minmax(0,1fr) 248px}
+.panel{background:#fff;display:flex;flex-direction:column;min-height:0}
+.panel.left{border-right:1px solid var(--line);overflow-y:auto}
+.panel.right{border-left:1px solid var(--line);overflow-y:auto}
+.panel h3{font-size:11px;color:var(--muted);font-weight:600;padding:10px 12px 4px;text-transform:uppercase;letter-spacing:.04em}
+.pal{padding:4px 10px 12px}
+.pal button{font:inherit;font-size:12px;padding:7px 9px;border:1px solid var(--line);background:#fafafb;border-radius:9px;cursor:grab;text-align:left;width:calc(50% - 4px);margin:3px 2px}
+.pal button:hover{border-color:var(--accent)}
+.pal .grp{width:100%;font-size:11px;color:var(--muted);font-weight:600;margin:8px 0 2px;padding-left:2px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.pal .grp .cnt{font-weight:400;opacity:.7}
+.pal .grp .fold{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;background:#fff}
+.pal .grp-body{display:flex;flex-wrap:wrap;margin:0 -2px}
+.pal .grp-body.hidden{display:none}
+
+/* 画布舞台：flex 居中，zoombar 固定底部 */
+.stage{position:relative;flex:1;min-height:0;overflow:auto;background:var(--cv-bg);display:flex;flex-direction:column;align-items:center;padding:28px 0 80px}
+.canvas-wrap{position:relative;flex:none;background:transparent}
+.canvas{position:absolute;top:0;left:0;background:var(--c-surface);box-shadow:0 6px 30px rgba(0,0,0,.10);transform-origin:top left}
+.part{position:absolute;cursor:move;user-select:none}
+.part.sel{outline:2px solid var(--accent);outline-offset:1px;z-index:50}
+.part .handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:3px;display:none;z-index:60}
+.part.sel .handle{display:block}
+.handle.nw{left:-6px;top:-6px;cursor:nwse-resize}
+.handle.ne{right:-6px;top:-6px;cursor:nesw-resize}
+.handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+.handle.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+.part iframe{border:0;width:100%;height:100%;display:block;pointer-events:none}
+
+/* 原生组件样式（统一吃主题变量） */
+.c-btn{display:inline-flex;align-items:center;gap:6px;justify-content:center;height:100%;width:100%;border:0;border-radius:calc(var(--radius) - 4px);font:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:0 14px}
+.c-btn.filled{background:var(--c-primary);color:var(--c-on-primary)}
+.c-btn.tonal{background:var(--c-surface-variant);color:var(--c-on-surface)}
+.c-btn.outlined{background:transparent;color:var(--c-primary);border:1px solid var(--c-outline)}
+.c-iconbtn{width:100%;height:100%;border:0;border-radius:50%;background:var(--c-surface-variant);color:var(--c-on-surface);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.c-fab{width:100%;height:100%;border:0;border-radius:16px;background:var(--c-primary);color:var(--c-on-primary);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.c-chip{height:100%;width:100%;display:flex;align-items:center;justify-content:center;border-radius:999px;background:var(--c-surface-variant);color:var(--c-on-surface);font:inherit;font-size:13px;padding:0 14px}
+.c-appbar{height:100%;width:100%;background:var(--c-surface);color:var(--c-on-surface);display:flex;align-items:center;padding:0 14px;font-weight:600;font-size:16px;border-bottom:1px solid var(--line)}
+.c-navbar{height:100%;width:100%;background:var(--c-surface);display:flex;align-items:stretch;border-top:1px solid var(--line)}
+.c-navbar .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--c-on-surface-variant)}
+.c-navbar .ni .ic{font-size:18px}
+.c-navbar .ni.on{color:var(--c-primary)}
+.c-tabbar{height:100%;width:100%;background:var(--c-surface);display:flex;align-items:center;border-top:1px solid var(--line)}
+.c-tabbar .ti{flex:1;text-align:center;font-size:12px;color:var(--c-on-surface-variant);padding:6px 0}
+.c-tabbar .ti.on{color:var(--c-primary);font-weight:600}
+.c-card{height:100%;width:100%;background:var(--c-surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;overflow:hidden}
+.c-card .t{font-weight:600;font-size:15px;margin-bottom:4px}
+.c-card .b{font-size:13px;color:var(--c-on-surface-variant);line-height:1.5}
+.c-listitem{height:100%;width:100%;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--c-surface)}
+.c-listitem .lt{font-weight:500}.c-listitem .ls{font-size:12px;color:var(--c-on-surface-variant)}
+.c-text{height:100%;width:100%;display:flex;align-items:center;padding:0 12px;font-size:14px;color:var(--c-on-surface-variant);line-height:1.5}
+.c-heading{height:100%;width:100%;display:flex;align-items:center;padding:0 12px;font-weight:700;font-size:22px}
+.c-image{height:100%;width:100%;background:repeating-linear-gradient(45deg,#eee,#eee 10px,#e3e3e3 10px,#e3e3e3 20px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.c-input{height:100%;width:100%;display:flex;align-items:center;padding:0 12px;border:1px solid var(--c-outline);border-radius:10px;color:var(--muted);font-size:14px;background:var(--c-surface)}
+.c-switch{height:100%;width:100%;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:14px}
+.c-switch .tk{width:42px;height:24px;border-radius:999px;background:var(--c-surface-variant);position:relative;margin-left:auto}
+.c-switch .tk::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:var(--motion)}
+.c-switch.on .tk{background:var(--c-primary)}.c-switch.on .tk::after{left:21px}
+.c-slider{height:100%;width:100%;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:13px}
+.c-slider .bar{flex:1;height:4px;background:var(--c-surface-variant);border-radius:999px;position:relative}
+.c-slider .bar::after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;background:var(--c-primary);top:-5px;left:40%}
+.c-dialog{height:100%;width:100%;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.c-dialog .box{background:var(--c-surface);border-radius:var(--radius);padding:18px;width:80%}
+.c-dialog .box .t{font-weight:600;margin-bottom:6px}.c-dialog .box .b{font-size:13px;color:var(--c-on-surface-variant);line-height:1.5}
+.c-snackbar{height:100%;width:100%;display:flex;align-items:center;padding:0 14px;background:#333;color:#fff;font-size:13px;border-radius:10px}
+.c-divider{height:100%;width:100%;background:var(--line)}
+.c-hero{height:100%;width:100%;display:flex;flex-direction:column;justify-content:center;padding:0 22px;background:linear-gradient(135deg,var(--c-primary),var(--c-surface-variant));color:var(--c-on-surface)}
+.c-hero .t{font-weight:800;font-size:26px;margin-bottom:6px}.c-hero .s{font-size:14px;opacity:.85}
+.c-box{height:100%;width:100%;background:var(--c-surface-variant);border-radius:var(--radius)}
+
+/* 检查器 */
+.ins{padding:10px 12px}
+.ins .row{margin-bottom:10px}
+.ins label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.ins input[type=text],.ins textarea,.ins select{width:100%;font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.ins textarea{resize:vertical;min-height:46px}
+.ins .hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px}
+.ins .empty{color:var(--muted);font-size:13px;padding:20px 4px;text-align:center}
+
+/* 主题面板 */
+.theme{border-top:1px solid var(--line);padding:10px 12px;background:#fafafb}
+.theme .row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.theme label{font-size:11px;color:var(--muted);width:48px}
+.theme input[type=color]{width:34px;height:26px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:2px}
+.theme input[type=range]{flex:1}
+.theme select{flex:1;font:inherit;font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:8px}
+
+/* 缩放工具条：固定底部，不覆盖画布 */
+.zoombar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px 6px;box-shadow:0 4px 14px rgba(0,0,0,.12);z-index:100}
+.zoombar button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;padding:3px 9px}
+.zoombar b{min-width:46px;text-align:center;font-size:12px;align-self:center;color:var(--muted)}
+
+/* 预览遮罩 */
+.preview{position:fixed;inset:0;background:rgba(20,20,24,.6);display:none;align-items:center;justify-content:center;z-index:200}
+.preview.on{display:flex}
+.preview .frame{background:#000;border-radius:18px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.preview .bar{position:absolute;top:8px;right:10px;z-index:5}
+.preview .bar .btn{background:#fff}
+
+/* 提示词弹层 */
+.modal{position:fixed;inset:0;background:rgba(20,20,24,.55);display:none;align-items:center;justify-content:center;z-index:300}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:14px;width:min(680px,92vw);max-height:86vh;display:flex;flex-direction:column}
+.modal .box header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.modal .box header h2{font-size:15px;flex:1}
+.modal textarea{flex:1;border:0;padding:14px 16px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;resize:none;outline:none}
+.modal .tip{font-size:12px;color:var(--muted);padding:0 16px 10px}
+
+/* 小提示 */
+.hintbar{font-size:11px;color:var(--muted);padding:6px 12px;background:#fafafb;border-top:1px solid var(--line)}
+.cart-info{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* 开场：选画布类型（每次打开都先问一次） */
+.welcome{position:fixed;inset:0;background:var(--cv-bg);display:flex;align-items:center;justify-content:center;z-index:400}
+.welcome[hidden]{display:none}
+.wbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 34px;text-align:center;box-shadow:0 14px 44px rgba(0,0,0,.10)}
+.wbox h2{font-size:18px;margin-bottom:6px}
+.wbox p{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.wbtns{display:flex;gap:12px;justify-content:center}
+.wbtn{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fafafb;border-radius:14px;padding:18px 22px;width:152px;display:flex;flex-direction:column;align-items:center;gap:7px;transition:border-color .15s ease,background .15s ease}
+.wbtn:hover{border-color:var(--accent);background:#fff}
+.wbtn b{font-size:26px;font-weight:400}
+.wbtn span{font-size:14px;font-weight:600}
+.wbtn i{font-size:11px;color:var(--muted);font-style:normal}
+.wcontinue{margin-top:18px;font:inherit;font-size:13px;color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="welcome" id="welcome">
+  <div class="wbox">
+    <h2>要建哪种画布？</h2>
+    <p>以后随时可用顶栏「＋ 屏幕」「＋ 手机」再新建</p>
+    <div class="wbtns">
+      <button class="wbtn" id="pickDesktop"><b>🖥</b><span>桌面屏幕</span><i>1024 × 680</i></button>
+      <button class="wbtn" id="pickPhone"><b>📱</b><span>手机画布</span><i>390 × 844</i></button>
+    </div>
+    <button class="wcontinue" id="pickResume" hidden>继续上次的画布</button>
+  </div>
+</div>
+<div class="topbar">
+  <h1>画布</h1>
+  <div class="screens" id="screens"></div>
+  <button class="btn ghost" id="addScreen">＋ 屏幕</button>
+  <button class="btn ghost" id="addPhone">＋ 手机</button>
+  <span class="cart-info">购物车 <b id="cartN">0</b></span>
+  <span class="sp"></span>
+  <button class="btn ghost" id="cartTo" title="把购物车里选的素材一次铺到当前屏幕">用购物车生成</button>
+  <button class="btn ghost" id="allToCart" title="把画布上所有动效素材存回购物车">全部存入购物车</button>
+  <button class="btn ghost" id="tidy">整理</button>
+  <button class="btn ghost" id="preview">预览</button>
+  <button class="btn ghost" id="copyPrompt">复制提示词</button>
+  <button class="btn ghost" id="clearAll">清空</button>
+</div>
+<div class="cols">
+  <div class="panel left">
+    <h3>组件库</h3>
+    <div class="pal" id="palette"></div>
+    <div class="hintbar">点击组件 = 添加到当前屏幕；每个屏幕独立。</div>
+  </div>
+  <div class="panel" style="min-height:0">
+    <div class="stage" id="stage">
+      <div class="canvas-wrap" id="canvasWrap"><div class="canvas" id="canvas"></div></div>
+      <div class="zoombar">
+        <button id="zoomOut">−</button><b id="zoomVal">100%</b><button id="zoomIn">＋</button>
+        <button id="zoomFit">适应</button><button id="zoomReset">1:1</button>
+      </div>
+    </div>
+  </div>
+  <div class="panel right">
+    <h3>检查器</h3>
+    <div class="ins" id="inspector"><div class="empty">点选画布上的组件<br>查看 / 编辑属性</div></div>
+    <div class="theme">
+      <h3 style="padding:0 0 6px">主题</h3>
+      <div class="row"><label>种子色</label><input type="color" id="thSeed" value="#6750A4"><span class="hint" id="thScheme" style="flex:1"></span></div>
+      <div class="row"><label>圆角</label><input type="range" id="thRadius" min="0" max="28" value="16"><span id="thRadiusV" style="font-size:11px;color:var(--muted);width:30px;text-align:right">16</span></div>
+      <div class="row"><label>字体</label>
+        <select id="thFont">
+          <option value='"Roboto","Microsoft YaHei",sans-serif'>Roboto（默认）</option>
+          <option value='"Roboto Flex",sans-serif'>Roboto Flex</option>
+          <option value='"Roboto Serif",serif'>Roboto Serif</option>
+          <option value='system-ui,sans-serif'>系统字体</option>
+        </select>
+      </div>
+      <div class="row"><label>动效</label>
+        <select id="thMotion">
+          <option value="340ms">标准</option>
+          <option value="520ms cubic-bezier(.2,1.4,.4,1)">表现力（弹簧）</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="preview" id="previewBox"><div class="bar"><button class="btn" id="closePreview">关闭</button></div><div class="frame" id="previewFrame"></div></div>
+<div class="modal" id="promptModal"><div class="box"><header><h2>设计提示词</h2><button class="btn" id="closePrompt">关闭</button><button class="btn primary" id="doCopy">复制</button></header><textarea id="promptText" readonly></textarea><div class="tip">已复制可粘进 Claude Code / Cursor；若浏览器拦截自动复制，请手动 Ctrl/⌘+A 全选再复制。</div></div></div>
+
+<script src="../data/素材.js"></script>
+<script>
+/* ============================================================
+   状态（尺寸按屏幕存 w/h，缩放独立）
+   ============================================================ */
+const STORE_KEY = "web-arsenal-canvas-v1";
+const SIZE = { phone:{w:390,h:844}, desktop:{w:1024,h:680} };
+let viewScale = 1;
+// 空画布起步：不预设屏幕，由开场选择页决定第一屏的类型与命名
+let CVS = migrate(load() || {
+  screens: [],
+  theme: { seed:"#6750A4", radius:16, font:'"Roboto","Microsoft YaHei",sans-serif', motion:"340ms" },
+  active:null
+});
+let selId = null;
+const $ = s => document.querySelector(s);
+const canvas = $("#canvas"), canvasWrap = $("#canvasWrap"), stage = $("#stage");
+
+/* 旧版数据兼容：补 w/h/kind/bg/parts，防止 NaN */
+function migrate(cvs){
+  if(!cvs || !Array.isArray(cvs.screens)) return cvs;
+  cvs.screens.forEach(s=>{
+    if(!s.kind || !SIZE[s.kind]) s.kind = "phone";
+    if(!s.w || !isFinite(s.w)) s.w = SIZE[s.kind].w;
+    if(!s.h || !isFinite(s.h)) s.h = SIZE[s.kind].h;
+    if(!s.bg) s.bg = "#ffffff";
+    if(!Array.isArray(s.parts)) s.parts = [];
+    s.parts.forEach(p=>{
+      if(!p.id) p.id = uid();
+      if(!p.props) p.props = {};
+      if(!p.behavior) p.behavior = {target:null,transition:"slide"};
+      if(!isFinite(p.x)) p.x=24; if(!isFinite(p.y)) p.y=24;
+      if(!isFinite(p.w)) p.w=160; if(!isFinite(p.h)) p.h=56;
+      // 旧效果组件存的是 assets/demos/xxx.html，需转成相对于 canvas.html 的 demos/xxx.html
+      if(p.type==="__effect"){
+        if(p.demo && p.demo.startsWith("assets/")) p.demo=p.demo.replace(/^assets\//,"");
+        if(!p.eid && window.WEB_ARSENAL){ const m=WEB_ARSENAL.find(x=>(x.效果演示||"").replace(/^assets\//,"")===p.demo); if(m) p.eid=m.id; }
+      }
+    });
+  });
+  if(!cvs.screens.length){ cvs.active = null; return cvs; }   // 空画布不要取 screens[0]
+  if(!cvs.screens.find(s=>s.id===cvs.active)) cvs.active = cvs.screens[0].id;
+  return cvs;
+}
+
+/* ============================================================
+   组件注册表（加组件只改这里）
+   ============================================================ */
+const PARTS = {
+  button:{ label:"按钮", def:{text:"按钮",variant:"filled"}, fields:["text","variant"], render:p=>`<button class="c-btn ${p.variant||'filled'}">${esc(p.text)}</button>`, prompt:p=>`按钮「${p.text}」` },
+  iconButton:{ label:"图标按钮", def:{icon:"★"}, fields:["icon"], render:p=>`<button class="c-iconbtn">${esc(p.icon)}</button>`, prompt:p=>`图标按钮「${p.icon}」` },
+  fab:{ label:"悬浮按钮", def:{icon:"＋"}, fields:["icon"], render:p=>`<button class="c-fab">${esc(p.icon)}</button>`, prompt:p=>`悬浮操作按钮「${p.icon}」` },
+  chip:{ label:"标签片", def:{text:"标签"}, fields:["text"], render:p=>`<div class="c-chip">${esc(p.text)}</div>`, prompt:p=>`标签片「${p.text}」` },
+  appBar:{ label:"应用栏", def:{text:"标题"}, fields:["text"], render:p=>`<div class="c-appbar">${esc(p.text)}</div>`, prompt:p=>`顶部应用栏，标题「${p.text}」` },
+  navBar:{ label:"导航栏", def:{items:"首页,发现,我的"}, fields:["items"], render:p=>`<div class="c-navbar">${p.items.split(",").map((t,i)=>`<div class="ni ${i===0?'on':''}"><span class="ic">●</span>${esc(t)}</div>`).join("")}</div>`, prompt:p=>`底部导航栏，项：${p.items}` },
+  tabBar:{ label:"标签页", def:{items:"标签一,标签二"}, fields:["items"], render:p=>`<div class="c-tabbar">${p.items.split(",").map((t,i)=>`<div class="ti ${i===0?'on':''}">${esc(t)}</div>`).join("")}</div>`, prompt:p=>`顶部标签页，项：${p.items}` },
+  card:{ label:"卡片", def:{text:"标题",body:"内容描述…"}, fields:["text","body"], render:p=>`<div class="c-card"><div class="t">${esc(p.text)}</div><div class="b">${esc(p.body)}</div></div>`, prompt:p=>`卡片，标题「${p.text}」` },
+  listItem:{ label:"列表项", def:{text:"项目",sub:"副标题"}, fields:["text","sub"], render:p=>`<div class="c-listitem"><div><div class="lt">${esc(p.text)}</div><div class="ls">${esc(p.sub)}</div></div></div>`, prompt:p=>`列表项「${p.text}」` },
+  text:{ label:"文本", def:{text:"一段说明文字…"}, fields:["text"], render:p=>`<div class="c-text">${esc(p.text)}</div>`, prompt:p=>`文本「${p.text}」` },
+  heading:{ label:"大标题", def:{text:"大标题"}, fields:["text"], render:p=>`<div class="c-heading">${esc(p.text)}</div>`, prompt:p=>`标题「${p.text}」` },
+  image:{ label:"图片", def:{}, fields:[], render:()=>`<div class="c-image">图片占位</div>`, prompt:()=>`图片占位` },
+  input:{ label:"输入框", def:{text:"请输入…"}, fields:["text"], render:p=>`<div class="c-input">${esc(p.text)}</div>`, prompt:p=>`输入框，提示「${p.text}」` },
+  switch:{ label:"开关", def:{text:"开关",on:false}, fields:["text","on"], render:p=>`<div class="c-switch ${p.on?'on':''}">${esc(p.text)}<span class="tk"></span></div>`, prompt:p=>`开关「${p.text}」${p.on?'（默认开）':''}` },
+  slider:{ label:"滑块", def:{text:"滑块"}, fields:["text"], render:p=>`<div class="c-slider">${esc(p.text)}<span class="bar"></span></div>`, prompt:p=>`滑块「${p.text}」` },
+  dialog:{ label:"对话框", def:{text:"提示",body:"对话框内容…"}, fields:["text","body"], render:p=>`<div class="c-dialog"><div class="box"><div class="t">${esc(p.text)}</div><div class="b">${esc(p.body)}</div></div></div>`, prompt:p=>`对话框「${p.text}」` },
+  snackbar:{ label:"消息条", def:{text:"已保存"}, fields:["text"], render:p=>`<div class="c-snackbar">${esc(p.text)}</div>`, prompt:p=>`消息条「${p.text}」` },
+  divider:{ label:"分割线", def:{}, fields:[], render:()=>`<div class="c-divider"></div>`, prompt:()=>`分割线` },
+  hero:{ label:"首屏", def:{text:"主标题",sub:"副标题说明…"}, fields:["text","sub"], render:p=>`<div class="c-hero"><div class="t">${esc(p.text)}</div><div class="s">${esc(p.sub)}</div></div>`, prompt:p=>`首屏 Hero，标题「${p.text}」` },
+  box:{ label:"容器", def:{}, fields:[], render:()=>`<div class="c-box"></div>`, prompt:()=>`容器块` },
+};
+/* 效果类（从素材库动态读，iframe 嵌入；永远和库同步） */
+function effectParts(){
+  if(!window.WEB_ARSENAL) return [];
+  return WEB_ARSENAL.map(m=>{
+    const raw=m.效果演示||"";
+    // canvas.html 在 assets/ 下，素材 demo 在 assets/demos/ 下；
+    // 素材库存的是 assets/demos/xxx.html，这里要转成相对于 canvas.html 的 demos/xxx.html
+    const demo=raw.replace(/^assets\//,"");
+    return {
+      id:m.id, label:m.标题||m.id, demo:demo, srcRaw:raw,
+      def:{}, fields:[],
+      render:()=>`<iframe src="${demo}" sandbox="allow-scripts"></iframe>`,
+      prompt:()=>`动效组件「${m.标题||m.id}」（${m.分类}/${m.子类}）`
+    };
+  });
+}
+
+/* ============================================================
+   工具
+   ============================================================ */
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function uid(){return "p"+Math.random().toString(36).slice(2,8);}
+function curScreen(){return CVS.screens.find(s=>s.id===CVS.active)||null;}
+function activeParts(){const s=curScreen();return s?s.parts:[];}
+function partById(id){return activeParts().find(p=>p.id===id);}
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(CVS));}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||"null");}catch(e){return null;}}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function finite(v,def){return isFinite(v)?v:def;}
+
+/* 种子色 → 简化 Material 3 scheme */
+function applyTheme(){
+  const t=CVS.theme;
+  document.documentElement.style.setProperty("--radius",t.radius+"px");
+  document.documentElement.style.setProperty("--font",t.font);
+  document.documentElement.style.setProperty("--motion",t.motion);
+  // --accent 是编辑器自己的强调色（激活的屏标签 / 选中框 / hover 边框），不跟主题种子色走：
+  // 种子色若接近白色（如 #fcfcfc），激活标签会变白底白字、选中框在浅画布上直接消失。
+  // 主题色只经由 --c-primary 作用于画布内的组件，两者互不干涉。
+  const hsl=hexToHsl(t.seed);
+  document.documentElement.style.setProperty("--c-primary",t.seed);
+  document.documentElement.style.setProperty("--c-surface","#ffffff");
+  document.documentElement.style.setProperty("--c-surface-variant",hslToHex(hsl.h,hsl.s*0.4,hsl.l*1.04+6));
+  document.documentElement.style.setProperty("--c-outline",hslToHex(hsl.h,hsl.s*0.3,hsl.l*0.6+18));
+  document.documentElement.style.setProperty("--c-on-surface",hslToHex(hsl.h,hsl.s*0.2,18));
+  $("#thScheme").textContent="primary "+t.seed;
+}
+function hexToHsl(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h,s,l=(mx+mn)/2;if(mx===mn)s=0;else{const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4}h/=6}return{h:h*360,s:s*100,l:l*100}}
+function hslToHex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12;const a=s*Math.min(l,1-l);const f=n=>{const c=l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return Math.round(255*c).toString(16).padStart(2,"0")};return "#"+f(0)+f(8)+f(4);}
+
+/* ============================================================
+   渲染：屏幕标签
+   ============================================================ */
+function renderScreens(){
+  const box=$("#screens");box.innerHTML="";
+  CVS.screens.forEach(s=>{
+    const t=document.createElement("div");
+    t.className="screen-tab"+(s.id===CVS.active?" on":"");
+    const inp=document.createElement("input");inp.value=s.name;
+    inp.addEventListener("change",()=>{s.name=inp.value;save();});
+    inp.addEventListener("click",e=>e.stopPropagation());
+    t.appendChild(inp);
+    if(CVS.screens.length>1){const x=document.createElement("span");x.className="x";x.textContent="✕";x.onclick=e=>{e.stopPropagation();delScreen(s.id);};t.appendChild(x);}
+    t.onclick=()=>{CVS.active=s.id;selId=null;renderAll();};
+    box.appendChild(t);
+  });
+}
+function delScreen(id){
+  if(CVS.screens.length<=1)return;
+  CVS.screens=CVS.screens.filter(s=>s.id!==id);
+  if(CVS.active===id)CVS.active=CVS.screens[0].id;
+  save();renderAll();
+}
+
+/* ============================================================
+   渲染：组件面板（组件 + 素材库动效；动效组可折叠）
+   ============================================================ */
+function renderPalette(){
+  const pal=$("#palette");pal.innerHTML="";
+  // 组件组
+  const g1=document.createElement("div");g1.className="grp";g1.innerHTML=`<span>组件（原生可编辑）</span>`;pal.appendChild(g1);
+  const b1=document.createElement("div");b1.className="grp-body";pal.appendChild(b1);
+  Object.keys(PARTS).forEach(k=>{
+    const def=PARTS[k];
+    const btn=document.createElement("button");btn.textContent=def.label;btn.draggable=true;
+    btn.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",JSON.stringify({type:k,def:def.def,fromEffect:false})));
+    btn.onclick=()=>addPart(k,def.def,false);
+    b1.appendChild(btn);
+  });
+  // 效果组（可折叠，避免 105 个按钮糊一脸）
+  const eff=effectParts();
+  const g2=document.createElement("div");g2.className="grp";
+  g2.innerHTML=`<span>素材库动效（${eff.length}）</span><span class="fold" id="effFold">收起</span>`;pal.appendChild(g2);
+  const b2=document.createElement("div");b2.className="grp-body";b2.id="effBody";pal.appendChild(b2);
+  eff.forEach(m=>{
+    const btn=document.createElement("button");btn.textContent="◈ "+m.label;btn.draggable=true;btn.title=m.demo;
+    btn.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",JSON.stringify({type:"__effect",demo:m.demo,label:m.label,id:m.id,fromEffect:true})));
+    btn.onclick=()=>addEffect(m);
+    b2.appendChild(btn);
+  });
+  g2.onclick=e=>{ if(e.target.id==="effFold"||e.target===g2.firstChild){ const hidden=b2.classList.toggle("hidden"); $("#effFold").textContent=hidden?"展开":"收起"; } };
+}
+
+/* ============================================================
+   增删组件
+   ============================================================ */
+function basePart(type,def,fromEffect){
+  const isEffect=fromEffect||type==="__effect";
+  const w=isEffect?220:160,h=isEffect?150:56;
+  const s=curScreen();
+  const n=s.parts.length;
+  return {id:uid(),type,props:JSON.parse(JSON.stringify(def||{})),x:24+(n%6)*20,y:24+(n%10)*20,w,h,behavior:{target:null,transition:"slide"}};
+}
+function addPart(type,def,fromEffect){
+  const p=basePart(type,def,fromEffect);
+  curScreen().parts.push(p);selId=p.id;save();renderAll();
+}
+function addEffect(m){
+  const p=basePart("__effect",{},true);p.demo=m.demo;p.label=m.label;p.eid=m.id;
+  curScreen().parts.push(p);selId=p.id;save();renderAll();
+}
+
+/* ============================================================
+   渲染：画布（仅重建 DOM，不在此处处理选中/拖动）
+   ============================================================ */
+function renderCanvas(){
+  const s=curScreen();
+  if(!s){canvas.style.width="0px";canvas.style.height="0px";canvas.innerHTML="";return;}
+  canvas.style.width=s.w+"px";canvas.style.height=s.h+"px";
+  canvas.innerHTML="";
+  s.parts.forEach(p=>{
+    const el=document.createElement("div");
+    el.className="part"+(p.id===selId?" sel":"");
+    el.style.left=p.x+"px";el.style.top=p.y+"px";el.style.width=p.w+"px";el.style.height=p.h+"px";
+    el.dataset.id=p.id;
+    const def=partDef(p);
+    el.innerHTML=(def?def.render(p.props||{},CVS.theme):"")+
+      `<span class="handle nw"></span><span class="handle ne"></span><span class="handle sw"></span><span class="handle se"></span>`;
+    bindPart(el,p);
+    canvas.appendChild(el);
+  });
+  applyZoom();
+}
+function partDef(p){
+  if(p.type==="__effect")return {render:()=>`<iframe src="${p.demo}" sandbox="allow-scripts"></iframe>`};
+  return PARTS[p.type];
+}
+/* 缩放：canvas 用 transform，wrap 尺寸跟随，保证滚动区与视觉一致 */
+function applyZoom(){
+  const s=curScreen();if(!s)return;
+  const z=finite(viewScale,1);
+  canvas.style.transform=`scale(${z})`;
+  canvasWrap.style.width=(finite(s.w,390)*z)+"px";
+  canvasWrap.style.height=(finite(s.h,844)*z)+"px";
+  $("#zoomVal").textContent=Math.round(z*100)+"%";
+}
+
+/* 选中：只切 class + 检查器，不重建画布（关键：保留元素与指针捕获） */
+function selectPart(id){
+  selId=id;
+  canvas.querySelectorAll(".part").forEach(el=>el.classList.toggle("sel",el.dataset.id===id));
+  renderInspector();
+}
+function deselect(){ selId=null; canvas.querySelectorAll(".part.sel").forEach(el=>el.classList.remove("sel")); renderInspector(); }
+
+/* 交互：选中 / 拖动 / 四角缩放 / 双击改文字（都作用在「当前」el 上，不重建） */
+function bindPart(el,p){
+  el.addEventListener("pointerdown",e=>{
+    if(e.target.classList.contains("handle"))return;   // 手柄另算
+    e.stopPropagation();
+    selectPart(p.id);
+    const sx=e.clientX,sy=e.clientY,ox=p.x,oy=p.y;const s=curScreen();
+    el.setPointerCapture(e.pointerId);
+    const mv=ev=>{
+      p.x=clamp(ox+(ev.clientX-sx)/viewScale,0,s.w-p.w);
+      p.y=clamp(oy+(ev.clientY-sy)/viewScale,0,s.h-p.h);
+      el.style.left=p.x+"px";el.style.top=p.y+"px";
+    };
+    const up=()=>{el.removeEventListener("pointermove",mv);el.removeEventListener("pointerup",up);save();};
+    el.addEventListener("pointermove",mv);el.addEventListener("pointerup",up);
+  });
+  el.addEventListener("dblclick",e=>{
+    if(p.type==="__effect")return;
+    const f=PARTS[p.type].fields[0];if(!f)return;
+    const v=prompt("编辑 "+f+"：",p.props[f]||"");if(v!==null){p.props[f]=v;save();renderCanvas();}
+  });
+  el.querySelectorAll(".handle").forEach(h=>{
+    h.addEventListener("pointerdown",e=>{
+      e.stopPropagation();selectPart(p.id);
+      const sx=e.clientX,sy=e.clientY,ow=p.w,oh=p.h;
+      h.setPointerCapture(e.pointerId);
+      const mv=ev=>{p.w=Math.max(40,ow+(ev.clientX-sx)/viewScale);p.h=Math.max(30,oh+(ev.clientY-sy)/viewScale);el.style.width=p.w+"px";el.style.height=p.h+"px";};
+      const up=()=>{h.removeEventListener("pointermove",mv);h.removeEventListener("pointerup",up);save();};
+      h.addEventListener("pointermove",mv);h.addEventListener("pointerup",up);
+    });
+  });
+}
+/* 点空白画布 = 取消选中（不添加任何东西） */
+canvas.addEventListener("pointerdown",e=>{ if(e.target===canvas) deselect(); });
+/* 从组件面板拖入画布：落点坐标按缩放还原 */
+canvas.addEventListener("dragover",e=>e.preventDefault());
+canvas.addEventListener("drop",e=>{
+  e.preventDefault();const d=JSON.parse(e.dataTransfer.getData("text/plain")||"{}");if(!d.type)return;
+  const r=canvas.getBoundingClientRect();
+  const p=basePart(d.type,d.def,d.fromEffect);
+  p.x=clamp((e.clientX-r.left)/viewScale-20,0,curScreen().w-p.w);
+  p.y=clamp((e.clientY-r.top)/viewScale-20,0,curScreen().h-p.h);
+  if(d.type==="__effect"){p.demo=d.demo;p.label=d.label;}
+  curScreen().parts.push(p);selId=p.id;save();renderAll();
+});
+
+/* ============================================================
+   渲染：检查器（属性 + 行为）
+   ============================================================ */
+function renderInspector(){
+  const box=$("#inspector");const p=partById(selId);
+  if(!p){box.innerHTML='<div class="empty">点选画布上的组件<br>查看 / 编辑属性</div>';return;}
+  const def=PARTS[p.type];
+  let h=`<div class="row"><label>类型</label><div style="font-size:13px">${def?def.label:(p.label||"动效组件")}</div></div>`;
+  if(def){
+    def.fields.forEach(f=>{
+      const v=p.props[f];
+      if(f==="variant")h+=`<div class="row"><label>样式</label><select data-f="${f}"><option value="filled"${v==="filled"?" selected":""}>填充</option><option value="tonal"${v==="tonal"?" selected":""}>中性</option><option value="outlined"${v==="outlined"?" selected":""}>描边</option></select></div>`;
+      else if(f==="on")h+=`<div class="row"><label>默认开启</label><input type="checkbox" data-f="${f}" ${v?"checked":""}></div>`;
+      else if(f==="items")h+=`<div class="row"><label>${f}</label><input type="text" data-f="${f}" value="${esc(v)}"><div class="hint">逗号分隔多项</div></div>`;
+      else h+=`<div class="row"><label>${f}</label><input type="text" data-f="${f}" value="${esc(v)}"></div>`;
+    });
+  }else{
+    h+=`<div class="row"><label>动效</label><div style="font-size:12px;color:var(--muted)">${esc(p.label||"")}<br>${esc(p.demo||"")}</div></div>`;
+  }
+  h+=`<div class="row"><label>点击跳转</label><select data-b="target"><option value="">无</option><option value="back">返回上一屏</option>`;
+  CVS.screens.forEach(s=>{if(s.id!==CVS.active)h+=`<option value="${s.id}"${p.behavior.target===s.id?" selected":""}>${esc(s.name)}</option>`;});
+  h+=`</select></div>`;
+  h+=`<div class="row"><label>过渡</label><select data-b="transition"><option value="slide"${p.behavior.transition==="slide"?" selected":""}>滑动</option><option value="fade"${p.behavior.transition==="fade"?" selected":""}>淡入</option><option value="zoom"${p.behavior.transition==="zoom"?" selected":""}>放大</option><option value="none"${p.behavior.transition==="none"?" selected":""}>无</option></select></div>`;
+  h+=`<div class="row"><button class="btn ghost" id="delPart" style="width:100%">删除此组件</button></div>`;
+  box.innerHTML=h;
+  box.querySelectorAll("[data-f]").forEach(inp=>{
+    inp.addEventListener("change",()=>{const f=inp.dataset.f;p.props[f]=inp.type==="checkbox"?inp.checked:inp.value;save();renderCanvas();});
+    inp.addEventListener("input",()=>{const f=inp.dataset.f;if(inp.type!=="checkbox"){p.props[f]=inp.value;renderCanvas();}});
+  });
+  box.querySelectorAll("[data-b]").forEach(sel=>sel.addEventListener("change",()=>{p.behavior[sel.dataset.b]=sel.value;save();}));
+  $("#delPart").onclick=()=>{curScreen().parts=curScreen().parts.filter(x=>x.id!==p.id);selId=null;save();renderAll();};
+}
+
+/* ============================================================
+   Tidy：按类型归位（用屏幕真实 w/h）
+   ============================================================ */
+function tidy(){
+  const s=curScreen();let y=12;
+  s.parts.forEach(p=>{
+    if(p.type==="appBar"||p.type==="tabBar"){p.x=0;p.y=0;p.w=s.w;p.h=56;return;}
+    if(p.type==="navBar"){p.x=0;p.y=s.h-64;p.w=s.w;p.h=64;return;}
+    if(p.type==="fab"){p.x=s.w-72;p.y=s.h-84;p.w=56;p.h=56;return;}
+    if(p.type==="dialog"){p.x=s.w/2-150;p.y=s.h/2-90;p.w=300;p.h=180;return;}
+    p.x=12;p.y=y;p.w=p.w||(s.w-24);y+=Math.max(p.h,40)+12;
+  });
+  save();renderAll();
+}
+
+/* ============================================================
+   购物车互通：与首页共用 arsenal-cart（素材 id 数组）
+   用购物车生成 = 把购物车里的素材铺到当前屏幕
+   全部存入购物车 = 把画布上所有动效素材收回到购物车
+   ============================================================ */
+function loadCart(){ try{ const a=JSON.parse(localStorage.getItem("arsenal-cart")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function saveCart(arr){ try{ localStorage.setItem("arsenal-cart", JSON.stringify(arr)); }catch(e){} }
+function renderCartInfo(){ const el=$("#cartN"); if(el) el.textContent=loadCart().length; }
+function cartToCanvas(){
+  const cart=loadCart();
+  if(!cart.length){ alert("购物车是空的 —— 先在素材库点 ☆ 选几个素材，或在首页「已选素材」里挑。"); return; }
+  const effById={}; effectParts().forEach(m=>effById[m.id]=m);
+  const cur=curScreen();
+  const exist=new Set(cur.parts.filter(p=>p.eid).map(p=>p.eid));
+  let n=0;
+  cart.forEach(id=>{
+    if(exist.has(id)) return;
+    const m=effById[id]; if(!m) return;            // 购物车里有已下架素材则跳过
+    const p=basePart("__effect",{},true); p.demo=m.demo; p.label=m.label; p.eid=m.id;
+    cur.parts.push(p); n++; exist.add(id);
+  });
+  if(n===0){ alert("购物车里的素材都已经在当前画布上了。"); return; }
+  save(); renderAll();
+  const btn=$("#cartTo"); btn.textContent="已生成 "+n+" 个"; setTimeout(()=>btn.textContent="用购物车生成",1600);
+}
+function allToCart(){
+  const cart=new Set(loadCart());
+  let n=0;
+  CVS.screens.forEach(s=>{
+    s.parts.forEach(p=>{
+      const id=p.eid || (effectParts().find(m=>m.demo===p.demo)||{}).id;
+      if(id && !cart.has(id)){ cart.add(id); n++; }
+    });
+  });
+  saveCart([...cart]); renderCartInfo();
+  const btn=$("#allToCart"); btn.textContent="已存入 "+n+" 个"; setTimeout(()=>btn.textContent="全部存入购物车",1600);
+}
+
+/* ============================================================
+   提示词导出（多屏 + 行为 + 主题，坐标用屏幕真实 w/h）
+   ============================================================ */
+function buildPrompt(){
+  const t=CVS.theme;
+  let out="请用前端代码（HTML/CSS/JS 或对应框架）实现以下界面设计，要求高保真还原布局、主题与交互。\n\n";
+  out+=`【主题】主色 ${t.seed}；圆角 ${t.radius}px；字体 ${t.font}；动效 ${t.motion==="340ms"?"标准":"表现力弹簧"}。\n`;
+  out+=`【配色变量】primary=${t.seed}；surface=#fff；surface-variant=${getComputedStyle(document.documentElement).getPropertyValue("--c-surface-variant").trim()}；outline=${getComputedStyle(document.documentElement).getPropertyValue("--c-outline").trim()}。\n\n`;
+  CVS.screens.forEach(s=>{
+    out+=`■ 屏幕「${s.name}」（${s.kind==="phone"?"手机 "+s.w+"×"+s.h:"桌面 "+s.w+"×"+s.h}）\n`;
+    s.parts.forEach(p=>{
+      const def=partDef(p);
+      const px=Math.round(p.x/s.w*100),py=Math.round(p.y/s.h*100),pw=Math.round(p.w/s.w*100),ph=Math.round(p.h/s.h*100);
+      const txt=def?(def.prompt?def.prompt(p.props||{}):p.type):(p.label||"动效组件");
+      let line=`  - ${txt}（位置 左${px}% 上${py}%，尺寸 ${pw}%×${ph}%）`;
+      if(p.behavior&&p.behavior.target){const ts=p.behavior.target==="back"?"返回":(CVS.screens.find(x=>x.id===p.behavior.target)||{}).name;line+=`；点击跳转到「${ts}」，过渡=${p.behavior.transition}`;}
+      out+=line+"\n";
+    });
+    out+="\n";
+  });
+  return out;
+}
+
+/* ============================================================
+   预览：真点跳转
+   ============================================================ */
+function openPreview(){
+  const frame=$("#previewFrame");const s=curScreen();
+  frame.style.width=s.w+"px";frame.style.height=s.h+"px";
+  renderPreviewScreen(frame,s.id);
+  $("#previewBox").classList.add("on");
+}
+function renderPreviewScreen(frame,sid){
+  const s=CVS.screens.find(x=>x.id===sid);if(!s)return;
+  frame.dataset.sid=sid;
+  frame.innerHTML=`<div style="position:relative;width:100%;height:100%;background:var(--c-surface);overflow:hidden">`+
+    s.parts.map(p=>{
+      const def=partDef(p);
+      return `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px;${p.behavior&&p.behavior.target?'cursor:pointer':''}" data-pid="${p.id}">${def?def.render(p.props||{},CVS.theme):""}</div>`;
+    }).join("")+`</div>`;
+  frame.querySelectorAll("[data-pid]").forEach(d=>{
+    const p=s.parts.find(x=>x.id===d.dataset.pid);
+    if(p&&p.behavior&&p.behavior.target){
+      d.onclick=()=>{const tid=p.behavior.target;if(tid==="back"){history.back();return;}renderPreviewScreen(frame,tid);};
+    }
+  });
+}
+
+/* ============================================================
+   缩放控制（防御 NaN/Infinity/非正数）
+   ============================================================ */
+function setScale(z){
+  const nz=isFinite(z)&&z>0?clamp(z,0.2,3):1;
+  viewScale=nz; applyZoom();
+}
+function fitScale(){
+  const s=curScreen();if(!s){setScale(1);return;}
+  const sw=finite(s.w,0), sh=finite(s.h,0);
+  const cw=finite(stage.clientWidth,0), ch=finite(stage.clientHeight,0);
+  if(!sw||!sh||!cw||!ch){setScale(1);return;}
+  const pad=56;
+  const z=Math.min((cw-pad)/sw,(ch-pad)/sh,1);
+  setScale(Math.max(0.2,z));
+}
+
+/* ============================================================
+   事件绑定
+   ============================================================ */
+/* 新屏命名按类型独立计数：桌面→屏幕1/2/3；手机→手机1/2
+   取同类现有最大编号 +1，删掉「屏幕2」后再建不会重名，两个序列互不影响 */
+function nextName(kind){
+  const prefix=kind==="phone"?"手机":"屏幕";
+  const re=new RegExp("^"+prefix+"(\\d+)$");
+  let max=0;
+  CVS.screens.forEach(s=>{const m=re.exec(s.name||"");if(m)max=Math.max(max,+m[1]);});
+  return prefix+(max+1);
+}
+function newScreen(kind){
+  const id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+  CVS.screens.push({id,name:nextName(kind),kind,w:SIZE[kind].w,h:SIZE[kind].h,bg:"#fff",parts:[]});
+  CVS.active=id;selId=null;save();renderAll();
+}
+function enterCanvas(){$("#welcome").hidden=true;renderAll();tryFit();}
+$("#addScreen").onclick=()=>newScreen("desktop");
+$("#addPhone").onclick=()=>newScreen("phone");
+$("#pickDesktop").onclick=()=>{newScreen("desktop");enterCanvas();};
+$("#pickPhone").onclick=()=>{newScreen("phone");enterCanvas();};
+$("#pickResume").onclick=enterCanvas;
+$("#tidy").onclick=tidy;
+$("#preview").onclick=openPreview;
+$("#closePreview").onclick=()=>$("#previewBox").classList.remove("on");
+$("#copyPrompt").onclick=()=>{$("#promptText").value=buildPrompt();$("#promptModal").classList.add("on");};
+$("#closePrompt").onclick=()=>$("#promptModal").classList.remove("on");
+$("#doCopy").onclick=()=>{
+  const ta=$("#promptText");ta.focus();ta.select();
+  const done=()=>{$("#doCopy").textContent="已复制";setTimeout(()=>$("#doCopy").textContent="复制",1400);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(done,()=>{try{document.execCommand("copy");done();}catch(e){}});}
+  else{try{document.execCommand("copy");done();}catch(e){}}
+};
+$("#clearAll").onclick=()=>{if(confirm("清空当前屏幕所有组件？")){curScreen().parts=[];selId=null;save();renderAll();}};
+$("#cartTo").onclick=cartToCanvas;
+$("#allToCart").onclick=allToCart;
+$("#thSeed").oninput=e=>{CVS.theme.seed=e.target.value;applyTheme();save();};
+$("#thRadius").oninput=e=>{CVS.theme.radius=+e.target.value;$("#thRadiusV").textContent=e.target.value;applyTheme();save();};
+$("#thFont").onchange=e=>{CVS.theme.font=e.target.value;applyTheme();save();};
+$("#thMotion").onchange=e=>{CVS.theme.motion=e.target.value;applyTheme();save();};
+$("#zoomIn").onclick=()=>setScale(viewScale+0.1);
+$("#zoomOut").onclick=()=>setScale(viewScale-0.1);
+$("#zoomReset").onclick=()=>setScale(1);
+$("#zoomFit").onclick=fitScale;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#previewBox").classList.remove("on");$("#promptModal").classList.remove("on");}});
+
+/* ============================================================
+   启动
+   ============================================================ */
+function renderAll(){applyTheme();renderScreens();renderCanvas();renderInspector();renderCartInfo();}
+renderPalette();
+renderAll();
+/* 每次打开都先问类型；已有画布时额外给一个「继续上次」入口 */
+function showWelcome(){
+  const cur=curScreen();
+  $("#pickResume").hidden=!cur;
+  if(cur) $("#pickResume").textContent="继续上次的画布（"+cur.name+"）";
+  $("#welcome").hidden=false;
+}
+showWelcome();
+/* 首次进入自动适应，若 stage 尚未 layout 则多试几次 */
+function tryFit(retries=5){
+  if(retries<=0){setScale(1);return;}
+  if(stage.clientWidth>0&&stage.clientHeight>0){fitScale();return;}
+  setTimeout(()=>tryFit(retries-1),60);
+}
+tryFit();
+</script>
+</body>
+</html>
