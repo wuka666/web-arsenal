@@ -1,7 +1,4 @@
-// Web 灵感弹药库 —— 本地 MCP 服务器（stdio）
-// 让任意支持 MCP 的客户端（Cursor / VS Code / Trae / WorkBuddy 等）
-// 能直接搜索、读取弹药库里的素材：提示词 + 可运行代码。
-// 与 Pixso MCP 配合：Pixso 出设计稿结构 → 弹药库补现成动效/组件代码。
+
 
 const fs = require('fs');
 const path = require('path');
@@ -9,18 +6,17 @@ const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
 
-// —— 加载数据（复用与校验脚本相同的加载方式）——
 const DATA_PATH = path.join(__dirname, '..', 'data', '素材.js');
 const SCHEME_PATH = path.join(__dirname, '..', 'data', '方案.js');
 function loadData(file, varName) {
   const code = fs.readFileSync(file, 'utf8');
   const sandbox = {};
-  // 数据文件末尾把数组挂到 window.WEB_ARSENAL / window.WEB_SCHEMES
+
   new Function('window', code)(sandbox);
   return sandbox[varName] || [];
 }
 const ARSENAL = loadData(DATA_PATH, 'WEB_ARSENAL');
-// 方案库：排除 skeleton-01（纯文档条目，无演示页与代码）
+
 const SCHEMES = loadData(SCHEME_PATH, 'WEB_SCHEMES').filter(s => s.id !== 'skeleton-01');
 
 const server = new McpServer({
@@ -28,7 +24,6 @@ const server = new McpServer({
   version: '1.0.0',
 });
 
-// 工具 1：搜索素材（按关键词 / 风格 / 场景 / 元素 / 子类 多维过滤）
 server.tool(
   'search_materials',
   '搜索 Web 灵感弹药库里的素材。可按关键词（标题/标签/说明）或 风格/场景/元素/子类 过滤。返回素材摘要列表（id、标题、分类、标签、一句话说明）。',
@@ -48,7 +43,7 @@ server.tool(
         [it.标题, (it.标签 || []).join(' '), it.效果说明 || ''].join(' ').toLowerCase().includes(k)
       );
     }
-    // 风格/场景/元素用「包含」匹配，避免调用方写「数据看板」匹配不到「后台·数据看板」
+
     const hit = (arr, v) => (arr || []).some(x => String(x).includes(v));
     if (风格) list = list.filter(it => hit(it.风格, 风格));
     if (场景) list = list.filter(it => hit(it.场景, 场景));
@@ -65,7 +60,6 @@ server.tool(
   }
 );
 
-// 工具 2：取素材完整信息（提示词 + 代码 + 参数）
 server.tool(
   'get_material',
   '按 id 取一条素材的完整内容：效果说明、用法、完整提示词（可复制给 AI 复刻）、可运行代码、可调参数。',
@@ -87,7 +81,6 @@ server.tool(
   }
 );
 
-// 工具 3：只取提示词（直接喂给 AI 复刻用）
 server.tool(
   'get_prompt',
   '只取素材的「提示词」文本，方便直接复制给大模型复刻该效果。',
@@ -99,7 +92,6 @@ server.tool(
   }
 );
 
-// 工具 4：只取代码（现成可跑的 HTML）
 server.tool(
   'get_code',
   '只取素材的完整可运行 HTML 代码（含 postMessage 调参接口），可直接保存为 .html 打开或嵌入项目。',
@@ -112,7 +104,6 @@ server.tool(
   }
 );
 
-// 工具 5：随机来一条（找灵感用）
 server.tool(
   'random_material',
   '随机返回一条素材，用于找灵感。可指定风格/场景缩小范围。',
@@ -134,7 +125,6 @@ server.tool(
   }
 );
 
-// 工具 6：搜索方案（整站视觉皮肤）
 server.tool(
   'search_schemes',
   '搜索方案库（整站视觉皮肤方案）。可按关键词或风格名过滤。返回方案摘要：id、风格名、骨架、重色落点、适用场景。',
@@ -160,7 +150,6 @@ server.tool(
   }
 );
 
-// 工具 7：取方案完整信息
 server.tool(
   'get_scheme',
   '按 id 取一套方案的完整内容：配色占比、布局骨架、重色落点、第一屏内容、删减元素、适用与禁忌、可调参数、Agent 提示词（若有）、完整模板代码、可复用片段。',
@@ -192,7 +181,7 @@ server.tool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  // 不往 stdout 打日志（会污染 MCP 协议），仅 stderr
+
   console.error(`[web-arsenal MCP] 已加载 ${ARSENAL.length} 条素材 + ${SCHEMES.length} 套方案，stdio 已连接`);
 }
 main().catch(e => { console.error('启动失败:', e); process.exit(1); });
