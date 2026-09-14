@@ -11,12 +11,12 @@
   .item { color: #fff; padding: 16px 18px; border-radius: 12px; margin: 6px 0; cursor: grab; user-select: none; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.12); touch-action: none; font-size: 15px; transition: box-shadow .2s; }
   .item .h { opacity: .7; font-size: 12px; }
   .item.dragging { box-shadow: 0 14px 34px rgba(0,0,0,.28); cursor: grabbing; z-index: 10; position: relative; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
 <div class="list" id="list"></div>
-<div class="hint">拖动任意条目：其余条目按实时落点以弹簧动效主动让位</div>
+
 <script>
   const state = { gap: 12, dragScale: 1.06, radius: 12, accent: "#3d5fd6", accent2: "#7c4dff", count: 6 };
   const list = document.getElementById("list");
@@ -80,7 +80,7 @@
     }
     if (target !== dragEl && target !== dragEl.nextSibling) {
       flip(() => list.insertBefore(dragEl, target));
-      startY = e.clientY - dy + 0; // keep grab offset stable
+      startY = e.clientY - dy + 0;
     }
   });
 

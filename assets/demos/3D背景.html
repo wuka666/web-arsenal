@@ -26,12 +26,11 @@
     throw new Error("WebGL 不可用");
   }
 
-  // 默认参数（父页面详情页可调）
   const state = {
     count: 260, speed: 4, fov: 60, size: 3.5, alpha: 0.9,
     color: "#735cd9", color2: "#ffffff", bg: "#101014", glow: false
   };
-  // hex → [r,g,b]（0-1）
+
   const rgb = hex => {
     const n = parseInt(hex.slice(1), 16);
     return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
@@ -85,7 +84,6 @@
   let N = 260;
   let posBuf = null, mixBuf = null;
 
-  // Fibonacci 球面：把 N 个点均匀撒在球上
   function buildPoints(count) {
     const pts = new Float32Array(count * 3);
     const mixes = new Float32Array(count);
@@ -119,7 +117,6 @@
     N = count;
   }
 
-  // 参数变了：数量重新生成，颜色/大小/透明度/背景/混合模式立即更新
   function apply() {
     if (state.count !== N) rebuild(state.count);
     gl.uniform3fv(uColor, rgb(state.color));
@@ -127,11 +124,11 @@
     gl.uniform1f(uSize, state.size);
     gl.uniform1f(uAlpha, state.alpha);
     gl.clearColor(...rgb(state.bg), 1);
-    // 发光：叠加混合，亮点互相加亮
+
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, state.glow ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
     document.body.style.background = state.bg;
-    resize(); // 透视角度可能变了，重建投影矩阵
+    resize();
   }
 
   function perspective(fovy, aspect, near, far) {
@@ -193,7 +190,6 @@
   }, { passive: true });
   window.addEventListener("resize", () => resize());
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

@@ -16,7 +16,7 @@
   .step.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
   .step.done .name { color: #1a1a1a; }
   .btn { margin-top: 14px; width: 100%; padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -26,7 +26,7 @@
   <div id="steps"></div>
   <button class="btn" id="btn">确认计划并启动</button>
 </div>
-<div class="hint">适合多步骤长耗时任务：AI 先展示分步计划，待你确认后再启动执行</div>
+
 <script>
   const state = { steps: 4, dur: 900, accent: "#3d5fd6", bg: "#fafafa", card: "#ffffff" };
   const stepsEl = document.getElementById("steps");

@@ -9,7 +9,7 @@
   html, body { height: 100%; background: #000; overflow: hidden; font-family: system-ui, "Microsoft YaHei", sans-serif; }
   canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
-  /* 提示条 */
+  
   .notice {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
     color: #ffffff60; font-size: 13px; text-align: center; pointer-events: none;
@@ -17,7 +17,7 @@
   }
   .notice a { color: #ffffff90; pointer-events: auto; }
 
-  /* 控制面板 */
+  
   .panel-toggle {
     position: fixed; right: 16px; bottom: 16px; z-index: 10;
     width: 40px; height: 40px; border-radius: 999px;
@@ -37,7 +37,7 @@
   .panel input[type="range"] { width: 100px; accent-color: #ffffff; }
   .panel input[type="color"] { width: 50px; height: 22px; border: 0; background: transparent; cursor: pointer; }
   .panel select { background: #222; color: #fff; border: 1px solid #ffffff33; border-radius: 6px; padding: 2px 6px; font-size: 12px; }
-  .panel .note { color: #ffffff66; font-size: 11px; margin-top: 4px; }
+  .panel
 </style>
 </head>
 <body>
@@ -60,7 +60,7 @@
   <label>主色 <input id="color1" type="color" value="#6eb5ff"></label>
   <label>辅色 <input id="color2" type="color" value="#ff8c5a"></label>
   <label>底色 <input id="bg" type="color" value="#000000"></label>
-  <p class="note">调参通过 postMessage({type:'param',key,value}) 实时更新</p>
+  
 </div>
 
 <script>
@@ -79,23 +79,23 @@
     ember: ['#FF7A45', '#FFD166'], ice: ['#9FE8FF', '#5B8DEF'], gold: ['#FFD700', '#FFF1B8']
   }
 
-  // 生成星星
+
   let stars = []
 
   function initStars() {
     stars = []
     for (let i = 0; i < state.count; i++) {
-      // 螺旋星系分布：半径 r 从 0.05 到 1，角度随半径变化
+
       const r = 0.05 + Math.pow(Math.random(), 0.6) * 0.95
-      const armAngle = r * 8 * Math.PI  // 绕 4 圈
-      const spread = (1 - r * 0.7) * state.scatter * 0.3  // 内圈密外圈疏
+      const armAngle = r * 8 * Math.PI
+      const spread = (1 - r * 0.7) * state.scatter * 0.3
       const angle = armAngle + (Math.random() - 0.5) * spread
       const x = Math.cos(angle) * r
       const y = Math.sin(angle) * r
       const brightness = 0.3 + Math.random() * 0.7
-      const armOffset = Math.random() * 0.2  // 星臂偏移
+      const armOffset = Math.random() * 0.2
       const size = 0.3 + Math.random() * 0.7
-      // 颜色混合：主色（蓝）为主，部分偏辅色（橙）
+
       const mix = Math.random()
       stars.push({ x, y, brightness, armOffset, size, mix, baseAngle: angle, r })
     }
@@ -126,11 +126,11 @@
   function draw() {
     time += 0.016 * state.speed
 
-    // 背景
+
     ctx.fillStyle = state.bg
     ctx.fillRect(0, 0, W, H)
 
-    // 中心光晕
+
     const cx = W / 2, cy = H / 2
     const maxR = Math.min(W, H) * 0.08
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR)
@@ -140,7 +140,7 @@
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, W, H)
 
-    // 背景星（小点，数量随 backgroundRatio 联动）
+
     ctx.fillStyle = '#ffffff30'
     const bgN = Math.round(state.count * state.bgRatio)
     for (let i = 0; i < bgN; i++) {
@@ -153,7 +153,7 @@
     }
     ctx.globalAlpha = 1
 
-    // 星系星星
+
     const scale = Math.min(W, H) * 0.35
     const rot = time * state.rotate
     const c1rgb = hexToRgb(state.color1)
@@ -163,17 +163,17 @@
       const angle = s.baseAngle + rot
       const r = s.r * scale
       const x = cx + Math.cos(angle) * r
-      const y = cy + Math.sin(angle) * r * 0.55  // 压扁成椭圆
+      const y = cy + Math.sin(angle) * r * 0.55
 
-      // 闪烁（速度随 twinkleSpeed 联动）
+
       const twinkle = 0.6 + 0.4 * Math.sin(time * state.twinkle * 3 + s.armOffset * 10)
       const alpha = s.brightness * twinkle
 
-      // 颜色
+
       const color = lerpColor(c1rgb, c2rgb, s.mix * 0.4)
       const sz = s.size * state.size * (0.5 + 0.5 * r / scale)
 
-      // 绘制星星（带辉光）
+
       const glowR = sz * 3
       const grad2 = ctx.createRadialGradient(x, y, 0, x, y, glowR)
       grad2.addColorStop(0, `rgba(${color[0]},${color[1]},${color[2]},${alpha * 0.6})`)
@@ -184,13 +184,13 @@
       ctx.arc(x, y, glowR, 0, Math.PI * 2)
       ctx.fill()
 
-      // 核心亮点
+
       ctx.fillStyle = `rgba(255,255,255,${alpha * 0.8})`
       ctx.beginPath()
       ctx.arc(x, y, sz * 0.4, 0, Math.PI * 2)
       ctx.fill()
 
-      // 十字衍射
+
       ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.15})`
       ctx.lineWidth = 0.5
       ctx.beginPath()
@@ -207,7 +207,7 @@
   initStars()
   draw()
 
-  // 面板控制
+
   const panel = document.getElementById('panel')
   document.getElementById('toggle').addEventListener('click', () => panel.classList.toggle('open'))
 

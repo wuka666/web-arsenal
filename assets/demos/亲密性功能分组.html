@@ -9,7 +9,7 @@
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); color: var(--zi); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
   .wrap { width: min(620px, 94vw); }
   h2 { font-size: 15px; margin-bottom: 18px; }
-  /* 组间距：组与组之间拉大，形成「内紧外松」——亲密性原则的核心 */
+
   .groups { display: flex; flex-direction: column; gap: var(--zujian); }
   .grp { display: flex; flex-direction: column; gap: var(--zunei); }
   .grp > .gt { font-size: 12px; letter-spacing: .06em; color: var(--zhucai); }
@@ -24,7 +24,7 @@
     display: flex; align-items: center; justify-content: center; font-size: calc(var(--tubiao) * 0.5); }
   .card b { display: block; font-size: 13.5px; }
   .card span { display: block; margin-top: 4px; font-size: 12px; color: var(--cizi); line-height: 1.5; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi); }
+
 </style>
 </head>
 <body>
@@ -54,9 +54,9 @@
     </div>
   </div>
 </div>
-<div class="hint">亲密性：相关的贴紧、不相关的拉开，看的人不用读文字就知道谁跟谁是一伙</div>
+
 <script>
-  // 参数状态：键名与 data/素材.js 的「参数」一一对应
+
   const state = { zunei: 12, zujian: 40, yuanjiao: 12, yinying: 10, tiliang: 8, tubiao: 24,
     zhucai: "#5E6AD2", di: "#fafafa", zi: "#1a1a1a", cizi: "#6b6b6b", kase: "#ffffff" };
   function apply() {

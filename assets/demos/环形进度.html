@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .ring-wrap {
     position: relative;
     width: var(--size, 120px); height: var(--size, 120px);
@@ -44,22 +44,22 @@
   <div class="ring-pct" id="pct">0%</div>
 </div>
 <button class="btn" id="btn">重新转</button>
-<p class="hint">小空间（卡片/指标）展示明确进度：环 + 百分比</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 2,            // 转满时长（秒）
-    easing: "easeOut", // 缓动
-    size: 120,         // 环直径（px）
-    thick: 10,         // 环线粗细（px）
-    cap: "round",      // 端点形状
-    rot: -90,          // 起点旋转角度
-    showPct: true,     // 是否显示百分比文字
-    pctSize: 24,       // 百分比字号
-    glow: false,       // 环是否发光
-    reverse: false,    // 进度方向（顺时针/逆时针）
-    color: "#1a1a1a",  // 环主色
-    track: "#eee"      // 轨道底色
+    dur: 2,
+    easing: "easeOut",
+    size: 120,
+    thick: 10,
+    cap: "round",
+    rot: -90,
+    showPct: true,
+    pctSize: 24,
+    glow: false,
+    reverse: false,
+    color: "#1a1a1a",
+    track: "#eee"
   };
   const ring = document.getElementById("ring");
   const ringTrack = document.getElementById("ringTrack");

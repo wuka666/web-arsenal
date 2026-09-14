@@ -18,7 +18,7 @@
     transition: color .25s ease, background .25s ease;
   }
   .btn.inked { background: var(--ink, #1a1a1a); color: var(--after-c, #fff); }
-  /* 点击涟漪：从点下去的位置扩散 */
+
   .ripple {
     position: absolute; border-radius: 50%;
     background: color-mix(in srgb, var(--ink, #1a1a1a) 25%, transparent);
@@ -26,7 +26,7 @@
   }
   .ripple.go { animation: inkRipple var(--ripple-dur, .6s) ease-out forwards; }
   @keyframes inkRipple { to { transform: scale(1); opacity: 0; } }
-  /* 墨渍：两个错位的墨团同时放大，边缘更自然 */
+
   .stain, .stain2 {
     position: absolute; border-radius: 50%; background: var(--ink, #1a1a1a);
     transform: scale(0); pointer-events: none;
@@ -35,7 +35,7 @@
   .stain2 { left: 63%; top: 36%; width: 10px; height: 10px; margin: -5px 0 0 -5px; }
   .stain.go { animation: inkStainReveal var(--stain-dur, .55s) ease-out forwards; }
   .stain2.go { animation: inkStainReveal2 var(--stain-dur, .55s) ease-out .04s forwards; }
-  /* 扩散倍数用 CSS 变量，改了立刻生效 */
+
   @keyframes inkStainReveal { to { transform: scale(var(--spread, 55)); } }
   @keyframes inkStainReveal2 { to { transform: scale(calc(var(--spread, 55) * .73)); } }
 </style>
@@ -43,7 +43,7 @@
 <body>
 <button class="btn" id="btn">点击展开墨渍</button>
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     ripple: 0.6, stain: 0.55, reset: 1.6, ink: "#1a1a1a", spread: 55,
     textColor: "#ffffff", btnBg: "#ffffff", bg: "#ffffff", radius: 14,
@@ -62,7 +62,7 @@
     s.setProperty("--btn-bg", state.btnBg);
     s.setProperty("--btn-r", state.radius + "px");
     s.setProperty("--page-bg", state.bg);
-    // 静止状态下换文案
+
     if (!locked) btn.textContent = state.text;
   }
 
@@ -97,7 +97,6 @@
     }, state.reset * 1000);
   });
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

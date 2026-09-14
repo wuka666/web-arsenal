@@ -2,10 +2,10 @@
 <style>
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:220vh;background:var(--bg);display:flex;align-items:center;justify-content:center;}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+
   .replay{position:fixed;right:12px;top:12px;z-index:9;padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;font-size:13px;cursor:pointer}
   .head{width:min(820px,90vw);text-align:var(--align);}
-  /* 每行用 overflow:hidden 做遮罩，内层上移 shift 后归零揭示 */
+
   .line{overflow:hidden;}
   .line span{display:block;font-weight:800;font-size:var(--size);line-height:var(--lh);color:var(--fg);
     transform:translateY(var(--shift));opacity:0;
@@ -20,7 +20,7 @@
     <div class="line"><span>AI 成为真正的协作者</span></div>
     <div class="line"><span>工具消融于流程之中</span></div>
   </div>
-  <div class="hint">向下滚动 / 调右侧参数看变化</div>
+
   <script>
   const state = {
     shift: 40, lineDelay: 0.08, dur: 0.7, size: 44, fg: "#111111",
@@ -42,7 +42,7 @@
     lines.forEach(l=>l.classList.toggle("bf", state.blur));
   }
   let io;
-  function reset(){ // 重播：清状态并重新用 IntersectionObserver 逐行观察
+  function reset(){
     lines.forEach(l=>l.classList.remove("in"));
     if(io) io.disconnect();
     io = new IntersectionObserver((es)=>{

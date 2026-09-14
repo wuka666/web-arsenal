@@ -12,7 +12,6 @@
   }
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #f7f7f5; }
 
-  /* 导航栏 */
   .oai-nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     height: var(--h); display: flex; align-items: center; justify-content: space-between;
@@ -25,7 +24,7 @@
     color: var(--ink); text-decoration: none; font-size: var(--fs); font-weight: 500;
     transition: color .15s; position: relative;
   }
-  .menu a:first-child { color: var(--accent); font-weight: 600; } /* 首项 = 身份宣言，用强调色 */
+  .menu a:first-child { color: var(--accent); font-weight: 600; }
   .menu a:hover { color: var(--accent); }
   .right { display: flex; align-items: center; gap: 16px; }
   .right a {
@@ -39,7 +38,6 @@
   }
   .try-btn:hover { background: #333; }
 
-  /* 演示内容区 */
   .demo-content { padding: calc(var(--h) + 40px) 28px 40px; max-width: 880px; margin: 0 auto; }
   .demo-content h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
   .demo-content p { color: #6b6b66; line-height: 1.8; font-size: 14.5px; }
@@ -92,20 +90,18 @@
   function render() {
     brandEl.textContent = state.brandName;
 
-    // 菜单项
     menuEl.innerHTML = '';
     const items = state.menuItems.split(',').map(s => s.trim()).filter(Boolean);
     items.forEach((item, i) => {
       const a = document.createElement('a');
       a.href = '#';
       a.textContent = item;
-      if (i === 0) a.style.color = 'var(--accent)'; // 首项强调
+      if (i === 0) a.style.color = 'var(--accent)';
       a.addEventListener('mouseenter', () => { a.style.color = 'var(--accent)'; });
       a.addEventListener('mouseleave', () => { if (i === 0) return; a.style.color = 'var(--ink)'; });
       menuEl.appendChild(a);
     });
 
-    // 右侧操作区
     rightEl.innerHTML = '';
     if (state.showRight) {
       const login = document.createElement('a');

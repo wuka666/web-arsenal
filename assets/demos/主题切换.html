@@ -17,14 +17,14 @@
   .card { margin-top: auto; display: flex; gap: 10px; }
   .chip { width: 64px; height: 64px; border-radius: 14px; }
   .btn { margin-top: 14px; align-self: flex-start; padding: 10px 18px; border-radius: 10px; border: none; font-size: 14px; cursor: pointer; }
-  .hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; font-size: 12px; opacity: .6; }
+
 </style>
 </head>
 <body>
 <div class="stage" id="stage">
   <div class="surface light" id="light"></div>
   <div class="surface dark" id="dark"></div>
-  <div class="hint">点任意位置：以触点为中心扩散切换深色模式，底层布局不变形</div>
+
 </div>
 <script>
   const state = { dur: .6, maxr: 160, lightBg: "#ffffff", darkBg: "#15171c", lightText: "#1a1a1a", darkText: "#f2f3f5", accent: "#3d5fd6" };

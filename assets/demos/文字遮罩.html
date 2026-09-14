@@ -11,7 +11,7 @@
     background: #fff; display: flex; align-items: center; justify-content: center;
     font-family: system-ui, "Microsoft YaHei", sans-serif; padding: 24px;
   }
-  /* 文字遮罩：文字内部显示图片，鼠标移动图片跟着滑动（视差） */
+
   .masked-heading {
     position: relative; width: min(720px, 92vw); margin: 0; padding: 50px 0;
     text-align: center; font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
@@ -26,9 +26,9 @@
 </head>
 <body>
 <h2 class="masked-heading" id="mh">
-  <!-- 透明文字占位：用来测量文字真实位置 -->
+
   <span class="masked-heading__measure" id="measure">灵感藏在细节里</span>
-  <!-- SVG 里放同样的文字，作为裁剪形状 -->
+
   <svg class="masked-heading__defs">
     <defs>
       <clipPath id="mh-clip" clipPathUnits="userSpaceOnUse">
@@ -36,7 +36,7 @@
       </clipPath>
     </defs>
   </svg>
-  <!-- 图片层：被裁剪成文字形状，随鼠标滑动 -->
+
   <span class="masked-heading__reveal" id="reveal">
     <span class="masked-heading__clip">
       <span class="masked-heading__media" id="media">
@@ -53,7 +53,6 @@
   const media = document.getElementById("media");
   const img = document.getElementById("img");
 
-  // 默认参数（父页面详情页可调）
   const state = {
     parallax: 26, drift: 18, duration: 1.1, brightness: 1, reveal: "rise",
     text: "灵感藏在细节里", bg: "#ffffff", scale: 1.25, saturate: 1.4, sizeScale: 1,
@@ -64,12 +63,10 @@
 
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
-  // 背景图：同目录下的 遮罩图.jpg（Windows 默认壁纸压出来的抽象蓝，可换成你自己的图）
   img.src = "遮罩图.jpg";
 
-  // 测量 HTML 文字位置，同步给 SVG 裁剪文字
   function sync() {
-    // 换文字 / 换字号后重新测量
+
     measure.textContent = state.text;
     glyph.textContent = state.text;
     fs = clamp(root.clientWidth * 0.13 * state.sizeScale, 20, 160);
@@ -83,7 +80,6 @@
     glyph.setAttribute("letter-spacing", cs.letterSpacing);
   }
 
-  // 每帧：图片跟随鼠标视差 + 缓慢漂移
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
@@ -98,12 +94,11 @@
     media.style.transform = "translate3d(" + clamp(off.x, -maxX, maxX).toFixed(1) + "px, " +
       clamp(off.y, -maxY, maxY).toFixed(1) + "px, 0) scale(" + state.scale + ")";
     media.style.filter = "brightness(" + state.brightness + ") saturate(" + state.saturate + ")";
-    // 文字投影：颜色 + 模糊半径实时可调
+
     reveal.style.filter = "drop-shadow(0 4px " + state.shadowBlur + "px " + state.shadowColor + ")";
     requestAnimationFrame(frame);
   }
 
-  // 入场动画：先摆好"还没进场"的状态
   function rest() {
     reveal.style.transition = "none";
     glyph.style.transition = "none";
@@ -146,7 +141,6 @@
     }
   }
 
-  // 参数变了：重播一次入场动画，让效果立即可见
   function apply() {
     document.body.style.background = state.bg;
     played = true;
@@ -163,7 +157,6 @@
   root.addEventListener("pointerleave", () => { off.tx = 0; off.ty = 0; });
   window.addEventListener("resize", () => sync());
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;
@@ -174,7 +167,7 @@
   img.onload = () => sync();
   sync();
   rest();
-  // 进入视口才播放入场动画
+
   const io = new IntersectionObserver((entries) => {
     if (entries.some(en => en.isIntersecting) && !played) {
       played = true;

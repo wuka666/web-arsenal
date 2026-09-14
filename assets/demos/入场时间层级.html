@@ -38,7 +38,7 @@
 </div>
 <div class="order">入场时间层级：错峰间隔决定「谁先被看到」，克制页面里这是唯一的高音</div>
 <script>
-  // 参数状态：键名与 data/素材.js 的「参数」一一对应
+
   const state = { jiange: 120, shichang: 700, weiyi: 18, huandong: "平滑", chongbo: true,
     zhucai: "#5E6AD2", di: "#fafafa", zi: "#1a1a1a", cizi: "#6b6b6b", kase: "#ffffff" };
   const EASE = { "平滑": "cubic-bezier(.16,1,.3,1)", "回弹": "cubic-bezier(.34,1.56,.64,1)", "匀速": "linear" };
@@ -54,7 +54,7 @@
     r.setProperty("--shichang", state.shichang + "ms");
     r.setProperty("--ease", EASE[state.huandong] || EASE["平滑"]);
   }
-  // 逐个排队入场：延迟 = 序号 × 错峰间隔，改间隔就能看出层级松紧
+
   function play() {
     document.querySelectorAll(".seq").forEach((el, i) => {
       el.classList.remove("run");
@@ -65,7 +65,7 @@
   }
   window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
   apply(); play();
-  // 自动重播：卡片缩略图里也能看到动效，关掉就只播一次
+
   timer = setInterval(() => { if (state.chongbo) play(); }, 4200);
 </script>
 </body>

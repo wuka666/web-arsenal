@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .row { display: flex; align-items: center; gap: 14px; }
   .rail {
     position: relative;
@@ -49,29 +49,28 @@
   <div class="pct" id="pct">0%</div>
 </div>
 <button class="btn" id="btn">重新加载</button>
-<p class="hint">进度可算的任务：填充宽度 + 百分比同步走，用户知道完成比例</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 2,            // 加载时长（秒），越大越慢
-    thick: 8,          // 轨道粗细（px）
-    round: 8,          // 圆角（px）
-    width: 300,        // 轨道宽度（px）
-    easing: "easeOut", // 缓动：easeOut（开头快结尾缓）/ linear（匀速）/ easeInOut（两端缓）
-    showPct: true,     // 是否显示百分比数字
-    pctSize: 18,       // 百分比字号
-    glow: false,       // 填充是否发光
-    color: "#1a1a1a",  // 填充主色
-    track: "#eee"      // 轨道底色
+    dur: 2,
+    thick: 8,
+    round: 8,
+    width: 300,
+    easing: "easeOut",
+    showPct: true,
+    pctSize: 18,
+    glow: false,
+    color: "#1a1a1a",
+    track: "#eee"
   };
   const fill = document.getElementById("fill");
   const pct = document.getElementById("pct");
 
-  // 缓动函数：把进度 t（0-1）映射到不同曲线
   function ease(t) {
     if (state.easing === "linear") return t;
     if (state.easing === "easeInOut") return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
-    return 1 - Math.pow(1 - t, 3); // easeOut：开头快结尾缓
+    return 1 - Math.pow(1 - t, 3);
   }
 
   function applyStyle() {

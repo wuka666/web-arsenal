@@ -2,9 +2,9 @@
 <style>
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);padding:8vh 6vw;}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+
   .ch{display:flex;align-items:center;gap:var(--gap);margin:0 0 6vh;flex-wrap:wrap;}
-  /* 超大序号：描边模式文字透明+描边；实心模式直接填充 */
+
   .num{font-size:var(--numSize);font-weight:900;line-height:.9;letter-spacing:-.04em;
     color:var(--numColor);min-width:1.6em;}
   .num.outline{color:transparent;-webkit-text-stroke:3px var(--numColor);}
@@ -19,7 +19,7 @@
   </div>
   <div class="ch"><div class="num">02</div><div class="txt"><h2>人机协作</h2><p>设计师与模型共同迭代</p></div></div>
   <div class="ch"><div class="num">03</div><div class="txt"><h2>落地评估</h2><p>从概念到生产的度量</p></div></div>
-  <div class="hint">调右侧参数看变化</div>
+
   <script>
   const state = {
     num: "01", numSize: 180, numColor: "#111111", outline: true,
@@ -36,9 +36,9 @@
     root.style.setProperty("--align", state.align === "左" ? "left" : state.align === "右" ? "right" : "center");
     root.style.setProperty("--gap", state.gap + "px");
     root.style.setProperty("--bg", state.bg);
-    // 描边开关：切换 .outline 类（实心时移除）
+
     allNum.forEach(n=>n.classList.toggle("outline", state.outline));
-    // 仅第一块由参数驱动，便于实时预览
+
     document.getElementById("num1").textContent = state.num;
     document.getElementById("t1").textContent = state.title;
     document.getElementById("s1").textContent = state.sub;

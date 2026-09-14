@@ -23,7 +23,7 @@
 <canvas id="rain"></canvas>
 <div class="card">内容区<br><span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.6)">雨会避开这里</span></div>
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     rain: 1, speed: 7, wind: 0, len: 1, width: 1.5,
     opacity: 0.5, color: "#ffffff", bg: "#17171c"
@@ -36,7 +36,7 @@
   // 降级条件：只在触摸设备上不画雨（省电），桌面端不管窗口多窄都画——
   // 因为演示常被嵌在 iframe 里（宽度小于屏幕），按宽度判断会把雨全禁掉
   const isTouch = window.matchMedia && window.matchMedia("(hover: none)").matches;
-  // hex → rgba 字符串
+
   const rgba = (hex, a) => {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
@@ -46,14 +46,14 @@
     return {
       x: Math.random() * W,
       y: randomY ? Math.random() * H : -20,
-      len: (12 + Math.random() * 18) * state.len, // 雨丝长度按参数缩放
+      len: (12 + Math.random() * 18) * state.len,
       v: 5 + Math.random() * 6,
       bend: 0
     };
   }
 
   function rebuild() {
-    // 保底 24 根：iframe 缩略图很小，按面积算会只剩几根，看不清
+
     const n = Math.round(Math.max(24, W * H / 6000 * state.rain));
     DROPS = Array.from({ length: n }, () => makeDrop(true));
   }
@@ -61,7 +61,7 @@
   function resize() {
     W = canvas.width = innerWidth;
     H = canvas.height = innerHeight;
-    // 避让区按视口比例缩放（iframe 缩略图很小，固定 400x280 会盖住整个视口）
+
     CARD.w = Math.min(420, W * 0.76);
     CARD.h = Math.min(280, H * 0.6);
     CARD.x = W / 2 - CARD.w / 2;
@@ -72,11 +72,11 @@
   function frame() {
     if (!isTouch) {
       ctx.clearRect(0, 0, W, H);
-      ctx.strokeStyle = rgba(state.color, state.opacity); // 雨色 + 透明度实时读 state
+      ctx.strokeStyle = rgba(state.color, state.opacity);
       ctx.lineWidth = state.width;
       for (const d of DROPS) {
         d.y += d.v * state.speed / 7;
-        d.x += state.wind * 0.3; // 风偏移：每帧横向漂移
+        d.x += state.wind * 0.3;
         d.bend *= 0.92;
         const dx = d.x - pointer.x, dy = d.y - pointer.y;
         const d2 = dx * dx + dy * dy;
@@ -97,7 +97,6 @@
     requestAnimationFrame(frame);
   }
 
-  // 参数变了：雨量/雨长重新生成，其余每帧直接读 state
   function apply() {
     document.body.style.background = state.bg;
     rebuild();
@@ -111,7 +110,6 @@
   }, { passive: true });
   window.addEventListener("resize", () => resize());
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

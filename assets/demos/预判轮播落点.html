@@ -14,7 +14,7 @@
   .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; transition: transform .2s, background .2s; }
   .dot.on { background: var(--accent); transform: scale(1.5); }
   .dot.predict { background: var(--predict); box-shadow: 0 0 0 3px rgba(224,83,61,.25); }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -22,7 +22,7 @@
   <div class="track" id="track"></div>
 </div>
 <div class="dots" id="dots"></div>
-<div class="hint">横滑时提前标注「将停留的位置」，松手前就能看到落点，无需松手后再调整</div>
+
 <script>
   const state = { count: 5, gap: 0, accent: "#3d5fd6", predict: "#e0533d", bg: "#fafafa" };
   const vp = document.getElementById("vp");

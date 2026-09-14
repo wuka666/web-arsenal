@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; outline: none; border: none;
     background: var(--bg, #1a1a1a); color: var(--tc, #fff);
@@ -19,9 +19,9 @@
     box-shadow: var(--sh, none);
     transition: box-shadow .25s ease;
   }
-  /* 按下：压过头（缩过头） */
+
   .btn.down { transform: scale(var(--press, .88)); transition: transform .06s ease; }
-  /* 松开：先冲过头再落定，重量感来自这一下 */
+
   .btn.pop { animation: pressPop var(--dur, .3s) ease-out forwards; }
   @keyframes pressPop {
     0%   { transform: scale(var(--press, .88)); }
@@ -32,9 +32,9 @@
 </head>
 <body>
 <button class="btn" id="btn">按住我试试</button>
-<p class="hint">点按：先压下去，松手弹回来时冲过头再落定</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     press: 0.88, over: 1.05, dur: 0.3,
     radius: 14, fontSize: 17, bg: "#1a1a1a", color: "#ffffff",
@@ -52,7 +52,7 @@
     s.setProperty("--fs", state.fontSize + "px");
     s.setProperty("--bg", state.bg);
     s.setProperty("--tc", state.color);
-    // 阴影：用 8 位十六进制把颜色和透明度拼起来
+
     s.setProperty("--sh", state.glow ? "0 12px 32px " + state.glowColor + "55" : "none");
     btn.textContent = state.text;
   }
@@ -68,7 +68,6 @@
   });
   btn.addEventListener("pointerleave", () => btn.classList.remove("down"));
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

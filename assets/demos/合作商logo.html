@@ -11,12 +11,12 @@
     align-items: center; justify-content: center; gap: 24px;
     background: var(--page, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif;
   }
-  .tip { font-size: 13px; color: #8a8a85; }
+
   .brands {
     width: min(860px, 92vw); overflow: hidden;
     mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
   }
-  /* 边缘渐隐开关：关掉后两端不虚化 */
+
   .brands.flat { mask-image: none; }
   .track { display: flex; gap: var(--gap, 64px); width: max-content; animation: scroll var(--scroll-s, 10s) linear infinite; }
   .brand {
@@ -30,7 +30,7 @@
 </style>
 </head>
 <body>
-  <p class="tip">这一排名字会一直慢慢滚动——鼠标移到哪个名字上，哪个就变彩色</p>
+
   <div class="brands" id="brands">
     <div class="track" id="track">
       <span class="brand">ACME</span><span class="brand">NOVA</span><span class="brand">云启</span>
@@ -39,7 +39,7 @@
     </div>
   </div>
   <script>
-    // 默认参数（父页面详情页可调）
+
     const state = {
       speed: 10, colorful: false, baseColor: "#b9b4a9", hoverColor: "#635bff",
       gap: 64, font: 24, hoverScale: 1.15, maskEdge: true, bg: "#ffffff"
@@ -61,7 +61,6 @@
       brands.classList.toggle("flat", !state.maskEdge);
     }
 
-    // 接收父页面（index.html 详情页）传来的参数
     window.addEventListener("message", (e) => {
       const d = e.data;
       if (!d || d.type !== "param") return;

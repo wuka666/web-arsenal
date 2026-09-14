@@ -12,9 +12,7 @@
     background: var(--page-bg, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif;
     padding: 0 20px;
   }
-  .note { font-size: 15px; color: #555; text-align: center; line-height: 1.8; }
-  .note b { color: var(--accent, #1a1a1a); }
-  /* 导航按钮：鼠标移上去背景变深 */
+
   .pills { display: flex; gap: 6px; background: var(--pill-bg, #f2f0eb); padding: 6px; border-radius: 999px; }
   .pills a {
     text-decoration: none; color: #555; font-size: 14px; padding: 9px 20px;
@@ -22,7 +20,7 @@
     transition: background var(--dur, .15s) ease, color var(--dur, .15s) ease;
   }
   .pills a:hover { background: var(--pill-hover, #d9d5cc); color: var(--accent, #1a1a1a); }
-  /* 主按钮：鼠标移上去浮起来 + 阴影变深 */
+
   .cta {
     font-size: 15px; font-weight: 700; padding: 14px 38px; border-radius: 12px;
     border: none; cursor: pointer; background: var(--accent, #1a1a1a); color: #fff;
@@ -32,22 +30,21 @@
     transform: translateY(calc(-1 * var(--lift, 2px))) scale(var(--scale, 1));
     box-shadow: 0 8px 20px color-mix(in srgb, var(--accent, #1a1a1a) var(--shadow, 18%), transparent);
   }
-  .tip { font-size: 12.5px; color: #8a8a85; text-align: center; }
+
 </style>
 </head>
 <body>
-  <p class="note">鼠标移到下面的按钮上看看——<br><b>所有按钮的反应快慢完全一样</b></p>
+
   <nav class="pills"><a>首页</a><a>题库</a><a>统计</a><a>设置</a></nav>
   <button class="cta">开始刷题</button>
-  <p class="tip">导航按钮：变深色。主按钮：浮起来。同一个速度，全站统一（详情页可调）</p>
+
   <script>
-    // 默认参数（父页面详情页可调）
+
     const state = {
       dur: 0.15, lift: 2, scale: 1, shadow: 18,
       accent: "#1a1a1a", pillBg: "#f2f0eb", pillHover: "#d9d5cc", bg: "#ffffff"
     };
 
-    // 一个滑杆控制所有按钮 = 统一手感；其余参数走 CSS 变量实时生效
     function apply() {
       const s = document.documentElement.style;
       s.setProperty("--dur", state.dur + "s");
@@ -60,7 +57,6 @@
       s.setProperty("--page-bg", state.bg);
     }
 
-    // 接收父页面（index.html 详情页）传来的参数
     window.addEventListener("message", (e) => {
       const d = e.data;
       if (!d || d.type !== "param") return;

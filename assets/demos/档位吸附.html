@@ -11,7 +11,7 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
@@ -46,34 +46,33 @@
   <div class="sheet-title">拖我上下走</div>
   <p class="mark" id="mark">当前档位：35%</p>
 </div>
-<p class="hint">按住抓手上下拖：松手自动吸附最近档位</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 0.28,         // 吸附动画时长（秒）
-    snap: 3,           // 档位数量（2~5）
-    magnet: 1,         // 磁吸范围（0-1，越接近 1 越远也能吸）
-    marks: true,       // 显示档位标签
-    sheetH: 35,        // 初始档位高度（vh，取最近档位）
-    radius: 20,        // 顶部圆角（px）
-    minH: 120,         // 最小可拖高度（px）
-    mask: 0.3,         // 遮罩浓度
-    maskColor: "#000000",  // 遮罩颜色
-    sheetBg: "#ffffff",    // 弹层底色
-    handleColor: "#dddddd",// 手柄颜色
-    markColor: "#999999"   // 档位标签颜色
+    dur: 0.28,
+    snap: 3,
+    magnet: 1,
+    marks: true,
+    sheetH: 35,
+    radius: 20,
+    minH: 120,
+    mask: 0.3,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    handleColor: "#dddddd",
+    markColor: "#999999"
   };
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
   const grab = document.getElementById("grab");
   const mark = document.getElementById("mark");
 
-  // 十六进制转 rgba
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
   }
-  // 根据档位数量生成档位表（均分 0~100%）
+
   const snaps = () => {
     const n = Math.max(2, Math.round(state.snap));
     return Array.from({ length: n }, (_, i) => (i + 1) / n);
@@ -82,20 +81,20 @@
   function apply() {
     const R = document.documentElement.style;
     R.setProperty("--dur", state.dur + "s");
-    R.setProperty("--h", nearest(state.sheetH / 100) * 100 + "vh"); // 初始高度吸附到最近档位
+    R.setProperty("--h", nearest(state.sheetH / 100) * 100 + "vh");
     R.setProperty("--radius", state.radius + "px");
     R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
     R.setProperty("--sheet", state.sheetBg);
     R.setProperty("--handlec", state.handleColor);
     R.setProperty("--markc", state.markColor);
     mark.style.display = state.marks ? "block" : "none";
-    // 拖拽逻辑参数：档位数量先归一（经 nearest() 生效），磁吸范围/最小高度在松手与拖动时读 state
+
     state.snap = Math.max(2, Math.round(+state.snap));
     state.magnet = +state.magnet;
     state.minH = +state.minH;
     if (state.marks) mark.textContent = "当前档位：" + Math.round(nearest(parseFloat(sheet.style.height || state.sheetH + "vh") / innerHeight) * 100) + "%";
   }
-  // 找最近档位
+
   function nearest(cur) {
     let best = snaps()[0];
     snaps().forEach(s => { if (Math.abs(s - cur) < Math.abs(best - cur)) best = s; });
@@ -137,7 +136,6 @@
   document.getElementById("open").addEventListener("click", open);
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

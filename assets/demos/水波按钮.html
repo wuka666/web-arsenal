@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     position: relative; overflow: hidden; cursor: pointer; user-select: none; outline: none;
     background: var(--bg, #fff); color: var(--tc, #1a1a1a); border: 2px solid var(--bd, #1a1a1a);
@@ -19,7 +19,7 @@
     transition: background .25s ease, color .25s ease;
   }
   .btn:active { filter: brightness(.96); }
-  /* 水波：从点下去的位置散开，反馈跟随手指而不是控件中心 */
+
   .ripple {
     position: absolute; border-radius: 50%;
     background: var(--ripple, #1a1a1a);
@@ -31,9 +31,9 @@
 </head>
 <body>
 <button class="btn" id="btn">点我任意位置</button>
-<p class="hint">水波从你点下去的位置散开，不是从按钮中心</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     dur: 0.55, opacity: 0.18, rippleColor: "#1a1a1a", spread: 1,
     bg: "#ffffff", color: "#1a1a1a", border: "#1a1a1a", radius: 14, fontSize: 17
@@ -54,13 +54,13 @@
 
   btn.addEventListener("click", (e) => {
     const rect = btn.getBoundingClientRect();
-    // 水波直径 = 按钮较长边 × 扩散倍数
+
     const r = Math.max(rect.width, rect.height) * state.spread;
     const rip = document.createElement("span");
     rip.className = "ripple";
     rip.style.width = rip.style.height = r + "px";
-    rip.style.opacity = state.opacity; // 浓度直接落在水波自身上
-    // 水波中心 = 手指落点
+    rip.style.opacity = state.opacity;
+
     rip.style.left = (e.clientX - rect.left - r / 2) + "px";
     rip.style.top = (e.clientY - rect.top - r / 2) + "px";
     btn.appendChild(rip);
@@ -68,7 +68,6 @@
     rip.addEventListener("animationend", () => rip.remove());
   });
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

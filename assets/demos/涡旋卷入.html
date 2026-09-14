@@ -9,12 +9,12 @@
   html, body { height: 100%; }
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; }
   canvas { display: block; width: min(520px, 94vw); height: min(520px, 88vh); border-radius: 16px; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }
+
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="hint">粒子沿螺旋路径卷向中心，而非直飞中心；越靠近中心活动范围越小</div>
+
 <script>
   const state = { count: 320, spin: 0.05, pull: 0.6, core: 8, size: 2.4, color: "#ffb24d", bg: "#0e1116" };
   const canvas = document.getElementById("c");
@@ -34,8 +34,8 @@
     const cx = W / 2, cy = H / 2;
     ctx.fillStyle = state.color;
     for (const p of ps) {
-      p.a += state.spin;                       // 沿螺旋旋转
-      p.r -= state.pull * devicePixelRatio * (1 - p.r / (Math.min(W, H) * 0.45 * devicePixelRatio)); // 越近越慢
+      p.a += state.spin;
+      p.r -= state.pull * devicePixelRatio * (1 - p.r / (Math.min(W, H) * 0.45 * devicePixelRatio));
       if (p.r < state.core * devicePixelRatio) { p.r = (40 + Math.random() * Math.min(W, H) * 0.45) * devicePixelRatio; p.a = Math.random() * 7; }
       const x = cx + Math.cos(p.a) * p.r;
       const y = cy + Math.sin(p.a) * p.r;

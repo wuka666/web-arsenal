@@ -52,7 +52,7 @@
   }
   window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
   apply();
-  // 自动演示一次开合（让缩略图能看到效果）
+
   setTimeout(() => { setOpen(true); setTimeout(() => setOpen(false), 1200); }, 600);
 </script>
 </body>

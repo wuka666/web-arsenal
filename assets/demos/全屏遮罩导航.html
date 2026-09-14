@@ -48,7 +48,7 @@
   }
   window.addEventListener("message", e=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
   apply();
-  // 自动演示一次开合（让缩略图能看到效果）
+
   setTimeout(() => { full.classList.add('open'); setTimeout(() => full.classList.remove('open'), 1400); }, 600);
 </script>
 </body>

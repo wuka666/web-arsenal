@@ -21,7 +21,7 @@
     transition: background .15s ease, color .15s ease;
   }
   .page button:hover { background: var(--accent, #1b1b1b); color: #fff; }
-  /* 位移量与方向用 CSS 变量，参数变化即时生效 */
+
   .page.leave { animation: pageLeave var(--leave-dur, .32s) var(--ease, ease-in) forwards; }
   .page.enter { animation: pageEnter var(--enter-dur, .5s) var(--ease, ease-out) forwards; }
   @keyframes pageLeave {
@@ -44,19 +44,18 @@
   <button id="goA">← 切回页面 A</button>
 </section>
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     leave: 0.32, enter: 0.5, dist: 36, ease: "ease-out", dir: "left",
     colorA: "#ffffff", colorB: "#f6f4ee", textColor: "#1b1b1b", accent: "#1b1b1b", radius: 10
   };
 
-  // 参数变了：改 CSS 变量，时长/距离/方向/颜色实时变
   function apply() {
     const s = document.documentElement.style;
     s.setProperty("--leave-dur", state.leave + "s");
     s.setProperty("--enter-dur", state.enter + "s");
     s.setProperty("--ease", state.ease);
-    // 方向：left = 旧页往左出、新页从右进；right 反过来
+
     const d = state.dir === "right" ? 1 : -1;
     s.setProperty("--out-x", state.dist * d + "px");
     s.setProperty("--in-x", -state.dist * d + "px");
@@ -85,7 +84,6 @@
   document.getElementById("goB").addEventListener("click", () => switchTo(pa, pb));
   document.getElementById("goA").addEventListener("click", () => switchTo(pb, pa));
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

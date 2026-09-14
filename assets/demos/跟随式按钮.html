@@ -9,14 +9,14 @@
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: #fafafa; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
   .zone { position: relative; width: min(420px, 92vw); height: 240px; border: 2px dashed #ddd; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
   .btn { padding: 16px 30px; border: none; border-radius: 14px; background: var(--accent); color: #fff; font-size: 15px; cursor: pointer; user-select: none; touch-action: none; transition: transform .12s ease, box-shadow .12s ease; will-change: transform; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
 <div class="zone" id="zone">
   <button class="btn" id="btn">按住拖动我</button>
 </div>
-<div class="hint">按住拖动：按钮随手指移动并渐变深浅，移开自动复位（无需弹窗取消）</div>
+
 <script>
   const state = { follow: 0.5, depth: 14, radius: 14, accent: "#3d5fd6", text: "#ffffff" };
   const btn = document.getElementById("btn");

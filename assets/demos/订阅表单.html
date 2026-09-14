@@ -2,10 +2,10 @@
 <style>
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+
   body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg,#fff)}
   .box{position:relative;width:300px}
-  /* 输入框：圆角/边框/底色均来自参数；聚焦时边框变 focusBorder */
+
   .inp{
     width:100%;box-sizing:border-box;padding:18px 14px 8px;font-size:15px;
     border:1.5px solid var(--ib,#ccc);border-radius:var(--ir,10px);
@@ -13,7 +13,7 @@
     transition:border-color var(--dur,.3s) var(--ease),background var(--dur,.3s) var(--ease);
   }
   .inp:focus{border-color:var(--ifb,#111)}
-  /* 浮动标签：占位文字上移成标签，位移/颜色/时长来自参数 */
+
   .flab{
     position:absolute;left:15px;top:16px;font-size:15px;color:var(--lc,#888);
     pointer-events:none;transition:all var(--dur,.3s) var(--ease);
@@ -21,7 +21,7 @@
   .inp:focus ~ .flab,.inp:not(:placeholder-shown) ~ .flab{
     top:6px;font-size:11px;transform:translateY(calc(var(--fs,8px) * -1px));color:var(--ifb,#111)
   }
-  /* 按钮：圆角/底色/文字色来自参数；done 状态用成功色 */
+
   .btn{
     margin-top:14px;width:100%;box-sizing:border-box;border:none;cursor:pointer;
     padding:13px;font-size:15px;font-weight:600;border-radius:var(--br,10px);
@@ -37,32 +37,32 @@
     <label class="flab" for="inp" id="flab">输入邮箱订阅更新</label>
     <button class="btn" id="btn">订阅</button>
   </div>
-  <div class="hint">滚动 / 调右侧参数看变化</div>
+
   <script>
-  // 8–12 键：含 7 个颜色参数，每个键 apply() 都真生效
+
   const state = {
     radius:10, border:"#cccccc", focusBorder:"#111111", bg:"#ffffff",
     btnRadius:10, btnColor:"#111111", btnText:"#ffffff", labelColor:"#888888",
     focusShift:8, dur:0.3, success:"#1a9e4b", btnTextStr:"订阅"
   };
   const inp = document.getElementById("inp"), btn = document.getElementById("btn"), root = document.documentElement;
-  // apply：把每个 state 键落到 CSS 变量与文案上
+
   function apply() {
     const s = root.style;
-    s.setProperty("--ir", state.radius + "px");     // 输入框圆角
-    s.setProperty("--ib", state.border);             // 边框色
-    s.setProperty("--ifb", state.focusBorder);       // 聚焦边框色
-    s.setProperty("--bg", state.bg);                 // 底色
-    s.setProperty("--br", state.btnRadius + "px");   // 按钮圆角
-    s.setProperty("--bc", state.btnColor);           // 按钮色
-    s.setProperty("--btc", state.btnText);          // 按钮文字色
-    s.setProperty("--lc", state.labelColor);        // 标签色
-    s.setProperty("--fs", state.focusShift);         // 聚焦位移
-    s.setProperty("--dur", state.dur + "s");         // 时长
-    s.setProperty("--sc", state.success);            // 成功色
-    btn.textContent = state.btnTextStr;              // 按钮文字
+    s.setProperty("--ir", state.radius + "px");
+    s.setProperty("--ib", state.border);
+    s.setProperty("--ifb", state.focusBorder);
+    s.setProperty("--bg", state.bg);
+    s.setProperty("--br", state.btnRadius + "px");
+    s.setProperty("--bc", state.btnColor);
+    s.setProperty("--btc", state.btnText);
+    s.setProperty("--lc", state.labelColor);
+    s.setProperty("--fs", state.focusShift);
+    s.setProperty("--dur", state.dur + "s");
+    s.setProperty("--sc", state.success);
+    btn.textContent = state.btnTextStr;
   }
-  // 提交：订阅中→已订阅（setTimeout 模拟，不真发请求）
+
   btn.addEventListener("click", () => {
     if (btn.classList.contains("done")) return;
     btn.disabled = true; btn.textContent = "订阅中…";

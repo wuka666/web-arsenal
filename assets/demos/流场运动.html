@@ -9,12 +9,12 @@
   html, body { height: 100%; }
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; }
   canvas { display: block; width: min(560px, 94vw); height: min(420px, 80vh); border-radius: 16px; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }
+
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="hint">粒子沿连续弯曲的流场路线前进，相邻轨迹自然衔接，避免各自乱飞</div>
+
 <script>
   const state = { count: 240, speed: 1.4, field: 0.004, trail: 0.06, size: 1.6, color: "#5ad1ff", bg: "#0e1116" };
   const canvas = document.getElementById("c");

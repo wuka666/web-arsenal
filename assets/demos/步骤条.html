@@ -17,7 +17,7 @@
   .node.finish { animation: pop .5s cubic-bezier(.34,1.7,.5,1); }
   @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
   .btn { padding: 10px 22px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
   </div>
 </div>
 <button class="btn" id="btn">下一步</button>
-<div class="hint">点「下一步」：进度完成时先超调再回弹，强化真实感</div>
+
 <script>
   const state = { steps: 4, dur: .5, overshoot: 1, accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", ease: "ease" };
   const track = document.getElementById("track");

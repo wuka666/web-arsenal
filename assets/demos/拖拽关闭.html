@@ -11,7 +11,7 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
@@ -46,28 +46,27 @@
   <div class="sheet-title">往下拖我</div>
   <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">慢拖回弹、快拖或拖过阈值就关闭</p>
 </div>
-<p class="hint">按住抓手往下拖：拖够远 / 甩得快 → 关闭，否则弹回</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    threshold: 30,     // 关闭阈值（拖过弹层高度的百分比）
-    dur: 0.3,          // 回弹/收起时长（秒）
-    vel: 1.0,          // 甩动关闭速度（px/ms）
-    followRatio: 1,    // 跟手比例（0.5=弹层只走一半）
-    maskFollow: true,  // 拖动时遮罩跟随渐隐
-    sheetH: 55,        // 弹层高度（vh）
-    radius: 20,        // 顶部圆角（px）
-    shadow: 0.12,      // 投影浓度
-    mask: 0.3,         // 遮罩浓度
-    maskColor: "#000000",  // 遮罩颜色
-    sheetBg: "#ffffff",    // 弹层底色
-    handleColor: "#dddddd" // 手柄颜色
+    threshold: 30,
+    dur: 0.3,
+    vel: 1.0,
+    followRatio: 1,
+    maskFollow: true,
+    sheetH: 55,
+    radius: 20,
+    shadow: 0.12,
+    mask: 0.3,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    handleColor: "#dddddd"
   };
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
   const grab = document.getElementById("grab");
 
-  // 十六进制转 rgba
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
@@ -82,7 +81,7 @@
     R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
     R.setProperty("--sheet", state.sheetBg);
     R.setProperty("--handlec", state.handleColor);
-    // 拖拽逻辑参数（阈值/甩速/跟手比例）在松手判断时读 state；这里统一转数字，父页面传字符串也不会失灵
+
     state.threshold = +state.threshold;
     state.vel = +state.vel;
     state.followRatio = +state.followRatio;
@@ -97,20 +96,20 @@
     vel = 0;
     grab.setPointerCapture(e.pointerId);
     sheet.classList.add("dragging");
-    mask.style.transition = "none"; // 拖动时遮罩要跟手，关掉渐变
+    mask.style.transition = "none";
   });
   grab.addEventListener("pointermove", (e) => {
     if (!dragging) return;
     curY = e.clientY;
     const now = performance.now();
     const dt = now - lastT;
-    if (dt > 0) vel = (curY - lastY) / dt; // px/ms，正=往下甩
+    if (dt > 0) vel = (curY - lastY) / dt;
     lastY = curY; lastT = now;
     const dy = Math.max(0, curY - startY);
-    // 跟手比例：弹层实际位移 = 手指位移 × followRatio
+
     const move = dy * state.followRatio;
     sheet.style.transform = "translateY(" + move + "px)";
-    // 遮罩跟随渐隐：拖得越远越透明
+
     if (state.maskFollow) mask.style.background = rgba(state.maskColor, state.mask * (1 - Math.min(1, dy / (sheet.offsetHeight * 1.2))));
   });
   function endDrag() {
@@ -119,9 +118,9 @@
     sheet.classList.remove("dragging");
     mask.style.transition = "";
     mask.style.background = "";
-    const dist = (curY - startY) * state.followRatio; // 实际位移参与阈值判断
+    const dist = (curY - startY) * state.followRatio;
     const ratio = dist / sheet.offsetHeight * 100;
-    // 判断：拖过阈值（距离）或甩得快（速度）
+
     if (ratio > state.threshold || vel > state.vel) close(); else rebound();
   }
   grab.addEventListener("pointerup", endDrag);
@@ -147,7 +146,6 @@
   document.getElementById("open").addEventListener("click", open);
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

@@ -26,7 +26,7 @@
         background:color-mix(in srgb, var(--ic,#2563eb) 14%, #fff); color:var(--ic,#2563eb); font-size:17px; }
   .item .nm { font-size:15px; font-weight:600; color:var(--text,#1f2937); }
   .item .ds { font-size:12px; color:var(--dc,#6b7280); margin-top:2px; }
-  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+
   .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(10px); opacity:0; background:#111827; color:#fff; padding:10px 18px; border-radius:10px; font-size:14px; transition:.2s; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
@@ -41,7 +41,7 @@
     <a>定价</a>
     <a>文档</a>
   </nav>
-  <p class="hint">悬停「产品」展开含图标与说明的多分类面板</p>
+
   <div class="toast" id="toast"></div>
 <script>
   const MENU = [

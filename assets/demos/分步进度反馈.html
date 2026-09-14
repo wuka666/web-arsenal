@@ -21,13 +21,13 @@
   .item.run .bar > i { width: 60%; }
   .item.done .bar > i { width: 100%; background: var(--done); }
   .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
 <div class="panel" id="p"></div>
 <button class="btn" id="btn">开始执行</button>
-<div class="hint">适配连续多步骤任务：制作状态清晰的步骤条，每步显示等待/进行中/完成</div>
+
 <script>
   const state = { steps: 4, dur: 1000, accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", card: "#ffffff" };
   const p = document.getElementById("p");

@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     position: relative; cursor: pointer; user-select: none; border: none; outline: none;
     background: var(--color, #1a1a1a); color: var(--txtColor, #fff);
@@ -37,26 +37,26 @@
   <span class="spinner"></span>
   <span class="txt" id="txt">提交</span>
 </button>
-<p class="hint">点一下：进入加载态（转圈 + 禁点），完成后恢复</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 0.9,          // 旋转一圈秒数
-    wait: 1.8,          // 模拟后端处理时长（秒）
-    label: "提交",      // 按钮文案
-    loadingLabel: "处理中", // 加载中文案
-    doneLabel: "已提交 ✓",  // 完成文案
-    radius: 12,         // 圆角（px）
-    height: 48,         // 按钮高度（px）
-    minW: 180,          // 最小宽度（px）
-    fontSize: 16,       // 字号（px）
-    letter: 2,          // 字间距（px）
-    sSize: 16,          // 旋转图标大小（px）
-    sThick: 2,          // 旋转图标粗细（px）
-    color: "#1a1a1a",   // 按钮背景
-    txtColor: "#ffffff",// 按钮文字
-    sTrack: "rgba(255,255,255,.35)", // 旋转图标轨色
-    sHead: "#ffffff"    // 旋转图标头色
+    dur: 0.9,
+    wait: 1.8,
+    label: "提交",
+    loadingLabel: "处理中",
+    doneLabel: "已提交 ✓",
+    radius: 12,
+    height: 48,
+    minW: 180,
+    fontSize: 16,
+    letter: 2,
+    sSize: 16,
+    sThick: 2,
+    color: "#1a1a1a",
+    txtColor: "#ffffff",
+    sTrack: "rgba(255,255,255,.35)",
+    sHead: "#ffffff"
   };
   const btn = document.getElementById("btn");
   const txt = document.getElementById("txt");

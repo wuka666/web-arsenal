@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); color: var(--zi); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 18px; }
-  /* 公告胶囊：用最小面积塞一条新消息，不抢首屏主角 */
+
   .pill { display: inline-flex; align-items: center; gap: 8px; padding: var(--neibian) calc(var(--neibian) * 1.6);
     background: var(--kadi); border: 1px solid var(--bianse); border-radius: var(--yuanjiao);
     font-size: var(--zihao); color: var(--zi); cursor: pointer; transition: filter .18s ease; }
@@ -19,16 +19,16 @@
   .pill.solid { background: var(--dian); color: #fff; border-color: var(--dian); }
   .pill.solid .new { background: #fff; color: var(--dian); }
   .pill.solid .arw, .pill.solid .dot { color: #fff; background: #fff; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cizi, #999); }
+
 </style>
 </head>
 <body>
   <div class="pill" id="a"><span class="new">New</span>Loops 上线：反馈直接变成任务<span class="arw">→</span></div>
   <div class="pill" id="b"><span class="dot"></span>小圆点版：更低调的日常公告<span class="arw">→</span></div>
   <div class="pill solid" id="c"><span class="new">New</span>实心版：想让这条消息更跳一点</div>
-  <div class="hint">更新公告胶囊：最小面积承载一条新消息，箭头右移暗示「点得动」</div>
+
 <script>
-  // 参数状态：键名与 data/素材.js 的「参数」一一对应
+
   const state = { yuanjiao: 999, neibian: 8, zihao: 13, jianto: 5, tiliang: 12,
     dian: "#5E6AD2", kadi: "#ffffff", bianse: "#e6e6e6", zi: "#1a1a1a", di: "#fafafa" };
   function apply() {

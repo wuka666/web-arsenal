@@ -44,20 +44,20 @@
   </div>
 
 <script>
-/* ---------- 可调参数 ---------- */
+
 const state = {
-  radius: 260,        // 探照半径(px) slider
-  ease: 0.1,          // 缓动系数(0.02~0.3) slider
+  radius: 260,
+  ease: 0.1,
   baseImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85',
   revealImg: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85',
-  centerColor: '#ffffff',   // 锥光中心色 color
-  headingColor: '#ffffff',  // 标题色 color
-  accentColor: '#e8702a',   // 按钮色 color
-  baseTint: '#1b1206',      // 底图品牌色叠加 color
-  revealTint: '#3a2a12',    // 揭示图叠加 color
-  titleText: 'Layers hold', // 标题第一行 string
-  subText: 'tales of time',  // 标题第二行 string
-  btnText: 'Start Digging'   // 按钮文字 string
+  centerColor: '#ffffff',
+  headingColor: '#ffffff',
+  accentColor: '#e8702a',
+  baseTint: '#1b1206',
+  revealTint: '#3a2a12',
+  titleText: 'Layers hold',
+  subText: 'tales of time',
+  btnText: 'Start Digging'
 };
 
 const base = document.getElementById('base');
@@ -71,7 +71,6 @@ const t2 = document.getElementById('t2');
 const desc = document.getElementById('desc');
 const cta = document.getElementById('cta');
 
-/* 鼠标平滑跟随 */
 const mouse = { x: -999, y: -999 };
 const smooth = { x: -999, y: -999 };
 const cur = { x: -999, y: -999 };
@@ -141,7 +140,6 @@ function loop() {
 }
 raf = requestAnimationFrame(loop);
 
-/* 外部调参 */
 window.addEventListener('message', ev => {
   const d = ev.data;
   if (d && d.type === 'param' && d.key in state) {

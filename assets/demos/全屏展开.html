@@ -11,7 +11,7 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
@@ -32,7 +32,7 @@
                 transform var(--dur, .38s) var(--ease, cubic-bezier(.32,.72,0,1));
   }
   .sheet.show { transform: translateY(0); }
-  /* 全屏时：圆角归零、抓手移到顶部缩成一条，视觉统一不穿帮 */
+
   .sheet.full { height: 100%; border-radius: 0; }
   .handle {
     width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd);
@@ -56,26 +56,25 @@
   <button class="full-btn" id="full">展开全屏</button>
   <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">圆角与抓手同步调整，视觉保持统一</p>
 </div>
-<p class="hint">先半屏弹出，点「展开全屏」看过渡</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 0.38,           // 过渡时长（秒）
-    radius: 16,          // 半屏时顶部圆角（px）
-    half: 50,            // 半屏高度（vh）
-    shadow: 0.12,        // 投影浓度
-    handle: true,        // 是否显示顶部手柄
-    mask: 0.4,           // 遮罩浓度
-    maskColor: "#000000",   // 遮罩颜色
-    sheetBg: "#ffffff",     // 弹层底色
-    handleColor: "#dddddd", // 手柄颜色
-    titleColor: "#1a1a1a"   // 标题文字颜色
+    dur: 0.38,
+    radius: 16,
+    half: 50,
+    shadow: 0.12,
+    handle: true,
+    mask: 0.4,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    handleColor: "#dddddd",
+    titleColor: "#1a1a1a"
   };
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
   const handle = document.getElementById("handle");
 
-  // 十六进制转 rgba
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
@@ -85,7 +84,7 @@
     const R = document.documentElement.style;
     R.setProperty("--radius", state.radius + "px");
     R.setProperty("--half", state.half + "vh");
-    R.setProperty("--dur", state.dur + "s"); // 时长走 CSS 变量，改动即时生效
+    R.setProperty("--dur", state.dur + "s");
     R.setProperty("--shadow", state.shadow);
     R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
     R.setProperty("--sheet", state.sheetBg);
@@ -103,7 +102,6 @@
   });
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

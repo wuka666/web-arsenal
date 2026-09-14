@@ -2,7 +2,7 @@
 <style>
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:220vh;background:var(--bg);}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+
   .replay{position:fixed;right:12px;top:12px;z-index:9;padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;font-size:13px;cursor:pointer}
   .hero{min-height:60vh;display:flex;flex-direction:column;justify-content:center;padding:var(--pad) 8vw;text-align:var(--align);}
   .tag{align-self:var(--as);background:var(--tagBg);color:var(--tagColor);font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;margin-bottom:20px;
@@ -20,7 +20,7 @@
     <h1 class="title" id="title">AI in Design</h1>
     <p class="sub" id="sub">Designer Fund × Foundation Capital 年度设计报告</p>
   </header>
-  <div class="hint">向下滚动 / 调右侧参数看变化</div>
+
   <script>
   const state = {
     title: "AI in Design", titleSize: 96, titleColor: "#111111",
@@ -47,7 +47,7 @@
     document.getElementById("sub").textContent = state.sub;
   }
   let io;
-  function reset(){ // 重播：清状态并重新用 IntersectionObserver 观察 hero
+  function reset(){
     const h = document.getElementById("hero");
     h.classList.remove("in");
     if(io) io.disconnect();

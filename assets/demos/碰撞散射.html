@@ -10,13 +10,13 @@
   body { font-family: system-ui, "Microsoft YaHei", sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #0e1116; gap: 12px; }
   canvas { display: block; width: min(520px, 94vw); height: min(360px, 70vh); border-radius: 16px; }
   .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #ff7a59; color: #fff; font-size: 14px; cursor: pointer; font-weight: 700; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #aaa; }
+
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <button class="btn" id="btn">重新发射</button>
-<div class="hint">粒子流先向前移动，碰到障碍物后按接触位置反弹/分流，禁止直接穿过障碍</div>
+
 <script>
   const state = { count: 220, speed: 2.2, obstacle: 46, size: 1.6, color: "#7CFFB2", obColor: "#ff7a59", bg: "#0e1116" };
   const canvas = document.getElementById("c");
@@ -39,7 +39,7 @@
       if (d < obs.r + 2 * devicePixelRatio) {
         const nx = dx / d, ny = dy / d;
         const dot = p.vx * nx + p.vy * ny;
-        p.vx -= 2 * dot * nx; p.vy -= 2 * dot * ny;     // 法线反射，不穿透
+        p.vx -= 2 * dot * nx; p.vy -= 2 * dot * ny;
         p.x = obs.x + nx * (obs.r + 3 * devicePixelRatio);
         p.y = obs.y + ny * (obs.r + 3 * devicePixelRatio);
       }

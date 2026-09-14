@@ -35,7 +35,7 @@
     0%   { transform: translateX(-100%); }
     100% { transform: translateX(400%); }
   }
-  .loader-tip { font-size: var(--tipSize, 13px); color: #999; }
+
   .page {
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     padding: 40px; text-align: center;
@@ -53,7 +53,7 @@
 <div class="loader" id="loader">
   <div class="logo" id="logo"><span id="logoText"></span></div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
-  <div class="loader-tip" id="tip">页面内容准备中…</div>
+
 </div>
 <div class="page">
   <h2>页面主体</h2>
@@ -61,24 +61,24 @@
   <button class="btn" id="btn">重播加载</button>
 </div>
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    wait: 2,            // 加载层显示时长（秒）
-    dur: 0.5,           // 淡出时长（秒）
-    speed: 1.2,         // 内部进度条跑动速度（秒）
-    letter: 4,          // 标字母距（px）
-    gap: 22,            // 内部元素间距（px）
-    logoSize: 30,       // Logo 字号（px）
-    barW: 160,          // 进度条宽度（px）
-    barH: 4,            // 进度条粗细（px）
-    tipSize: 13,        // 提示字号（px）
-    showTip: true,      // 是否显示底部提示
-    spinnerOnly: false, // 是否只用旋转图标（不用进度条）
-    brand: "加载完成",  // 品牌名/Logo 文字
-    tip: "页面内容准备中…", // 提示文案
-    bg: "#ffffff",      // 加载层底色
-    color: "#1a1a1a",   // 主色
-    track: "#eeeeee"    // 进度条轨道色
+    wait: 2,
+    dur: 0.5,
+    speed: 1.2,
+    letter: 4,
+    gap: 22,
+    logoSize: 30,
+    barW: 160,
+    barH: 4,
+    tipSize: 13,
+    showTip: true,
+    spinnerOnly: false,
+    brand: "加载完成",
+    tip: "页面内容准备中…",
+    bg: "#ffffff",
+    color: "#1a1a1a",
+    track: "#eeeeee"
   };
   const loader = document.getElementById("loader");
   const logoText = document.getElementById("logoText");

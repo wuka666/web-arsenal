@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>星流/Astra 暗色发布页 · 方案演示</title>
 <style>
-  /* ── openai-astra 设计令牌 ── */
+  
   :root {
     --bg: var(--di); --fg: var(--zi); --fg-2: #fafafa; --muted: var(--cizi); --meta: #ffffff70;
     --accent: #fff; --accent-on: #000;
-    /* 中文字体优先的中文字体栈；拉丁部分保留系统无衬线 */
+    
     --font-display: "HarmonyOS Sans SC", "MiSans", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-body: var(--font-display);
     --text-xs: 13px; --text-sm: 14px; --text-base: 17px; --text-lg: 18px; --text-2xl: 30px; --text-3xl: 48px;
     --leading-body: 1.65;
-    /* 中文不需要负字距；拉丁标签单独给（见 .label-right） */
+    
     --tracking-display: 0;
     --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
     --radius-pill: 9999px;
@@ -27,15 +27,15 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--text-base) / var(--leading-body) var(--font-body); letter-spacing: 0; -webkit-font-smoothing: antialiased; }
 
-  /* ── 布局骨架（固定）：canvas z-0 / 内容 z-1 / 顶栏与提示 z-2 ── */
+  
   .stage { position: fixed; inset: 0; z-index: 0; background: var(--bg); }
   #starCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-  /* starflow 库可能自建 canvas 并挂到 body：同样固定全屏、垫在内容之下 */
+  
   canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 0; }
   .chrome { position: fixed; inset: 0; z-index: 2; height: 100svh; pointer-events: none; }
   .chrome .label { position: absolute; top: 50%; transform: translateY(-50%); font: 500 clamp(32px, 5vw, 64px) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); user-select: none; white-space: nowrap; }
   .chrome .label-left { left: clamp(20px, 4vw, 56px); }
-  .chrome .label-right { right: clamp(20px, 4vw, 56px); letter-spacing: -0.04em; } /* 拉丁单词保留轻微负字距 */
+  .chrome .label-right { right: clamp(20px, 4vw, 56px); letter-spacing: -0.04em; } 
   .chrome .letter { display: inline-block; opacity: 0; transform: translateX(44px); animation: label-reveal 1s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 1s) forwards; }
   @keyframes label-reveal { to { opacity: 1; transform: translate(0); } }
   .chrome .scroll-hint { position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); color: #fafafa99; font-size: var(--text-sm); letter-spacing: 0; }
@@ -61,7 +61,7 @@
   .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: flex-end; gap: 8px; padding: 16px 20px; pointer-events: none; }
   .topbar button { pointer-events: auto; background: var(--astra-glass); color: var(--fg); border: 0; border-radius: 999px; padding: 8px 14px; font: 500 13px / 1 var(--font-body); cursor: pointer; }
 
-  /* 调参面板 */
+  
   .tuner-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 10; width: 36px; height: 36px; border-radius: 999px; background: #ffffff1f; border: 0; color: #ffffffcc; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
   .tuner-panel { position: fixed; right: 16px; bottom: 64px; z-index: 10; width: 260px; background: #111; border: 1px solid #ffffff1a; border-radius: 12px; padding: 16px; display: none; flex-direction: column; gap: 8px; }
   .tuner-panel.open { display: flex; }
@@ -84,19 +84,19 @@
 <body>
 <div class="stage"><canvas id="starCanvas"></canvas></div>
 
-<!-- 首屏标签（介绍模块骨架：全屏星系 + 两侧标签逐字入场） -->
+
 <div class="chrome" id="chrome">
   <p class="label label-left"><span class="letter" style="--delay:1.0s">星</span><span class="letter" style="--delay:1.1s">流</span></p>
   <p class="label label-right"><span class="letter" style="--delay:1.5s">Starflow</span></p>
   <p class="scroll-hint">向下滚动</p>
 </div>
 
-<!-- 顶栏 -->
+
 <div class="topbar">
   <button id="langToggle">EN</button>
 </div>
 
-<!-- 调参 -->
+
 <button class="tuner-toggle" id="tunerToggle">⚙</button>
 <div class="tuner-panel" id="tunerPanel">
   <h3>方案参数</h3>
@@ -148,12 +148,7 @@
 <div class="notice"><span id="modeText">背景加载中…</span> · <a href="https://win-hao.github.io/starflow/" target="_blank">在线版</a></div>
 
 <script>
-  // ════════════════════════════════════════════════════════════
-  // 双轨背景：优先加载真实 Three.js 3D（../库/starflow.js）
-  //  - HTTP 服务下：import 成功 + 有 WebGL → 真实 3D
-  //  - file:// 双击 / 无 WebGL / 加载失败 → 自动降级 Canvas 2D
-  // 布局骨架固定不变：canvas(z-0) + 内容(z-1) + 顶栏/提示(z-2)
-  // ════════════════════════════════════════════════════════════
+
   const canvas = document.getElementById('starCanvas')
   const modeText = document.getElementById('modeText')
 
@@ -163,7 +158,6 @@
     starSize: 1.2, starSpeed: 0.4, ambient: '#23435f'
   }
 
-  // ── Canvas 2D 星系（降级模式）──
   let ctx = null, W = 0, H = 0, stars = [], time = 0, rafId = 0
 
   function initStars() {
@@ -254,7 +248,6 @@
     modeText.textContent = '背景：Canvas 2D 降级（file:// 或环境无 WebGL）'
   }
 
-  // ── 真实 Three.js 3D（双轨主轨道）──
   let astra = null
 
   async function try3D() {
@@ -285,7 +278,6 @@
     if (!astra) start2D()
   }
 
-  // ── 调参 ──
   const panel = document.getElementById('tunerPanel')
   document.getElementById('tunerToggle').addEventListener('click', () => panel.classList.toggle('open'))
 
@@ -343,7 +335,6 @@
 
   applyStyle()
 
-  // postMessage
   addEventListener('message', e => {
     const d = e.data
     if (!d || d.type !== 'param') return
@@ -352,7 +343,6 @@
     pushTo3D(d.key, d.value)
   })
 
-  // ── 启动：先试真实 3D（HTTP 下），失败自动走 2D（file:// 双击也能看）──
   try3D()
 </script>
 </body>

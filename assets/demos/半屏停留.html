@@ -11,13 +11,13 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
     padding: 12px 28px; border-radius: 10px;
   }
-  /* 底层页面：始终保留可见区域，半屏弹层不遮完 */
+
   .bg { position: fixed; inset: 0; padding: 60px 40px; }
   .bg-card {
     background: #f5f5f5; border-radius: 16px; padding: 24px;
@@ -55,26 +55,25 @@
   <div class="sheet-title">半屏停留</div>
   <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">重点保留底层可见区域</p>
 </div>
-<p class="hint">弹层停在半屏，底层页面仍然可见</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    height: 50,        // 弹层高度（vh）
-    mask: 0.25,        // 遮罩浓度
-    dur: 0.35,         // 弹出时长（秒）
-    radius: 20,        // 顶部圆角（px）
-    shadow: 0.12,      // 投影浓度
-    handle: true,      // 是否显示顶部手柄
-    maskColor: "#000000", // 遮罩颜色
-    sheetBg: "#ffffff",   // 弹层底色
-    handleColor: "#dddddd", // 手柄颜色
-    titleColor: "#1a1a1a"  // 标题文字颜色
+    height: 50,
+    mask: 0.25,
+    dur: 0.35,
+    radius: 20,
+    shadow: 0.12,
+    handle: true,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    handleColor: "#dddddd",
+    titleColor: "#1a1a1a"
   };
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
   const handle = document.getElementById("handle");
 
-  // 十六进制转 rgba，用于遮罩色 + 浓度合成
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
@@ -86,7 +85,7 @@
     R.setProperty("--dur", state.dur + "s");
     R.setProperty("--radius", state.radius + "px");
     R.setProperty("--shadow", state.shadow);
-    R.setProperty("--maskbg", rgba(state.maskColor, state.mask)); // 颜色+浓度都生效
+    R.setProperty("--maskbg", rgba(state.maskColor, state.mask));
     R.setProperty("--sheet", state.sheetBg);
     R.setProperty("--handlec", state.handleColor);
     R.setProperty("--titlec", state.titleColor);
@@ -98,7 +97,6 @@
   document.getElementById("open").addEventListener("click", open);
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

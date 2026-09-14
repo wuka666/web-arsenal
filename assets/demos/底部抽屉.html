@@ -16,7 +16,7 @@
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
     padding: 12px 28px; border-radius: 10px;
   }
-  /* 遮罩：颜色 + 浓度分两个变量，透明度直接参与过渡 */
+
   .mask {
     position: fixed; inset: 0; background: var(--mc, #000000); opacity: 0; pointer-events: none;
     transition: opacity var(--dur, .3s) ease;
@@ -28,7 +28,7 @@
     background: var(--db, #fff); box-shadow: 0 -8px 30px rgba(0,0,0,.12);
     transform: translateY(105%);
   }
-  /* 关键帧停顿：滑到露出大半时顿一下，再完全展开——状态更容易被识别 */
+
   .drawer.in { animation: drawerIn var(--dur, .38s) ease-out forwards; }
   .drawer.out { animation: drawerOut var(--od, .26s) ease-in forwards; }
   @keyframes drawerIn {
@@ -51,7 +51,7 @@
   <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">展开到一半顿一下，再完全落位</p>
 </div>
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
     dur: 0.38, outDur: 0.26, height: 240, radius: 20,
     maskColor: "#000000", maskOpacity: 0.35, drawerBg: "#ffffff", titleColor: "#1a1a1a", handle: true
@@ -86,7 +86,6 @@
   document.getElementById("open").addEventListener("click", open);
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

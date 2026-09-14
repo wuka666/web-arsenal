@@ -1,23 +1,23 @@
 <!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>滚动进度指示</title>
 <style>
-  /* 原站签名缓动：滚动揭示用 cubic-bezier(.44,0,.56,1) */
+
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;min-height:220vh;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg,#fff);color:#333;}
-  /* 进度条容器：固定在顶部或底部，宽度铺满 */
+
   #bar{position:fixed;left:0;width:100%;height:var(--h,4px);background:var(--todo,#e5e5e5);z-index:var(--z,9999);box-shadow:var(--shadow,0 0 0 transparent);}
-  /* 已完成填充：宽度随滚动从左到右增长 */
+
   #fill{height:100%;width:0;background:var(--done,#111);border-radius:var(--radius,0);transition:width var(--dur,.3s) var(--ease);}
-  /* 末端百分比文字：可开关 */
+
   #pct{position:fixed;right:8px;font-size:12px;font-weight:700;color:var(--pct,#111);display:var(--showpct,none);font-variant-numeric:tabular-nums;z-index:var(--z,9999);}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
+
   .content{padding:60px 24px;max-width:680px;margin:0 auto;line-height:1.9;font-size:15px;}
   .content h2{margin-top:40px;font-size:22px}
 </style></head>
 <body>
   <div id="bar"><div id="fill"></div></div>
   <div id="pct">0%</div>
-  <div class="hint">滚动看变化</div>
+
   <div class="content">
     <h2>滚动进度指示</h2>
     <p>这是一段占位长文。向下滚动页面，顶部细条会随阅读进度从左到右填充，让你随时知道“读到了哪里”。</p>
@@ -30,23 +30,22 @@
     <p>继续向下滚动，看细条走到 100% 时的收尾状态。</p>
   </div>
   <script>
-  // 默认参数：父页面（详情页）可实时调
+
   const state = {
-    h: 4,            // 进度条高度（px）
-    done: "#111111", // 已完成色
-    todo: "#e5e5e5", // 未完成色
-    pos: "顶部",     // 位置：顶部 / 底部
-    radius: 0,       // 圆角（px）
-    dur: 0.3,        // 过渡时长（秒）
-    showPct: false,  // 末端显示百分比
-    pctColor: "#111111", // 百分比文字色
-    shadow: false,   // 进度条阴影
-    bg: "#ffffff",   // 底色（页面背景）
-    z: "顶层"        // 进度条叠放层级：低层 / 顶层
+    h: 4,
+    done: "#111111",
+    todo: "#e5e5e5",
+    pos: "顶部",
+    radius: 0,
+    dur: 0.3,
+    showPct: false,
+    pctColor: "#111111",
+    shadow: false,
+    bg: "#ffffff",
+    z: "顶层"
   };
   const bar=document.getElementById("bar"), fill=document.getElementById("fill"), pct=document.getElementById("pct");
 
-  // apply：把每个 state 键映射到真实样式
   function apply(){
     const root=document.documentElement;
     root.style.setProperty("--h", state.h+"px");
@@ -59,27 +58,25 @@
     root.style.setProperty("--bg", state.bg);
     root.style.setProperty("--z", state.z==="顶层" ? "9999" : "1");
     root.style.setProperty("--showpct", state.showPct ? "block" : "none");
-    // 位置：顶部或底部
+
     if(state.pos==="底部"){ bar.style.top="auto"; bar.style.bottom="0"; }
     else { bar.style.top="0"; bar.style.bottom="auto"; }
     update();
   }
 
-  // 滚动进度：已滚动 / 可滚动总高 = 百分比
   function update(){
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const p = max>0 ? Math.min(window.scrollY/max, 1) : 0;
     const v = Math.round(p*100);
     fill.style.width = v+"%";
     pct.textContent = v+"%";
-    // 百分比文字贴在进度条内侧
+
     if(state.pos==="底部"){ pct.style.top="auto"; pct.style.bottom=(state.h+4)+"px"; }
     else { pct.style.bottom="auto"; pct.style.top=(state.h+4)+"px"; }
   }
   window.addEventListener("scroll", update, {passive:true});
   window.addEventListener("resize", update);
 
-  // 父页面消息：调参实时生效
   window.addEventListener("message",(e)=>{ const d=e.data; if(!d||d.type!=="param")return; state[d.key]=d.value; apply(); });
   apply();
   </script>

@@ -13,7 +13,7 @@
   .retry { background: #eaf0ff; border: 1px solid #cdddff; color: var(--accent); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }
   .fallback { background: #e9f9ef; border: 1px solid #c7ecd4; color: var(--done); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 12.5px; }
   .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -23,7 +23,7 @@
   <div class="retry" id="retry">↻ 自动重试中…（退避 0.5s）</div>
 </div>
 <button class="btn" id="btn">模拟一次完整重试</button>
-<div class="hint">适配任务失败场景：展示失败原因、重试过程与备用方案</div>
+
 <script>
   const state = { accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", card: "#ffffff" };
   const p = document.getElementById("p");

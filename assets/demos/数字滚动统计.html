@@ -2,8 +2,7 @@
 <style>
   :root{ --ease: cubic-bezier(.44,0,.56,1); }
   body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
-  .hint{position:fixed;left:12px;bottom:10px;font-size:12px;color:#888;z-index:9}
-  /* 制造滚动区：顶部留白 + 底部统计块，进入视口才计数（区别于 v107 普通数字滚动） */
+
   body{min-height:220vh;background:var(--bg,#fff);}
   .spacer{height:120vh;display:flex;align-items:flex-end;justify-content:center;color:#bbb;font-size:14px}
   .wrap{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
@@ -18,9 +17,9 @@
     <div class="lab" id="lab">累计用户</div>
     <button class="replay" id="replay">重新计数</button>
   </div>
-  <div class="hint">滚动 / 调右侧参数看变化 · 滚动触发版（搭配 v107）</div>
+
   <script>
-  // 8–12 键：含 3 个颜色参数，每个键 apply() 都真生效
+
   const state = {
     target:900, dur:1.6, suffix:"+", sep:true, ease:"平滑",
     fontSize:56, numColor:"#111111", label:"累计用户", labelColor:"#666666",
@@ -28,19 +27,19 @@
   };
   const num = document.getElementById("num"), lab = document.getElementById("lab"), root = document.documentElement;
   let raf = 0, entered = false;
-  // 三种缓动：平滑=先快后慢，回弹=过头回弹，匀速=线性
+
   const EASE = {
     "平滑": t => 1 - Math.pow(1 - t, 3),
     "回弹": t => { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); },
     "匀速": t => t
   };
   const WEIGHT = { "常规": 400, "中粗": 600, "特粗": 800 };
-  // 数字格式化：千位分隔 + 后缀
+
   function fmt(n) {
     const r = Math.round(n);
     return (state.sep ? r.toLocaleString("en-US") : String(r)) + state.suffix;
   }
-  // 真正滚动计数（从 0 到目标值）
+
   function roll() {
     cancelAnimationFrame(raf);
     const from = 0, to = state.target, dur = state.dur * 1000;
@@ -52,7 +51,7 @@
       if (t < 1) raf = requestAnimationFrame(tick);
     })(t0);
   }
-  // apply：把每个 state 键落到样式/文案上
+
   function apply() {
     const s = root.style;
     s.setProperty("--bg", state.bg);
@@ -60,10 +59,10 @@
     s.setProperty("--nc", state.numColor);
     s.setProperty("--lc", state.labelColor);
     s.setProperty("--wt", WEIGHT[state.weight] || 800);
-    lab.textContent = state.label;       // 标签文字
-    if (entered) roll();                  // 已进入视口后调参立即重滚
+    lab.textContent = state.label;
+    if (entered) roll();
   }
-  // 进入视口才触发：延迟 delay 秒后开始计数
+
   const io = new IntersectionObserver((es) => {
     es.forEach(e => {
       if (e.isIntersecting) {
@@ -74,12 +73,12 @@
     });
   }, { threshold: 0.5 });
   io.observe(document.querySelector(".wrap"));
-  // 重播按钮：归零并重新计数
+
   document.getElementById("replay").addEventListener("click", () => {
     num.textContent = "0" + state.suffix;
     roll();
   });
-  // 接收详情页传参
+
   window.addEventListener("message", (e) => {
     const d = e.data; if (!d || d.type !== "param") return;
     state[d.key] = d.value; apply();

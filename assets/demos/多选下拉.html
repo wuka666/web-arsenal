@@ -34,7 +34,7 @@
   .box { width:16px; height:16px; border:2px solid var(--border,#d1d5db); border-radius:5px; display:flex; align-items:center; justify-content:center; flex:none; }
   .opt.on .box { background:var(--theme,#2563eb); border-color:var(--theme,#2563eb); }
   .opt.on .box::after { content:"✓"; color:#fff; font-size:12px; }
-  .hint { position:fixed; bottom:14px; left:0; right:0; text-align:center; font-size:13px; color:#999; }
+
 </style>
 </head>
 <body>
@@ -45,7 +45,7 @@
     </div>
     <div class="menu" id="menu"></div>
   </div>
-  <p class="hint">选中以标签呈现 · 可删除 · 数量与结果同步</p>
+
 <script>
   const OPTIONS = ["设计","前端","后端","产品","运营","测试","数据","算法"];
   const state = {

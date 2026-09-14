@@ -12,7 +12,7 @@
   .inner { position: absolute; left: 0; right: 0; top: 0; padding: 18px; display: flex; flex-direction: column; gap: 10px; will-change: transform; }
   .ln { height: 12px; border-radius: 6px; background: #e6e6ea; }
   .ln.s { width: 70%; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -23,7 +23,7 @@
     <div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln s"></div>
   </div>
 </div>
-<div class="hint">列表拉到顶端后可小幅继续拖动，但阻力递增，松手自动回弹</div>
+
 <script>
   const state = { resistance: 0.25, over: 80, bounce: .5, accent: "#3d5fd6", bg: "#fafafa" };
   const box = document.getElementById("box");
@@ -38,7 +38,7 @@
   box.addEventListener("pointermove", e => {
     if (!dragging) return;
     let d = e.clientY - sy;
-    if (d < 0) d = 0;                         // 只允许向下越界
+    if (d < 0) d = 0;
     if (d > 0) d = Math.min(d, state.over) * (state.resistance + (1 - state.resistance) * (1 - Math.min(d, state.over) / state.over));
     ty = d;
     inner.style.transform = "translateY(" + d + "px)";

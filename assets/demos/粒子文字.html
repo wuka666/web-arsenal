@@ -14,7 +14,7 @@
 <body>
 <canvas id="c"></canvas>
 <script>
-  // 默认参数（父页面详情页可通过消息实时调）
+
   const state = {
     text: "墨点聚字", density: 7, size: 2.2, repel: 90, speed: 5.5,
     color: "#181612", accent: "#3d5fd6", bg: "#ffffff", highlight: true
@@ -23,13 +23,12 @@
   const ctx = canvas.getContext("2d");
   let W = 0, H = 0, particles = [];
   const pointer = { x: -9999, y: -9999 };
-  // 把 #rrggbb 转成 rgba() 字符串
+
   const rgba = (hex, a) => {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
   };
 
-  // 把文字画到离屏画布，按间隔采样出粒子目标点
   function sample(text) {
     const off = document.createElement("canvas");
     const octx = off.getContext("2d");
@@ -71,7 +70,7 @@
 
   function frame() {
     ctx.clearRect(0, 0, W, H);
-    const k = state.speed / 100; // 回归速度（0-10 映射到 0-0.1）
+    const k = state.speed / 100;
     for (const p of particles) {
       const dx = p.x - pointer.x;
       const dy = p.y - pointer.y;
@@ -96,7 +95,6 @@
     requestAnimationFrame(frame);
   }
 
-  // 参数变了就重新采样粒子，让效果立即更新
   function apply() {
     init();
   }
@@ -109,7 +107,6 @@
   }, { passive: true });
   window.addEventListener("resize", () => init());
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

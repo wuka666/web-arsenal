@@ -10,7 +10,7 @@
   .stage { position: relative; width: 300px; height: 200px; }
   .card { position: absolute; inset: 0; border-radius: 18px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.16); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; cursor: grab; touch-action: none; user-select: none; will-change: transform, opacity; }
   .btn { padding: 10px 22px; border: none; border-radius: 10px; background: #3d5fd6; color: #fff; font-size: 14px; cursor: pointer; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -18,7 +18,7 @@
   <div class="card" id="card">飞出去的卡片</div>
 </div>
 <button class="btn" id="fly">让卡片飞出</button>
-<div class="hint">卡片飞出过程中，可用手指按住它「拦截」停住，而非等动画播完才响应</div>
+
 <script>
   const state = { dur: 900, dist: 360, rot: 22, card: "#3d5fd6", bg: "#fafafa", threshold: 200 };
   const stage = document.getElementById("stage");
@@ -62,7 +62,7 @@
     if (!dragging) return; dragging = false; card.style.cursor = "grab";
     const m = new DOMMatrixReadOnly(getComputedStyle(card).transform);
     if (m.m41 > state.threshold) flyOut();
-    else { // 弹回原位
+    else {
       card.style.transition = "transform .4s cubic-bezier(.34,1.5,.5,1)";
       card.style.transform = "translate(0,0) rotate(0deg)";
       setTimeout(() => card.style.transition = "", 420);

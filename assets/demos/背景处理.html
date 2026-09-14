@@ -11,13 +11,13 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
     padding: 12px 28px; border-radius: 10px;
   }
-  /* 底层内容：弹层打开时模糊 + 轻微缩小，强化"退到后面"的状态 */
+
   .bg {
     position: fixed; inset: 0; padding: 40px;
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
@@ -59,27 +59,26 @@
   <div class="sheet-title">底层已退后</div>
   <p style="text-align:center;font-size:13px;color:#666;margin-top:8px">模糊 + 缩小，一眼看出它在后面</p>
 </div>
-<p class="hint">弹层打开时，底层页面模糊 + 轻微缩小</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    blur: 6,          // 底层模糊（px）
-    scale: 0.96,      // 底层缩小比例
-    dur: 0.35,        // 过渡时长（秒）
-    dim: 0.72,        // 底层压暗程度（1=不变暗）
-    sheetH: 45,       // 弹层高度（vh）
-    radius: 20,       // 顶部圆角（px）
-    mask: 0.25,       // 遮罩浓度
-    maskColor: "#000000",  // 遮罩颜色
-    sheetBg: "#ffffff",    // 弹层底色
-    cardBg: "#f0f0f0",     // 底层卡片颜色
-    handleColor: "#dddddd" // 手柄颜色
+    blur: 6,
+    scale: 0.96,
+    dur: 0.35,
+    dim: 0.72,
+    sheetH: 45,
+    radius: 20,
+    mask: 0.25,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    cardBg: "#f0f0f0",
+    handleColor: "#dddddd"
   };
   const bg = document.getElementById("bg");
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
 
-  // 十六进制转 rgba
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
@@ -112,7 +111,6 @@
   document.getElementById("open").addEventListener("click", open);
   mask.addEventListener("click", close);
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

@@ -12,7 +12,7 @@
   .badge { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; transition: background .2s; }
   .legend { display: flex; gap: 20px; font-size: 13px; color: #666; }
   .legend b { color: #1a1a1a; }
-  .hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #999; }
+
 </style>
 </head>
 <body>
@@ -21,7 +21,7 @@
   <div class="badge" id="badge">初始方向判定执行动作</div>
 </div>
 <div class="legend">横滑=翻页（<b id="h">—</b>）　竖拉=关闭（<b id="v">—</b>）</div>
-<div class="hint">横滑与竖拉冲突时，以「初始滑动方向」判定执行哪一个动作</div>
+
 <script>
   const state = { threshold: 24, hColor: "#3d5fd6", vColor: "#e0533d", card: "#ffffff", bg: "#fafafa" };
   const card = document.getElementById("card");

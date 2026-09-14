@@ -10,7 +10,7 @@
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .action {
     position: relative; overflow: hidden; cursor: pointer; user-select: none; border: none; outline: none;
     background: var(--btnbg, #1a1a1a); color: var(--btnc, #fff);
@@ -21,7 +21,7 @@
                 border-radius var(--dur, .45s) ease,
                 background var(--dur, .45s) ease;
   }
-  /* 收尾：任务完成后，按钮变形为对勾提示状态（不是弹个新框） */
+
   .action.done {
     width: var(--final, 52px); height: var(--final, 52px);
     border-radius: 50%; background: var(--ok, #16a34a); cursor: default;
@@ -46,20 +46,20 @@
   <span class="txt" id="txt">保存设置</span>
   <span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>
 </button>
-<p class="hint">点一下：按钮自己变形为「已保存 ✓」，不用弹新窗口</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 0.45,           // 收尾变形时长（秒）
-    text: "保存设置",     // 按钮文字
-    w: 200,              // 按钮宽度（px）
-    h: 52,               // 按钮高度（px）
-    radius: 14,          // 按钮圆角（px）
-    finalSize: 52,       // 收尾圆形直径（px）
-    success: "#16a34a",  // 成功色
-    btnBg: "#1a1a1a",    // 按钮底色
-    btnColor: "#ffffff", // 按钮文字颜色
-    tickColor: "#ffffff" // 对勾颜色
+    dur: 0.45,
+    text: "保存设置",
+    w: 200,
+    h: 52,
+    radius: 14,
+    finalSize: 52,
+    success: "#16a34a",
+    btnBg: "#1a1a1a",
+    btnColor: "#ffffff",
+    tickColor: "#ffffff"
   };
   const act = document.getElementById("act");
   const txt = document.getElementById("txt");
@@ -75,7 +75,7 @@
     R.setProperty("--btnbg", state.btnBg);
     R.setProperty("--btnc", state.btnColor);
     R.setProperty("--tickc", state.tickColor);
-    txt.textContent = state.text; // 按钮文字实时可改
+    txt.textContent = state.text;
   }
 
   act.addEventListener("click", () => {
@@ -85,7 +85,6 @@
     setTimeout(() => act.classList.remove("done"), 2400);
   });
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;

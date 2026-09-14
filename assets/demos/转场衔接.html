@@ -11,7 +11,7 @@
     background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
     overflow: hidden;
   }
-  .hint { font-size: 13px; color: #999; }
+
   .btn {
     cursor: pointer; user-select: none; border: none; outline: none;
     background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 700;
@@ -34,7 +34,7 @@
                 background var(--dur, .38s) ease;
   }
   .sheet.show { transform: translateY(0); }
-  /* 转场衔接：抽屉直接延伸为全屏新页面，不关掉重开 */
+
   .sheet.page { height: 100%; border-radius: 0; transform: translateY(0); background: var(--page, #fff); }
   .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--handlec, #ddd); margin: 10px auto 0; }
   .sheet-title { text-align: center; font-weight: 800; margin-top: 12px; }
@@ -55,30 +55,29 @@
     <p style="font-size:13px;color:#666">抽屉直接延伸成了新页面，中间没有「关掉再打开」的割裂感。</p>
   </div>
 </div>
-<p class="hint">点「进入详情页」：抽屉就地长成全屏新页面</p>
+
 <script>
-  // 默认参数（父页面详情页可调）
+
   const state = {
-    dur: 0.38,         // 转场时长（秒）
-    ease: "先快后慢",   // 缓动方式
-    sheetH: 55,        // 抽屉高度（vh）
-    radius: 20,        // 顶部圆角（px）
-    shadow: 0.12,      // 投影浓度
-    mask: 0.3,         // 遮罩浓度
-    maskColor: "#000000",  // 遮罩颜色
-    sheetBg: "#ffffff",    // 抽屉底色
-    pageBg: "#ffffff",     // 详情页底色
-    handleColor: "#dddddd" // 手柄颜色
+    dur: 0.38,
+    ease: "先快后慢",
+    sheetH: 55,
+    radius: 20,
+    shadow: 0.12,
+    mask: 0.3,
+    maskColor: "#000000",
+    sheetBg: "#ffffff",
+    pageBg: "#ffffff",
+    handleColor: "#dddddd"
   };
   const mask = document.getElementById("mask");
   const sheet = document.getElementById("sheet");
 
-  // 十六进制转 rgba
   function rgba(hex, a) {
     const n = parseInt(hex.slice(1), 16);
     return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
   }
-  // 缓动方式 → 贝塞尔曲线（走 CSS 变量，改完立即生效）
+
   const EASES = {
     "先快后慢": "cubic-bezier(.32,.72,0,1)",
     "匀速": "linear",
@@ -112,7 +111,6 @@
     mask.classList.remove("show");
   });
 
-  // 接收父页面（index.html 详情页）传来的参数
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.type !== "param") return;
