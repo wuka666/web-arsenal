@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·陈列型官网</title>
+<style>
+:root{
+  --zhucai:#FF9667;--di:#f8f8f8;--zi:#222222;--cizi:#8a8a8a;--xian:#ededed;
+  --yuanjiao:6px;--jianju:18px;--zihao:15px;--lie:4;--yinying:20;--baohedu:100;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:960px;margin:0 auto;padding:0 var(--jianju) calc(var(--jianju)*2);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--xian);}
+.logo{font-weight:800;font-size:18px;letter-spacing:-.4px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:13.5px;color:var(--cizi);}
+.menu a{color:inherit;text-decoration:none;}
+.menu a.hot{color:var(--zi);font-weight:700;}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:999px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:13.5px;}
+
+.kicker{padding:calc(var(--jianju)*2.2) 0 6px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cizi);}
+.hero{display:grid;grid-template-columns:1fr;gap:var(--jianju);}
+.shot{
+  min-height:44vh;border-radius:calc(var(--yuanjiao)*1px);
+  background:radial-gradient(circle at 22% 28%,rgba(255,255,255,.5),transparent 42%),linear-gradient(135deg,#5E6AD2 0%,#FF9667 55%,#FFD2A8 100%);
+  display:flex;align-items:flex-end;padding:16px;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*1px) rgba(0,0,0,.12);
+}
+.shot .tagline{font-size:13px;font-weight:800;color:#fff;}
+.info{display:flex;align-items:center;gap:14px;padding:calc(var(--jianju)*1.2) 0;border-bottom:1px solid var(--xian);}
+.info h1{font-size:calc(var(--zihao)*2.4);font-weight:800;letter-spacing:-.8px;line-height:1.1;}
+.info .sub{margin-top:5px;font-size:calc(var(--zihao)*.85);color:var(--cizi);}
+.badge{flex:none;padding:9px 15px;border-radius:999px;background:var(--zhucai);color:#fff;font-size:15px;font-weight:800;white-space:nowrap;}
+
+.shead{display:flex;align-items:baseline;justify-content:space-between;padding:calc(var(--jianju)*2) 0 calc(var(--jianju)*.8);}
+.shead h3{font-size:15px;font-weight:800;}
+.shead span{font-size:12px;color:var(--cizi);}
+.grid{display:grid;grid-template-columns:repeat(var(--lie),1fr);gap:var(--jianju);}
+.cell{cursor:pointer;}
+.thumb{
+  width:100%;aspect-ratio:4/3;border-radius:var(--yuanjiao);background:var(--pic);
+  /* 饱和度单独可调：底色一乱或饱和度一降，整墙作品立刻发脏 */
+  filter:saturate(calc(var(--baohedu)/100));
+  box-shadow:0 calc(var(--yinying)*0.1px) calc(var(--yinying)*0.4px) rgba(0,0,0,.10);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.cell:hover .thumb{transform:translateY(-6px);box-shadow:0 calc(var(--yinying)*0.25px) calc(var(--yinying)*0.9px) rgba(0,0,0,.18);}
+.cell .t{margin-top:8px;font-size:13px;font-weight:700;}
+.cell .m{margin-top:2px;font-size:11.5px;color:var(--cizi);}
+.cell.king .t{color:var(--zhucai);}
+.foot{padding:calc(var(--jianju)*2) 0 calc(var(--jianju));color:var(--cizi);font-size:12.5px;display:flex;justify-content:space-between;border-top:1px solid var(--xian);margin-top:calc(var(--jianju)*1.4);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <span class="logo">Gallery</span>
+      <span class="menu"><a class="hot">Website Awards</a><a>Collections</a><a>Nominees</a><a>Academy</a></span>
+      <button class="cta">Submit your site</button>
+    </nav>
+
+    <div class="kicker">Site of the Day · Sep 14, 2026</div>
+    <header class="hero">
+      <div class="shot"><span class="tagline">第一焦点 · 当日最佳作品</span></div>
+      <div class="info">
+        <div>
+          <h1>Léo Parpeix - Portfolio 2026</h1>
+          <div class="sub">第二焦点 · 评分 7.69 / 10，其余信息全部灰阶退让</div>
+        </div>
+        <div class="badge">7.69 / 10</div>
+      </div>
+    </header>
+
+    <div class="shead"><h3>Latest</h3><span id="count"></span></div>
+    <section class="grid" id="grid"></section>
+
+    <footer class="foot"><span>© 2026 陈列型官网</span><span>底色退让，作品当主角</span></footer>
+  </div>
+<script>
+  const state = {
+    zhucai:"#FF9667", di:"#f8f8f8", ka:"#ffffff", zi:"#222222", cizi:"#8a8a8a", xian:"#ededed",
+    yuanjiao:6, jianju:18, zihao:15, lie:4, yinying:20, baohedu:100
+  };
+  const PIC = [
+    "linear-gradient(135deg,#FF9667,#FFD2A8)",
+    "linear-gradient(140deg,#5E6AD2,#9AA0F0)",
+    "linear-gradient(125deg,#12B981,#8FE3C4)",
+    "linear-gradient(150deg,#111827,#4B5563)",
+    "linear-gradient(135deg,#E1306C,#FCA5C8)",
+    "linear-gradient(120deg,#0EA5E9,#A5E8FF)",
+    "linear-gradient(145deg,#F59E0B,#FCD34D)",
+    "linear-gradient(135deg,#7C3AED,#C4B5FD)"
+  ];
+  const DATA = [
+    { t:"Thoma Lecornu", m:"Portfolio" },
+    { t:"EMO® — Altar II", m:"Electronic Materials Office®" },
+    { t:"Readymag WOTY 2026", m:"Website of the Year" },
+    { t:"STANZZA design", m:"ADELT Agency" },
+    { t:"Nominees", m:"Gallery" },
+    { t:"Collections", m:"Directory" },
+    { t:"Directory", m:"Agencies" },
+    { t:"Submit your site", m:"Get judged" }
+  ];
+  function build(){
+    const g = document.getElementById("grid");
+    g.innerHTML = "";
+    DATA.forEach((d,i)=>{
+      const cell = document.createElement("a");
+      cell.className = "cell" + (i===0 ? " king" : "");
+      const th = document.createElement("div");
+      th.className = "thumb";
+      th.style.setProperty("--pic", PIC[i % PIC.length]);
+      const t = document.createElement("div"); t.className="t"; t.textContent=d.t;
+      const m = document.createElement("div"); m.className="m"; m.textContent=d.m;
+      cell.append(th,t,m);
+      g.appendChild(cell);
+    });
+    document.getElementById("count").textContent = DATA.length + " sites";
+  }
+  function apply(){
+    const r = document.documentElement.style;
+    ["zhucai","di","zi","cizi","xian"].forEach(k => r.setProperty("--"+k, state[k]));
+    r.setProperty("--yuanjiao", state.yuanjiao+"px");
+    r.setProperty("--jianju", state.jianju+"px");
+    r.setProperty("--zihao", state.zihao+"px");
+    r.setProperty("--lie", state.lie);
+    r.setProperty("--yinying", state.yinying);
+    r.setProperty("--baohedu", state.baohedu);
+    build();
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</body>
+</html>
