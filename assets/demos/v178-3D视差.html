@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 视差演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 800px; }
+  .scene { position: relative; width: min(420px, 92vw); height: 280px; transform-style: preserve-3d; }
+  .layer { position: absolute; left: 50%; top: 50%; border-radius: 16px; will-change: transform; }
+  .back { width: 240px; height: 160px; margin: -80px 0 0 -120px; background: color-mix(in srgb, var(--accent) 18%, transparent); filter: blur(2px); }
+  .mid { width: 180px; height: 120px; margin: -60px 0 0 -90px; background: var(--c2); box-shadow: 0 10px 30px rgba(0,0,0,.12); }
+  .front { width: 110px; height: 64px; margin: -32px 0 0 -55px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border-radius: var(--radius); }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="layer back"></div>
+  <div class="layer mid"></div>
+  <div class="layer front">焦点内容</div>
+  
+</div>
+
+<script>
+  const state = { depth: 0.6, sens: 1, radius: 16, accent: "#5E6AD2", di: "#fafafa", c2: "#cdd2ee" };
+  const scene = document.getElementById("scene");
+  const L = { back: scene.querySelector(".back"), mid: scene.querySelector(".mid"), front: scene.querySelector(".front") };
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--c2", state.c2);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+  }
+  // 三层按「深度」分配位移系数：越靠前动得越多，越靠后动得越少，制造纵深
+  const F = { back: 0.15, mid: 0.45, front: 0.9 };
+  scene.addEventListener("pointermove", e => {
+    const r = scene.getBoundingClientRect();
+    const ox = (e.clientX - (r.left + r.width / 2)) / r.width;
+    const oy = (e.clientY - (r.top + r.height / 2)) / r.height;
+    for (const k in L) {
+      const f = F[k] * state.depth * state.sens * 60;
+      L[k].style.transform = "translate3d(" + (ox * f) + "px," + (oy * f) + "px,0)";
+    }
+  });
+  scene.addEventListener("pointerleave", () => { for (const k in L) L[k].style.transform = "translate3d(0,0,0)"; });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

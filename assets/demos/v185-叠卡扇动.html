@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>叠卡扇动演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; overflow: hidden; }
+  .fan { position: relative; width: 240px; height: 180px; }
+  .card { position: absolute; left: 50%; bottom: 0; width: 150px; height: 110px; margin-left: -75px; background: var(--c2); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,.15); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #333; transform-origin: 50% var(--origin); transition: transform .45s cubic-bezier(.34,1.4,.5,1); will-change: transform; }
+  .card.top { background: var(--accent); color: #fff; }
+  .toggle { padding: 11px 26px; border: none; border-radius: 12px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="fan" id="fan">
+  <div class="card">卡片 3</div>
+  <div class="card">卡片 2</div>
+  <div class="card top">卡片 1</div>
+</div>
+<button class="toggle" id="toggle">展开 / 收起</button>
+
+<script>
+  const state = { spread: 38, origin: 220, radius: 14, accent: "#5E6AD2", di: "#fafafa", c2: "#cdd2ee" };
+  const fan = document.getElementById("fan");
+  const cards = Array.from(fan.querySelectorAll(".card"));
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--c2", state.c2);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+    document.documentElement.style.setProperty("--origin", state.origin + "px");
+  }
+  let open = false;
+  function layout() {
+    const n = cards.length;
+    cards.forEach((c, i) => {
+      if (open) {
+        // 以卡片外的点为支点，逐张旋转张开成扇形
+        const mid = (n - 1) / 2, rot = (i - mid) * (state.spread / (n - 1));
+        c.style.transform = "rotate(" + rot + "deg) translateY(" + (-Math.abs(i - mid) * 10) + "px)";
+      } else {
+        c.style.transform = "rotate(0deg) translateY(0)";
+      }
+    });
+  }
+  document.getElementById("toggle").addEventListener("click", () => { open = !open; layout(); });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); layout(); });
+  apply(); layout();
+</script>
+</body>
+</html>

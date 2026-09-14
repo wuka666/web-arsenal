@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图片展开演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: min(420px, 92vw); }
+  .thumb { aspect-ratio: 1; border-radius: var(--radius); cursor: pointer; background: linear-gradient(135deg, var(--c1), var(--c2)); transition: transform .2s ease; }
+  .thumb:hover { transform: translateY(-3px); }
+  .backdrop { position: fixed; inset: 0; background: #000; opacity: 0; transition: opacity var(--dur) ease; z-index: 5; }
+  .hero { position: fixed; z-index: 6; background: linear-gradient(135deg, var(--c1), var(--c2)); border-radius: var(--radius); transition: all var(--dur) cubic-bezier(.4,0,.2,1); will-change: transform, width, height, top, left, border-radius; }
+  .close { position: fixed; z-index: 7; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--accent); color: #fff; font-size: 18px; cursor: pointer; opacity: 0; transition: opacity var(--dur) ease; }
+</style>
+</head>
+<body>
+<div class="grid" id="grid">
+  <div class="thumb"></div><div class="thumb"></div><div class="thumb"></div>
+  <div class="thumb"></div><div class="thumb"></div><div class="thumb"></div>
+</div>
+<div class="backdrop" id="backdrop"></div>
+<div class="close" id="close">×</div>
+
+<script>
+  const state = { dur: 0.5, radius: 16, mask: 0.6, accent: "#5E6AD2", di: "#fafafa", c1: "#5E6AD2", c2: "#b8c0ff" };
+  const grid = document.getElementById("grid");
+  const backdrop = document.getElementById("backdrop");
+  const closeBtn = document.getElementById("close");
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--c1", state.c1);
+    document.documentElement.style.setProperty("--c2", state.c2);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+    document.documentElement.style.setProperty("--dur", state.dur + "s");
+    backdrop.style.background = "rgba(0,0,0," + state.mask + ")";
+  }
+  let hero = null, srcEl = null;
+  function open(t) {
+    if (hero) return;
+    srcEl = t;
+    const r = t.getBoundingClientRect();
+    hero = document.createElement("div");
+    hero.className = "hero";
+    hero.style.left = r.left + "px"; hero.style.top = r.top + "px";
+    hero.style.width = r.width + "px"; hero.style.height = r.height + "px";
+    document.body.appendChild(hero);
+    // FLIP：下一帧再放到全屏目标位，过渡自然连续
+    requestAnimationFrame(() => {
+      const W = innerWidth, H = innerHeight, pad = Math.min(W, H) * 0.08;
+      const w = W - pad * 2, h = w * 0.66;
+      hero.style.left = pad + "px"; hero.style.top = (H - h) / 2 + "px";
+      hero.style.width = w + "px"; hero.style.height = h + "px"; hero.style.borderRadius = "0px";
+    });
+    backdrop.style.opacity = "1"; closeBtn.style.opacity = "1";
+  }
+  function shut() {
+    if (!hero) return;
+    const r = srcEl.getBoundingClientRect();
+    hero.style.left = r.left + "px"; hero.style.top = r.top + "px";
+    hero.style.width = r.width + "px"; hero.style.height = r.height + "px"; hero.style.borderRadius = state.radius + "px";
+    backdrop.style.opacity = "0"; closeBtn.style.opacity = "0";
+    const h = hero; hero = null;
+    setTimeout(() => h.remove(), state.dur * 1000 + 30);
+  }
+  grid.querySelectorAll(".thumb").forEach(t => t.addEventListener("click", () => open(t)));
+  backdrop.addEventListener("click", shut); closeBtn.addEventListener("click", shut);
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

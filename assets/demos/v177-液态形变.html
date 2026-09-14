@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>液态形变演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .card { width: 200px; height: 130px; border-radius: var(--radius); background: var(--accent); color: var(--text); padding: 16px; cursor: grab; touch-action: none; will-change: transform; user-select: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .card:active { cursor: grabbing; }
+  .card b { font-size: 16px; }
+  .card span { font-size: 12.5px; opacity: .85; }
+</style>
+</head>
+<body>
+<div class="card" id="card"><b>拖我甩一下</b><span>拖动越快，卡片被拉得越扁，松手回弹</span></div>
+
+<script>
+  const state = { deform: 0.5, recover: 0.5, radius: 18, accent: "#5E6AD2", di: "#fafafa", text: "#ffffff" };
+  const card = document.getElementById("card");
+  let dragging = false, vx = 0, vy = 0, offX = 0, offY = 0, cx0 = 0, cy0 = 0;
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--text", state.text);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+  }
+  card.addEventListener("pointerdown", e => {
+    dragging = true; card.setPointerCapture(e.pointerId);
+    const r = card.getBoundingClientRect();
+    cx0 = r.left + r.width / 2; cy0 = r.top + r.height / 2;
+    offX = e.clientX - cx0; offY = e.clientY - cy0;
+    vx = vy = 0; lastX = e.clientX; lastY = e.clientY;
+    card.style.transition = "none";
+  });
+  let lastX = 0, lastY = 0;
+  card.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    vx = vx * 0.6 + dx * 0.4; vy = vy * 0.6 + dy * 0.4;
+    lastX = e.clientX; lastY = e.clientY;
+    const tx = (e.clientX - offX) - cx0, ty = (e.clientY - offY) - cy0;
+    // 速度转形变：沿拖动方向拉伸、垂直方向压扁，幅度随 deform 调；速度归零时自动回正
+    const sp = Math.min(Math.hypot(vx, vy) / 40, 1);
+    const sx = 1 + sp * state.deform * 0.5 * (vx >= 0 ? 1 : -1);
+    const sy = 1 - sp * state.deform * 0.35;
+    const sk = (vy / 40) * state.deform * 6;
+    card.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + sx.toFixed(3) + "," + sy.toFixed(3) + ") skewX(" + sk.toFixed(2) + "deg)";
+  });
+  function release() {
+    if (!dragging) return; dragging = false;
+    card.style.transition = "transform " + state.recover + "s cubic-bezier(.34,1.5,.5,1)";
+    card.style.transform = "translate(0,0) scale(1,1) skewX(0deg)";
+  }
+  card.addEventListener("pointerup", release);
+  card.addEventListener("pointercancel", release);
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

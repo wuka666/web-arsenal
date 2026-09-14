@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>卡片错位布局演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    background: var(--di);
+    color: var(--zi);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 28px 16px;
+  }
+  .wrap { width: min(640px, 94vw); }
+  h2 { font-size: 15px; margin-bottom: 6px; }
+  .sub { font-size: 12.5px; color: var(--cizi); margin-bottom: 20px; }
+
+  .list { display: flex; flex-direction: column; gap: var(--jiange); }
+  .card {
+    background: var(--kase);
+    border: 1px solid color-mix(in srgb, var(--zi) 10%, transparent);
+    border-radius: var(--yuanjiao);
+    padding: 16px 18px;
+    box-shadow: 0 calc(var(--yinying) * 0.2px) calc(var(--yinying) * 0.7px) rgba(0,0,0,.08);
+    transform: translateX(var(--shift, 0px));
+    transition: transform .25s ease, box-shadow .2s ease;
+  }
+  .card .t { font-size: 14.5px; font-weight: 700; }
+  .card .d { margin-top: 5px; font-size: 12.5px; color: var(--cizi); line-height: 1.55; }
+
+  .card.first {
+    border-color: var(--zhucai);
+    box-shadow: 0 calc(var(--yinying) * 0.3px) calc(var(--yinying) * 1px) color-mix(in srgb, var(--zhucai) 35%, transparent);
+  }
+  .card.first .t { color: var(--zhucai); }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>卡片错位：每张卡各走各的对齐轴</h2>
+  <div class="sub">初始版所有卡片左侧对齐、只有一条轴 → 整齐但扁平；错位后层次立刻出来</div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+
+  const state = {
+    cuowei: 42, jiange: 22, yuanjiao: 14, yinying: 14,
+    guilv: 0, duiqie: 0, qiangdiao: 1,
+    zhucai: "#5E6AD2", di: "#fafafa", zi: "#1a1a1a", cizi: "#6b6b6b", kase: "#ffffff"
+  };
+  const DATA = [
+    { t: "首屏主张", d: "一句话讲清你是谁，错位让这条先被看见" },
+    { t: "核心能力", d: "三到四项能力，各自缩进不同形成节奏" },
+    { t: "使用场景", d: "场景卡错开，避免「四块一样大」的模板感" },
+    { t: "客户证言", d: "证言卡再错一级，纵深由偏移量堆出来" },
+    { t: "行动引导", d: "最后一块回正或继续错位，收住动线" }
+  ];
+  function alignOf(i) {
+
+    if (state.duiqie === 1) return "center";
+    if (state.duiqie === 2) return "left";
+    return ["left", "center", "right"][i % 3];
+  }
+  function shiftOf(i) {
+
+    const c = state.cuowei;
+    if (state.guilv === 0) return (i % 2 === 0 ? 1 : -1) * c;
+    if (state.guilv === 1) return i * (c * 0.5);
+    return i * c;
+  }
+  function build() {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+    DATA.forEach((it, i) => {
+      const el = document.createElement("div");
+      el.className = "card" + (i === 0 && state.qiangdiao ? " first" : "");
+      el.style.textAlign = alignOf(i);
+      el.style.setProperty("--shift", shiftOf(i) + "px");
+      el.innerHTML = '<div class="t">' + it.t + '</div><div class="d">' + it.d + '</div>';
+      list.appendChild(el);
+    });
+  }
+  function apply() {
+    const r = document.documentElement.style;
+    r.setProperty("--jiange", state.jiange + "px");
+    r.setProperty("--yuanjiao", state.yuanjiao + "px");
+    r.setProperty("--yinying", state.yinying);
+    r.setProperty("--zhucai", state.zhucai);
+    r.setProperty("--di", state.di);
+    r.setProperty("--zi", state.zi);
+    r.setProperty("--cizi", state.cizi);
+    r.setProperty("--kase", state.kase);
+    build();
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</body>
+</html>

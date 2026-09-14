@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多元素联动演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .field { position: relative; width: min(440px, 92vw); height: 300px; border-radius: 18px; border: 2px dashed color-mix(in srgb, var(--accent) 25%, transparent); touch-action: none; }
+  .ball { position: absolute; border-radius: 50%; will-change: transform; cursor: grab; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; }
+  .ball:active { cursor: grabbing; }
+</style>
+</head>
+<body>
+<div class="field" id="field">
+  
+</div>
+
+<script>
+  const state = { push: 1, friction: 0.92, weight: 1.4, accent: "#5E6AD2", di: "#fafafa", c2: "#cdd2ee" };
+  const field = document.getElementById("field");
+  let balls = [];
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--c2", state.c2);
+  }
+  function build() {
+    field.querySelectorAll(".ball").forEach(b => b.remove());
+    balls = [];
+    const W = field.clientWidth, H = field.clientHeight;
+    const n = 5, base = 30;
+    for (let i = 0; i < n; i++) {
+      const big = i % 2 === 0;
+      const r = base * (big ? state.weight : 1 / Math.max(state.weight, 1));
+      const el = document.createElement("div");
+      el.className = "ball";
+      el.style.width = el.style.height = (r * 2) + "px";
+      el.style.background = i === 0 ? state.accent : state.c2;
+      el.textContent = i === 0 ? "拖我" : "";
+      field.appendChild(el);
+      balls.push({ x: 40 + i * (W - 80) / (n - 1), y: H / 2 + (i % 2 ? 40 : -40), r, mass: r, el, vx: 0, vy: 0 });
+    }
+  }
+  let drag = null, px = 0, py = 0;
+  field.addEventListener("pointerdown", e => {
+    const b = e.target.closest(".ball"); if (!b) return;
+    drag = balls.find(x => x.el === b); drag.el.setPointerCapture(e.pointerId);
+    px = e.clientX; py = e.clientY;
+  });
+  field.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const r = field.getBoundingClientRect();
+    drag.x = Math.max(drag.r, Math.min(r.width - drag.r, e.clientX - r.left));
+    drag.y = Math.max(drag.r, Math.min(r.height - drag.r, e.clientY - r.top));
+    drag.vx = e.clientX - px; drag.vy = e.clientY - py; px = e.clientX; py = e.clientY;
+  });
+  field.addEventListener("pointerup", () => drag = null);
+  function step() {
+    const W = field.clientWidth, H = field.clientHeight;
+    for (let i = 0; i < balls.length; i++) {
+      const a = balls[i];
+      if (a !== drag) { a.x += a.vx; a.y += a.vy; a.vx *= state.friction; a.vy *= state.friction; }
+      // 边界
+      if (a.x < a.r) { a.x = a.r; a.vx *= -0.5; }
+      if (a.x > W - a.r) { a.x = W - a.r; a.vx *= -0.5; }
+      if (a.y < a.r) { a.y = a.r; a.vy *= -0.5; }
+      if (a.y > H - a.r) { a.y = H - a.r; a.vy *= -0.5; }
+    }
+    // 两两排斥：重叠部分按质量分摊位移，重的动得少
+    for (let i = 0; i < balls.length; i++) for (let j = i + 1; j < balls.length; j++) {
+      const a = balls[i], b = balls[j];
+      let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
+      const min = a.r + b.r;
+      if (d < min) {
+        const ov = (min - d) * state.push * 0.5, nx = dx / d, ny = dy / d;
+        const ta = b.mass / (a.mass + b.mass), tb = a.mass / (a.mass + b.mass);
+        if (a !== drag) { a.x -= nx * ov * ta; a.y -= ny * ov * ta; }
+        if (b !== drag) { b.x += nx * ov * tb; b.y += ny * ov * tb; }
+      }
+    }
+    for (const a of balls) a.el.style.transform = "translate(" + (a.x - a.r) + "px," + (a.y - a.r) + "px)";
+    requestAnimationFrame(step);
+  }
+  function rebuild() { apply(); build(); }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; if (d.key === "weight") build(); else apply(); });
+  build(); step();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>底部 Tab 动效演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .stage { position: relative; width: min(420px, 92vw); height: 240px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 30px; }
+  .bar { position: relative; display: flex; gap: 6px; background: color-mix(in srgb, var(--accent) 8%, #fff); border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent); padding: 6px; border-radius: 22px; }
+  .tab { position: relative; z-index: 1; border: none; background: transparent; color: color-mix(in srgb, var(--accent) 70%, #555); padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius); transition: color .3s ease; }
+  .tab.on { color: var(--text); }
+  .pill { position: absolute; z-index: 0; top: 6px; bottom: 6px; left: 6px; width: 60px; background: var(--accent); border-radius: var(--radius); transition: transform var(--bounce) cubic-bezier(.34,1.56,.5,1); }
+  .pill.stretch { animation: stretch var(--bounce) cubic-bezier(.34,1.56,.5,1); }
+  @keyframes stretch { 0% { transform: var(--pos) scaleX(1); } 35% { transform: var(--pos) scaleX(var(--stretch)); } 70% { transform: var(--pos) scaleX(.94); } 100% { transform: var(--pos) scaleX(1); } }
+</style>
+</head>
+<body>
+<div class="stage">
+  
+  <div class="bar" id="bar">
+    <span class="pill" id="pill"></span>
+    <button class="tab on">首页</button>
+    <button class="tab">发现</button>
+    <button class="tab">消息</button>
+    <button class="tab">我的</button>
+  </div>
+</div>
+
+<script>
+  const state = { stretch: 1.4, bounce: 0.45, radius: 20, accent: "#5E6AD2", di: "#fafafa", text: "#ffffff" };
+  const bar = document.getElementById("bar");
+  const pill = document.getElementById("pill");
+  const tabs = Array.from(bar.querySelectorAll(".tab"));
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--text", state.text);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+    document.documentElement.style.setProperty("--bounce", state.bounce + "s");
+    document.documentElement.style.setProperty("--stretch", state.stretch);
+  }
+  function moveTo(i, anim) {
+    const t = tabs[i], r = t.getBoundingClientRect(), br = bar.getBoundingClientRect();
+    const x = r.left - br.left, w = r.width;
+    pill.style.width = w + "px";
+    const pos = "translateX(" + x + "px)";
+    pill.style.setProperty("--pos", pos);
+    if (anim) {
+      pill.style.transition = "none";
+      pill.classList.remove("stretch"); void pill.offsetWidth; pill.classList.add("stretch");
+    } else {
+      pill.style.transition = "transform " + state.bounce + "s cubic-bezier(.34,1.56,.5,1)";
+      pill.style.transform = pos;
+    }
+    tabs.forEach((t2, j) => t2.classList.toggle("on", j === i));
+  }
+  tabs.forEach((t, i) => t.addEventListener("click", () => moveTo(i, true)));
+  function apply2() { apply(); requestAnimationFrame(() => moveTo(tabs.findIndex(t => t.classList.contains("on")), false)); }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply2(); });
+  apply(); moveTo(0, false);
+</script>
+</body>
+</html>

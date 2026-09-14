@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>按钮滑出取消演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; overflow: hidden; }
+  .btn { position: relative; padding: 16px 34px; border: none; border-radius: var(--radius); background: var(--accent); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer; user-select: none; touch-action: none; transition: transform var(--spring) ease, filter var(--spring) ease; will-change: transform; }
+  .btn.down { transform: translateY(var(--depth)) scale(.98); filter: brightness(.82); }
+  .btn.done { background: #2e9e5b; }
+  .status { font-size: 12.5px; color: color-mix(in srgb, var(--accent) 55%, #888); }
+</style>
+</head>
+<body>
+<button class="btn" id="btn">按住发送</button>
+<div class="status" id="status">按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发</div>
+
+<script>
+  const state = { depth: 6, spring: 0.3, radius: 14, accent: "#5E6AD2", di: "#fafafa", text: "#ffffff" };
+  const btn = document.getElementById("btn");
+  const status = document.getElementById("status");
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--text", state.text);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+    document.documentElement.style.setProperty("--depth", state.depth + "px");
+    document.documentElement.style.setProperty("--spring", state.spring + "s");
+  }
+  let pressing = false;
+  function inside(e) { const r = btn.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; }
+  btn.addEventListener("pointerdown", e => { pressing = true; btn.classList.add("down"); btn.setPointerCapture(e.pointerId); });
+  btn.addEventListener("pointermove", e => {
+    // 移出按钮范围即取消按压（视觉复位），移回再按下——松手时按当前是否在范围内决定
+    if (pressing && !inside(e)) { btn.classList.remove("down"); }
+    else if (pressing && inside(e)) { btn.classList.add("down"); }
+  });
+  btn.addEventListener("pointerup", e => {
+    if (!pressing) return; pressing = false;
+    if (inside(e) && btn.classList.contains("down")) {
+      btn.classList.remove("down"); btn.classList.add("done"); btn.textContent = "已发送 ✓";
+      status.textContent = "在按钮内松手 → 触发发送";
+      setTimeout(() => { btn.classList.remove("done"); btn.textContent = "按住发送"; status.textContent = "按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发"; }, 1100);
+    } else {
+      btn.classList.remove("down"); status.textContent = "手指移出后松手 → 已取消，不触发";
+      setTimeout(() => status.textContent = "按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发", 1100);
+    }
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

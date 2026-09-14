@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>磁吸动效演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .zone { position: relative; width: min(440px, 92vw); height: 280px; border: 2px dashed color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .chip { width: 84px; height: 84px; border-radius: 18px; background: var(--accent); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; will-change: transform; user-select: none; }
+</style>
+</head>
+<body>
+<div class="zone" id="zone">
+  <div class="chip">磁吸 A</div>
+  <div class="chip">磁吸 B</div>
+  <div class="chip">磁吸 C</div>
+  
+</div>
+
+<script>
+  const state = { radius: 150, strength: 0.55, spring: 0.45, accent: "#5E6AD2", di: "#fafafa", text: "#ffffff" };
+  const chips = Array.from(document.querySelectorAll(".chip"));
+  const zone = document.getElementById("zone");
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--text", state.text);
+  }
+  // 阻力再贴合：距离远时吸力弱（像有阻力），越近吸力越强（pow>1 制造「先抗后吸」手感）
+  zone.addEventListener("pointermove", e => {
+    const zr = zone.getBoundingClientRect();
+    chips.forEach(c => {
+      const r = c.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = e.clientX - cx, dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < state.radius) {
+        const pull = Math.pow(1 - dist / state.radius, 1.7) * state.strength;
+        c.style.transition = "none";
+        c.style.transform = "translate(" + (dx * pull) + "px," + (dy * pull) + "px) scale(" + (1 + pull * 0.12) + ")";
+      } else if (c.style.transform !== "translate(0px,0px)") {
+        c.style.transition = "transform " + state.spring + "s cubic-bezier(.34,1.4,.5,1)";
+        c.style.transform = "translate(0px,0px) scale(1)";
+      }
+    });
+  });
+  zone.addEventListener("pointerleave", () => {
+    chips.forEach(c => {
+      c.style.transition = "transform " + state.spring + "s cubic-bezier(.34,1.4,.5,1)";
+      c.style.transform = "translate(0px,0px) scale(1)";
+    });
+  });
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply();
+</script>
+</body>
+</html>

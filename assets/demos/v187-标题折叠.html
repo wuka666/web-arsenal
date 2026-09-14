@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>标题折叠演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); height: 100vh; overflow: hidden; }
+  .scroll { height: 100vh; overflow-y: auto; }
+  .head { position: sticky; top: 0; background: var(--headbg); padding: 22px 20px; will-change: transform, background-color; }
+  .head h1 { font-size: var(--fs); color: var(--headc); transform: translateX(var(--tx)); line-height: 1.1; }
+  .head .sub { margin-top: 6px; font-size: 13px; color: color-mix(in srgb, var(--headc) 70%, #999); transform: translateX(var(--tx)); }
+  .body { padding: 20px; color: #444; font-size: 14px; line-height: 1.9; }
+  .body p { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="scroll" id="scroll">
+  <div class="head" id="head"><h1>滚动时我折叠</h1><div class="sub">缩放 · 横移 · 上移 · 底色，全绑在同一滚动进度上</div></div>
+  <div class="body">
+    <p>往下滚，标题会一边缩小、一边上移、一边变浅，所有变化都跟着同一条滚动进度走——不是四个独立动画，而是一个进度驱动四个属性。</p>
+    <p>这种「单一进度驱动多属性」的做法，好处是绝不会各动各的、互相打架；用户感知到的是「同一个东西在连续变形」，而不是几段拼接的动效。</p>
+    <p>继续滚动到底，标题缩到最小并贴顶，让出空间给正文；往上滚又平滑还原。多滚几次体会进度与形变的绑定关系。</p>
+    <p>这套思路适合文章页、产品详情、长表单的首屏标题，把「抵达感」交给滚动而非按钮。</p>
+    <p>（占位段落，撑出滚动高度）</p><p>（占位段落）</p><p>（占位段落）</p><p>（占位段落）</p><p>（占位段落）</p>
+  </div>
+</div>
+
+<script>
+  const state = { scale: 0.6, rise: 80, radius: 14, accent: "#5E6AD2", di: "#fafafa", text: "#1a1a1a" };
+  const scroll = document.getElementById("scroll");
+  const head = document.getElementById("head");
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--headc", state.text);
+  }
+  function onScroll() {
+    const max = Math.max(scroll.scrollHeight - scroll.clientHeight, 1);
+    const p = Math.min(scroll.scrollTop / 220, 1); // 0→1 的折叠进度
+    const fs = 24 - (24 - 24 * state.scale) * p;
+    const tx = -p * 40;
+    const ry = -p * state.rise;
+    head.style.setProperty("--fs", fs.toFixed(1) + "px");
+    head.style.setProperty("--tx", tx.toFixed(1) + "px");
+    head.style.transform = "translateY(" + ry.toFixed(1) + "px)";
+    // 底色随进度从透明变为主色（折叠后像吸顶条）
+    head.style.setProperty("--headbg", "color-mix(in srgb, var(--accent) " + Math.round(p * 14) + "%, var(--di))");
+  }
+  scroll.addEventListener("scroll", onScroll);
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); onScroll(); });
+  apply(); onScroll();
+</script>
+</body>
+</html>

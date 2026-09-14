@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>滚轮吸附演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, "Microsoft YaHei", sans-serif; background: var(--di); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: hidden; }
+  .pager { position: relative; width: min(360px, 92vw); height: 240px; overflow: hidden; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--accent) 16%, transparent); }
+  .track { position: absolute; top: 0; left: 0; width: 100%; will-change: transform; }
+  .panel { height: 240px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; }
+  .panel:nth-child(odd) { background: var(--accent); }
+  .panel:nth-child(even) { background: var(--c2); color: #333; }
+  .dots { display: flex; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 30%, #ccc); transition: all .2s; }
+  .dot.on { background: var(--accent); transform: scale(1.4); }
+</style>
+</head>
+<body>
+<div class="pager" id="pager"><div class="track" id="track">
+  <div class="panel">页 1</div><div class="panel">页 2</div><div class="panel">页 3</div><div class="panel">页 4</div>
+</div></div>
+<div class="dots" id="dots"></div>
+
+<script>
+  const state = { friction: 0.92, snap: 0.18, radius: 16, accent: "#5E6AD2", di: "#fafafa", c2: "#cdd2ee" };
+  const pager = document.getElementById("pager");
+  const track = document.getElementById("track");
+  const dots = document.getElementById("dots");
+  const H = 240, N = 4;
+  let pos = 0, vel = 0;
+  for (let i = 0; i < N; i++) { const d = document.createElement("div"); d.className = "dot"; dots.appendChild(d); }
+  function apply() {
+    document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--di", state.di);
+    document.documentElement.style.setProperty("--c2", state.c2);
+    document.documentElement.style.setProperty("--radius", state.radius + "px");
+  }
+  pager.addEventListener("wheel", e => {
+    e.preventDefault();
+    vel += e.deltaY * 0.6;
+    vel = Math.max(-60, Math.min(60, vel));
+  }, { passive: false });
+  function step() {
+    pos += vel; vel *= state.friction;
+    const max = (N - 1) * H;
+    if (Math.abs(vel) < 1.2) {
+      const target = Math.max(0, Math.min(max, Math.round(pos / H) * H));
+      pos += (target - pos) * state.snap; // 临近停止吸附到最近页
+      if (Math.abs(target - pos) < 0.5) pos = target;
+    } else {
+      pos = Math.max(-40, Math.min(max + 40, pos)); // 越界留一点阻尼
+    }
+    track.style.transform = "translateY(" + (-pos) + "px)";
+    const cur = Math.round(pos / H);
+    Array.from(dots.children).forEach((d, i) => d.classList.toggle("on", i === cur));
+    requestAnimationFrame(step);
+  }
+  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
+  apply(); step();
+</script>
+</body>
+</html>

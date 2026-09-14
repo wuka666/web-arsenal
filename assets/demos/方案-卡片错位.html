@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·卡片错位</title>
+<style>
+:root{
+  --zhucai:#5E6AD2;--zhongdian:#8B93F8;--di:#F7F8FA;--zi:#1d2330;--cizi:#7c8696;
+  --yuanjiao:14px;--jianju:16px;--zihao:15px;--yinying:18;--cuowei:42px;--guilv:0;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
+.wrap{max-width:1040px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
+.logo{font-weight:800;font-size:18px;}
+.menu{display:flex;gap:calc(var(--jianju)*1.4);font-size:14px;color:var(--cizi);}
+.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
+.hero{padding:calc(var(--jianju)*3) 0 calc(var(--jianju)*2);}
+.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);max-width:46ch;}
+
+.section{margin-top:calc(var(--jianju)*2);display:flex;flex-direction:column;gap:calc(var(--jianju)*1.2);}
+.tile{
+  background:color-mix(in srgb,var(--zi) 4%,transparent);
+  border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);
+  border-radius:calc(var(--yuanjiao)*1.2);
+  padding:calc(var(--jianju)*1.4);
+  transform:translateX(var(--sh,0px));
+  transition:transform .25s ease;
+  box-shadow:0 calc(var(--yinying)*0.2px) calc(var(--yinying)*0.6px) rgba(0,0,0,.06);
+}
+.tile .k{font-size:13px;color:var(--zhucai);font-weight:700;letter-spacing:.04em;}
+.tile h3{margin:8px 0 6px;font-size:17px;}
+.tile p{font-size:13.5px;color:var(--cizi);}
+.tile.lead{border-color:var(--zhucai);box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*1px) color-mix(in srgb,var(--zhucai) 30%,transparent);}
+.tile.lead h3{color:var(--zhucai);}
+.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav"><span class="logo">卡片错位</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">开始使用</button></nav>
+    <header class="hero">
+      <h1>用错位讲出层次</h1>
+      <p class="sub">所有卡片都左对齐时只有整齐；让每张卡各走各的对齐轴，页面立刻有了主次与节奏。</p>
+    </header>
+    <section class="section" id="sec"></section>
+    <footer class="foot"><span>© 2026 卡片错位</span><span>抖音·五种高级审美布局拆解</span></footer>
+  </div>
+<script>
+
+  const state = {
+    zhucai:"#5E6AD2", zhongdian:"#8B93F8", di:"#F7F8FA", zi:"#1d2330", cizi:"#7c8696",
+    yuanjiao:14, jianju:16, zihao:15, yinying:18, cuowei:42, guilv:0
+  };
+  const TILES = [
+    { k:"主张", h:"一句话定义", p:"错位让这条先被看见", lead:true },
+    { k:"能力", h:"核心能力", p:"各自缩进不同形成节奏" },
+    { k:"场景", h:"使用场景", p:"场景卡错开，避免模板感" },
+    { k:"证言", h:"客户证言", p:"再错一级，纵深由偏移堆出" }
+  ];
+  function shiftOf(i){
+    const c = state.cuowei;
+    if (state.guilv === 0) return (i % 2 === 0 ? 1 : -1) * c;
+    if (state.guilv === 1) return i * (c * 0.5);
+    return i * c;
+  }
+  function build(){
+    const sec = document.getElementById("sec");
+    sec.innerHTML = "";
+    TILES.forEach((t, i) => {
+      const el = document.createElement("div");
+      el.className = "tile" + (t.lead ? " lead" : "");
+      el.style.setProperty("--sh", shiftOf(i) + "px");
+      el.innerHTML = '<div class="k">' + t.k + '</div><h3>' + t.h + '</h3><p>' + t.p + '</p>';
+      sec.appendChild(el);
+    });
+  }
+  function apply(){
+    const r = document.documentElement.style;
+    r.setProperty("--zhucai", state.zhucai);
+    r.setProperty("--zhongdian", state.zhongdian);
+    r.setProperty("--di", state.di);
+    r.setProperty("--zi", state.zi);
+    r.setProperty("--cizi", state.cizi);
+    r.setProperty("--yuanjiao", state.yuanjiao + "px");
+    r.setProperty("--jianju", state.jianju + "px");
+    r.setProperty("--zihao", state.zihao + "px");
+    r.setProperty("--yinying", state.yinying);
+    r.setProperty("--cuowei", state.cuowei + "px");
+    build();
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</body>
+</html>
