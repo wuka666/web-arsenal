@@ -1,15 +1,41 @@
-# 依赖与安装产物（不入库，别人克隆后自己 npm install）
+# ==== 依赖与安装产物 ====
 node_modules/
 
-# 本地会话临时文件与调试脚本（不入库）
+# ==== 构建产物（P1 引入 Vite 后）====
+dist/
+.vite/
+*.tsbuildinfo
+
+# ==== Python 缓存与虚拟环境（P2 后端）====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# ==== 环境变量与密钥（绝不提交）====
+.env
+.env.*
+!.env.example
+
+# ==== 本地数据库（P2）====
+*.sqlite
+*.sqlite3
+*.db
+
+# ==== 本地临时文件与调试脚本 ====
 tmp/
 mcp/test_mcp.js
 
-# 系统与编辑器文件
+# ==== 系统与编辑器 ====
 .DS_Store
 Thumbs.db
 .idea/
+.vscode/
 *.log
 
-# 内部资料（个人工作用，不进公开仓库）
+# ==== 内部资料（个人工作用，不进公开仓库）====
 Agent宪法.md
+ROADMAP.md

@@ -1,0 +1,24 @@
+# 行尾统一为 LF（仓库内 + 检出后都是 LF）
+# 不加这段时：Windows 的 core.autocrlf=true 会把文件在检出时全变 CRLF，
+# 导致每次提交都混入整文件级的行尾噪音，且 data/*.js 会被误判成二进制。
+* text=auto eol=lf
+
+# Windows 脚本必须保留 CRLF，否则无法执行
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制文件不做任何行尾转换
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.eot  binary
+*.pdf  binary
+*.zip  binary
