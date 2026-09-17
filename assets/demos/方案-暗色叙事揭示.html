@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>暗色叙事揭示 · 方案</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --zhucai:#e8702a;        /* 强调色：CTA + 光晕外圈 */
+    --zhongdian:#ffffff;     /* 锥光中心色 */
+    --di:#1b1206;            /* 底图品牌色（冷暗） */
+    --revealTint:#6b3a12;    /* 揭示图层色（暖） */
+    --zi:#ffffff;            /* 标题/正文亮色 */
+    --yuanjiao:999px;        /* 按钮圆角 */
+    --jianju:24px;           /* 留白刻度 */
+    --zihao:17px;            /* 基准字号，驱动标题缩放 */
+    --yinying:30;            /* CTA 阴影强度 */
+    --faguang:0;             /* 光晕外发光强度 */
+    --radius:260px;         /* 探照半径（JS 读取） */
+    --ease:.10;             /* 缓动系数（JS 读取） */
+  }
+  html,body{height:100%;font-family:'Inter',system-ui,'Microsoft YaHei',sans-serif;background:#0a0703;color:var(--zi);}
+  a{color:inherit;text-decoration:none;}
+
+  /* 顶栏：轻量、透叠在舞台上 */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+       padding:18px calc(var(--jianju)*1.4);font-size:14px;color:rgba(255,255,255,.82);}
+  .nav .logo{font-weight:800;letter-spacing:.14em;color:#fff;}
+  .nav .menu{display:flex;gap:calc(var(--jianju)*1.1);}
+  .nav .menu a{opacity:.78;}
+  .nav .navcta{border:1px solid rgba(255,255,255,.32);padding:8px 18px;border-radius:var(--yuanjiao);}
+
+  /* 舞台：整屏沉浸式揭示 */
+  .stage{position:relative;width:100%;height:100vh;min-height:560px;overflow:hidden;background:#000;}
+  .layer{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .base{z-index:10;}
+  .baseTint{position:absolute;inset:0;z-index:20;pointer-events:none;mix-blend-mode:multiply;background:var(--di);opacity:.5;}
+  .reveal{z-index:30;pointer-events:none;}
+  .revealTint{position:absolute;inset:0;z-index:35;pointer-events:none;mix-blend-mode:soft-light;background:var(--revealTint);}
+  .glow{position:absolute;z-index:40;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;pointer-events:none;
+        background:radial-gradient(circle, color-mix(in srgb,var(--zhongdian) calc(var(--faguang)*1%), transparent) 0%, transparent 60%);
+        transition:opacity .2s;}
+  .head{position:absolute;top:50%;left:0;right:0;z-index:50;transform:translateY(-54%);text-align:center;padding:0 20px;pointer-events:none;}
+  .head h1{color:var(--zi);line-height:.96;text-shadow:0 8px 40px rgba(0,0,0,.5);}
+  .head .l1{display:block;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:400;font-size:calc(var(--zihao)*5.4);}
+  .head .l2{display:block;font-weight:400;font-size:calc(var(--zihao)*5.4);margin-top:calc(var(--zihao)*-.2);letter-spacing:.01em;}
+  .blurb{position:absolute;left:calc(var(--jianju)*1.6);bottom:calc(var(--jianju)*1.8);z-index:50;max-width:320px;
+         display:flex;flex-direction:column;gap:18px;align-items:flex-start;}
+  .blurb p{color:rgba(255,255,255,.8);line-height:1.65;font-size:14px;}
+  .blurb button{border:0;color:#fff;font-size:14px;font-weight:700;padding:13px 30px;border-radius:var(--yuanjiao);cursor:pointer;
+        background:var(--zhucai);box-shadow:0 calc(var(--yinying)*.3px) calc(var(--yinying)*.9px) rgba(0,0,0,.4);transition:transform .2s;}
+  .blurb button:hover{transform:scale(1.03);}
+  .blurb button:active{transform:scale(.96);}
+
+  /* 设计 Token 预览段：让方案同时承担色板/字号/按钮/卡片一眼可见（规矩12） */
+  .tokens{background:#0d0a06;padding:calc(var(--jianju)*2.4) calc(var(--jianju)*1.6);}
+  .tokens h2{font-size:15px;font-weight:800;letter-spacing:.04em;color:rgba(255,255,255,.9);margin-bottom:calc(var(--jianju)*1.1);}
+  .tok-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:calc(var(--jianju)*1.4);align-items:start;}
+  .swatches{display:flex;gap:10px;flex-wrap:wrap;}
+  .sw{width:64px;height:64px;border-radius:12px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+  .sw span{position:absolute;left:6px;bottom:5px;font-size:9px;color:rgba(255,255,255,.85);text-shadow:0 1px 2px rgba(0,0,0,.6);}
+  .type .t{line-height:1.5;color:#fff;margin-bottom:6px;}
+  .type .t.d{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:34px;}
+  .type .t.h{font-size:20px;font-weight:700;}
+  .type .t.b{font-size:14px;color:rgba(255,255,255,.78);}
+  .type .t.c{font-size:12px;color:rgba(255,255,255,.5);}
+  .comp{display:flex;flex-direction:column;gap:14px;margin-top:calc(var(--jianju)*1.2);}
+  .comp .btn-primary{background:var(--zhucai);color:#fff;border:0;border-radius:var(--yuanjiao);padding:12px 26px;font-weight:700;align-self:flex-start;cursor:pointer;}
+  .comp .btn-ghost{border:1px solid rgba(255,255,255,.3);color:#fff;background:transparent;border-radius:var(--yuanjiao);padding:12px 26px;font-weight:600;align-self:flex-start;cursor:pointer;}
+  .comp .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px;}
+  .comp .card b{color:#fff;font-size:14px;}
+  .comp .card p{color:rgba(255,255,255,.6);font-size:12px;margin-top:4px;}
+  .foot{background:#0a0703;padding:calc(var(--jianju)*1.2) calc(var(--jianju)*1.6);font-size:12px;color:rgba(255,255,255,.45);
+        display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.07);}
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <span class="logo">DISCOVERY</span>
+    <span class="menu"><a>作品</a><a>叙事</a><a>关于</a></span>
+    <span class="navcta">开始探索</span>
+  </nav>
+
+  <section class="stage" id="stage">
+    <div class="layer base" id="base"></div>
+    <div class="baseTint"></div>
+    <canvas id="cmask" style="display:none"></canvas>
+    <div class="layer reveal" id="reveal"></div>
+    <div class="revealTint"></div>
+    <div class="glow" id="glow"></div>
+    <div class="head">
+      <h1>
+        <span class="l1" id="t1">Layers hold</span>
+        <span class="l2" id="t2">tales of time</span>
+      </h1>
+    </div>
+    <div class="blurb">
+      <p id="desc">每一次移动，都在揭开一层被时间掩埋的叙事。用光代替点击，让探索本身成为首页。</p>
+      <button id="cta">Start Digging</button>
+    </div>
+  </section>
+
+  <section class="tokens">
+    <h2>设计 Token 预览</h2>
+    <div class="tok-grid">
+      <div>
+        <div class="swatches">
+          <div class="sw" style="background:var(--zhucai)"><span>zhucai</span></div>
+          <div class="sw" style="background:var(--zhongdian)"><span>zhongdian</span></div>
+          <div class="sw" style="background:var(--di)"><span>di</span></div>
+          <div class="sw" style="background:var(--revealTint)"><span>reveal</span></div>
+          <div class="sw" style="background:var(--zi)"><span>zi</span></div>
+        </div>
+        <div class="comp">
+          <button class="btn-primary">主按钮</button>
+          <button class="btn-ghost">次按钮</button>
+          <div class="card"><b>叙事卡片</b><p>揭示之下的内容落点，承接首屏的沉浸语气。</p></div>
+        </div>
+      </div>
+      <div class="type">
+        <div class="t d">Display</div>
+        <div class="t h">Heading</div>
+        <div class="t b">Body text — 正文用于承载叙事说明，保持克制。</div>
+        <div class="t c">Caption — 元信息、版权与辅助说明。</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot"><span>© 2026 DISCOVERY</span><span>隐私 · 条款 · 联系</span></footer>
+
+<script>
+const state = {
+  zhucai:'#e8702a', zhongdian:'#ffffff', di:'#1b1206', revealTint:'#6b3a12', zi:'#ffffff',
+  radius:260, ease:0.10, yuanjiao:999, jianju:24, zihao:17, yinying:30, faguang:0,
+  titleText:'Layers hold', subText:'tales of time', btnText:'Start Digging'
+};
+
+const base = document.getElementById('base');
+const reveal = document.getElementById('reveal');
+const glow = document.getElementById('glow');
+const canvas = document.getElementById('cmask');
+const ctx = canvas.getContext('2d');
+const t1 = document.getElementById('t1');
+const t2 = document.getElementById('t2');
+const cta = document.getElementById('cta');
+
+// 离线生成两层图：不依赖任何远程链接（规矩11）。底图冷暗、揭示图暖亮，制造「探索发现」对比。
+function genImage(c1, c2, dots){
+  const w=1600,h=900, cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+  const g=cv.getContext('2d');
+  const grd=g.createLinearGradient(0,0,0,h);
+  grd.addColorStop(0,c1); grd.addColorStop(1,c2);
+  g.fillStyle=grd; g.fillRect(0,0,w,h);
+  g.strokeStyle='rgba(255,255,255,.10)'; g.lineWidth=1;
+  if(dots){
+    for(let i=0;i<140;i++){ const x=Math.random()*w, y=Math.random()*h, r=Math.random()*1.6+.3;
+      g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fillStyle='rgba(255,255,255,.16)'; g.fill(); }
+  } else {
+    for(let i=0;i<26;i++){ const y=Math.random()*h; g.beginPath(); g.moveTo(0,y);
+      g.bezierCurveTo(w*.3,y+Math.random()*60-30,w*.6,y+Math.random()*60-30,w,y+Math.random()*40-20); g.stroke(); }
+  }
+  return cv.toDataURL();
+}
+
+function apply(){
+  const root=document.documentElement.style;
+  root.setProperty('--zhucai',state.zhucai);
+  root.setProperty('--zhongdian',state.zhongdian);
+  root.setProperty('--di',state.di);
+  root.setProperty('--revealTint',state.revealTint);
+  root.setProperty('--zi',state.zi);
+  root.setProperty('--yuanjiao',state.yuanjiao+'px');
+  root.setProperty('--jianju',state.jianju+'px');
+  root.setProperty('--zihao',state.zihao+'px');
+  root.setProperty('--yinying',state.yinying);
+  root.setProperty('--faguang',state.faguang);
+  root.setProperty('--radius',state.radius+'px');
+  root.setProperty('--ease',state.ease);
+  const baseImg=genImage(shade(state.di,58),shade(state.di,-40),true);
+  const revImg=genImage(state.zhucai,state.revealTint,false);
+  base.style.backgroundImage='url('+baseImg+')';
+  reveal.style.backgroundImage='url('+revImg+')';
+  t1.textContent=state.titleText; t2.textContent=state.subText; cta.textContent=state.btnText;
+  t1.style.color=state.zi; t2.style.color=state.zi;
+  cta.style.background=state.zhucai;
+  glow.style.background='radial-gradient(circle, color-mix(in srgb,var(--zhongdian) calc(var(--faguang)*1%), transparent) 0%, transparent 60%)';
+  drawMask();
+}
+
+// 把品牌色朝黑/朝亮偏移，生成图层明暗，避免引入额外色值
+function shade(hex,amt){
+  const m=hex.replace('#',''); const n=m.length===3?m.split('').map(c=>c+c).join(''):m;
+  let r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);
+  r=Math.max(0,Math.min(255,r+amt)); g=Math.max(0,Math.min(255,g+amt)); b=Math.max(0,Math.min(255,b+amt));
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+function drawMask(){
+  const w=window.innerWidth,h=window.innerHeight;
+  canvas.width=w; canvas.height=h; ctx.clearRect(0,0,w,h);
+  const r=Math.max(1,state.radius);
+  const cc=state.zhongdian;
+  const g=ctx.createRadialGradient(cur.x,cur.y,0,cur.x,cur.y,r);
+  g.addColorStop(0,cc); g.addColorStop(.4,cc);
+  g.addColorStop(.62,hexA(cc,.72)); g.addColorStop(.78,hexA(cc,.38));
+  g.addColorStop(.9,hexA(cc,.12)); g.addColorStop(1,hexA(cc,0));
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cur.x,cur.y,r,0,Math.PI*2); ctx.fill();
+  const url=canvas.toDataURL();
+  reveal.style.maskImage='url('+url+')';
+  reveal.style.webkitMaskImage='url('+url+')';
+  reveal.style.maskSize='100% 100%'; reveal.style.webkitMaskSize='100% 100%';
+}
+
+function hexA(hex,a){
+  const m=hex.replace('#',''); const n=m.length===3?m.split('').map(c=>c+c).join(''):m;
+  return 'rgba('+parseInt(n.slice(0,2),16)+','+parseInt(n.slice(2,4),16)+','+parseInt(n.slice(4,6),16)+','+a+')';
+}
+
+const mouse={x:-999,y:-999}, smooth={x:-999,y:-999}, cur={x:-999,y:-999};
+window.addEventListener('mousemove',e=>{
+  mouse.x=e.clientX; mouse.y=e.clientY;
+  glow.style.left=e.clientX+'px'; glow.style.top=e.clientY+'px';
+  if(smooth.x===-999){smooth.x=e.clientX;smooth.y=e.clientY;}
+});
+window.addEventListener('resize',drawMask);
+
+function loop(){
+  smooth.x+=(mouse.x-smooth.x)*state.ease;
+  smooth.y+=(mouse.y-smooth.y)*state.ease;
+  cur.x=smooth.x; cur.y=smooth.y;
+  drawMask(); requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// 调参契约：postMessage({type:'param',key,value}) 同步 CSS 变量与 state，调了实时可见
+window.addEventListener('message',ev=>{
+  const d=ev.data; if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+
+apply();
+</script>
+</body>
+</html>

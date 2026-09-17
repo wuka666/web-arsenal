@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#E6EDF6" />
+<title>玻璃装置首屏 · 方案</title>
+<style>
+/* 设计单位系统：--u = 1280×960 原稿的一个基准像素；背景铺满视口、前景保持实测尺寸 */
+:root{
+  --u: min(100vw / 1280, 100vh / 960);
+  --ink:#020C21; --ink-soft:#0F182F; --muted:#59627E; --muted2:#4D5B77;
+  --frame:#E6EDF6; --cta:#0F1B31; --cta-knob:#384B64; --meet-knob:#1A2B45;
+  --accent:#4A78B0; --track:#DDE4EE;
+  /* 参数（postMessage 驱动） */
+  --yan:#E6EDF6; --mo:#020C21; --qiang:#4A78B0; --qiut:#dfe9f4;
+  --biaoti:98; --liang:100;
+}
+@supports (height:100dvh){:root{--u: min(100vw / 1280, 100dvh / 960)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--frame);overflow-x:hidden;overflow-y:auto;color:var(--mo);
+  font-family:"Inter","Helvetica Neue",Helvetica,Arial,"Microsoft YaHei",sans-serif;font-synthesis:none;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+a:focus-visible{outline:calc(2*var(--u)) solid #2f5f9e;outline-offset:calc(3*var(--u))}
+
+.page{position:relative;width:100%;height:100vh;height:100dvh;background:var(--yan)}
+.card{position:absolute;inset:0;isolation:isolate}
+/* 玻璃装置底板：原站为 CloudFront 视频，这里用 canvas 2D 离线绘制同气质装置（球+刃+流动光斑） */
+.bg{position:absolute;left:-2px;top:-2px;width:calc(100vw + 4px);height:calc(100vh + 4px);
+  z-index:0;filter:brightness(calc(var(--liang)*1%)) saturate(.965);transform:scale(1.002)}
+@supports (height:100dvh){.bg{height:calc(100dvh + 4px)}}
+.tint{position:absolute;inset:0;background:rgba(255,249,240,.05);z-index:1;pointer-events:none}
+
+/* 绝对定位助手：宽屏时包裹层 display:contents，子元素直接对 .card 定位 */
+.stack,.row,.hero-blk,.tagrow,.stats,.stat{display:contents}
+.l{position:absolute;z-index:2}
+.t{left:calc((var(--x) + 13)*var(--u));top:calc((var(--y) + 15)*var(--u))}
+.c{left:calc((var(--x) + 13)*var(--u));top:calc(50% + (var(--y) - 2)*var(--u))}
+.b{left:calc((var(--x) + 13)*var(--u));bottom:calc((var(--y) + 19)*var(--u))}
+.r{left:auto;right:calc((var(--x) + 19)*var(--u))}
+/* 光学字宽：逐元素横向微缩放，复刻原稿字形度量，不做归一化 */
+.sx{display:inline-block;transform-origin:left top;transform:scaleX(var(--sx,1))}
+
+/* ── 品牌 ── */
+.brand{display:flex;align-items:center;height:calc(39*var(--u))}
+.mark{width:calc(39*var(--u));height:calc(39*var(--u));display:block;flex:none}
+.brand b{font-size:calc(22*var(--u));font-weight:520;letter-spacing:-0.03em;line-height:1;margin-left:calc(7.7*var(--u))}
+
+/* ── 玻璃导航胶囊 ── */
+.nav{position:absolute;left:50%;transform:translateX(calc(-50% - 3*var(--u)));
+  top:calc((31 + 15)*var(--u));width:calc(293*var(--u));height:calc(67*var(--u));
+  border-radius:999px;background:rgba(255,255,255,0.78);
+  border:calc(1*var(--u)) solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(calc(40*var(--u)));backdrop-filter:blur(calc(40*var(--u)));
+  box-shadow:0 0 0 calc(1.3*var(--u)) rgba(120,145,180,0.2),0 calc(2*var(--u)) calc(10*var(--u)) rgba(28,52,92,.05);z-index:2}
+.nav>*{position:absolute}
+.nav span{font-size:calc(15*var(--u));font-weight:570;letter-spacing:-0.0561em;line-height:1;color:#202940;white-space:nowrap}
+.nav i{display:block}
+.n-home{left:calc(36*var(--u));top:calc(22*var(--u));width:calc(21.3*var(--u));height:calc(22.4*var(--u))}
+.n-home svg{width:100%;height:100%;display:block}
+.n-explore{left:calc(72*var(--u));top:calc(26*var(--u))}
+.n-div{left:calc(144*var(--u));top:calc(18*var(--u));width:calc(1.5*var(--u));height:calc(31*var(--u));background:#CED5E0;border:0}
+.n-grid{left:calc(168*var(--u));top:calc(24*var(--u));width:calc(20.2*var(--u));height:calc(20.2*var(--u))}
+.n-grid svg{width:100%;height:100%;display:block}
+.n-product{left:calc(203.8*var(--u));top:calc(26*var(--u))}
+
+/* ── 主 CTA ── */
+.cta{width:calc(217*var(--u));height:calc(70*var(--u));border-radius:999px;background:var(--cta);display:block;
+  box-shadow:0 calc(10*var(--u)) calc(24*var(--u)) rgba(11,26,50,.18)}
+.cta span{position:absolute;left:calc(34.8*var(--u));top:calc(27.55*var(--u));
+  font-size:calc(17.5*var(--u));font-weight:400;letter-spacing:-0.0442em;line-height:1;color:#fff;white-space:nowrap}
+.knob{position:absolute;border-radius:50%;background:var(--cta-knob);display:flex;align-items:center;justify-content:center}
+.cta .knob{left:calc(156*var(--u));top:calc(10.5*var(--u));width:calc(49*var(--u));height:calc(49*var(--u))}
+.knob svg{width:calc(17*var(--u));height:calc(17*var(--u))}
+
+/* ── 主标题组 ── */
+.eyebrow{font-size:calc(16*var(--u));font-weight:470;letter-spacing:-0.015em;line-height:1;color:var(--muted);white-space:nowrap}
+h1{font-size:calc(var(--biaoti)*var(--u));font-weight:360;letter-spacing:-0.035em;
+  line-height:calc(var(--biaoti)*0.918*var(--u));color:var(--ink);white-space:nowrap}
+.play{width:calc(50.5*var(--u));height:calc(50.5*var(--u));border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 calc(6*var(--u)) calc(18*var(--u)) rgba(28,52,92,.10)}
+.play svg{width:calc(13*var(--u));height:calc(14*var(--u))}
+.tag{font-size:calc(24*var(--u));font-weight:470;letter-spacing:-0.03em;line-height:1;color:var(--ink-soft);white-space:nowrap}
+
+/* ── 玻璃面板 ── */
+.panel{width:calc(275*var(--u));height:calc(271*var(--u));border-radius:calc(28*var(--u));
+  background:linear-gradient(135deg,rgba(255,255,255,0.44),rgba(255,255,255,0.16));
+  border:calc(1*var(--u)) solid rgba(255,255,255,.60);
+  -webkit-backdrop-filter:blur(calc(40*var(--u))) saturate(112%);backdrop-filter:blur(calc(40*var(--u))) saturate(112%);
+  box-shadow:inset calc(1*var(--u)) calc(1*var(--u)) 0 rgba(255,255,255,.55),
+    inset calc(-1*var(--u)) calc(-1*var(--u)) 0 rgba(255,255,255,.18),
+    0 calc(18*var(--u)) calc(40*var(--u)) rgba(28,52,92,.07)}
+.panel>*{position:absolute}
+.p-title{left:calc(29*var(--u));top:calc(44.7*var(--u));font-size:calc(24*var(--u));font-weight:500;
+  letter-spacing:-0.02em;line-height:1;color:var(--ink);white-space:nowrap}
+.dot{left:calc(137*var(--u));top:calc(53*var(--u));width:calc(10*var(--u));height:calc(10*var(--u));
+  border-radius:50%;background:var(--qiang)}
+.shield{left:calc(177*var(--u));top:calc(46*var(--u));width:calc(73*var(--u));height:calc(73*var(--u));
+  border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 calc(26*var(--u)) calc(10*var(--u)) rgba(255,255,255,.5),0 calc(6*var(--u)) calc(16*var(--u)) rgba(28,52,92,.06)}
+.shield svg{width:calc(30*var(--u));height:calc(39*var(--u))}
+.p-sub{left:calc(29*var(--u));top:calc(94.35*var(--u));font-size:calc(18*var(--u));font-weight:400;
+  letter-spacing:-0.02em;line-height:calc(20.4*var(--u));color:var(--muted2)}
+.scale{left:calc(47*var(--u));top:calc(189*var(--u));width:calc(190*var(--u));display:flex;justify-content:space-between;
+  font-size:calc(15*var(--u));font-weight:400;letter-spacing:-0.03em;line-height:1;color:#586580}
+.track{left:calc(46*var(--u));top:calc(221*var(--u));width:calc(190*var(--u));height:calc(8*var(--u));
+  border-radius:999px;background:#DDE4EE;overflow:hidden}
+.track i{display:block;width:calc(59*var(--u));height:100%;border-radius:999px;background:#5F88B4;transform-origin:left center}
+
+/* ── 统计 ── */
+.num{font-size:calc(100*var(--u));font-weight:200;letter-spacing:0em;line-height:1;color:var(--ink);white-space:nowrap}
+.lbl{font-size:calc(19*var(--u));font-weight:400;letter-spacing:-0.02em;line-height:calc(23.5*var(--u));color:#39455F}
+.slash{width:calc(23*var(--u));height:calc(75*var(--u));
+  background:linear-gradient(to top left,transparent calc(50% - .85*var(--u)),
+    #A7B4C6 calc(50% - .85*var(--u)),#A7B4C6 calc(50% + .85*var(--u)),transparent calc(50% + .85*var(--u)))}
+
+/* ── Meet Sentinel 胶囊 ── */
+.meet{width:calc(269*var(--u));height:calc(86*var(--u));border-radius:999px;display:block;background:rgba(255,255,255,0.325);
+  border:calc(1*var(--u)) solid rgba(255,255,255,.62);
+  -webkit-backdrop-filter:blur(calc(40*var(--u)));backdrop-filter:blur(calc(40*var(--u)));
+  box-shadow:0 0 0 calc(1.2*var(--u)) rgba(120,145,180,0.1),
+    inset calc(1*var(--u)) calc(1*var(--u)) 0 rgba(255,255,255,.5),
+    0 calc(8*var(--u)) calc(22*var(--u)) rgba(28,52,92,.035)}
+.meet>*{position:absolute}
+.thumb{left:calc(12*var(--u));top:calc(11*var(--u));width:calc(64*var(--u));height:calc(64*var(--u));
+  border-radius:50%;overflow:hidden;box-shadow:inset 0 0 0 calc(1*var(--u)) rgba(255,255,255,.45)}
+/* 缩略球用 CSS 渐变模拟玻璃球，替代原站视频截帧（离线） */
+.thumb i{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #ffffff 0%, var(--qiut) 42%, #b9c9dd 78%, #9db2cb 100%)}
+.thumb i::after{content:"";position:absolute;left:18%;top:12%;width:34%;height:22%;border-radius:50%;
+  background:rgba(255,255,255,.85);filter:blur(1px)}
+.meet b{left:calc(89.8*var(--u));top:calc(34.55*var(--u));font-size:calc(17.5*var(--u));
+  font-weight:425;letter-spacing:-0.0681em;line-height:1;color:#1B2A44;white-space:nowrap}
+.meet .knob{left:calc(206*var(--u));top:calc(17*var(--u));width:calc(50*var(--u));height:calc(50*var(--u));background:var(--meet-knob)}
+
+/* ── 汉堡（默认隐藏；竖屏才出现，见下方独立查询） ── */
+.burger{display:none;position:absolute;align-items:center;justify-content:center;flex-direction:column;gap:calc(6*var(--u));
+  width:calc(56*var(--u));height:calc(56*var(--u));border-radius:999px;cursor:pointer;z-index:10;
+  background:rgba(255,255,255,0.78);border:calc(1*var(--u)) solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(calc(40*var(--u)));backdrop-filter:blur(calc(40*var(--u)));
+  box-shadow:0 0 0 calc(1.3*var(--u)) rgba(120,145,180,0.2),0 calc(2*var(--u)) calc(10*var(--u)) rgba(28,52,92,.05)}
+.burger i{display:block;width:calc(20*var(--u));height:calc(1.8*var(--u));border-radius:999px;background:#202940;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),opacity .3s}
+.burger[aria-expanded="true"] i:first-child{transform:translateY(calc(3.9*var(--u))) rotate(45deg)}
+.burger[aria-expanded="true"] i:last-child{transform:translateY(calc(-3.9*var(--u))) rotate(-45deg)}
+
+/* ── TIER 2 · 紧凑（按画框形状而非设备宽度分档） ── */
+@media (max-aspect-ratio: 87/80), (max-width: 899px), (max-height: 639px){
+  :root{--u: min(100vw / 880, 100vh / 1220); --pad: 52}
+  @supports (height:100dvh){:root{--u: min(100vw / 880, 100dvh / 1220)}}
+  .stack{display:flex;flex-direction:column;justify-content:space-between;position:absolute;inset:0;z-index:2;
+    padding:calc(var(--pad)*var(--u))}
+  .row,.hero-blk,.stats,.stat,.tagrow{display:flex}
+  .row{align-items:center;justify-content:space-between;width:100%}
+  .hero-blk{flex-direction:column;align-items:flex-start;width:100%;margin:calc(30*var(--u)) 0}
+  .tagrow{align-items:center;gap:calc(16*var(--u));margin-top:calc(28*var(--u))}
+  .stats{align-items:flex-end;gap:calc(26*var(--u));flex-wrap:wrap}
+  .stat{align-items:flex-end;gap:calc(16*var(--u))}
+  .l,.t,.c,.b,.r{position:relative;left:auto;right:auto;top:auto;bottom:auto}
+  h1{margin-top:calc(16*var(--u));white-space:normal}
+  .panel{align-self:flex-end;margin-top:calc(36*var(--u))}
+  .row:last-child{flex-wrap:wrap;row-gap:calc(24*var(--u))}
+  .meet{margin-left:auto}
+  .nav{position:relative;left:auto;top:auto;transform:none;flex:none}
+  @media (min-aspect-ratio: 1/1){
+    :root{--u: min(100vw / 1240, 100vh / 820); --pad: 46}
+    @supports (height:100dvh){:root{--u: min(100vw / 1240, 100dvh / 820)}}
+    .hero-blk{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:calc(46*var(--u));align-items:end;margin:calc(24*var(--u)) 0}
+    .eyebrow{grid-column:1;grid-row:1}
+    h1{grid-column:1;grid-row:2}
+    .tagrow{grid-column:1;grid-row:3}
+    .panel{grid-column:2;grid-row:1 / span 3;align-self:center;margin-top:0}
+    .row:last-child{flex-wrap:nowrap}
+  }
+  /* TIER 3 · 手机：--u 管构图、--t 管阅读（下限保触控与可读性） */
+  @media (max-width: 640px) and (max-aspect-ratio: 1/1){
+    :root{--u: min(100vw / 600, 100vh / 940); --t: max(var(--u), min(0.85px, 100vh / 780)); --pad: 40}
+    @supports (height:100dvh){:root{--u: min(100vw / 600, 100dvh / 940); --t: max(var(--u), min(0.85px, 100dvh / 780))}}
+    .sx{transform:none}
+    .brand{height:auto}
+    .mark{width:calc(36*var(--t));height:calc(36*var(--t))}
+    .brand b{font-size:calc(21*var(--t));margin-left:calc(8*var(--t))}
+    h1{font-size:calc(var(--biaoti)*0.67*var(--u));line-height:calc(var(--biaoti)*0.65*var(--u));margin-top:calc(12*var(--u))}
+    .eyebrow{font-size:calc(16*var(--t))}
+    .tag{font-size:calc(19*var(--t));line-height:calc(25*var(--t));white-space:normal}
+    .panel{width:100%;align-self:stretch;height:calc(212*var(--t));margin-top:calc(24*var(--u))}
+    .p-title{left:calc(30*var(--t));top:calc(30*var(--t));font-size:calc(24*var(--t))}
+    .dot{left:calc(137*var(--t));top:calc(40*var(--t));width:calc(10*var(--t));height:calc(10*var(--t))}
+    .shield{left:auto;right:calc(26*var(--t));top:calc(22*var(--t));width:calc(64*var(--t));height:calc(64*var(--t))}
+    .shield svg{width:calc(26*var(--t));height:calc(34*var(--t))}
+    .p-sub{left:calc(31*var(--t));top:calc(80*var(--t));font-size:calc(17*var(--t));line-height:calc(21*var(--t))}
+    .scale{left:calc(31*var(--t));top:calc(150*var(--t));width:calc(100% - 62*var(--t));font-size:calc(14*var(--t))}
+    .track{left:calc(31*var(--t));top:calc(178*var(--t));width:calc(100% - 62*var(--t));height:calc(8*var(--t))}
+    .track i{width:31%}
+    .stats{gap:calc(18*var(--u));align-items:center;flex-wrap:nowrap}
+    .stat{flex-direction:column;align-items:flex-start;gap:calc(6*var(--t))}
+    .num{font-size:calc(76*var(--u))}
+    .lbl{font-size:calc(15*var(--t));line-height:calc(19*var(--t))}
+    .slash{height:calc(92*var(--t));width:calc(29*var(--t));align-self:center}
+    .meet{width:100%;height:calc(72*var(--t))}
+    .thumb{left:calc(9*var(--t));top:calc(5*var(--t));width:calc(62*var(--t));height:calc(62*var(--t))}
+    .meet b{left:calc(84*var(--t));top:calc(28*var(--t));font-size:calc(17*var(--t))}
+    .meet .knob{left:auto;right:calc(11*var(--t));top:calc(11*var(--t));width:calc(50*var(--t));height:calc(50*var(--t))}
+  }
+}
+/* 导航折叠是独立规则，只看画框形状：竖屏折、横屏永不折 */
+@media (max-aspect-ratio: 1/1){
+  .burger{display:flex}
+  .menu{display:block;position:absolute;z-index:9;top:calc((var(--pad,52) + 68)*var(--u));right:calc(var(--pad,52)*var(--u));
+    width:calc(304*var(--u));padding:calc(16*var(--u));border-radius:calc(30*var(--u));
+    background:rgba(255,255,255,.82);border:calc(1*var(--u)) solid rgba(255,255,255,.85);
+    -webkit-backdrop-filter:blur(calc(40*var(--u)));backdrop-filter:blur(calc(40*var(--u)));
+    box-shadow:0 0 0 calc(1.3*var(--u)) rgba(120,145,180,.2),0 calc(16*var(--u)) calc(34*var(--u)) rgba(28,52,92,.10);
+    opacity:0;visibility:hidden;transform:translateY(calc(-10*var(--u))) scale(.97);transform-origin:top right;
+    transition:opacity .26s cubic-bezier(.2,.7,.3,1),transform .26s cubic-bezier(.2,.7,.3,1),visibility .26s}
+  .menu[data-open]{opacity:1;visibility:visible;transform:none}
+  .menu .nav{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;display:grid;
+    grid-template-columns:auto 1fr;align-items:center;column-gap:calc(16*var(--u));row-gap:calc(16*var(--u));
+    padding:calc(8*var(--u)) calc(10*var(--u));border:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .menu .nav>*{position:relative;left:auto;top:auto}
+  .menu .nav span{font-size:calc(19*var(--u))}
+  .menu .n-div{grid-column:1 / -1;width:100%;height:calc(1.2*var(--u));margin:calc(2*var(--u)) 0}
+  .menu .cta{position:relative;left:auto;top:auto;width:100%;height:calc(64*var(--u));margin-top:calc(14*var(--u))}
+  .menu .cta span{left:calc(28*var(--u));top:calc(23*var(--u));font-size:calc(19*var(--u))}
+  .menu .cta .knob{left:auto;right:calc(9*var(--u));top:calc(7*var(--u));width:calc(50*var(--u));height:calc(50*var(--u))}
+}
+/* 静止帧 = 原样 CSS；入场 pre 态只在 html.pre 下生效，动画放完即摘 */
+@media (prefers-reduced-motion:no-preference){
+  .cta,.meet{transition:transform .35s cubic-bezier(.2,.7,.3,1)}
+  .cta:hover,.meet:hover{transform:translateY(calc(-2*var(--u)))}
+}
+html.pre .brand,html.pre .nav,html.pre .cta,html.pre .burger,
+html.pre .eyebrow,html.pre .play,html.pre .tag,
+html.pre .panel,html.pre .lbl,html.pre .meet{opacity:0}
+html.pre h1 .sx,html.pre .num{clip-path:inset(100% 0 -14% 0)}
+html.pre .slash{scale:1 0}
+html.pre .track i{scale:0 1}
+html.pre .dot{scale:0}
+
+/* Token 预览段（方案版追加）：色板 / 字号比例 / 组件层级一眼可验收 */
+.tokens{position:relative;z-index:3;background:#f7fafd;border-top:1px solid rgba(120,145,180,.22);
+  padding:calc(64*var(--u)) calc(56*var(--u)) calc(72*var(--u))}
+.tokens h2{font-size:calc(15*var(--u));font-weight:570;letter-spacing:.04em;color:#39455F;margin-bottom:calc(30*var(--u))}
+.tok-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:calc(48*var(--u));align-items:start;max-width:calc(1100*var(--u));margin:0 auto}
+.swatches{display:flex;gap:calc(12*var(--u));flex-wrap:wrap}
+.sw{width:calc(78*var(--u));height:calc(78*var(--u));border-radius:calc(14*var(--u));position:relative;overflow:hidden;
+  border:calc(1*var(--u)) solid rgba(120,145,180,.25);box-shadow:0 calc(2*var(--u)) calc(8*var(--u)) rgba(28,52,92,.06)}
+.sw span{position:absolute;left:calc(7*var(--u));bottom:calc(6*var(--u));font-size:calc(9*var(--u));color:#3a4a66}
+.comp{display:flex;flex-wrap:wrap;gap:calc(14*var(--u));margin-top:calc(30*var(--u));align-items:center}
+.comp .pill{position:relative;display:inline-flex;align-items:center;height:calc(56*var(--u));padding:0 calc(24*var(--u));
+  border-radius:999px;background:var(--cta);color:#fff;font-size:calc(15*var(--u));font-weight:400}
+.comp .glass{position:relative;display:inline-flex;align-items:center;gap:calc(10*var(--u));height:calc(56*var(--u));
+  padding:0 calc(22*var(--u));border-radius:999px;background:rgba(255,255,255,.325);color:#1B2A44;
+  border:calc(1*var(--u)) solid rgba(255,255,255,.62);font-size:calc(15*var(--u));
+  -webkit-backdrop-filter:blur(calc(20*var(--u)));backdrop-filter:blur(calc(20*var(--u)))}
+.comp .glass i{width:calc(22*var(--u));height:calc(22*var(--u));border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#fff,var(--qiut) 55%,#b9c9dd 100%);display:block}
+.comp .card{width:calc(240*var(--u));padding:calc(20*var(--u));border-radius:calc(20*var(--u));
+  background:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.35));
+  border:calc(1*var(--u)) solid rgba(255,255,255,.8);box-shadow:0 calc(10*var(--u)) calc(26*var(--u)) rgba(28,52,92,.07)}
+.comp .card b{display:block;color:var(--mo);font-size:calc(16*var(--u));font-weight:500}
+.comp .card p{margin-top:calc(6*var(--u));color:var(--muted2);font-size:calc(13*var(--u));line-height:1.6}
+.type .t{color:var(--mo);margin-bottom:calc(12*var(--u));white-space:nowrap}
+.type .t.d{font-size:calc(52*var(--u));font-weight:360;letter-spacing:-.035em}
+.type .t.h{font-size:calc(28*var(--u));font-weight:470;letter-spacing:-.03em}
+.type .t.b{font-size:calc(18*var(--u));font-weight:400;color:var(--muted2);white-space:normal}
+.type .t.c{font-size:calc(15*var(--u));font-weight:570;letter-spacing:-.05em;color:#202940}
+.type .t small{display:block;font-size:calc(11*var(--u));color:#7c8aa4;letter-spacing:.06em;margin-bottom:calc(2*var(--u))}
+@media (max-width:760px){.tok-grid{grid-template-columns:1fr}}
+</style>
+<script>(function(){var d=document.documentElement;
+  if(!('animate' in Element.prototype))return;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  d.classList.add('pre');
+  setTimeout(function(){d.classList.remove('pre')},4000);
+})();</script>
+</head>
+<body>
+<div class="page"><div class="card">
+  <canvas class="bg" id="plate" aria-hidden="true"></canvas>
+  <div class="tint"></div>
+  <div class="stack">
+    <div class="row">
+      <a class="brand l t" style="--x:68;--y:47" href="#">
+        <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <defs><clipPath id="gclip"><circle cx="20" cy="20" r="18.2"/></clipPath></defs>
+          <circle cx="20" cy="20" r="18.4" stroke="#0d1b30" stroke-width="1.1"/>
+          <g clip-path="url(#gclip)" stroke="#0d1b30" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13.2 4.6c3-.9 6.2-1 9.2-.1" stroke-width="1.7"/>
+            <path d="M5.6 9.2c3.8-1.9 8-2.4 11.7-1.2 2.5.8 4.3 2.1 6.6 2.3 2 .2 4.2-.4 6.4-1.5" stroke-width="2.3"/>
+            <path d="M2.6 13.9c4.4-2.4 9.4-3 13.6-1.5 2.4.9 4.1 2.3 6.4 2.4 2.3.1 4.7-1 7.1-2.4 1.6-.9 3.4-1.4 5.3-1.4" stroke-width="2.7"/>
+            <path d="M1.6 18.7c4.8-2.7 10.1-3.2 14.4-1.6 1.8.7 3.2 1.6 4.7 2.1-1.7 1.3-3.4 2.2-5.1 2.6 2.9.5 5.9-.1 8.8-1.5 1.5-.7 2.9-1.6 4.4-2.3 1.9-.9 3.9-1.3 5.9-1.1" stroke-width="2.9"/>
+            <path d="M1.9 24.1c4.5-2.4 9.6-3 13.9-1.6 2.3.7 4 1.9 6.2 2 2.4.1 5-.9 7.5-2.3 1.6-.9 3.3-1.4 5-1.4" stroke-width="2.8"/>
+            <path d="M3.7 28.8c4.1-2 8.7-2.5 12.6-1.3 2.2.7 3.8 1.8 5.9 1.8 2.3.1 4.8-.8 7.1-2.1 1.2-.7 2.5-1.1 3.8-1.2" stroke-width="2.4"/>
+            <path d="M7.6 32.9c3.5-1.5 7.4-1.9 10.6-.9 1.9.6 3.3 1.4 5 1.5 1.6.1 3.3-.3 5-1.1" stroke-width="1.9"/>
+            <path d="M13.6 35.8c2.8-.9 5.8-1 8.6-.2" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <b class="sx" style="--sx:0.894">ConSentinel</b>
+      </a>
+      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><i></i><i></i></button>
+      <div class="menu" id="site-menu">
+        <nav class="nav" aria-label="Primary">
+          <span class="n-home"><svg viewBox="0 0 20 21" fill="none" aria-hidden="true"><path d="M2 8.4 10 2l8 6.4V18a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" stroke="#202940" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+          <span class="n-explore">Explore</span>
+          <hr class="n-div" />
+          <span class="n-grid"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1" y="1" width="7.4" height="7.4" rx="1.7" stroke="#202940" stroke-width="1.7"/><rect x="11.6" y="1" width="7.4" height="7.4" rx="1.7" stroke="#202940" stroke-width="1.7"/><rect x="1" y="11.6" width="7.4" height="7.4" rx="1.7" stroke="#202940" stroke-width="1.7"/><rect x="11.6" y="11.6" width="7.4" height="7.4" rx="1.7" stroke="#202940" stroke-width="1.7"/></svg></span>
+          <span class="n-product">Product</span>
+        </nav>
+        <a class="cta l t r" style="--x:58;--y:30" href="#">
+          <span>Get free plan</span>
+          <span class="knob"><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-blk">
+      <p class="eyebrow l c sx" style="--x:65.7;--y:-209.2;--sx:0.9293">Your digital infrastructure</p>
+      <h1 class="l c" style="--x:62.6;--y:-167.3">
+        <span class="sx" style="--sx:0.9431">Smarter Security</span><br>
+        <span class="sx" style="--sx:0.9792">Starts Here</span>
+      </h1>
+      <div class="tagrow">
+        <span class="play l c" style="--x:66;--y:34">
+          <svg viewBox="0 0 13 14" aria-hidden="true"><path d="M1.4 1.3 11.6 7 1.4 12.7z" fill="#0b1526"/></svg>
+        </span>
+        <span class="tag l c sx" style="--x:131;--y:48.7;--sx:0.8973">Secure the Sphere. Protect What Matters.</span>
+      </div>
+      <aside class="panel l c r" style="--x:58;--y:-165">
+        <span class="p-title sx" style="--sx:0.8707">AI-Driven</span>
+        <span class="dot"></span>
+        <span class="shield">
+          <svg viewBox="0 0 30 39" fill="none" aria-hidden="true">
+            <path d="M15 1.2 1.6 6.6v13.1c0 6.6 5.1 12.6 13.4 17.9 8.3-5.3 13.4-11.3 13.4-17.9V6.6z" stroke="#101c33" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2.1 18.9c4.6-1.1 8.9-1.6 12.9-1.6s8.3.5 12.9 1.6" stroke="#101c33" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <p class="p-sub sx" style="--sx:0.8899">Cloud<br>Infrastructure<br>Protection</p>
+        <div class="scale"><span>1K</span><span>10K</span><span>50K</span><span>100K</span></div>
+        <div class="track"><i></i></div>
+      </aside>
+    </div>
+    <div class="row">
+      <div class="stats">
+        <div class="stat">
+          <span class="num l b sx" style="--x:64;--y:60.4;--sx:1">112+</span>
+          <span class="lbl l b sx" style="--x:295;--y:73.2;--sx:0.9634">Countries<br>Protected<br>Globally</span>
+        </div>
+        <span class="slash l b" style="--x:418;--y:76"></span>
+        <div class="stat">
+          <span class="num l b sx" style="--x:480;--y:60.4;--sx:0.9858">55K+</span>
+          <span class="lbl l b sx" style="--x:716;--y:96.7;--sx:0.9209">Clients<br>Secured</span>
+        </div>
+      </div>
+      <a class="meet l b r" style="--x:59;--y:66" href="#">
+        <span class="thumb"><i></i></span>
+        <b>Meet Sentinel</b>
+        <span class="knob"><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+  </div>
+</div></div>
+
+<section class="tokens">
+  <h2>设计 Token 预览</h2>
+  <div class="tok-grid">
+    <div>
+      <div class="swatches">
+        <div class="sw" style="background:var(--yan)"><span>yan</span></div>
+        <div class="sw" style="background:var(--mo);color:#fff"><span style="color:#c9d6e8">mo</span></div>
+        <div class="sw" style="background:var(--qiang)"><span style="color:#fff">qiang</span></div>
+        <div class="sw" style="background:var(--qiut)"><span>qiut</span></div>
+        <div class="sw" style="background:rgba(255,255,255,.55)"><span>glass</span></div>
+      </div>
+      <div class="comp">
+        <span class="pill">Get free plan</span>
+        <span class="glass"><i></i>Meet Sentinel</span>
+        <div class="card"><b>玻璃面板</b><p>backdrop-blur 40u + 双向内高光 + 1u 亮描边，浮在装置之上。</p></div>
+      </div>
+    </div>
+    <div class="type">
+      <div class="t d">Smarter Security</div>
+      <div class="t h">Secure the Sphere.</div>
+      <div class="t b">Body — 一段说明文字，颜色走 --muted2，行高 1.55，永远压在大留白上。</div>
+      <div class="t c">Caption — NAV / EYEBROW 层级，字距收紧到 -0.05em</div>
+    </div>
+  </div>
+</section>
+
+<script>/* 时间线：WAAPI 四种行为（遮罩升 / 轻抬 / 玻璃落定 / 点缀），放完自摘 pre 态还原成纯 CSS */
+(function(){
+  var pre = document.documentElement.classList.contains('pre');
+  if (!pre) return;
+  var EXPO = 'cubic-bezier(.16,1,.3,1)', SOFT = 'cubic-bezier(.22,.7,.25,1)', GLASS = 'cubic-bezier(.2,.75,.28,1)';
+  var s = matchMedia('(max-width: 640px)').matches ? .86 : 1;
+  var running = [];
+  function anim(el, frames, dur, delay, ease){
+    var a = el.animate(frames, { duration: dur*s, delay: delay*s, easing: ease, fill: 'both' });
+    running.push(a); return a;
+  }
+  function q(sel){ return document.querySelector(sel); }
+  function qa(sel){ return document.querySelectorAll(sel); }
+  function rise(el, delay, dur){ anim(el, [
+    { clipPath: 'inset(100% 0 -14% 0)', translate: '0 .16em' },
+    { clipPath: 'inset(-18% 0 -14% 0)', translate: '0 0' }], dur, delay, EXPO); }
+  function lift(el, delay, dist, dur){ anim(el, [
+    { opacity: 0, translate: '0 ' + dist }, { opacity: 1, translate: '0 0' }], dur || 560, delay, SOFT); }
+  function settle(el, delay, dur, from, dist){ anim(el, [
+    { opacity: 0, scale: from, translate: '0 ' + dist },
+    { opacity: 1, scale: 1, translate: '0 0' }], dur || 760, delay, GLASS); }
+  lift(q('.brand'), 60, '.55em', 600);
+  settle(q('.nav'), 150, 700, .99, '.5em');
+  settle(q('.cta'), 200, 700, .985, '.5em');
+  settle(q('.burger'), 150, 700, .9, '.4em');
+  lift(q('.eyebrow'), 300, '.8em', 520);
+  rise(qa('h1 .sx')[0], 380, 980); rise(qa('h1 .sx')[1], 470, 980);
+  settle(q('.play'), 720, 640, .88, '.3em');
+  lift(q('.tag'), 770, '.7em', 560);
+  settle(q('.panel'), 800, 880, .982, '1.4em');
+  anim(q('.shield'), [{ scale: .86 }, { scale: 1 }], 700, 1020, EXPO);
+  anim(q('.dot'), [{ scale: 0 }, { scale: 1 }], 520, 1080, EXPO);
+  anim(q('.track i'), [{ scale: '0 1' }, { scale: '1 1' }], 820, 1120, EXPO);
+  rise(qa('.num')[0], 920, 860); rise(qa('.num')[1], 990, 860);
+  lift(qa('.lbl')[0], 1030, '.6em', 520); lift(qa('.lbl')[1], 1075, '.6em', 520);
+  anim(q('.slash'), [{ scale: '1 0' }, { scale: '1 1' }], 700, 1010, EXPO);
+  settle(q('.meet'), 1140, 820, .985, '1.2em');
+  Promise.all(running.map(function(a){ return a.finished.catch(function(){}); })).then(function(){
+    document.documentElement.classList.remove('pre');
+    running.forEach(function(a){ a.cancel(); });
+    running.length = 0;
+  });
+})();
+</script>
+<script>
+/* 汉堡：与菜单 data-open 同步开合；点外部 / Escape / 转横屏都收起 */
+(function(){
+  var b = document.querySelector('.burger'), m = document.getElementById('site-menu');
+  function close(){ b.setAttribute('aria-expanded','false'); delete m.dataset.open; }
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(open));
+    if (open) m.dataset.open = ''; else delete m.dataset.open;
+  });
+  m.addEventListener('click', function(e){
+    if (e.target.closest('a')) { close(); b.setAttribute('aria-expanded','false'); }
+    e.stopPropagation();
+  });
+  document.addEventListener('click', close);
+  addEventListener('keydown', function(e){ if (e.key === 'Escape'){ close(); b.focus(); } });
+  matchMedia('(min-aspect-ratio: 1/1)').addEventListener('change', function(e){ if (e.matches) close(); });
+})();
+</script>
+<script>
+/* 玻璃装置底板：canvas 2D 离线绘制（球 + 玻璃刃 + 流动光斑 + 微推近），替代原站 CloudFront 视频 */
+(function(){
+  const cv = document.getElementById('plate'), ctx = cv.getContext('2d');
+  const state = { yan:'#E6EDF6', mo:'#020C21', qiang:'#4A78B0', qiut:'#dfe9f4',
+                  biaoti:98, qiuda:62, qiujiao:-18, daokuand:26, guangsu:1, liang:100 };
+  let W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2), t = 0, raf = 0;
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  function hexToRgb(h){ const v = parseInt(String(h).replace('#',''), 16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+  function rgba(h, a){ const c = hexToRgb(h); return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function resize(){
+    W = innerWidth; H = innerHeight;
+    cv.width = W*DPR; cv.height = H*DPR;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  function draw(){
+    const cx = W*0.52, cy = H*0.58, R = Math.min(W, H) * 0.5 * state.qiuda / 100;
+    /* 影棚底：上冷下暖的浅蓝白渐变 + 地面反光带 */
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#f4f8fc'); bg.addColorStop(0.62, state.yan); bg.addColorStop(1, '#dde6f0');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(0, H*0.78, W, H*0.22);
+    /* 微推近：10s 周期 ±0.4%，复刻原片几乎不可见的呼吸感 */
+    const push = 1 + 0.004 * Math.sin(t * 0.628);
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(push, push); ctx.translate(-cx, -cy);
+    /* 球体：底色 + 左上高光 + 底部内阴影 */
+    const g = ctx.createRadialGradient(cx - R*0.38, cy - R*0.42, R*0.1, cx, cy, R);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.45, state.qiut); g.addColorStop(0.85, '#c3d2e4'); g.addColorStop(1, '#aebfd6');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
+    ctx.strokeStyle = 'rgba(120,145,180,.35)'; ctx.lineWidth = 1; ctx.stroke();
+    const hi = ctx.createRadialGradient(cx - R*0.42, cy - R*0.48, 0, cx - R*0.42, cy - R*0.48, R*0.5);
+    hi.addColorStop(0, 'rgba(255,255,255,.95)'); hi.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = hi; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
+    /* 底部环境光反射（地面焦散），随时间横移 */
+    const ca = ctx.createLinearGradient(cx - R, cy + R*0.55, cx + R, cy + R*0.95);
+    ca.addColorStop(0, 'rgba(255,255,255,0)');
+    ca.addColorStop(0.5 + 0.18*Math.sin(t*1.3), 'rgba(255,255,255,.55)');
+    ca.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = ca;
+    ctx.beginPath(); ctx.ellipse(cx, cy + R*0.78, R*0.9, R*0.16, 0, 0, 6.2832); ctx.fill();
+    /* 玻璃刃：穿过球体的薄片（旋转椭圆 + 两道棱线），角度可调 */
+    const ang = state.qiujiao * Math.PI / 180, bw = state.daokuand;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+    const bl = ctx.createLinearGradient(0, -bw, 0, bw);
+    bl.addColorStop(0, 'rgba(255,255,255,.65)'); bl.addColorStop(0.5, rgba(state.qiut, .35)); bl.addColorStop(1, 'rgba(160,180,205,.45)');
+    ctx.fillStyle = bl;
+    ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, bw, 0, 0, 6.2832); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, bw, 0, 0, 6.2832); ctx.stroke();
+    ctx.strokeStyle = 'rgba(90,115,150,.4)';
+    ctx.beginPath(); ctx.moveTo(-R*1.3, 0); ctx.lineTo(R*1.3, 0); ctx.stroke();
+    ctx.restore();
+    /* 球面流动焦散弧：两道弧随时间游走 */
+    for (let i = 0; i < 2; i++){
+      const a0 = -0.9 + Math.sin(t*0.5 + i*2.1) * 0.6, a1 = a0 + 0.9 + 0.2*Math.cos(t*0.4 + i);
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.5 - i*0.18) + ')';
+      ctx.lineWidth = 2.2 - i*0.8;
+      ctx.beginPath(); ctx.arc(cx, cy, R*(0.72 + i*0.12), a0, a1); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function loop(){
+    t += 0.016 * Math.max(0.01, state.guangsu);
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+  function start(){ cancelAnimationFrame(raf); if (still.matches){ draw(); } else { raf = requestAnimationFrame(loop); } }
+  still.addEventListener('change', start);
+  addEventListener('resize', function(){ resize(); if (still.matches) draw(); });
+  addEventListener('message', function(e){
+    const d = e.data; if (!d || d.type !== 'param') return;
+    if (!(d.key in state)) return;
+    state[d.key] = d.value;
+    const R = document.documentElement.style;
+    R.setProperty('--yan', state.yan); R.setProperty('--mo', state.mo);
+    R.setProperty('--qiang', state.qiang); R.setProperty('--qiut', state.qiut);
+    R.setProperty('--biaoti', state.biaoti); R.setProperty('--liang', state.liang);
+    if (still.matches) draw();
+  });
+  const R = document.documentElement.style;
+  R.setProperty('--yan', state.yan); R.setProperty('--mo', state.mo);
+  R.setProperty('--qiang', state.qiang); R.setProperty('--qiut', state.qiut);
+  R.setProperty('--biaoti', state.biaoti); R.setProperty('--liang', state.liang);
+  resize(); start();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长按上下文菜单演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#fff;display:flex;align-items:center;padding:20px}
+.bub{position:relative;background:var(--bc,#eef1f5);color:#222;padding:12px 14px;border-radius:14px;font-size:14px;max-width:180px;line-height:1.6;user-select:none;touch-action:none}
+.menu{position:absolute;background:var(--sc,#fff);border:1px solid #e5e7eb;border-radius:var(--sr,12px);box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;opacity:0;transform:scale(.85);transform-origin:top left;transition:opacity var(--dur,.25s),transform var(--dur,.25s);pointer-events:none;z-index:9}
+.menu.on{opacity:1;transform:scale(1);pointer-events:auto}
+.mi{height:var(--ih,40px);display:flex;align-items:center;padding:0 16px;font-size:13px;color:#222;white-space:nowrap}
+.mi:hover{background:var(--ac,#2f6bff);color:#fff}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="bub" id="bub">长按这条消息，会弹出只针对它的操作菜单</div>
+<div class="menu" id="menu"></div>
+</div></div>
+<script>
+const bub=document.getElementById('bub'),menu=document.getElementById('menu');
+const items=['复制','转发','收藏','删除'];
+const state={ac:'#2f6bff',sc:'#ffffff',bc:'#eef1f5',n:3,sr:12,dur:.25,hold:.5,ih:40};
+let timer=0;
+function build(){menu.innerHTML='';for(let i=0;i<state.n;i++){const m=document.createElement('div');m.className='mi';m.textContent=items[i]||('操作'+(i+1));m.onclick=close;menu.appendChild(m);}}
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--sc',state.sc);document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--sr',state.sr+'px');document.documentElement.style.setProperty('--ih',state.ih+'px');bub.style.background=state.bc;menu.style.transition='opacity '+state.dur+'s,transform '+state.dur+'s';}
+function open(){build();const r=bub.getBoundingClientRect(),s=document.getElementById('sc').getBoundingClientRect();menu.style.left=(r.left-s.left+6)+'px';menu.style.top=(r.bottom-s.top+6)+'px';menu.classList.add('on');}
+function close(){menu.classList.remove('on');}
+bub.addEventListener('pointerdown',e=>{timer=setTimeout(open,state.hold*1000);});
+bub.addEventListener('pointerup',()=>clearTimeout(timer));
+bub.addEventListener('pointerleave',()=>clearTimeout(timer));
+applyStyle();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','sc','bc','n','sr','dur','hold','ih'].includes(d.key)){applyStyle();if(menu.classList.contains('on'))build();}});
+</script></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>连锁更新演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+.top{font-size:13px;color:#333}#total{font-weight:700;color:var(--pc,#2f6bff)}
+.grp{width:240px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+.ghead{display:flex;justify-content:space-between;font-size:13px;color:#444;margin-bottom:8px}
+.gc{font-weight:700;color:var(--pc,#2f6bff)}
+.item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid #f1f2f4;font-size:12px;color:#555}
+.go{background:var(--pc,#2f6bff);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer}
+.pulse{animation:p .4s ease}
+@keyframes p{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+</style></head><body>
+<div class="top">总未读：<span id="total">0</span></div>
+<div class="grp" id="g0"><div class="ghead"><span>评论</span><span class="gc" id="c0">0</span></div><div id="l0"></div></div>
+<div class="grp" id="g1"><div class="ghead"><span>私信</span><span class="gc" id="c1">0</span></div><div id="l1"></div></div>
+<script>
+const state={pc:'#2f6bff',g0:3,g1:2};
+const groups=[{c:document.getElementById('c0'),l:document.getElementById('l0'),n:state.g0},{c:document.getElementById('c1'),l:document.getElementById('l1'),n:state.g1}];
+function applyStyle(){document.documentElement.style.setProperty('--pc',state.pc);}
+function build(){groups[0].n=state.g0;groups[1].n=state.g1;const total=groups[0].n+groups[1].n;document.getElementById('total').textContent=total;groups.forEach((g,gi)=>{g.c.textContent=g.n;g.l.innerHTML='';for(let k=0;k<g.n;k++){const row=document.createElement('div');row.className='item';row.innerHTML='<span>条目 '+(k+1)+'</span><button class="go">处理</button>';row.querySelector('.go').onclick=()=>handle(gi);g.l.appendChild(row);}});}
+function pulse(el){el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');}
+function handle(gi){if(groups[gi].n>0){groups[gi].n--;build();pulse(groups[gi].c);pulse(document.getElementById('total'));}}
+applyStyle();build();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['pc','g0','g1'].includes(d.key)){applyStyle();build();}});
+</script></body></html>

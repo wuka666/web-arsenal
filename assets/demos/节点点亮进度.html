@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>节点点亮进度演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .nodes { display: flex; align-items: center; }
+  .seg { display: flex; align-items: center; }
+  .node {
+    width: var(--nodeSize, 16px); height: var(--nodeSize, 16px); border-radius: 50%;
+    background: var(--pending, #eee); flex: none; transition: background .25s ease, transform .25s ease;
+  }
+  .node.on { background: var(--active, #2563eb); transform: scale(1.12); }
+  .link {
+    width: var(--gap, 28px); height: 3px; background: var(--trackLine, #e5e7eb); flex: none;
+    transition: background .25s ease;
+  }
+  .link.on { background: var(--active, #2563eb); }
+  .node .lbl {
+    position: absolute; transform: translate(-50%, 22px); font-size: 11px; color: #999; display: none;
+  }
+  .wrap { position: relative; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="nodes" id="nodes"></div>
+<button class="btn" id="btn">重新点亮</button>
+
+<script>
+  const state = {
+    nodes: 6,
+    dur: 4,
+    stutter: 4,
+    stutterPause: 1.2,
+    nodeSize: 16,
+    gap: 28,
+    activeColor: "#2563eb",
+    pendingColor: "#eee",
+    trackLine: "#e5e7eb",
+    showLabel: false
+  };
+  const nodesEl = document.getElementById("nodes");
+  let timers = [];
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--nodeSize", state.nodeSize + "px");
+    root.style.setProperty("--gap", state.gap + "px");
+    root.style.setProperty("--active", state.activeColor);
+    root.style.setProperty("--pending", state.pendingColor);
+    root.style.setProperty("--trackLine", state.trackLine);
+    build();
+  }
+
+  function build() {
+    timers.forEach(clearTimeout); timers = [];
+    nodesEl.innerHTML = "";
+    const n = Math.max(2, Math.round(state.nodes));
+    for (let i = 0; i < n; i++) {
+      const seg = document.createElement("div");
+      seg.className = "seg";
+      const node = document.createElement("div");
+      node.className = "node"; node.dataset.i = i;
+      if (state.showLabel) {
+        const lbl = document.createElement("span");
+        lbl.className = "lbl"; lbl.textContent = i + 1; lbl.style.display = "block";
+        node.appendChild(lbl);
+      }
+      seg.appendChild(node);
+      if (i < n - 1) {
+        const link = document.createElement("div");
+        link.className = "link"; link.dataset.i = i;
+        seg.appendChild(link);
+      }
+      nodesEl.appendChild(seg);
+    }
+  }
+
+  function run() {
+    timers.forEach(clearTimeout); timers = [];
+    build();
+    const n = Math.max(2, Math.round(state.nodes));
+    const step = (Math.max(state.dur, 0.3) * 1000) / n;
+    const stutterIdx = Math.round(state.stutter);
+    for (let i = 0; i < n; i++) {
+      let delay = (i + 1) * step;
+      if (stutterIdx > 0 && i === stutterIdx) delay += state.stutterPause * 1000; // 在此节点停留，暴露卡顿位置
+      const t = setTimeout(() => {
+        const node = nodesEl.querySelector('.node[data-i="' + i + '"]');
+        if (node) node.classList.add("on");
+        const link = nodesEl.querySelector('.link[data-i="' + i + '"]');
+        if (link) link.classList.add("on");
+      }, delay);
+      timers.push(t);
+    }
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["nodes","dur","stutter","stutterPause","nodeSize","gap","activeColor","pendingColor","trackLine","showLabel"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

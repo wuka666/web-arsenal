@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>过冲锁定进度演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .pct {
+    font-size: var(--pctSize, 22px); font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--color, #1a1a1a);
+  }
+  .track {
+    position: relative; width: min(70vw, 420px); height: var(--thick, 12px);
+    background: var(--track, #eee); border-radius: var(--radius, 999px);
+    overflow: visible;
+  }
+  .fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    width: 0%; background: var(--color, #1a1a1a);
+    border-radius: inherit; transform-origin: center;
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="pct" id="pct">0%</div>
+<div class="track"><div class="fill" id="fill"></div></div>
+<button class="btn" id="btn">重新播放</button>
+
+<script>
+  const state = {
+    dur: 1.8,
+    overshoot: 12,
+    thick: 12,
+    radius: 999,
+    color: "#1a1a1a",
+    track: "#eee",
+    lock: true,
+    showPct: true,
+    pctSize: 22,
+    ease: "easeOutBack"
+  };
+  const fill = document.getElementById("fill");
+  const pct = document.getElementById("pct");
+  const track = document.querySelector(".track");
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--pctSize", state.pctSize + "px");
+    pct.style.display = state.showPct ? "block" : "none";
+  }
+
+  function ease(t) {
+    if (state.ease === "linear") return t;
+    if (state.ease === "easeOutCubic") return 1 - Math.pow(1 - t, 3);
+    // easeOutBack：先冲过 100% 再回落，过冲幅度由 overshoot 控制
+    const s = Math.max(state.overshoot, 0) / 100 * 2.2 + 1.2;
+    const c = s - 1;
+    return 1 + c * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    fill.style.width = "0%";
+    pct.textContent = "0%";
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.1) * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const p = ease(t);
+      const shown = Math.max(0, Math.min(p, 1.12)); // 允许短暂过冲可见
+      fill.style.width = (shown * 100) + "%";
+      pct.textContent = Math.round(Math.min(Math.max(p, 0), 1) * 100) + "%";
+      if (t < 1) { raf = requestAnimationFrame(tick); }
+      else { settle(); }
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function settle() {
+    fill.style.width = "100%";
+    pct.textContent = "100%";
+    if (state.lock) {
+      // 锁定弹动：整条轻微回弹一下，确认"到位"
+      track.style.transition = "transform .18s cubic-bezier(.34,1.56,.64,1)";
+      track.style.transform = "scaleX(1.04)";
+      setTimeout(() => { track.style.transform = "scaleX(1)"; }, 180);
+    }
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["dur","overshoot","ease","lock","showPct","pctSize","color","track","thick","radius"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>扫光按钮 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+         background: var(--di); font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+  /* 扫光三件套：overflow 裁切 + ::after 斜向高光静止在左侧 + hover 时平移扫过 */
+  .btn { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+         height: calc(var(--gao)*1px); padding: 0 22px; border-radius: var(--yuanjiao);
+         font-size: calc(var(--zihao)*1px); font-weight: 500; letter-spacing: -.02em; line-height: 1; white-space: nowrap;
+         cursor: pointer; transition: background .35s, border-color .35s, box-shadow .35s, filter .35s; }
+  .btn::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+         background: linear-gradient(115deg, transparent 20%, color-mix(in srgb, #fff calc(var(--saoliang)*1%), transparent) 48%, transparent 76%);
+         transform: translateX(-130%); }
+  .btn:hover::after, .btn.demo::after { transform: translateX(130%); transition: transform var(--sudu) ease; }
+  .solid { background: linear-gradient(180deg, var(--zhucai) 0%, color-mix(in srgb, var(--zhucai) 91%, #000) 48%, color-mix(in srgb, var(--zhucai) 81%, #000) 100%);
+         color: var(--zi); border: 1px solid var(--zhucai);
+         box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 0 calc(var(--guang)*1px) rgba(186,208,255,.18); }
+  .solid:hover { filter: brightness(1.05);
+         box-shadow: inset 0 1px 0 #fff, 0 0 calc(var(--guang)*1.6px) rgba(186,208,255,.4), 0 8px 18px rgba(255,255,255,.1); }
+  .ghost { background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(0,0,0,.45) 50%, rgba(160,175,200,.08));
+         color: #fff; border: 1px solid rgba(198,198,198,.45); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+  .ghost:hover { border-color: rgba(220,230,255,.75);
+         box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 0 calc(var(--guang)*1px) rgba(170,200,255,.22); }
+  .accent { background: linear-gradient(180deg, #f26b1d, #c9500f); color: #fff; border: 1px solid #f26b1d; }
+  .accent:hover { filter: brightness(1.08); box-shadow: 0 0 calc(var(--guang)*1.4px) rgba(242,107,29,.4); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <button class="btn solid">Start for Free</button>
+    <button class="btn ghost">See it in action</button>
+    <button class="btn accent">立即升级</button>
+  </div>
+  <div class="row" id="auto">
+    <button class="btn solid">自动演示</button>
+  </div>
+<script>
+const state = { di:'#101014', zhucai:'#ffffff', zi:'#111111',
+                saoliang:45, sudu:0.65, guang:22, yuanjiao:6, gao:42, zihao:14 };
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--zhucai', state.zhucai);
+  R.setProperty('--zi', state.zi); R.setProperty('--saoliang', state.saoliang);
+  R.setProperty('--sudu', state.sudu + 's'); R.setProperty('--guang', state.guang);
+  R.setProperty('--yuanjiao', state.yuanjiao + 'px'); R.setProperty('--gao', state.gao);
+  R.setProperty('--zihao', state.zihao);
+}
+window.addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+// 每 3s 自动扫一次，预览/截图不依赖鼠标
+const auto = document.querySelector('#auto .btn');
+setInterval(() => { auto.classList.add('demo'); setTimeout(() => auto.classList.remove('demo'), 900); }, 3000);
+apply();
+</script>
+</body>
+</html>

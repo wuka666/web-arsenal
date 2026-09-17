@@ -17,10 +17,10 @@
 </head>
 <body>
 <div class="card" id="card">
-  <div class="big">在卡片上滑动</div>
-  <div class="badge" id="badge">初始方向判定执行动作</div>
+  <div class="big">日程卡片</div>
+  <div class="badge" id="badge"></div>
 </div>
-<div class="legend">横滑=翻页（<b id="h">—</b>）　竖拉=关闭（<b id="v">—</b>）</div>
+<div class="legend"><b id="h">—</b>　<b id="v">—</b></div>
 
 <script>
   const state = { threshold: 24, hColor: "#3d5fd6", vColor: "#e0533d", card: "#ffffff", bg: "#fafafa" };
@@ -33,20 +33,20 @@
     document.body.style.background = state.bg;
     h.style.color = state.hColor; v.style.color = state.vColor;
     badge.style.background = "#eee"; badge.style.color = "#444";
-    badge.textContent = "初始方向判定执行动作";
+    badge.textContent = "";
   }
   card.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; axis = null; moved = 0; card.setPointerCapture(e.pointerId); });
   card.addEventListener("pointermove", e => {
     const dx = e.clientX - sx, dy = e.clientY - sy;
     moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
     if (!axis && Math.abs(dx) + Math.abs(dy) > 6) axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
-    if (axis === "h") { card.style.transform = "translateX(" + dx + "px)"; badge.style.background = state.hColor; badge.style.color = "#fff"; badge.textContent = "已判定：横滑翻页"; }
-    else if (axis === "v") { card.style.transform = "translateY(" + dy + "px)"; badge.style.background = state.vColor; badge.style.color = "#fff"; badge.textContent = "已判定：竖拉关闭"; }
+    if (axis === "h") { card.style.transform = "translateX(" + dx + "px)"; badge.style.background = state.hColor; badge.style.color = "#fff"; badge.textContent = "已判定"; }
+    else if (axis === "v") { card.style.transform = "translateY(" + dy + "px)"; badge.style.background = state.vColor; badge.style.color = "#fff"; badge.textContent = "已判定"; }
   });
   card.addEventListener("pointerup", e => {
     const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (axis === "h" && Math.abs(dx) > state.threshold) flash("执行：翻到下一页");
-    else if (axis === "v" && Math.abs(dy) > state.threshold) flash("执行：关闭卡片");
+    if (axis === "h" && Math.abs(dx) > state.threshold) flash("已执行");
+    else if (axis === "v" && Math.abs(dy) > state.threshold) flash("已执行");
     else flash("位移不足，未触发动作");
     card.style.transform = "translate(0,0)";
   });

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>仪表扫针演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .gauge { width: var(--size, 220px); height: var(--size, 220px); }
+  .val {
+    font-size: var(--valSize, 26px); font-weight: 800; font-variant-numeric: tabular-nums;
+    fill: var(--needle, #1a1a1a);
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<svg class="gauge" id="svg" viewBox="0 0 220 220"></svg>
+<button class="btn" id="btn">重新扫针</button>
+
+<script>
+  const svg = document.getElementById("svg");
+  const state = {
+    value: 72,
+    dur: 1.6,
+    startAng: 180,
+    sweep: 180,
+    needle: "#1a1a1a",
+    arc: "#2563eb",
+    track: "#eee",
+    ticks: 10,
+    size: 220,
+    showVal: true,
+    valSize: 26
+  };
+  const NS = "http://www.w3.org/2000/svg";
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--size", state.size + "px");
+    root.style.setProperty("--needle", state.needle);
+    root.style.setProperty("--valSize", state.valSize + "px");
+    draw(0);
+  }
+
+  function pt(cx, cy, R, u) {
+    const ang = (state.startAng - u * state.sweep) * Math.PI / 180;
+    return [cx + R * Math.cos(ang), cy - R * Math.sin(ang)];
+  }
+  function arcPath(cx, cy, R, u0, u1) {
+    let d = "";
+    const steps = 60;
+    for (let i = 0; i <= steps; i++) {
+      const u = u0 + (u1 - u0) * i / steps;
+      const [x, y] = pt(cx, cy, R, u);
+      d += (i === 0 ? "M" : "L") + x.toFixed(2) + "," + y.toFixed(2);
+    }
+    return d;
+  }
+
+  function draw(p) {
+    const S = 220, cx = S / 2, cy = S / 2, R = S * 0.4;
+    svg.innerHTML = "";
+    const track = document.createElementNS(NS, "path");
+    track.setAttribute("d", arcPath(cx, cy, R, 0, 1));
+    track.setAttribute("fill", "none");
+    track.setAttribute("stroke", state.track);
+    track.setAttribute("stroke-width", "12");
+    track.setAttribute("stroke-linecap", "round");
+    svg.appendChild(track);
+
+    const prog = document.createElementNS(NS, "path");
+    prog.setAttribute("d", arcPath(cx, cy, R, 0, p / 100));
+    prog.setAttribute("fill", "none");
+    prog.setAttribute("stroke", state.arc);
+    prog.setAttribute("stroke-width", "12");
+    prog.setAttribute("stroke-linecap", "round");
+    svg.appendChild(prog);
+
+    // 刻度
+    const tn = Math.max(2, Math.round(state.ticks));
+    for (let i = 0; i < tn; i++) {
+      const u = i / (tn - 1);
+      const [x1, y1] = pt(cx, cy, R - 14, u);
+      const [x2, y2] = pt(cx, cy, R - 6, u);
+      const t = document.createElementNS(NS, "line");
+      t.setAttribute("x1", x1); t.setAttribute("y1", y1);
+      t.setAttribute("x2", x2); t.setAttribute("y2", y2);
+      t.setAttribute("stroke", "#cbd5e1"); t.setAttribute("stroke-width", "2");
+      svg.appendChild(t);
+    }
+
+    // 指针
+    const [nx, ny] = pt(cx, cy, R - 18, p / 100);
+    const needle = document.createElementNS(NS, "line");
+    needle.setAttribute("x1", cx); needle.setAttribute("y1", cy);
+    needle.setAttribute("x2", nx); needle.setAttribute("y2", ny);
+    needle.setAttribute("stroke", state.needle);
+    needle.setAttribute("stroke-width", "3"); needle.setAttribute("stroke-linecap", "round");
+    svg.appendChild(needle);
+    const hub = document.createElementNS(NS, "circle");
+    hub.setAttribute("cx", cx); hub.setAttribute("cy", cy); hub.setAttribute("r", "6");
+    hub.setAttribute("fill", state.needle); svg.appendChild(hub);
+
+    if (state.showVal) {
+      const txt = document.createElementNS(NS, "text");
+      txt.setAttribute("x", cx); txt.setAttribute("y", cy + R * 0.55);
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("class", "val");
+      txt.textContent = Math.round(p) + "%";
+      svg.appendChild(txt);
+    }
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.2) * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      draw(e * state.value);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["value","dur","startAng","sweep","needle","arc","track","ticks","size","showVal","valSize"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

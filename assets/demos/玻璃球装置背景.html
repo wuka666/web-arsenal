@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>玻璃球装置背景 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { height: 100vh; overflow: hidden; background: var(--yan);
+         font-family: "Inter", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif; color: var(--mo); }
+  canvas { position: fixed; inset: 0; display: block; filter: brightness(calc(var(--liang)*1%)); }
+  .copy { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center;
+          padding: 0 8vw; pointer-events: none; }
+  .copy h1 { font-size: clamp(30px, 4.6vw, 62px); font-weight: 360; letter-spacing: -.035em; line-height: 1.05; max-width: 620px; }
+  .copy p { margin-top: 18px; max-width: 420px; color: #4D5B77; font-size: 15.5px; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <canvas id="plate"></canvas>
+  <div class="copy">
+    <h1>Studio light<br>on a glass object</h1>
+    <p>影棚底 + 实体玻璃装置的离线底板：球体高光、可调角度玻璃刃、缓慢流动的焦散，前景文字始终清晰。</p>
+  </div>
+<script>
+const state = { yan:'#E6EDF6', qiut:'#dfe9f4', guang:'#ffffff', an:'#9db2cb',
+                qiuda:62, qiujiao:-18, daokuand:26, weiyi:58, guangsu:1, tui:0.4, liang:100 };
+const cv = document.getElementById('plate'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2), t = 0, raf = 0;
+const still = matchMedia('(prefers-reduced-motion: reduce)');
+function hexToRgb(h){ const v = parseInt(String(h).replace('#',''), 16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function rgba(h, a){ const c = hexToRgb(h); return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+function resize(){
+  W = innerWidth; H = innerHeight;
+  cv.width = W*DPR; cv.height = H*DPR; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+function draw(){
+  const cx = W*0.62, cy = H * state.weiyi / 100, R = Math.min(W, H) * 0.5 * state.qiuda / 100;
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#f7fafd'); bg.addColorStop(0.6, state.yan); bg.addColorStop(1, rgba(state.an, .35));
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = rgba(state.guang, .28); ctx.fillRect(0, H*0.78, W, H*0.22);
+  /* 微推近：周期呼吸，幅度由 tui 控制 */
+  const push = 1 + (state.tui / 100) * Math.sin(t * 0.628);
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(push, push); ctx.translate(-cx, -cy);
+  const g = ctx.createRadialGradient(cx - R*0.38, cy - R*0.42, R*0.1, cx, cy, R);
+  g.addColorStop(0, state.guang); g.addColorStop(0.45, state.qiut); g.addColorStop(0.85, rgba(state.an, .55)); g.addColorStop(1, rgba(state.an, .8));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = rgba(state.an, .5); ctx.lineWidth = 1; ctx.stroke();
+  const hi = ctx.createRadialGradient(cx - R*0.42, cy - R*0.48, 0, cx - R*0.42, cy - R*0.48, R*0.5);
+  hi.addColorStop(0, rgba(state.guang, .95)); hi.addColorStop(1, rgba(state.guang, 0));
+  ctx.fillStyle = hi; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
+  /* 地面投影 + 反射焦散 */
+  const ca = ctx.createLinearGradient(cx - R, cy + R*0.5, cx + R, cy + R);
+  ca.addColorStop(0, rgba(state.guang, 0));
+  ca.addColorStop(0.5 + 0.18*Math.sin(t*1.3), rgba(state.guang, .55));
+  ca.addColorStop(1, rgba(state.guang, 0));
+  ctx.fillStyle = ca; ctx.beginPath(); ctx.ellipse(cx, cy + R*0.8, R*0.9, R*0.16, 0, 0, 6.2832); ctx.fill();
+  /* 玻璃刃：穿过球体的薄片，角度/宽度可调 */
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(state.qiujiao * Math.PI / 180);
+  const bl = ctx.createLinearGradient(0, -state.daokuand, 0, state.daokuand);
+  bl.addColorStop(0, rgba(state.guang, .65)); bl.addColorStop(0.5, rgba(state.qiut, .35)); bl.addColorStop(1, rgba(state.an, .6));
+  ctx.fillStyle = bl;
+  ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, state.daokuand, 0, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = rgba(state.guang, .85); ctx.lineWidth = 1.1;
+  ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, state.daokuand, 0, 0, 6.2832); ctx.stroke();
+  ctx.strokeStyle = rgba(state.an, .55);
+  ctx.beginPath(); ctx.moveTo(-R*1.3, 0); ctx.lineTo(R*1.3, 0); ctx.stroke();
+  ctx.restore();
+  /* 球面流动焦散弧 */
+  for (let i = 0; i < 2; i++){
+    const a0 = -0.9 + Math.sin(t*0.5 + i*2.1) * 0.6, a1 = a0 + 0.9 + 0.2*Math.cos(t*0.4 + i);
+    ctx.strokeStyle = rgba(state.guang, 0.5 - i*0.18); ctx.lineWidth = 2.2 - i*0.8;
+    ctx.beginPath(); ctx.arc(cx, cy, R*(0.72 + i*0.12), a0, a1); ctx.stroke();
+  }
+  ctx.restore();
+}
+function loop(){ t += 0.016 * Math.max(0.01, state.guangsu); draw(); raf = requestAnimationFrame(loop); }
+function start(){ cancelAnimationFrame(raf); if (still.matches) draw(); else raf = requestAnimationFrame(loop); }
+still.addEventListener('change', start);
+addEventListener('resize', function(){ resize(); if (still.matches) draw(); });
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--yan', state.yan); R.setProperty('--mo', '#020C21');
+  R.setProperty('--qiut', state.qiut); R.setProperty('--an', state.an);
+  R.setProperty('--guang', state.guang); R.setProperty('--liang', state.liang);
+}
+addEventListener('message', function(e){
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply(); if (still.matches) draw();
+});
+apply(); resize(); start();
+</script>
+</body>
+</html>

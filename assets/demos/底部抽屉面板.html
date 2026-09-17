@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底部抽屉面板演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#eef1f5}
+.map{position:absolute;inset:0;background:repeating-linear-gradient(45deg,#e7ebf0,#e7ebf0 14px,#eef1f5 14px,#eef1f5 28px)}
+.card{position:absolute;left:0;right:0;bottom:0;height:var(--sh,110px);background:var(--sc,#fff);border-radius:var(--sr,16px) var(--sr,16px) 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.12);overflow:hidden;transition:height var(--dur,.35s) cubic-bezier(.4,1,.5,1);touch-action:none}
+.card.exp{height:var(--eh,300px)}
+.handle{height:22px;display:flex;align-items:center;justify-content:center;cursor:grab}
+.grip{width:var(--hw,40px);height:5px;border-radius:3px;background:#d4d8de}
+.sum{padding:4px 16px;font-size:14px;color:var(--sumc,#222)}
+.det{position:absolute;left:16px;right:16px;top:60px;color:#888;font-size:13px;line-height:1.7;opacity:0;transition:opacity var(--dur,.35s)}
+.card.exp .det{opacity:1}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="map"></div>
+<div class="card" id="card"><div class="handle" id="hd"><span class="grip"></span></div>
+<div class="sum">洪崖洞 · 重庆地标建筑</div>
+<div class="det">洪崖洞原名洪崖门，是古重庆城门之一。以吊脚楼形态依山就势，入夜灯火璀璨，是重庆最具辨识度的夜景打卡地。可乘轻轨到达，建议傍晚前往。</div>
+</div>
+</div></div>
+<script>
+const card=document.getElementById('card'),hd=document.getElementById('hd');
+const state={ac:'#2f6bff',sc:'#ffffff',eh:300,sh:110,sr:16,dur:.35,hw:40,sumc:'#222'};
+let drag=false,sy=0,sh0=0;
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--sc',state.sc);document.documentElement.style.setProperty('--eh',state.eh+'px');document.documentElement.style.setProperty('--sh',state.sh+'px');document.documentElement.style.setProperty('--sr',state.sr+'px');document.documentElement.style.setProperty('--hw',state.hw+'px');document.documentElement.style.setProperty('--sumc',state.sumc);card.style.transition='height '+state.dur+'s cubic-bezier(.4,1,.5,1)';}
+hd.addEventListener('pointerdown',e=>{drag=true;sy=e.clientY;sh0=card.offsetHeight;card.style.transition='none';hd.setPointerCapture(e.pointerId);});
+hd.addEventListener('pointermove',e=>{if(!drag)return;const h=Math.max(state.sh,Math.min(state.eh,sh0-(e.clientY-sy)));card.style.height=h+'px';});
+hd.addEventListener('pointerup',e=>{if(!drag)return;drag=false;const h=card.offsetHeight;card.style.transition='height '+state.dur+'s cubic-bezier(.4,1,.5,1)';card.classList.toggle('exp',h>(state.sh+state.eh)/2);});
+applyStyle();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','sc','eh','sh','sr','dur','hw','sumc'].includes(d.key))applyStyle();});
+</script></body></html>

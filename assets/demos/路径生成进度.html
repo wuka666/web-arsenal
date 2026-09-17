@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>路径生成进度演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: var(--bg, #0b0b12); font-family: system-ui, "Microsoft YaHei", sans-serif; color: #fff;
+  }
+  .stage { width: min(80vw, 420px); }
+  svg { width: 100%; height: auto; display: block; }
+  .path { fill: none; stroke: var(--color, #7b5cff); stroke-width: var(--strokeW, 4); stroke-linecap: round; filter: var(--glow, none); }
+  .mid { fill: var(--color, #7b5cff); opacity: 0; filter: var(--midGlow, none); transition: opacity .3s ease; }
+  .pct { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--color, #7b5cff); }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #7b5cff; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="stage"><svg id="svg" viewBox="0 0 300 160"></svg></div>
+<div class="pct" id="pct">0%</div>
+<button class="btn" id="btn">重新生成</button>
+
+<script>
+  const svg = document.getElementById("svg");
+  const pct = document.getElementById("pct");
+  const NS = "http://www.w3.org/2000/svg";
+  const state = {
+    dur: 3,
+    pathType: "曲线",
+    strokeW: 4,
+    color: "#7b5cff",
+    glow: true,
+    midGlow: true,
+    midSize: 14,
+    bg: "#0b0b12",
+    pad: 30,
+    ease: "easeInOut",
+    showPct: true
+  };
+  let pathEl, midEl, len = 0;
+
+  function pathD() {
+    const p = state.pad, W = 300 - p, H = 160 - p, y = 160 / 2;
+    if (state.pathType === "直线") return `M${p},${y} L${W},${y}`;
+    if (state.pathType === "折线") return `M${p},${H} L${(p+W)/2},${p} L${W},${H}`;
+    return `M${p},${H} C${p+W*0.33},${p} ${p+W*0.66},${H} ${W},${p}`;
+  }
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--strokeW", state.strokeW + "px");
+    root.style.setProperty("--glow", state.glow ? ("drop-shadow(0 0 5px " + state.color + ")") : "none");
+    root.style.setProperty("--midGlow", state.midGlow ? ("drop-shadow(0 0 6px " + state.color + ")") : "none");
+    pct.style.display = state.showPct ? "block" : "none";
+    draw();
+  }
+
+  function draw() {
+    svg.innerHTML = "";
+    pathEl = document.createElementNS(NS, "path");
+    pathEl.setAttribute("class", "path");
+    pathEl.setAttribute("d", pathD());
+    svg.appendChild(pathEl);
+    midEl = document.createElementNS(NS, "circle");
+    midEl.setAttribute("class", "mid");
+    midEl.setAttribute("r", state.midSize / 2);
+    svg.appendChild(midEl);
+    len = pathEl.getTotalLength();
+    pathEl.style.strokeDasharray = len;
+    pathEl.style.strokeDashoffset = len;
+    try {
+      const m = pathEl.getPointAtLength(len / 2);
+      midEl.setAttribute("cx", m.x); midEl.setAttribute("cy", m.y);
+    } catch (e) {}
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    draw();
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.3) * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      let e = t;
+      if (state.ease === "linear") e = t;
+      else if (state.ease === "easeOut") e = 1 - Math.pow(1 - t, 3);
+      else e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      pathEl.style.strokeDashoffset = len * (1 - e);
+      if (state.midGlow) midEl.style.opacity = e >= 0.5 ? "1" : "0";
+      pct.textContent = Math.round(e * 100) + "%";
+      if (t < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["dur","pathType","strokeW","color","glow","midGlow","midSize","bg","pad","ease","showPct"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

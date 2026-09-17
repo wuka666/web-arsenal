@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>聚光高亮演示</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
+.hd{color:#333;font-size:15px}
+.row{display:flex;gap:14px}
+.btn{background:#f4f5f7;border:1px solid #e5e7eb;border-radius:10px;padding:14px 22px;color:#444;font-size:14px;cursor:pointer;position:relative;z-index:1}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.3s;z-index:10}
+.overlay.on{opacity:1;pointer-events:auto}
+.btn.live{z-index:11}
+.ring{position:fixed;border:3px solid var(--hl,#2f6bff);border-radius:12px;pointer-events:none;opacity:0;transition:.35s cubic-bezier(.4,1.3,.5,1);z-index:12}
+.ring.on{opacity:1}
+</style></head><body>
+
+<div class="row" id="row">
+  <div class="btn">上传文件</div>
+  <div class="btn">邀请成员</div>
+  <div class="btn">创建工作区</div>
+  <div class="btn">完成引导</div>
+</div>
+<div class="overlay" id="ov"></div>
+<div class="ring" id="ring"></div>
+<script>
+const btns=[...document.querySelectorAll('.btn')];
+const ov=document.getElementById('ov'),ring=document.getElementById('ring');
+const state={mask:.55,hl:'#2f6bff',radius:12,dur:.35,auto:false};
+let i=0;
+function applyStyle(){ov.style.background='rgba(0,0,0,'+state.mask+')';ring.style.borderColor=state.hl;ring.style.borderRadius=state.radius+'px';ring.style.transition=state.dur+'s cubic-bezier(.4,1.3,.5,1)';}
+function focus(n){i=(n+btns.length)%btns.length;btns.forEach(b=>b.classList.remove('live'));btns[i].classList.add('live');const r=btns[i].getBoundingClientRect();ring.style.left=(r.left-6)+'px';ring.style.top=(r.top-6)+'px';ring.style.width=(r.width+12)+'px';ring.style.height=(r.height+12)+'px';}
+function start(){applyStyle();ov.classList.add('on');ring.classList.add('on');focus(0);}
+btns.forEach((b,idx)=>{b.onclick=()=>{if(b.classList.contains('live')){if(idx<btns.length-1)focus(idx+1);else{ov.classList.remove('on');ring.classList.remove('on');btns.forEach(x=>x.classList.remove('live'));}}};});
+applyStyle();start();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['mask','hl','radius','dur','auto'].includes(d.key))start();});
+</script></body></html>

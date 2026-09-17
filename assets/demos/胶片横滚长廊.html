@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>胶片横滚长廊 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; align-items: center; background: var(--jiaojuan);
+         font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; overflow: hidden; }
+  /* 胶片 = 齿孔条（repeating 渐变）+ 帧格横滚；齿孔上下各一条，帧间距即「剪开」感 */
+  .strip { display: flex; gap: calc(var(--zhakuan)*0.06px); overflow-x: auto; padding: 34px 8vw;
+           scrollbar-width: none; cursor: grab; width: 100%; }
+  .strip::-webkit-scrollbar { display: none; }
+  .strip.drag { cursor: grabbing; }
+  .film { position: relative; flex: none; width: calc(var(--zhakuan)*1px);
+          background: color-mix(in srgb, var(--jiaojuan) 86%, #fff);
+          border-radius: calc(var(--yuanjiao)*1px); padding: 26px 10px; }
+  .film::before, .film::after { content: ""; position: absolute; left: 10px; right: 10px; height: calc(var(--chikong)*1px);
+          background-image: radial-gradient(circle, var(--jiaojuan) 42%, transparent 46%);
+          background-size: calc(var(--chikong)*2.4px) calc(var(--chikong)*1px);
+          background-position: center; background-repeat: repeat-x; }
+  .film::before { top: 9px; } .film::after { bottom: 9px; }
+  .frame { height: 300px; border-radius: 4px; display: flex; align-items: flex-end; padding: 14px;
+           background: linear-gradient(160deg, color-mix(in srgb, var(--qiangdiao) 72%, #1a1108), color-mix(in srgb, var(--ziti) 24%, #14100b)); }
+  .film:nth-child(even) .frame { background: linear-gradient(200deg, color-mix(in srgb, var(--ziti) 34%, #14100b), color-mix(in srgb, var(--qiangdiao) 40%, #1a1108)); }
+  .frame span { color: var(--ziti); font-size: 13px; letter-spacing: .02em; opacity: .9; }
+  .grain { position: fixed; inset: 0; pointer-events: none; opacity: calc(var(--sasa) / 100);
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+           background-size: 300px 300px; }
+</style>
+</head>
+<body>
+  <div class="strip" id="strip"></div>
+  <div class="grain" aria-hidden="true"></div>
+<script>
+const state = { jiaojuan:'#15120f', ziti:'#e8ddcc', qiangdiao:'#b3472f',
+                zhakuan:300, chikong:10, sasa:14, yuanjiao:6, sudu:1 };
+const strip = document.getElementById('strip');
+const captions = ['S01 · 出发','S02 · 站台','S03 · 慢车','S04 · 午后','S05 · 车窗','S06 · 终点'];
+function build(){
+  strip.innerHTML = captions.map(c =>
+    '<div class="film"><div class="frame"><span>' + c + '</span></div></div>').join('');
+}
+build();
+/* 滚轮纵向量转横向滚动；按住拖拽 = 胶片手感 */
+strip.addEventListener('wheel', e => {
+  e.preventDefault();
+  strip.scrollLeft += (e.deltaY + e.deltaX) * state.sudu;
+}, { passive: false });
+let down = false, sx = 0, sl = 0;
+strip.addEventListener('pointerdown', e => { down = true; sx = e.clientX; sl = strip.scrollLeft; strip.classList.add('drag'); });
+addEventListener('pointermove', e => { if (down) strip.scrollLeft = sl - (e.clientX - sx) * 1.4; });
+addEventListener('pointerup', () => { down = false; strip.classList.remove('drag'); });
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--jiaojuan', state.jiaojuan); R.setProperty('--ziti', state.ziti);
+  R.setProperty('--qiangdiao', state.qiangdiao); R.setProperty('--zhakuan', state.zhakuan);
+  R.setProperty('--chikong', state.chikong); R.setProperty('--sasa', state.sasa);
+  R.setProperty('--yuanjiao', state.yuanjiao);
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value;
+  if (d.key === 'zhakuan') build();
+  apply();
+});
+apply();
+// 开场停在第二帧，截图能看到「长廊在延伸」而不是一条空带
+setTimeout(() => { strip.scrollLeft = state.zhakuan * 0.75; }, 60);
+</script>
+</body>
+</html>

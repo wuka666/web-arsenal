@@ -17,7 +17,7 @@
 </head>
 <body>
 <div class="stage" id="stage">
-  <div class="page" id="page"><h3>当前页面</h3><p>从左侧边缘右滑返回上一页</p></div>
+  <div class="page" id="page"><h3>当前页面</h3><p></p></div>
   <div class="arrow" id="arrow">‹</div>
   <div class="edge" id="edge"></div>
   
@@ -57,9 +57,9 @@
     if (go) {
       page.style.transform = "translateX(" + w + "px)";
       setTimeout(() => {
-        page.querySelector("h3").textContent = "已返回上一页"; page.querySelector("p").textContent = "（演示：回到上一级）";
+        page.querySelector("h3").textContent = "已返回"; page.querySelector("p").textContent = "";
         page.style.transition = "none"; page.style.transform = "translateX(0)";
-        setTimeout(() => { page.querySelector("h3").textContent = "当前页面"; page.querySelector("p").textContent = "从左侧边缘右滑返回上一页"; }, 700);
+        setTimeout(() => { page.querySelector("h3").textContent = "当前页面"; page.querySelector("p").textContent = ""; }, 700);
       }, state.spring * 1000);
     } else {
       page.style.transform = "translateX(0)";

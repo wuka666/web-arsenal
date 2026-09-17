@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新手任务清单演示</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{width:320px;border:1px solid #e5e7eb;border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.ttl{font-size:14px;color:#222;font-weight:700;margin-bottom:10px}
+.pbar{height:8px;background:#eef0f3;border-radius:6px;overflow:hidden;margin-bottom:14px}
+.pfill{height:100%;width:0;background:var(--pc,#2f6bff);border-radius:6px;transition:width .4s ease}
+.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #f1f2f4;font-size:13px;color:#333;cursor:pointer}
+.box.done .next{display:none}
+.box.done .done{display:block}
+.cb{width:18px;height:18px;border:2px solid #cbd2dc;border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;transition:.2s}
+.item.ok .cb{background:var(--ok,#16a34a);border-color:var(--ok,#16a34a)}
+.item.ok{color:#9aa3af;text-decoration:line-through}
+.next{font-size:12px;color:var(--pc,#2f6bff);margin-top:6px}
+.done{display:none;color:#16a34a;font-size:13px;font-weight:700;margin-top:8px}
+</style></head><body>
+<div class="box" id="box">
+  <div class="ttl">新手入门</div>
+  <div class="pbar"><div class="pfill" id="pf"></div></div>
+  <div class="item" data-t="0"><span class="cb">✓</span><span>完善个人资料</span></div>
+  <div class="item" data-t="1"><span class="cb">✓</span><span>关注 3 个话题</span></div>
+  <div class="item" data-t="2"><span class="cb">✓</span><span>发布第一条动态</span></div>
+  <div class="item" data-t="3"><span class="cb">✓</span><span>邀请一位好友</span></div>
+  <div class="next" id="next">下一项：完善个人资料</div>
+  <div class="done">全部完成，欢迎上车 🎉</div>
+</div>
+<script>
+const items=[...document.querySelectorAll('.item')];
+const pf=document.getElementById('pf'),next=document.getElementById('next'),box=document.getElementById('box');
+const state={pc:'#2f6bff',ok:'#16a34a',auto:true};
+function applyStyle(){document.documentElement.style.setProperty('--pc',state.pc);document.documentElement.style.setProperty('--ok',state.ok);}
+function refresh(){const done=items.filter(it=>it.classList.contains('ok')).length;pf.style.width=(done/items.length*100)+'%';const nx=items.find(it=>!it.classList.contains('ok'));next.textContent=nx?('下一项：'+nx.lastChild.textContent.trim()):'';if(done===items.length)box.classList.add('done');else box.classList.remove('done');}
+items.forEach(it=>{it.onclick=()=>{if(state.auto){it.classList.toggle('ok');refresh();}};});
+applyStyle();refresh();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['pc','ok','auto'].includes(d.key)){if(d.key==='auto'&&!state.auto)items.forEach(it=>it.classList.remove('ok'));applyStyle();refresh();}});
+</script></body></html>

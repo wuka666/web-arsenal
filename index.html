@@ -173,16 +173,12 @@
   .tag { font-size: 12px; color: var(--muted); background: #f2f0eb; padding: 2px 9px; border-radius: 6px; }
   .tag.style { color: #7c3aed; background: #f2eafe; }
   .tag.scene { color: #0d9488; background: #e2f4f1; }
-  .hint { margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
-  .hint:empty { display: none; }
-
-  
   .detail { border-top: 1px dashed var(--line); display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; padding: 16px; }
   .detail[hidden] { display: none; }
   @media (max-width: 900px) { .detail { grid-template-columns: 1fr; } }
 
   .demo-big { position: relative; align-self: start; height: 420px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
-  .demo-big iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; transform-origin: 0 0; }
+  .demo-big iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; transform-origin: 0 0; }
 
   .info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
   .info h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -696,8 +692,7 @@
     (it.标签 || []).forEach(t => tags.appendChild(el("span", "tag", t)));
     (it.风格 || []).forEach(t => tags.appendChild(el("span", "tag style", t)));
     (it.场景 || []).forEach(t => tags.appendChild(el("span", "tag scene", t)));
-    const hint = el("p", "hint", "");
-    body.append(top, h2, tags, hint);
+    body.append(top, h2, tags);
 
     if (it.下载) {
       const dlBtn = el("a", "dl-btn", "⬇ 下载 3D 模型文件");
@@ -716,18 +711,18 @@
     card.append(thumb, body, detail);
     card.addEventListener("click", (e) => {
       if (e.target.closest(".detail") || e.target.closest(".add-btn")) return;
-      toggle(card, thumb, demoBig, iframe, detail, hint);
+      toggle(card, thumb, demoBig, iframe, detail);
     });
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
       if (e.target.closest(".detail") || e.target.closest(".add-btn")) return;
       e.preventDefault();
-      toggle(card, thumb, demoBig, iframe, detail, hint);
+      toggle(card, thumb, demoBig, iframe, detail);
     });
     return card;
   }
 
-  function toggle(card, thumb, demoBig, iframe, detail, hint) {
+  function toggle(card, thumb, demoBig, iframe, detail) {
     const open = card.classList.toggle("open");
     card.setAttribute("aria-expanded", open ? "true" : "false");
     detail.hidden = !open;
@@ -736,13 +731,11 @@
       thumb.style.display = "none";
       demoBig.appendChild(iframe);
       fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
-      hint.textContent = "";
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
       thumb.style.display = "";
       thumb.appendChild(iframe);
       fitThumbFrame(iframe);
-      hint.textContent = "";
     }
   }
 
@@ -1121,7 +1114,7 @@
     }
     return info;
   }
-  function toggleScheme(card, thumb, demoBig, iframe, detail, hint) {
+  function toggleScheme(card, thumb, demoBig, iframe, detail) {
     const open = card.classList.toggle("open");
     card.setAttribute("aria-expanded", open ? "true" : "false");
     detail.hidden = !open;
@@ -1130,13 +1123,11 @@
       thumb.style.display = "none";
       demoBig.appendChild(iframe);
       fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
-      hint.textContent = "";
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
       thumb.style.display = "";
       thumb.appendChild(iframe);
       fitThumbFrame(iframe);   // 收回缩略图，重新按缩略图尺寸适配
-      hint.textContent = "";
     }
   }
   function makeSchemeCard(s) {
@@ -1166,8 +1157,7 @@
     const tags = el("div", "tags");
     if (s.骨架) tags.appendChild(el("span", "tag", "骨架 " + s.骨架));
     if (s.重色落点) tags.appendChild(el("span", "tag style", s.重色落点));
-    const hint = el("p", "hint", "");
-    body.append(top, h2, tags, hint);
+    body.append(top, h2, tags);
 
     const detail = el("div", "detail");
     detail.hidden = true;
@@ -1177,13 +1167,13 @@
     card.append(thumb, body, detail);
     card.addEventListener("click", (e) => {
       if (e.target.closest(".detail") || e.target.closest(".scheme-link")) return;
-      toggleScheme(card, thumb, demoBig, iframe, detail, hint);
+      toggleScheme(card, thumb, demoBig, iframe, detail);
     });
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
       if (e.target.closest(".detail") || e.target.closest(".scheme-link")) return;
       e.preventDefault();
-      toggleScheme(card, thumb, demoBig, iframe, detail, hint);
+      toggleScheme(card, thumb, demoBig, iframe, detail);
     });
     return card;
   }

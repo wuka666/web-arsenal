@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>过冲闭合环演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .ring-wrap { position: relative; width: var(--size, 140px); height: var(--size, 140px); transform-origin: center; }
+  .ring-track { fill: none; stroke: var(--track, #eee); stroke-width: var(--thick, 12); }
+  .ring {
+    fill: none; stroke: var(--color, #1a1a1a); stroke-width: var(--thick, 12);
+    stroke-linecap: var(--cap, round);
+    transform: rotate(var(--rot, -90deg)); transform-origin: center;
+    filter: drop-shadow(var(--glow, 0 0 0 transparent));
+  }
+  .ring-pct {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: var(--pctSize, 26px); font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--color, #1a1a1a);
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="ring-wrap" id="wrap">
+  <svg viewBox="0 0 140 140" id="svg">
+    <circle class="ring-track" id="ringTrack" cx="70" cy="70" r="58"></circle>
+    <circle class="ring" id="ring" cx="70" cy="70" r="58"></circle>
+  </svg>
+  <div class="ring-pct" id="pct">0%</div>
+</div>
+<button class="btn" id="btn">重新转</button>
+
+<script>
+  const state = {
+    dur: 2,
+    easing: "easeOutBack",
+    size: 140,
+    thick: 12,
+    cap: "round",
+    rot: -90,
+    overshoot: 10,
+    lockBounce: true,
+    showPct: true,
+    pctSize: 26,
+    glow: false,
+    color: "#1a1a1a",
+    track: "#eee"
+  };
+  const ring = document.getElementById("ring");
+  const ringTrack = document.getElementById("ringTrack");
+  const pct = document.getElementById("pct");
+  const wrap = document.getElementById("wrap");
+  const svg = document.getElementById("svg");
+
+  function ease(t) {
+    if (state.easing === "linear") return t;
+    if (state.easing === "easeOut") return 1 - Math.pow(1 - t, 3);
+    const s = Math.max(state.overshoot, 0) / 100 * 2.2 + 1.2;
+    const c = s - 1;
+    return 1 + c * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+  }
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--size", state.size + "px");
+    root.style.setProperty("--cap", state.cap === "butt" ? "butt" : "round");
+    root.style.setProperty("--rot", state.rot + "deg");
+    root.style.setProperty("--pctSize", state.pctSize + "px");
+    root.style.setProperty("--glow", state.glow ? ("0 0 6px " + state.color + "88") : "0 0 0 transparent");
+    pct.style.display = state.showPct ? "flex" : "none";
+    svg.setAttribute("width", state.size);
+    svg.setAttribute("height", state.size);
+    const r = 58 - Math.min(state.thick / 2, 10);
+    ring.setAttribute("r", r);
+    ringTrack.setAttribute("r", r);
+    circ = 2 * Math.PI * r;
+    ring.style.strokeDasharray = circ;
+    ring.style.strokeDashoffset = circ;
+    pct.textContent = "0%";
+  }
+  let circ = 2 * Math.PI * 58;
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    applyStyle();
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.1) * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const p = Math.max(0, Math.min(ease(t), 1.1));
+      ring.style.strokeDashoffset = circ * (1 - Math.min(p, 1));
+      pct.textContent = Math.round(Math.min(Math.max(ease(t), 0), 1) * 100) + "%";
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else settle();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function settle() {
+    ring.style.strokeDashoffset = 0;
+    pct.textContent = "100%";
+    if (state.lockBounce) {
+      wrap.style.transition = "transform .22s cubic-bezier(.34,1.56,.64,1)";
+      wrap.style.transform = "scale(1.06)";
+      setTimeout(() => { wrap.style.transform = "scale(1)"; }, 220);
+    }
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["dur","easing","size","thick","cap","rot","overshoot","lockBounce","showPct","pctSize","glow","color","track"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

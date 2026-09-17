@@ -53,11 +53,10 @@
 <div class="loader" id="loader">
   <div class="logo" id="logo"><span id="logoText"></span></div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
-
+  <div id="tip" style="color:#9aa0a6;font-size:var(--tipSize,13px);margin-top:10px;text-align:center"></div>
 </div>
 <div class="page">
   <h2>页面主体</h2>
-  <p>首次打开或核心内容未加载完成时，先展示全屏加载层；就绪后整体淡出，露出页面主体。</p>
   <button class="btn" id="btn">重播加载</button>
 </div>
 <script>
@@ -103,8 +102,8 @@
       s.textContent = ch;
       logoText.appendChild(s);
     }
-    tipEl.textContent = state.tip;
-    tipEl.style.display = state.showTip ? "block" : "none";
+    if (tipEl) tipEl.textContent = state.tip;
+    if (tipEl) tipEl.style.display = state.showTip ? "block" : "none";
     document.querySelector(".loader-bar").style.display = state.spinnerOnly ? "none" : "block";
   }
 

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>旋钮胶囊 CTA · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+         background: var(--di); font-family: "Inter", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif; }
+  /* 旋钮胶囊 = 长条 + 右端独立圆旋钮 + 内嵌 chevron；旋钮与胶囊各自有底，才有「机械件」感 */
+  .knobctl { position: relative; display: inline-flex; align-items: center;
+             width: calc(var(--kuan)*1px); height: calc(var(--gao)*1px); border-radius: var(--yuanjiao);
+             background: var(--zhu); color: var(--zi); border: 0; cursor: pointer;
+             box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(11,26,50,.18);
+             transition: transform .35s cubic-bezier(.2,.7,.3,1); }
+  .knobctl span { padding-left: calc(var(--gao)*0.5px); font-size: calc(var(--zihao)*1px);
+                  font-weight: 400; letter-spacing: -.044em; white-space: nowrap; }
+  .knobctl i { position: absolute; right: calc(var(--gao)*0.15px); width: calc(var(--niuDa)*1px); height: calc(var(--niuDa)*1px);
+               border-radius: 50%; background: var(--niu); display: flex; align-items: center; justify-content: center;
+               transition: transform .35s cubic-bezier(.2,.7,.3,1); }
+  .knobctl i svg { width: calc(var(--niuDa)*0.35px); height: calc(var(--niuDa)*0.35px); }
+  .knobctl:hover, .knobctl.demo { transform: translateY(calc(var(--fudong)*-1px)); }
+  .knobctl:hover i, .knobctl.demo i { transform: translateX(calc(var(--fudong)*0.6px)); }
+  .knobctl.ghost { background: rgba(255,255,255,.5); color: #1B2A44; border: 1px solid rgba(255,255,255,.85);
+                   box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(11,26,50,.10); }
+  .knobctl.ghost i { background: #1A2B45; }
+  .knobctl.line { background: transparent; color: #0F1B31; border: 1px solid rgba(15,27,49,.35); box-shadow: none; }
+  .knobctl.line i { background: #0F1B31; }
+</style>
+</head>
+<body>
+  <button class="knobctl demo"><span>Get free plan</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+  <button class="knobctl ghost"><span>Meet Sentinel</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+  <button class="knobctl line"><span>See it in action</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+<script>
+const state = { di:'#E6EDF6', zhu:'#0F1B31', zi:'#ffffff', niu:'#384B64',
+                kuan:217, gao:70, yuanjiao:999, niuDa:49, zihao:17.5, fudong:2 };
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--zhu', state.zhu);
+  R.setProperty('--zi', state.zi); R.setProperty('--niu', state.niu);
+  R.setProperty('--kuan', state.kuan); R.setProperty('--gao', state.gao);
+  R.setProperty('--yuanjiao', state.yuanjiao + 'px'); R.setProperty('--niuDa', state.niuDa);
+  R.setProperty('--zihao', state.zihao); R.setProperty('--fudong', state.fudong);
+}
+addEventListener('message', function(e){
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+// 第一枚每 3.2s 自动演示一次上浮 + 旋钮右移，截图/预览不依赖鼠标
+const demoBtn = document.querySelector('.knobctl');
+setInterval(function(){
+  demoBtn.classList.remove('demo');
+  void demoBtn.offsetWidth;
+  demoBtn.classList.add('demo');
+  setTimeout(function(){ demoBtn.classList.remove('demo'); }, 900);
+}, 3200);
+apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>连接光带演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: var(--bg, #fff); font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .track {
+    position: relative; width: min(70vw, 440px); height: var(--thick, 6px);
+    background: var(--track, #eef2ff); border-radius: var(--radius, 999px); overflow: hidden;
+  }
+  .band {
+    position: absolute; top: 0; left: 0; height: 100%;
+    width: var(--bandW, 35%);
+    background: linear-gradient(90deg, transparent, var(--color, #2563eb), transparent);
+    border-radius: inherit;
+    filter: var(--glow, none);
+    animation: travel var(--speed, 1.6s) linear infinite;
+  }
+  @keyframes travel {
+    from { transform: translateX(-110%); }
+    to { transform: translateX(320%); }
+  }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="track" id="track"></div>
+<button class="btn" id="btn">重新游走</button>
+
+<script>
+  const state = {
+    speed: 1.6,
+    bandW: 35,
+    thick: 6,
+    radius: 999,
+    color: "#2563eb",
+    track: "#eef2ff",
+    glow: true,
+    dir: "往返",
+    count: 1,
+    bg: "#ffffff"
+  };
+  const track = document.getElementById("track");
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--glow", state.glow ? ("drop-shadow(0 0 4px " + state.color + ")") : "none");
+    root.style.setProperty("--bandW", state.bandW + "%");
+    root.style.setProperty("--speed", state.speed + "s");
+    build();
+  }
+
+  function build() {
+    track.innerHTML = "";
+    const c = Math.max(1, Math.round(state.count));
+    for (let i = 0; i < c; i++) {
+      const b = document.createElement("div");
+      b.className = "band";
+      // 往返=乒乓；单向循环=顺向无缝
+      b.style.animationDirection = state.dir === "往返" ? "alternate" : "normal";
+      b.style.animationDelay = (i * (state.speed / c)) + "s";
+      track.appendChild(b);
+    }
+  }
+
+  document.getElementById("btn").addEventListener("click", build);
+  applyStyle();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+  });
+</script>
+</body>
+</html>

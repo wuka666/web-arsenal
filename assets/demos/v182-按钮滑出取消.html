@@ -15,7 +15,7 @@
 </head>
 <body>
 <button class="btn" id="btn">按住发送</button>
-<div class="status" id="status">按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发</div>
+<div class="status" id="status"></div>
 
 <script>
   const state = { depth: 6, spring: 0.3, radius: 14, accent: "#5E6AD2", di: "#fafafa", text: "#ffffff" };
@@ -41,11 +41,11 @@
     if (!pressing) return; pressing = false;
     if (inside(e) && btn.classList.contains("down")) {
       btn.classList.remove("down"); btn.classList.add("done"); btn.textContent = "已发送 ✓";
-      status.textContent = "在按钮内松手 → 触发发送";
-      setTimeout(() => { btn.classList.remove("done"); btn.textContent = "按住发送"; status.textContent = "按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发"; }, 1100);
+      status.textContent = "已发送";
+      setTimeout(() => { btn.classList.remove("done"); btn.textContent = "按住发送"; status.textContent = ""; }, 1100);
     } else {
-      btn.classList.remove("down"); status.textContent = "手指移出后松手 → 已取消，不触发";
-      setTimeout(() => status.textContent = "按住按钮：下沉变暗；手指移出范围就取消，外部松手不触发", 1100);
+      btn.classList.remove("down"); status.textContent = "已取消";
+      setTimeout(() => status.textContent = "", 1100);
     }
   });
   window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });

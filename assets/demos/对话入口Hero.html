@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>对话入口 Hero · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: var(--di); font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif;
+         color: var(--zi); padding: 40px 20px; }
+  .hero { width: 100%; max-width: calc(var(--kuan)*1px); display: flex; flex-direction: column; align-items: center; }
+  h1 { font-size: calc(var(--zihao)*1px); font-weight: 600; letter-spacing: -.03em; text-align: center; }
+  /* 输入框 = 圆角大盒 + 内嵌发送钮；焦点时描边点亮强调色，是整个首屏唯一「跳色」 */
+  .ask { width: 100%; margin-top: 28px; display: flex; align-items: flex-end; gap: 10px;
+         background: var(--kuang); border: 1px solid rgba(255,255,255,.1); border-radius: calc(var(--yuanjiao)*1px);
+         padding: 14px 14px 14px 20px; transition: border-color .25s, box-shadow .25s; }
+  .ask:focus-within { border-color: color-mix(in srgb, var(--qiangdiao) 70%, transparent);
+         box-shadow: 0 0 0 3px color-mix(in srgb, var(--qiangdiao) 18%, transparent); }
+  .ask textarea { flex: 1; border: 0; background: transparent; resize: none; outline: none;
+         color: var(--zi); font: inherit; font-size: 15px; line-height: 1.5; height: 24px; }
+  .send { flex: none; width: 34px; height: 34px; border: 0; border-radius: 10px; cursor: pointer;
+         background: var(--qiangdiao); color: #fff; display: grid; place-items: center;
+         transition: transform .2s, filter .2s; }
+  .send:hover { transform: scale(1.06); filter: brightness(1.1); }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+  .chip { border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px;
+         font-size: 13px; color: color-mix(in srgb, var(--zi) 75%, transparent); cursor: pointer;
+         transition: background .2s, border-color .2s; }
+  .chip:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.3); }
+  .entries { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 44px; width: 100%; }
+  .entry { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 14px 16px;
+         font-size: 13.5px; color: color-mix(in srgb, var(--zi) 85%, transparent); cursor: pointer;
+         transition: background .2s, transform .2s; }
+  .entry:hover { background: rgba(255,255,255,.05); transform: translateY(-2px); }
+  .entry b { display: block; color: var(--zi); font-size: 13.5px; margin-bottom: 3px; }
+  @media (max-width: 760px){ .entries { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+  <main class="hero">
+    <h1>有什么可以帮忙的？</h1>
+    <div class="ask">
+      <textarea id="box" placeholder="给 AI 助手发消息"></textarea>
+      <button class="send" aria-label="发送">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="entries">
+      <div class="entry"><b>写点什么</b>草稿、邮件、文案</div>
+      <div class="entry"><b>总结一下</b>长文提炼要点</div>
+      <div class="entry"><b>分析数据</b>表格与图表</div>
+      <div class="entry"><b>写段代码</b>示例与调试</div>
+    </div>
+  </main>
+<script>
+const state = { di:'#141414', kuang:'#1e1e1e', zi:'#ececec', qiangdiao:'#ff4d6d',
+                zihao:34, kuan:680, yuanjiao:24, bing:4 };
+const CHIPS = ['帮我写周报','解释这段代码','做个旅行计划','润色这段文案','列个学习清单','翻译成英文','头脑风暴','检查语法'];
+const chipsEl = document.getElementById('chips');
+function buildChips(){ chipsEl.innerHTML = CHIPS.slice(0, state.bing).map(c => '<span class="chip">' + c + '</span>').join(''); }
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--kuang', state.kuang);
+  R.setProperty('--zi', state.zi); R.setProperty('--qiangdiao', state.qiangdiao);
+  R.setProperty('--zihao', state.zihao); R.setProperty('--kuan', state.kuan);
+  R.setProperty('--yuanjiao', state.yuanjiao);
+  buildChips();
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+apply();
+</script>
+</body>
+</html>

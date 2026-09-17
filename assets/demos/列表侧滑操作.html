@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>列表侧滑操作演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#fff}
+.list{position:absolute;inset:0;overflow:hidden}
+.row{position:relative;height:var(--rh,64px);border-bottom:1px solid #f1f2f4;touch-action:none}
+.actions{position:absolute;top:0;right:0;height:100%;display:flex}
+.act{width:var(--aw,72px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;background:var(--ac,#2f6bff);border-radius:var(--sr,10px)}
+.act.del{background:var(--dc,#ef4444)}
+.front{position:absolute;inset:0;background:var(--sc,#fff);display:flex;align-items:center;padding:0 16px;font-size:14px;color:#333;transition:transform var(--dur,.3s) cubic-bezier(.4,1,.5,1);will-change:transform}
+.front.open{transform:translateX(calc(-1 * var(--rw,144px)))}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="list" id="list"></div>
+</div></div>
+<script>
+const list=document.getElementById('list');
+const names=['张伟：今晚一起吃饭吗','李娜：文件已发你','群通知：周五团建','王芳：周末爬山走起'];
+const state={ac:'#2f6bff',dc:'#ef4444',sc:'#ffffff',n:2,dur:.3,rh:64,rw:144,sr:10};
+let rows=[];
+function build(){list.innerHTML='';rows=[];names.forEach((nm,i)=>{const row=document.createElement('div');row.className='row';
+ const acts=document.createElement('div');acts.className='actions';for(let k=0;k<state.n;k++){const a=document.createElement('div');a.className='act'+(k===state.n-1?' del':'');a.textContent=k===state.n-1?'删除':'已读';acts.appendChild(a);}
+ const front=document.createElement('div');front.className='front';front.textContent=nm;
+ row.appendChild(acts);row.appendChild(front);list.appendChild(row);
+ let x=0,drag=false,sy=0,pid=null;
+ const setX=(xx)=>{front.style.transition='none';front.style.transform='translateX('+xx+'px)';};
+ front.addEventListener('pointerdown',e=>{drag=true;pid=e.pointerId;sy=e.clientX-x;front.setPointerCapture(pid);});
+ front.addEventListener('pointermove',e=>{if(!drag)return;x=Math.max(-state.rw,Math.min(0,e.clientX-sy));setX(x);});
+ front.addEventListener('pointerup',e=>{if(!drag)return;drag=false;const open=x< -state.rw/2;front.style.transition='transform '+state.dur+'s cubic-bezier(.4,1,.5,1)';front.classList.toggle('open',open);x=open?-state.rw:0;});
+ rows.push({front});
+});}
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--dc',state.dc);document.documentElement.style.setProperty('--rh',state.rh+'px');document.documentElement.style.setProperty('--rw',state.rw+'px');document.documentElement.style.setProperty('--sr',state.sr+'px');}
+function rebuild(){build();}
+applyStyle();build();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','dc','sc','n','dur','rh','rw','sr'].includes(d.key)){applyStyle();rebuild();}});
+</script></body></html>

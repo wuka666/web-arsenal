@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>玻璃胶囊导航 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: linear-gradient(160deg, #f4f8fc, var(--di) 55%, #dbe4ef);
+         font-family: "Inter", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif; }
+  .wrap { position: relative; }
+  /* 玻璃胶囊导航 = 一个整体玻璃容器装下「图标 + 文字 + 竖分隔」，与纯文字导航的区别就在这层容器 */
+  .cap { display: inline-flex; align-items: center; height: calc(var(--gao)*1px); padding: 0 calc(var(--gao)*0.54px);
+         border-radius: var(--yuanjiao); background: color-mix(in srgb, var(--boli) 78%, transparent);
+         border: 1px solid rgba(255,255,255,.85);
+         -webkit-backdrop-filter: blur(calc(var(--mohu)*1px)); backdrop-filter: blur(calc(var(--mohu)*1px));
+         box-shadow: 0 0 0 1.3px rgba(120,145,180,.2), 0 2px 10px rgba(28,52,92,.05); }
+  .cap .txt { font-size: calc(var(--zihao)*1px); font-weight: 570; letter-spacing: calc(var(--zihang)*1em);
+              color: var(--mo); white-space: nowrap; }
+  .cap .ic { display: block; flex: none; color: var(--mo); }
+  .cap .ic svg { display: block; width: 100%; height: 100%; }
+  .cap .home { width: calc(var(--gao)*0.34px); height: calc(var(--gao)*0.36px); margin-right: calc(var(--gao)*0.18px); }
+  .cap .grid { width: calc(var(--gao)*0.31px); height: calc(var(--gao)*0.31px); margin-right: calc(var(--gao)*0.18px); }
+  .cap hr { width: 1.5px; height: calc(var(--gao)*0.46px); background: #CED5E0; border: 0;
+            margin: 0 calc(var(--gao)*0.36px); }
+  .burger { position: absolute; right: calc(var(--gao)*-1.2px); top: 50%; transform: translateY(-50%);
+            width: calc(var(--gao)*0.84px); height: calc(var(--gao)*0.84px); border-radius: 50%; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+            background: color-mix(in srgb, var(--boli) 78%, transparent); border: 1px solid rgba(255,255,255,.85);
+            -webkit-backdrop-filter: blur(calc(var(--mohu)*1px)); backdrop-filter: blur(calc(var(--mohu)*1px));
+            box-shadow: 0 0 0 1.3px rgba(120,145,180,.2); }
+  .burger i { display: block; width: 20px; height: 1.8px; border-radius: 999px; background: var(--mo);
+              transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+  .burger[aria-expanded="true"] i:first-child { transform: translateY(3.9px) rotate(45deg); }
+  .burger[aria-expanded="true"] i:last-child { transform: translateY(-3.9px) rotate(-45deg); }
+  .menu { position: absolute; top: calc(var(--gao)*1.35px); left: 0; width: calc(var(--kuan)*1.04px);
+          padding: 16px; border-radius: 30px; background: color-mix(in srgb, var(--boli) 82%, transparent);
+          border: 1px solid rgba(255,255,255,.85);
+          -webkit-backdrop-filter: blur(calc(var(--mohu)*1px)); backdrop-filter: blur(calc(var(--mohu)*1px));
+          box-shadow: 0 0 0 1.3px rgba(120,145,180,.2), 0 16px 34px rgba(28,52,92,.10);
+          opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.97); transform-origin: top right;
+          transition: opacity .26s cubic-bezier(.2,.7,.3,1), transform .26s cubic-bezier(.2,.7,.3,1), visibility .26s; }
+  .menu[data-open] { opacity: 1; visibility: visible; transform: none; }
+  .menu a { display: flex; align-items: center; height: 46px; padding: 0 10px; border-radius: 12px;
+            color: var(--mo); text-decoration: none; font-size: calc(var(--zihao)*1.25px); }
+  .menu a:hover { background: color-mix(in srgb, var(--lan) 14%, transparent); }
+  .menu .cta { margin-top: 12px; height: 58px; justify-content: center; background: #0F1B31; color: #fff;
+               border-radius: 999px; font-size: calc(var(--zihao)*1.25px); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="cap" aria-label="Primary">
+      <span class="ic home"><svg viewBox="0 0 20 21" fill="none"><path d="M2 8.4 10 2l8 6.4V18a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+      <span class="txt">Explore</span>
+      <hr />
+      <span class="ic grid"><svg viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="7.4" height="7.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/><rect x="11.6" y="1" width="7.4" height="7.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/><rect x="1" y="11.6" width="7.4" height="7.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/><rect x="11.6" y="11.6" width="7.4" height="7.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/></svg></span>
+      <span class="txt">Product</span>
+    </nav>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><i></i><i></i></button>
+    <div class="menu" id="menu">
+      <a href="#">Explore</a>
+      <a href="#">Product</a>
+      <a href="#">Pricing</a>
+      <a class="cta" href="#">Get free plan</a>
+    </div>
+  </div>
+<script>
+const state = { di:'#E6EDF6', boli:'#ffffff', mo:'#202940', lan:'#4A78B0',
+                kuan:293, gao:67, yuanjiao:999, mohu:40, zihao:15, zihang:-0.0561 };
+const burger = document.getElementById('burger'), menu = document.getElementById('menu');
+function setOpen(open){
+  burger.setAttribute('aria-expanded', String(open));
+  if (open) menu.dataset.open = ''; else delete menu.dataset.open;
+}
+burger.addEventListener('click', function(e){ e.stopPropagation(); setOpen(burger.getAttribute('aria-expanded') !== 'true'); });
+document.addEventListener('click', function(){ setOpen(false); });
+addEventListener('keydown', function(e){ if (e.key === 'Escape') setOpen(false); });
+// 每 4.5s 自动开一次玻璃菜单，截图/预览能看到两种状态
+setInterval(function(){
+  setOpen(true);
+  setTimeout(function(){ setOpen(false); }, 1700);
+}, 4500);
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--boli', state.boli);
+  R.setProperty('--mo', state.mo); R.setProperty('--lan', state.lan);
+  R.setProperty('--kuan', state.kuan); R.setProperty('--gao', state.gao);
+  R.setProperty('--yuanjiao', state.yuanjiao + 'px'); R.setProperty('--mohu', state.mohu);
+  R.setProperty('--zihao', state.zihao); R.setProperty('--zihang', state.zihang);
+}
+addEventListener('message', function(e){
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+apply();
+</script>
+</body>
+</html>

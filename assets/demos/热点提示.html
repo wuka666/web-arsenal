@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>热点提示演示</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.wrap{position:relative;display:inline-flex;align-items:center;gap:8px;padding:16px 20px;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;color:#333}
+.dot{position:relative;width:10px;height:10px;border-radius:50%;background:var(--dc,#f59e0b);cursor:pointer;flex:none}
+.dot.unread::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--dc,#f59e0b);animation:breathe var(--freq,1.6s) ease-out infinite}
+@keyframes breathe{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+.panel{position:absolute;left:30px;top:-6px;width:200px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;font-size:12px;color:#444;box-shadow:0 8px 24px rgba(0,0,0,.16);opacity:0;transform:translateX(-6px);transition:.3s;pointer-events:none;z-index:4}
+.panel.on{opacity:1;transform:none;pointer-events:auto}
+.panel button{margin-top:8px;background:var(--dc,#f59e0b);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer}
+</style></head><body>
+<div class="wrap"><span>AI 智能总结</span><span class="dot unread" id="dot"></span>
+<div class="panel" id="panel"><div id="pt">新功能：一键生成周报，省时 80%</div><button id="got">知道了</button></div></div>
+<script>
+const dot=document.getElementById('dot'),panel=document.getElementById('panel'),got=document.getElementById('got'),pt=document.getElementById('pt');
+const state={dc:'#f59e0b',freq:1.6,dir:'right',pw:200,read:'#9ca3af',text:'新功能：一键生成周报，省时 80%'};
+function applyStyle(){document.documentElement.style.setProperty('--dc',state.dc);panel.style.width=state.pw+'px';pt.textContent=state.text;panel.style.left=(state.dir==='right'?'30px':'-'+ (state.pw+14) +'px');dot.style.setProperty('--freq',state.freq+'s');}
+dot.onclick=()=>{panel.classList.toggle('on');};
+got.onclick=()=>{panel.classList.remove('on');dot.classList.remove('unread');dot.style.background=state.read;};
+applyStyle();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['dc','freq','dir','pw','read','text'].includes(d.key))applyStyle();});
+</script></body></html>

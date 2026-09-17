@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>星系滚动编排 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--di); color: #fff; font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; }
+  canvas { position: fixed; inset: 0; z-index: 0; display: block; }
+  section { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 max(6vw, 32px); pointer-events: none; }
+  section .tag { font-size: 13px; letter-spacing: .1em; color: color-mix(in srgb, var(--xing1) 80%, #fff); }
+  section h2 { margin-top: 10px; font-size: clamp(26px, 4vw, 42px); font-weight: 500; letter-spacing: -.02em; max-width: 560px; }
+  section p { margin-top: 12px; max-width: 460px; color: rgba(255,255,255,.6); font-size: 14.5px; line-height: 1.7; }
+  section.right { align-items: flex-end; text-align: right; }
+  .center { align-items: center; text-align: center; }
+</style>
+</head>
+<body>
+  <canvas id="cv"></canvas>
+  <section>
+    <p class="tag">PHASE 01 · 完整</p>
+    <h2>首屏是一整片星系</h2>
+    <p>数千颗星沿旋臂缓慢流动。此时页面只给氛围，不给信息。</p>
+  </section>
+  <section class="right">
+    <p class="tag">PHASE 02 · 让位</p>
+    <h2>滚动时星系散开，让出阅读空间</h2>
+    <p>星星不消失，只是退到两侧——背景与内容交换主次。</p>
+  </section>
+  <section class="center">
+    <p class="tag">PHASE 03 · 聚形</p>
+    <h2>再往下，星尘聚成一个形状</h2>
+    <p>同一片星，在不同章节站成不同的队形——滚动本身就是叙事。</p>
+  </section>
+<script>
+const state = { di:'#000000', xing1:'#6eb5ff', xing2:'#ff8c5a', weixing:'#23435f',
+                xingshu:1500, xingda:0.55, sudu:1, xishu:1 };
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2), stars = [], t = 0;
+function hexToRgb(h){ const v = parseInt(String(h).replace('#',''), 16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function resize(){ W = innerWidth; H = innerHeight; cv.width = W*DPR; cv.height = H*DPR;
+  cv.style.width = W+'px'; cv.style.height = H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+function seed(){
+  stars = [];
+  for (let i=0;i<state.xingshu;i++){
+    const r = 0.05 + Math.pow(Math.random(), 0.5) * 0.95;
+    const angle = r * 7 * Math.PI + (Math.random()-0.5) * (1 - r*0.6) * 0.4;
+    stars.push({ a: angle, r, size: 0.3+Math.random()*0.7, bright: 0.3+Math.random()*0.7,
+                 phase: Math.random()*6.28, mix: Math.random(), ringA: Math.random()*6.28 });
+  }
+}
+/* 滚动进度 p：0=完整星系 → 0.5=散开让位 → 1=聚形成环 */
+function progress(){
+  const total = document.body.scrollHeight - innerHeight;
+  return Math.min(1, Math.max(0, scrollY / Math.max(1, total)));
+}
+function draw(){
+  t += 0.016 * state.sudu;
+  const p = progress();
+  const cx = W/2, cy = H/2, base = Math.min(W,H) * 0.32;
+  /* 三段形变：散开幅度、扁率压缩、成环插值全由 p 驱动 */
+  const scatter = Math.sin(Math.min(1, p*2) * Math.PI) * 1.6 * state.xishu;   // 中段鼓包
+  const ring = p > 0.55 ? (p - 0.55) / 0.45 : 0;                              // 后段成环
+  const flat = 1 - ring * 0.7;
+  ctx.fillStyle = state.di; ctx.fillRect(0, 0, W, H);
+  const amb = hexToRgb(state.weixing);
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W,H)*0.6);
+  g.addColorStop(0, 'rgba('+amb[0]+','+amb[1]+','+amb[2]+',0.22)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const c1 = hexToRgb(state.xing1), c2 = hexToRgb(state.xing2);
+  const ringR = Math.min(W,H) * 0.3;
+  for (const s of stars){
+    const rot = s.a + t * 0.2;
+    let rr = s.r * base * (1 + scatter * s.r);
+    let x = cx + Math.cos(rot) * rr;
+    let y = cy + Math.sin(rot) * rr * state.xingda * flat;
+    if (ring > 0){ /* 星星按各自相位插值到圆环上，形成「聚形」 */
+      const tx = cx + Math.cos(s.ringA + t*0.2) * ringR, ty = cy + Math.sin(s.ringA + t*0.2) * ringR * 0.92;
+      x += (tx - x) * ring; y += (ty - y) * ring;
+    }
+    const tw = 0.5 + 0.5*Math.sin(t*3 + s.phase);
+    const alpha = s.bright * tw * 0.7;
+    const col = [c1[0]+(c2[0]-c1[0])*s.mix*0.35, c1[1]+(c2[1]-c1[1])*s.mix*0.35, c1[2]+(c2[2]-c1[2])*s.mix*0.35];
+    ctx.fillStyle = 'rgba('+(col[0]|0)+','+(col[1]|0)+','+(col[2]|0)+','+(alpha*0.85).toFixed(3)+')';
+    ctx.beginPath(); ctx.arc(x, y, s.size * 0.7, 0, 6.2832); ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--xing1', state.xing1);
+  if (stars.length !== state.xingshu) seed();
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+addEventListener('resize', resize);
+resize(); seed(); apply(); requestAnimationFrame(draw);
+</script>
+</body>
+</html>

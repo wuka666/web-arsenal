@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>双轨下载缓冲演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #1a1a1a;
+  }
+  .box { width: min(72vw, 440px); display: flex; flex-direction: column; gap: var(--gap, 6px); }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .bar {
+    position: relative; flex: 1; height: var(--thick, 8px);
+    background: var(--track, #eee); border-radius: var(--radius, 6px); overflow: hidden;
+  }
+  .fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: inherit; }
+  .dl { background: var(--dl, #16a34a); }
+  .buf { background: var(--buf, #bbf7d0); }
+  .tag { font-size: 12px; color: #888; width: 42px; flex: none; }
+  .pct { font-size: var(--pctSize, 18px); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--dl, #16a34a); width: 46px; text-align: right; }
+  .btn {
+    cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="row"><span class="tag">下载</span><div class="bar"><div class="fill dl" id="dl"></div></div><span class="pct" id="pct">0%</span></div>
+  <div class="row"><span class="tag">缓冲</span><div class="bar"><div class="fill buf" id="buf"></div></div><span class="pct" id="bufpct" style="color:#86c98f">0%</span></div>
+</div>
+<button class="btn" id="btn">重新下载</button>
+
+<script>
+  const state = {
+    dur: 6,
+    bufferLead: 20,
+    thick: 8,
+    gap: 6,
+    radius: 6,
+    dlColor: "#16a34a",
+    bufColor: "#bbf7d0",
+    track: "#eee",
+    showPct: true,
+    pctSize: 18,
+    jitter: false
+  };
+  const dl = document.getElementById("dl");
+  const buf = document.getElementById("buf");
+  const pct = document.getElementById("pct");
+  const bufpct = document.getElementById("bufpct");
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--gap", state.gap + "px");
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--dl", state.dlColor);
+    root.style.setProperty("--buf", state.bufColor);
+    root.style.setProperty("--track", state.track);
+    root.style.setProperty("--pctSize", state.pctSize + "px");
+    pct.style.display = state.showPct ? "block" : "none";
+    bufpct.style.display = state.showPct ? "block" : "none";
+  }
+
+  let raf = 0;
+  function run() {
+    cancelAnimationFrame(raf);
+    applyStyle();
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.5) * 1000;
+    const lead = Math.min(state.bufferLead, 60) / 100;
+    let last = start, p = 0;
+    function tick(now) {
+      const dt = (now - last) / dur; last = now;
+      let step = dt;
+      if (state.jitter) step *= (0.4 + Math.random() * 1.4); // 下载受网络抖动，缓冲兜底
+      p = Math.min(1, p + step);
+      const bp = Math.min(1, p + lead);
+      dl.style.width = (p * 100) + "%";
+      buf.style.width = (bp * 100) + "%";
+      pct.textContent = Math.round(p * 100) + "%";
+      bufpct.textContent = Math.round(bp * 100) + "%";
+      if (p < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["dur","bufferLead","thick","gap","radius","dlColor","bufColor","track","showPct","pctSize","jitter"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚轮选择器演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pk{position:relative;display:flex;justify-content:center;gap:8px;height:var(--bh,160px)}
+.col{position:relative;width:var(--cw,64px);height:100%;overflow:hidden;touch-action:none}
+.band{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:var(--rh,32px);background:var(--bc,#eef3ff);border-radius:8px;pointer-events:none}
+.list{position:absolute;left:0;right:0;top:50%;will-change:transform}
+.it{height:var(--rh,32px);display:flex;align-items:center;justify-content:center;font-size:var(--fs,18px);color:#9aa0a6;transition:color .2s}
+.val{margin-top:14px;font-size:14px;color:#444}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="pk" id="pk">
+<div class="band"></div>
+</div>
+<div class="val" id="val">08 : 30</div>
+</div></div>
+<script>
+const pk=document.getElementById('pk'),val=document.getElementById('val');
+const cols=[{min:0,max:23,cur:8},{min:0,max:59,cur:30}];
+const state={ac:'#2f6bff',bc:'#eef3ff',n:2,rh:32,dur:.3,fs:18,bh:160,cw:64};
+let lists=[],cur=[8,30];
+function makeCol(ci){const c=document.createElement('div');c.className='col';const L=document.createElement('div');L.className='list';for(let v=cols[ci].min;v<=cols[ci].max;v++){const it=document.createElement('div');it.className='it';it.textContent=String(v).padStart(2,'0');L.appendChild(it);}c.appendChild(L);pk.appendChild(c);lists[ci]=L;
+ let y=0,sy=0,drag=false,pid=null;
+ const setY=(yy)=>{L.style.transition='none';L.style.transform='translateY('+yy+'px)';};
+ const snap=()=>{const idx=Math.round(-y/state.rh);const clamp=Math.max(cols[ci].min,Math.min(cols[ci].max,idx));cur[ci]=clamp;y=-clamp*state.rh;L.style.transition='transform '+state.dur+'s cubic-bezier(.4,1.2,.5,1)';L.style.transform='translateY('+y+'px)';paint();};
+ c.addEventListener('pointerdown',e=>{drag=true;pid=e.pointerId;sy=e.clientY-y;c.setPointerCapture(pid);});
+ c.addEventListener('pointermove',e=>{if(!drag)return;y=e.clientY-sy;setY(y);});
+ c.addEventListener('pointerup',e=>{if(!drag)return;drag=false;snap();});
+ setY(-cols[ci].cur*state.rh);
+}
+function paint(){lists.forEach((L,ci)=>{const items=L.children;for(let k=0;k<items.length;k++){const idx=Math.round(-cur[ci]);items[k].style.color=(k===idx)?state.ac:'#9aa0a6';}});val.textContent=String(cur[0]).padStart(2,'0')+' : '+String(cur[1]).padStart(2,'0');}
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--rh',state.rh+'px');document.documentElement.style.setProperty('--fs',state.fs+'px');document.documentElement.style.setProperty('--bh',state.bh+'px');document.documentElement.style.setProperty('--cw',state.cw+'px');}
+function build(){pk.querySelectorAll('.col').forEach(e=>e.remove());lists=[];for(let i=0;i<state.n;i++)makeCol(i);applyStyle();paint();}
+applyStyle();build();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','bc','n','rh','dur','fs','bh','cw'].includes(d.key)){cols.length=state.n;for(let i=state.n-1;i>=0;i--){if(cols[i]===undefined)cols[i]={min:0,max:i===0?23:59,cur:cur[i]||0};}build();}});
+</script></body></html>

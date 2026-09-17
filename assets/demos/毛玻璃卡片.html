@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>毛玻璃卡片 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 26px; flex-wrap: wrap;
+         padding: 48px 24px; background: linear-gradient(135deg, var(--beijing1), var(--beijing2));
+         font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; }
+  /* 毛玻璃 = 半透白底 + backdrop blur + 亮描边 + 内顶高光，缺一样就「塑料」 */
+  .card { width: 300px; padding: 26px 24px; border-radius: calc(var(--yuanjiao)*1px);
+          background: color-mix(in srgb, var(--boli) calc(var(--touming)*1%), transparent);
+          -webkit-backdrop-filter: blur(calc(var(--mohu)*1px)); backdrop-filter: blur(calc(var(--mohu)*1px));
+          border: 1px solid color-mix(in srgb, #fff calc(var(--miaobian)*1%), transparent);
+          box-shadow: inset 0 1px 0 color-mix(in srgb, #fff calc(var(--miaobian)*0.9*1%), transparent),
+                      0 18px 44px rgba(0,0,0,.18); }
+  .card h3 { color: #1c1c1e; font-size: calc(var(--zihao) + 3px); font-weight: 700; letter-spacing: -.02em; }
+  .card p { margin-top: 10px; color: rgba(28,28,30,.72); font-size: calc(var(--zihao)*1px); line-height: 1.6; }
+  .card button { margin-top: 18px; border: 0; border-radius: 999px; padding: 9px 20px;
+          background: #1c1c1e; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+          transition: transform .2s; }
+  .card button:hover { transform: scale(1.04); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h3>玻璃拟态卡片</h3>
+    <p>毛玻璃浮在彩色渐变之上：底色透出来、前景仍清晰，是「层次」而不是「透明」。</p>
+    <button>了解详情</button>
+  </div>
+  <div class="card">
+    <h3>浮层信息组</h3>
+    <p>同一语言可以叠多张：告警、摘要、行程卡都能用这一套玻璃语言承载。</p>
+    <button>查看更多</button>
+  </div>
+</body>
+<script>
+const state = { beijing1:'#ff9a9e', beijing2:'#a18cd1', boli:'#ffffff',
+                touming:12, mohu:16, yuanjiao:16, miaobian:18, zihao:15 };
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--beijing1', state.beijing1); R.setProperty('--beijing2', state.beijing2);
+  R.setProperty('--boli', state.boli); R.setProperty('--touming', state.touming);
+  R.setProperty('--mohu', state.mohu); R.setProperty('--yuanjiao', state.yuanjiao);
+  R.setProperty('--miaobian', state.miaobian); R.setProperty('--zihao', state.zihao);
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+apply();
+</script>
+</html>

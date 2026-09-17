@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>液态金属药丸导航 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 48px;
+         background: var(--di); font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; }
+  .bar { display: flex; align-items: center; justify-content: center; gap: calc(var(--jiange)*1px); padding: 0 20px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--zi); opacity: .85; }
+  /* 液态金属质感 = 深灰斜向渐变 + 灰描边 + 扫光高光 + hover 辉光，四件套缺一不可 */
+  .pill { position: relative; overflow: hidden; display: inline-flex; align-items: center;
+          height: calc(var(--gao)*1px); padding: 0 20px; border-radius: var(--yuanjiao);
+          border: 1px solid rgba(198,198,198,.55);
+          background: linear-gradient(105deg, var(--an) 0%, color-mix(in srgb, var(--liang) 55%, var(--an)) 48%, var(--liang) 100%);
+          color: var(--zi); font-size: calc(var(--zihao)*1px); letter-spacing: -.01em; white-space: nowrap;
+          transition: background .35s ease, border-color .35s ease, box-shadow .35s ease; cursor: pointer; }
+  .pill::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+          background: linear-gradient(115deg, transparent 30%, color-mix(in srgb, #fff calc(var(--saoliang)*1%), transparent) 50%, transparent 70%);
+          transform: translateX(-120%); }
+  .pill:hover::before, .pill.demo::before { transform: translateX(120%); transition: transform .6s ease; }
+  .pill:hover, .pill.demo { border-color: rgba(235,235,235,.9);
+          background: linear-gradient(105deg, var(--an) 0%, color-mix(in srgb, var(--liang) 72%, var(--an)) 45%, color-mix(in srgb, var(--liang) 130%, #6a6a6a) 100%);
+          box-shadow: 0 0 calc(var(--guang)*1px) rgba(200,210,230,.18); }
+  .pill.on { border-color: rgba(235,235,235,.9); box-shadow: 0 0 calc(var(--guang)*1px) rgba(200,210,230,.18); }
+  .ghost { border: 1px solid rgba(198,198,198,.4); background: transparent; color: var(--zi); }
+</style>
+</head>
+<body>
+  <nav class="bar">
+    <span class="dot"></span>
+    <span class="pill">产品</span>
+    <span class="pill on">能力</span>
+    <span class="pill">价格</span>
+    <span class="pill">文档</span>
+    <span class="pill ghost">登录</span>
+  </nav>
+  <nav class="bar" id="auto">
+    <span class="pill">Benefits</span>
+    <span class="pill">How It Works</span>
+    <span class="pill">FAQs</span>
+    <span class="pill">Pricing</span>
+  </nav>
+<script>
+const state = { di:'#0b0b0b', liang:'#4a4a4a', an:'#050505', zi:'#f3f3f3',
+                yuanjiao:7, gao:40, zihao:14, jiange:8, guang:18, saoliang:16 };
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--liang', state.liang);
+  R.setProperty('--an', state.an); R.setProperty('--zi', state.zi);
+  R.setProperty('--yuanjiao', state.yuanjiao + 'px'); R.setProperty('--gao', state.gao);
+  R.setProperty('--zihao', state.zihao); R.setProperty('--jiange', state.jiange);
+  R.setProperty('--guang', state.guang); R.setProperty('--saoliang', state.saoliang);
+}
+window.addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+// 第二排每 2.8s 自动扫一枚，方便截图/预览不用手动 hover 也能看到动效
+const autoPills = document.querySelectorAll('#auto .pill');
+let ai = 0;
+setInterval(() => {
+  autoPills.forEach(p => p.classList.remove('demo'));
+  autoPills[ai % autoPills.length].classList.add('demo');
+  ai++;
+}, 2800);
+apply();
+</script>
+</body>
+</html>

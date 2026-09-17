@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>可视化倒计时演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.wrap{position:relative;width:120px;height:120px}
+svg{transform:rotate(-90deg)}
+.bg{fill:none;stroke:#eef0f3;stroke-width:10}
+.fg{fill:none;stroke:var(--cc,#2f6bff);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--tc,#222);font-weight:700}
+</style></head><body>
+<div class="wrap"><svg width="120" height="120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="fg" cx="60" cy="60" r="52"/></svg><div class="num" id="num">10</div></div>
+<script>
+const fg=document.getElementById('fg'),num=document.getElementById('num'),bgc=document.querySelector('.bg');
+const state={sec:10,cc:'#2f6bff',tc:'#222',bg:'#eef0f3',r:52};
+let left=state.sec,timer=0;const C=2*Math.PI*state.r;
+function applyStyle(){document.documentElement.style.setProperty('--cc',state.cc);document.documentElement.style.setProperty('--tc',state.tc);fg.style.strokeDasharray=C;bgc.style.stroke=state.bg;}
+function tick(){fg.style.strokeDasharray=C;fg.style.strokeDashoffset=C*(1-left/state.sec);num.textContent=left;if(left<=0){clearInterval(timer);return;}left--;}
+function start(){left=state.sec;clearInterval(timer);applyStyle();tick();timer=setInterval(tick,1000);}
+applyStyle();start();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['sec','cc','tc','bg','r'].includes(d.key))start();});
+</script></body></html>

@@ -2,101 +2,65 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>方案·定义型首屏（Linear）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案·Linear 定义型首屏</title>
 <style>
-:root{--zhucai:#5E6AD2;--zhongdian:#8B93F8;--di:#08090A;--zi:#F7F8F8;--cizi:#8A8F98;--yuanjiao:10px;--jianju:16px;--zihao:16px;--yinying:20;--faguang:18}
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
-body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
-.wrap{max-width:1040px;margin:0 auto;padding:var(--jianju) calc(var(--jianju)*1.5) calc(var(--jianju)*3);}
-.nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);padding:calc(var(--jianju)*0.8) 0;font-size:14px;color:var(--cizi);}
-.logo{font-weight:800;font-size:17px;color:var(--zi);}
-.nav a{color:inherit;text-decoration:none;}
-.nav .right{margin-left:auto;display:flex;align-items:center;gap:var(--jianju);}
-.signup{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:7px 16px;font-size:13.5px;font-weight:700;cursor:pointer;}
-
-.pill{display:inline-flex;align-items:center;gap:8px;margin-top:calc(var(--jianju)*2);padding:5px 12px 5px 8px;border:1px solid color-mix(in srgb,var(--zi) 14%,transparent);border-radius:999px;font-size:13px;color:var(--cizi);background:color-mix(in srgb,var(--zi) 4%,transparent);cursor:pointer;}
-.pill b{background:var(--zhucai);color:#fff;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;}
-.pill .arw{transition:transform .2s ease;}
-.pill:hover .arw{transform:translateX(4px);}
-.hero{display:flex;gap:calc(var(--jianju)*2);margin-top:calc(var(--jianju)*1.6);align-items:flex-start;}
-.hero-l{min-width:0;}
-h1{font-size:calc(var(--zihao)*2.6);line-height:1.1;letter-spacing:-.6px;font-weight:800;}
-h1 em{font-style:normal;color:var(--zhongdian);}
-.sub{margin-top:calc(var(--jianju)*0.9);font-size:calc(var(--zihao)*1.05);color:var(--cizi);max-width:46ch;}
-.btns{margin-top:calc(var(--jianju)*1.8);display:flex;gap:var(--jianju);align-items:center;}
-.btn{border-radius:var(--yuanjiao);padding:11px 24px;font-size:14.5px;font-weight:700;cursor:pointer;border:1px solid transparent;}
-.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.9px) rgba(0,0,0,.4);}
-.btn.ghost{border-color:color-mix(in srgb,var(--zi) 20%,transparent);color:var(--zi);background:transparent;}
-
-.void{min-height:200px;border-radius:calc(var(--yuanjiao)*1.5);}
-body[data-glow="1"] .void{background:radial-gradient(circle at 40% 30%,color-mix(in srgb,var(--zhongdian) calc(var(--faguang)*1%),transparent),transparent 65%);}
-.groups{margin-top:calc(var(--jianju)*3);display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.6);}
-.grp h4{font-size:13px;color:var(--zhongdian);margin-bottom:calc(var(--jianju)*0.6);}
-.grp p{font-size:13.5px;color:var(--cizi);}
-
-.hook{margin-top:calc(var(--jianju)*3);padding-top:calc(var(--jianju)*1.4);border-top:1px solid color-mix(in srgb,var(--zi) 10%,transparent);display:flex;align-items:center;justify-content:space-between;color:var(--cizi);font-size:13.5px;}
-.hook .down{color:var(--zhucai);font-size:18px;}
-body[data-hook="0"] .hook{display:none;}
-
-.in{opacity:0;transform:translateY(18px);}
-.in.run{animation:up .7s cubic-bezier(.16,1,.3,1) forwards;}
-@keyframes up{to{opacity:1;transform:none;}}
+:root{
+  --di:#08090A;
+  --zi:#F7F8F8;
+  --cizi:#8A8F98;
+  --zhongdian:#5E6AD2;
+  --bian:#1C1D21;
+  --yuanjiao:999px;
+  --jianju:16px;
+  --zihao:16px;
+  --liubai:70px;
+  --yinying:18;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Inter","Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;display:flex;flex-direction:column;}
+.nav{display:flex;align-items:center;gap:var(--jianju);padding:18px 40px;}
+.logo{font-weight:700;font-size:19px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
+.logo .dot{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,#5E6AD2,#8A7BF2);}
+.nav-links{display:flex;gap:24px;margin-left:20px;font-size:14px;color:var(--cizi);}
+.nav-links a{color:inherit;text-decoration:none;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:14px;}
+.nav-right a{color:var(--cizi);text-decoration:none;}
+.btn{background:var(--zi);color:var(--di);border:none;border-radius:var(--yuanjiao);padding:9px 18px;font-weight:600;cursor:pointer;}
+.hero{flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--liubai) 40px;max-width:1180px;margin:0 auto;width:100%;}
+.eyebrow{font-size:13px;color:var(--zhongdian);font-weight:600;margin-bottom:22px;letter-spacing:.3px;}
+.h1{font-size:calc(var(--zihao)*3.4);font-weight:700;letter-spacing:-1.5px;line-height:1.08;max-width:16em;}
+.sub{margin-top:26px;font-size:calc(var(--zihao)*1.25);color:var(--cizi);max-width:28em;line-height:1.6;}
+.cta{margin-top:38px;display:flex;gap:14px;}
+.btn-a{background:var(--zi);color:var(--di);border:none;border-radius:var(--yuanjiao);padding:14px 26px;font-weight:600;cursor:pointer;}
+.btn-b{background:transparent;color:var(--zi);border:1px solid var(--bian);border-radius:var(--yuanjiao);padding:14px 26px;font-weight:500;cursor:pointer;}
+.pills{margin-top:46px;display:flex;gap:10px;flex-wrap:wrap;}
+.pill{border:1px solid var(--bian);border-radius:999px;padding:8px 16px;font-size:12.5px;color:var(--cizi);}
 </style>
 </head>
-<body data-glow="1" data-hook="1">
-  <div class="wrap">
-    <nav class="nav"><span class="logo">Linear</span><a>Product</a><a>Resources</a><a>Customers</a><a>Pricing</a><a>Now</a><span class="right"><a>Log in</a><button class="signup">Sign up</button></span></nav>
-    <div class="pill in"><b>New</b>Loops 上线：把反馈直接变成任务<span class="arw">→</span></div>
-    <header class="hero">
-      <div class="hero-l" id="hl">
-        <h1 class="in">面向团队与<em>智能体</em>的产品开发系统</h1>
-        <p class="sub in">为规划与构建产品而生，为 AI 时代而设计。</p>
-        <div class="btns in"><button class="btn solid">免费开始</button><button class="btn ghost">看它怎么跑</button></div>
-      </div>
-      <div class="void"></div>
-    </header>
-    <section class="groups in">
-      <div class="grp"><h4>对话 / 反馈 → issue</h4><p>一句话把散落的反馈收进待办</p></div>
-      <div class="grp"><h4>idea → launch</h4><p>从一个想法走到上线，路径不断</p></div>
-      <div class="grp"><h4>部署 agent 当队友</h4><p>把重复劳动交给智能体执行</p></div>
-    </section>
-    <div class="hook"><span>往下看：三分钟搞懂它替你做了什么</span><span class="down">↓</span></div>
-
+<body>
+<nav class="nav">
+  <div class="logo"><span class="dot"></span>Linear</div>
+  <div class="nav-links">
+    <a href="#">Product</a><a href="#">Resources</a><a href="#">Pricing</a><a href="#">Customers</a><a href="#">Now</a>
   </div>
-<script>
-
-  const state = { zhucai:"#5E6AD2", zhongdian:"#8B93F8", di:"#08090A", zi:"#F7F8F8", cizi:"#8A8F98",
-    yuanjiao:10, jianju:16, zihao:16, yinying:20, faguang:18, liubai:32, gouzi:1 };
-  function apply(){
-    const r = document.documentElement.style;
-    r.setProperty("--zhucai", state.zhucai);
-    r.setProperty("--zhongdian", state.zhongdian);
-    r.setProperty("--di", state.di);
-    r.setProperty("--zi", state.zi);
-    r.setProperty("--cizi", state.cizi);
-    r.setProperty("--yuanjiao", state.yuanjiao + "px");
-    r.setProperty("--jianju", state.jianju + "px");
-    r.setProperty("--zihao", state.zihao + "px");
-    r.setProperty("--yinying", state.yinying);
-    r.setProperty("--faguang", state.faguang);
-    document.body.dataset.glow = state.faguang > 0 ? "1" : "0";
-    document.body.dataset.hook = String(state.gouzi);
-
-    document.getElementById("hl").style.width = (100 - state.liubai) + "%";
-  }
-
-  function play(){
-    document.querySelectorAll(".in").forEach((el,i)=>{
-      el.classList.remove("run");
-      void el.offsetWidth;
-      el.style.animationDelay = (i * 0.12) + "s";
-      el.classList.add("run");
-    });
-  }
-  window.addEventListener("message", e => { const d = e.data; if (!d || d.type !== "param") return; state[d.key] = d.value; apply(); });
-  apply(); play();
-  setInterval(play, 6000);
-</script>
+  <div class="nav-right">
+    <a href="#">Log in</a>
+    <button class="btn">Sign up</button>
+  </div>
+</nav>
+<main class="hero">
+  <div class="eyebrow">为团队与智能体打造</div>
+  <h1 class="h1">面向团队与智能体的产品开发系统</h1>
+  <p class="sub">专为规划与构建产品而生，为 AI 时代设计。让人类与智能体在同一套工作流里协作。</p>
+  <div class="cta">
+    <button class="btn-a">免费开始</button>
+    <button class="btn-b">预约演示</button>
+  </div>
+  <div class="pills">
+    <span class="pill">Issue tracking</span><span class="pill">Cycles</span><span class="pill">Linear Agent</span><span class="pill">Roadmaps</span><span class="pill">Insights</span>
+  </div>
+</main>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>

@@ -2,64 +2,49 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>方案·冷调科技型</title>
 <style>
-:root{--zhucai:#39D0D8;--zhongdian:#5B8CFF;--di:#0A0E1A;--zi:#e8f4f8;--cizi:#8fa6b8;--yuanjiao:12px;--jianju:12px;--zihao:15px;--yinying:20;--faguang:40}
+:root{--zhucai:#38BDF8;--zhongdian:#22D3EE;--di:#0B1020;--zi:#E6F0FF;--cizi:#7E8DB0;--yuanjiao:10px;--jianju:12px;--zihao:14px;--yinying:18;--faguang:0;--lie:3;--glow:1}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
-body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
-.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
-.logo{font-weight:800;font-size:18px;}
-.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
-.menu a{color:inherit;text-decoration:none;}
-.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
-.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
-.hero-text{max-width:640px;}
-.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
-.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
-.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
-.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
-.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
-.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
-.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
-.feat .ico{font-size:26px;}
-.feat h3{margin:10px 0 6px;font-size:16px;}
-.feat p{font-size:13.5px;color:var(--cizi);}
-.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
-.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
-.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
-.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
-.visual{display:none;}
-body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
-body[data-lay="center"] .hero-text{margin:0 auto;}
-body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
-body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
-body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
-body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
-body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.5;padding:calc(var(--jianju)*1.4);}
+.nav{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(120,150,200,.18);margin-bottom:var(--jianju);}
+.logo{font-weight:800;font-size:16px;color:var(--zhucai);}
+.menu{display:flex;gap:14px;font-size:12.5px;color:var(--cizi);}
+.status{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--cizi);}
+.status .live{width:8px;height:8px;border-radius:50%;background:var(--zhongdian);}
+.wall{display:grid;grid-template-columns:190px 1fr;gap:var(--jianju);}
+.side{display:flex;flex-direction:column;gap:calc(var(--jianju)*.8);}
+.navitem{padding:9px 12px;border-radius:var(--yuanjiao);font-size:13px;color:var(--cizi);background:rgba(120,150,200,.06);}
+.navitem.on{background:color-mix(in srgb,var(--zhucai) 16%,transparent);color:var(--zhucai);font-weight:700;}
+.panels{display:grid;grid-template-columns:repeat(var(--lie),1fr);gap:var(--jianju);align-content:start;}
+.panel{border:1px solid rgba(120,150,200,.18);border-radius:var(--yuanjiao);padding:14px;background:rgba(120,150,200,.04);}
+.panel .k{font-size:11.5px;color:var(--cizi);}
+.panel .v{font-size:calc(var(--zihao)*1.8);font-weight:800;margin-top:4px;color:var(--zhucai);}
+.panel .spark{height:26px;margin-top:8px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--zhongdian) 60%,transparent));border-radius:4px;opacity:.7;}
+body[data-glow="1"] .panel.on{border-color:var(--zhucai);box-shadow:0 0 calc(var(--faguang)*.6px) color-mix(in srgb,var(--zhucai) 60%,transparent);}
+.panel.on .v{color:#fff;}
 </style>
 </head>
-<body data-lay="center" data-glow="1">
-  <div class="wrap">
-    <nav class="nav"><span class="logo">冷调科技型</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">申请内测</button></nav>
-    <header class="hero">
-      <div class="hero-text"><h1>科技产品</h1><p class="sub">冷调 + 发光，给技术控一点「未来已来」的暗爽</p><div class="btns"><button class="btn solid">申请内测</button><button class="btn ghost">读文档</button></div></div>
-      <div class="visual"></div>
-    </header>
-    <section class="features">
-      <article class="feat"><div class="ico">⚙</div><h3>引擎</h3><p>底层自研，性能拉满</p></article>
-      <article class="feat"><div class="ico">🔌</div><h3>开放接口</h3><p>SDK / API 随心接</p></article>
-      <article class="feat"><div class="ico">🛰</div><h3>云端同步</h3><p>多端一致，无缝切换</p></article>
-    </section>
-    <section class="stats">
-      <div class="stat"><b>12ms</b><span>推理延迟</span></div>
-      <div class="stat"><b>99.99%</b><span>稳定</span></div>
-      <div class="stat"><b>30+</b><span>开放接口</span></div>
-    </section>
-    <footer class="foot"><span>© 2026 冷调科技型</span><span>隐私 · 条款 · 联系</span></footer>
-  </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<body data-glow="1">
+<div class="nav"><span class="logo">棱镜云</span><span class="menu"><a>概览</a><a>API</a><a>日志</a><a>计费</a></span><span class="status"><span class="live"></span>所有系统正常</span></div>
+<div class="wall">
+<div class="side">
+<div class="navitem on">请求监控</div>
+<div class="navitem">函数计算</div>
+<div class="navitem">边缘节点</div>
+<div class="navitem">告警规则</div>
+<div class="navitem">访问密钥</div>
+</div>
+<div class="panels">
+<div class="panel on"><div class="k">QPS</div><div class="v">24.8k</div><div class="spark"></div></div>
+<div class="panel"><div class="k">P99 延迟</div><div class="v">42ms</div><div class="spark"></div></div>
+<div class="panel"><div class="k">错误率</div><div class="v">0.03%</div><div class="spark"></div></div>
+<div class="panel"><div class="k">在线节点</div><div class="v">128</div><div class="spark"></div></div>
+<div class="panel"><div class="k">带宽</div><div class="v">3.1Gb</div><div class="spark"></div></div>
+<div class="panel"><div class="k">今日调用</div><div class="v">9.2M</div><div class="spark"></div></div>
+</div>
+</div>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='glow'){document.body.setAttribute('data-glow',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>

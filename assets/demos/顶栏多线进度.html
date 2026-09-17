@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>顶栏多线进度演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; background: var(--bg, #fff);
+    font-family: system-ui, "Microsoft YaHei", sans-serif; color: #888;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .barbox {
+    position: fixed; left: 0; right: 0; display: flex; flex-direction: column;
+    gap: var(--gap, 2px); z-index: 5;
+  }
+  .barbox.top { top: 0; }
+  .barbox.bottom { bottom: 0; }
+  .bar { height: var(--thick, 3px); width: 0%; background: var(--color, #7b5cff); box-shadow: var(--glow, none); }
+  .btn {
+    position: fixed; bottom: 18px; cursor: pointer; user-select: none; border: none; outline: none;
+    background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
+    padding: 9px 22px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="barbox top" id="barbox"></div>
+<button class="btn" id="btn">重新推进</button>
+
+<script>
+  const barbox = document.getElementById("barbox");
+  const state = {
+    lines: 2,
+    dur: 1.8,
+    thick: 3,
+    gap: 2,
+    color: "#7b5cff",
+    glow: true,
+    pos: "顶部",
+    ease: "easeOut",
+    loop: true,
+    bg: "#ffffff"
+  };
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--thick", state.thick + "px");
+    root.style.setProperty("--gap", state.gap + "px");
+    root.style.setProperty("--color", state.color);
+    root.style.setProperty("--bg", state.bg);
+    root.style.setProperty("--glow", state.glow ? ("0 0 6px " + state.color) : "none");
+    barbox.className = "barbox " + (state.pos === "底部" ? "bottom" : "top");
+    build();
+  }
+
+  function build() {
+    barbox.innerHTML = "";
+    const n = Math.max(1, Math.round(state.lines));
+    for (let i = 0; i < n; i++) {
+      const b = document.createElement("div");
+      b.className = "bar"; b.dataset.i = i;
+      barbox.appendChild(b);
+    }
+  }
+
+  let raf = 0, timer = 0;
+  function run() {
+    cancelAnimationFrame(raf); clearTimeout(timer);
+    const bars = barbox.querySelectorAll(".bar");
+    const start = performance.now();
+    const dur = Math.max(state.dur, 0.2) * 1000;
+    function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const e = state.ease === "linear" ? t : 1 - Math.pow(1 - t, 3);
+      bars.forEach(b => b.style.width = (e * 100) + "%");
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else if (state.loop) timer = setTimeout(() => { bars.forEach(b => b.style.width = "0%"); run(); }, 700);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.getElementById("btn").addEventListener("click", run);
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["lines","dur","thick","gap","color","glow","pos","ease","loop","bg"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

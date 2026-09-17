@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>丝绢波光背景 · 单文件 demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { height: 100vh; overflow: hidden; background: var(--di);
+         font-family: "Inter", system-ui, "Microsoft YaHei", sans-serif; color: var(--xingse); }
+  /* 波带画成锐利细线，靠 CSS blur 融成丝绢；scale 放大防止模糊边缘露黑框 */
+  #cloud { position: fixed; inset: 0; display: block;
+           filter: blur(calc(var(--mohu)*1px)); transform: scale(1.14); }
+  #starcv { position: fixed; inset: 0; display: block; }
+  .grain { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: calc(var(--keli) / 100);
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+           background-size: 300px 300px; }
+  .read { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column;
+          align-items: center; justify-content: center; text-align: center; padding: 0 24px; }
+  .read h1 { font-size: clamp(30px, 5vw, 54px); font-weight: 500; letter-spacing: -.045em; line-height: 1.12; }
+  .read p { margin-top: 16px; max-width: 460px; color: color-mix(in srgb, var(--xingse) 60%, transparent);
+            font-size: 15.5px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <canvas id="cloud"></canvas>
+  <canvas id="starcv"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="read">
+    <h1>Layers hold<br>tales of time</h1>
+    <p>背景只做衬托不做主角：波光在文案身后缓慢流动，文字始终清晰可读。</p>
+  </div>
+<script>
+const state = { di:'#000000', bolan:'#dfe6ef', xingse:'#ffffff',
+                bolansu:1, xingxing:220, keli:16, mohu:26, daikuan:30, weiyi:60 };
+const cloud = document.getElementById('cloud'), starcv = document.getElementById('starcv');
+const cctx = cloud.getContext('2d'), sctx = starcv.getContext('2d');
+let W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2), starList = [];
+function hexToRgb(h){ const v = parseInt(String(h).replace('#',''), 16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function resize(){
+  W = innerWidth; H = innerHeight;
+  [cloud, starcv].forEach(c => { c.width = W*DPR; c.height = H*DPR; c.style.width = W+'px'; c.style.height = H+'px';
+    c.getContext('2d').setTransform(DPR,0,0,DPR,0,0); });
+  seed();
+}
+function seed(){
+  starList = [];
+  for (let i=0;i<state.xingxing;i++) starList.push({ x:Math.random()*W, y:Math.random()*H,
+    r:Math.random()*0.9+0.3, a:Math.random()*0.6+0.15, p:Math.random()*6.28, s:Math.random()*1.4+0.4 });
+}
+/* 波带轮廓：三个频率的正弦叠加；weiyi 定波带高度、daikuan 定展开宽度 */
+function yAt(x, off){
+  const base = H * state.weiyi / 100;
+  return base
+    + Math.sin(x*0.0021 + off*0.02 + t*0.55) * H*0.13
+    + Math.sin(x*0.0047 - off*0.012 - t*0.8) * H*0.05
+    + Math.sin(x*0.0009 + t*0.3) * H*0.07
+    + off;
+}
+let t = 0, last = 0;
+function drawWave(now){
+  t += Math.min(0.05, (now-last)/1000 || 0.016) * state.bolansu; last = now;
+  const c = cctx, rgb = hexToRgb(state.bolan), span = H * state.daikuan / 100;
+  c.clearRect(0,0,W,H);
+  c.globalCompositeOperation = 'lighter';
+  for (let i=0;i<46;i++){
+    const k = i/45, off = (k-0.5)*span, a = Math.pow(Math.cos((k-0.5)*Math.PI), 2.2);
+    c.beginPath();
+    for (let x=-40; x<=W+40; x+=14){ const y = yAt(x, off); x===-40 ? c.moveTo(x,y) : c.lineTo(x,y); }
+    c.strokeStyle = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+(0.045+0.42*a).toFixed(3)+')';
+    c.lineWidth = 8 + 20*a;
+    c.stroke();
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+function drawStars(now){
+  sctx.clearRect(0,0,W,H); sctx.fillStyle = state.xingse;
+  for (const st of starList){
+    sctx.globalAlpha = st.a * (0.55 + 0.45*Math.sin(now*0.001*st.s + st.p));
+    sctx.beginPath(); sctx.arc(st.x, st.y, st.r, 0, 6.2832); sctx.fill();
+  }
+  sctx.globalAlpha = 1;
+}
+function loop(now){ drawWave(now); drawStars(now); requestAnimationFrame(loop); }
+addEventListener('resize', resize);
+function apply(){
+  const R = document.documentElement.style;
+  R.setProperty('--di', state.di); R.setProperty('--bolan', state.bolan);
+  R.setProperty('--xingse', state.xingse); R.setProperty('--keli', state.keli);
+  R.setProperty('--mohu', state.mohu);
+  if (starList.length !== state.xingxing) seed();
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'param') return;
+  if (!(d.key in state)) return; state[d.key] = d.value; apply();
+});
+resize(); apply(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

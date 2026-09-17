@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>情境提示演示</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+.field{position:relative;width:260px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid #d7dce3;border-radius:10px;font-size:14px;outline:none;transition:.2s}
+.inp.bad{border-color:#ef4444}
+.tip{position:absolute;left:0;top:46px;background:#fff;border:1px solid #fecaca;color:#b91c1c;font-size:12px;padding:7px 10px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.12);opacity:0;transform:translateY(-4px);transition:.25s;pointer-events:none;z-index:3}
+.tip.on{opacity:1;transform:none}
+.sub{background:var(--hl,#2f6bff);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;cursor:pointer}
+</style></head><body>
+<div class="field"><input class="inp" id="inp" placeholder="请输入昵称"><div class="tip" id="tip">昵称不能为空</div></div>
+<button class="sub" id="sub">保存</button>
+<script>
+const inp=document.getElementById('inp'),tip=document.getElementById('tip'),sub=document.getElementById('sub');
+const state={hl:'#2f6bff',text:'昵称不能为空',dur:.3};
+function applyStyle(){document.documentElement.style.setProperty('--hl',state.hl);tip.textContent=state.text;sub.style.background=state.hl;tip.style.transition='opacity '+state.dur+'s ease,transform '+state.dur+'s ease';}
+function check(){if(inp.value.trim()===''){inp.classList.add('bad');tip.classList.add('on');}else{inp.classList.remove('bad');tip.classList.remove('on');}}
+sub.onclick=check;inp.addEventListener('input',()=>{if(inp.value.trim()!==''){inp.classList.remove('bad');tip.classList.remove('on');}});
+applyStyle();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['hl','text','dur'].includes(d.key))applyStyle();});
+</script></body></html>

@@ -2,64 +2,36 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>方案·杂志排版风</title>
 <style>
-:root{--zhucai:#C0392B;--zhongdian:#1a1a1a;--di:#FBF6EE;--zi:#1f1b16;--cizi:#7d7464;--yuanjiao:6px;--jianju:12px;--zihao:15px;--yinying:10;--faguang:0}
+:root{--zhucai:#E03E1A;--zhongdian:#2B2B2B;--di:#F4F1EA;--zi:#1A1A1A;--cizi:#6B6B66;--yuanjiao:4px;--jianju:16px;--zihao:15px;--yinying:0;--faguang:0;--lan:2;--shouzi:1}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
-body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
-.wrap{max-width:1080px;margin:0 auto;padding:calc(var(--jianju)*2) var(--jianju);}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
-.logo{font-weight:800;font-size:18px;}
-.menu{display:flex;gap:calc(var(--jianju)*1.2);font-size:14px;color:var(--cizi);}
-.menu a{color:inherit;text-decoration:none;}
-.cta{background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px;}
-.hero{padding:calc(var(--jianju)*4) 0 calc(var(--jianju)*3);}
-.hero-text{max-width:640px;}
-.hero h1{font-size:calc(var(--zihao)*2.6);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
-.hero .sub{margin-top:14px;font-size:calc(var(--zihao)*1.05);color:var(--cizi);}
-.btns{margin-top:26px;display:flex;gap:calc(var(--jianju)*1.2);}
-.btn{border-radius:var(--yuanjiao);padding:13px 30px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
-.btn.solid{background:var(--zhucai);color:#fff;box-shadow:0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
-.btn.ghost{border-color:color-mix(in srgb,var(--zi) 25%,transparent);color:var(--zi);background:transparent;}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*1.4);margin-top:calc(var(--jianju)*3);}
-.feat{background:color-mix(in srgb,var(--zi) 5%,transparent);border:1px solid color-mix(in srgb,var(--zi) 10%,transparent);border-radius:calc(var(--yuanjiao)*1.2);padding:calc(var(--jianju)*1.4);}
-.feat .ico{font-size:26px;}
-.feat h3{margin:10px 0 6px;font-size:16px;}
-.feat p{font-size:13.5px;color:var(--cizi);}
-.stats{display:flex;gap:calc(var(--jianju)*2.4);margin-top:calc(var(--jianju)*3);padding:calc(var(--jianju)*2) 0;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);}
-.stat b{font-size:calc(var(--zihao)*2);font-weight:800;color:var(--zhongdian);}
-.stat span{display:block;font-size:13px;color:var(--cizi);margin-top:4px;}
-.foot{padding:calc(var(--jianju)*2) 0;color:var(--cizi);font-size:13px;display:flex;justify-content:space-between;border-top:1px solid color-mix(in srgb,var(--zi) 12%,transparent);margin-top:calc(var(--jianju)*2);}
-.visual{display:none;}
-body[data-lay="center"] .hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
-body[data-lay="center"] .hero-text{margin:0 auto;}
-body[data-lay="split"] .hero,body[data-lay="asym"] .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:calc(var(--jianju)*2);align-items:center;}
-body[data-lay="split"] .visual,body[data-lay="asym"] .visual{display:block;min-height:220px;border-radius:calc(var(--yuanjiao)*1.5);background:linear-gradient(135deg,var(--zhongdian),var(--zhucai));}
-body[data-lay="asym"] .visual{background:radial-gradient(circle at 35% 30%,var(--mo,var(--zhongdian)),transparent 62%);border-radius:50% 42% 56% 44%;}
-body[data-lay="film"] .features{grid-auto-flow:column;grid-auto-columns:280px;overflow-x:auto;grid-template-columns:none;}
-body[data-glow="1"] .btn.solid{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhongdian),0 calc(var(--yinying)*0.3px) calc(var(--yinying)*0.8px) rgba(0,0,0,.25);}
+body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;padding:calc(var(--jianju)*1.4) calc(var(--jianju)*1.6);}
+.masthead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--zi);padding-bottom:10px;margin-bottom:18px;}
+.brand{font-family:Georgia,"Songti SC",serif;font-weight:800;font-size:24px;letter-spacing:1px;}
+.issue{font-size:12px;color:var(--cizi);}
+.kicker{color:var(--zhucai);font-weight:800;font-size:12px;letter-spacing:3px;text-transform:uppercase;}
+.head{font-family:Georgia,"Songti SC",serif;font-size:calc(var(--zihao)*2.9);font-weight:800;line-height:1.12;margin:10px 0 16px;}
+.byline{font-size:12.5px;color:var(--cizi);border-top:1px solid #ccc;border-bottom:1px solid #ccc;padding:6px 0;margin-bottom:14px;}
+.multi{column-count:var(--lan);column-gap:calc(var(--jianju)*1.6);font-size:14px;color:#333;line-height:1.75;text-align:justify;}
+.multi p{margin-bottom:11px;}
+body[data-shouzi="1"] .multi p:first-child::first-letter{font-family:Georgia,serif;font-size:calc(var(--zihao)*3.4);font-weight:800;float:left;line-height:.78;padding:6px 9px 0 0;color:var(--zhucai);}
+.pull{font-family:Georgia,serif;font-style:italic;color:var(--zhongdian);border-left:3px solid var(--zhucai);padding-left:12px;margin:6px 0 11px;break-inside:avoid;}
 </style>
 </head>
-<body data-lay="left" data-glow="0">
-  <div class="wrap">
-    <nav class="nav"><span class="logo">杂志排版风</span><span class="menu"><a>首页</a><a>功能</a><a>案例</a><a>定价</a></span><button class="cta">订阅周刊</button></nav>
-    <header class="hero">
-      <div class="hero-text"><h1>编辑部</h1><p class="sub">杂志式排版，用网格与留白让长文也读得下去</p><div class="btns"><button class="btn solid">订阅周刊</button><button class="btn ghost">投稿</button></div></div>
-      <div class="visual"></div>
-    </header>
-    <section class="features">
-      <article class="feat"><div class="ico">📰</div><h3>头条栏目</h3><p>大标题 + 导语，定调本期重点</p></article>
-      <article class="feat"><div class="ico">📝</div><h3>深度长读</h3><p>多栏正文，配图与引文穿插</p></article>
-      <article class="feat"><div class="ico">🏷</div><h3>专题标签</h3><p>按话题聚合，方便追更</p></article>
-    </section>
-    <section class="stats">
-      <div class="stat"><b>36</b><span>在更栏目</span></div>
-      <div class="stat"><b>210</b><span>深度稿</span></div>
-      <div class="stat"><b>4.2万</b><span>月读读者</span></div>
-    </section>
-    <footer class="foot"><span>© 2026 杂志排版风</span><span>隐私 · 条款 · 联系</span></footer>
-  </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<body data-shouzi="1">
+<div class="masthead"><span class="brand">谷雨周刊</span><span class="issue">第 214 期 · 城市与慢生活</span></div>
+<div class="kicker">封面故事</div>
+<div class="head">当一座城市决定，把节奏放慢下来</div>
+<div class="byline">文 / 沈知白 · 摄影 / 林川 · 阅读约 8 分钟</div>
+<div class="multi">
+<p>在西南的这座山城，晨雾还没散尽，江边的早市已经支起了第一笼热气。摊主不急着叫卖，买菜的人也不急着还价——时间在这里，好像被刻意拉长了几拍。</p>
+<p class="pull">"我们不缺效率，缺的是把一件事做完的耐心。"</p>
+<p>过去十年，城市更新像一场没有终点的赛跑。玻璃幕墙越盖越高，地铁线越铺越远，连早餐摊都开始用扫码点单。可当速度成为唯一的美德，人们反而记不清上一顿饭的味道。</p>
+<p>于是有人提出一种逆向的实验：把主干道的车道让出一条给自行车，把写字楼的电梯等候区改成可以发呆的角落。起初争议不断，半年后，街角的咖啡馆多了，遛狗的人也多了。</p>
+<p>慢，不是落后，而是一种被重新发现的奢侈。当一座城市愿意为停顿留出空间，生活才真正开始呼吸。</p>
+</div>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='shouzi'){document.body.setAttribute('data-shouzi',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lan:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
 </body>
 </html>

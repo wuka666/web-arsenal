@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>角标过渡演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
+.badge{position:relative;background:var(--bc,#f4f5f7);border-radius:10px;padding:14px 20px;font-size:14px;color:#333}
+.b{position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;padding:0 5px;background:var(--cc,#ef4444);color:#fff;border-radius:11px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;overflow:hidden}
+.flip{display:inline-block;transition:transform var(--fdur,.35s) ease}
+.flip.go{transform:translateY(var(--fd,-100%));opacity:0}
+.controls{display:flex;gap:10px}
+button{background:var(--cc,#ef4444);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer}
+</style></head><body>
+<div class="badge">消息<span class="b"><span class="flip" id="flip">5</span></span></div>
+<div class="controls"><button id="dec">-1</button><button id="inc">+1</button></div>
+<script>
+const flip=document.getElementById('flip');
+const state={bc:'#f4f5f7',cc:'#ef4444',start:5,dir:'down',dur:.35};
+let v=state.start;
+function applyStyle(){document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--cc',state.cc);document.documentElement.style.setProperty('--fdur',state.dur+'s');document.documentElement.style.setProperty('--fd',state.dir==='up'?'100%':'-100%');}
+function set(n){flip.classList.add('go');setTimeout(()=>{flip.textContent=n;flip.classList.remove('go');},180);}
+document.getElementById('dec').onclick=()=>{v=Math.max(0,v-1);set(v);};
+document.getElementById('inc').onclick=()=>{v=Math.min(99,v+1);set(v);};
+applyStyle();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','cc','start','dir','dur'].includes(d.key))applyStyle();});
+</script></body></html>

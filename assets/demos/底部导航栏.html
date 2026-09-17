@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底部导航栏演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column}
+.content{flex:1;display:flex;align-items:center;justify-content:center;color:#555;font-size:15px}
+.bar{position:relative;display:flex;border-top:1px solid #eceef1;background:#fff;transition:height .3s}
+.t{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--off,#9aa0a6);transition:color .3s}
+.t.on{color:var(--ac,#2f6bff)}
+.ic{width:var(--isz,22px);height:var(--isz,22px);border-radius:6px;background:currentColor;opacity:.85}
+.lb{font-size:var(--fs,12px)}
+.ind{position:absolute;top:0;height:var(--ih,3px);background:var(--ac,#2f6bff);border-radius:0 0 3px 3px;transition:left .3s cubic-bezier(.4,1.2,.5,1),width .3s;left:0}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="content" id="ct">首页</div>
+<div class="bar" id="bar">
+<div class="t on" data-i="0"><span class="ic"></span><span class="lb">首页</span></div>
+<div class="t" data-i="1"><span class="ic"></span><span class="lb">消息</span></div>
+<div class="t" data-i="2"><span class="ic"></span><span class="lb">我的</span></div>
+<div class="ind" id="ind"></div>
+</div>
+</div></div>
+<script>
+const tabs=[...document.querySelectorAll('.t')],ind=document.getElementById('ind'),bar=document.getElementById('bar'),ct=document.getElementById('ct');
+const names=['首页','消息','我的'];
+const state={ac:'#2f6bff',off:'#9aa0a6',ih:3,radius:14,dur:.3,fs:12,isz:22,bh:60};
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--off',state.off);document.documentElement.style.setProperty('--ih',state.ih+'px');document.documentElement.style.setProperty('--fs',state.fs+'px');document.documentElement.style.setProperty('--isz',state.isz+'px');bar.style.height=state.bh+'px';bar.style.borderRadius=state.radius+'px';ind.style.transition='left '+state.dur+'s cubic-bezier(.4,1.2,.5,1),width '+state.dur+'s';}
+function place(){const t=tabs.find(x=>x.classList.contains('on'));ind.style.left=t.offsetLeft+'px';ind.style.width=t.offsetWidth+'px';}
+function select(i){tabs.forEach((t,k)=>t.classList.toggle('on',k===i));ct.textContent=names[i];place();}
+tabs.forEach((t,i)=>t.onclick=()=>select(i));
+applyStyle();select(0);setTimeout(place,60);
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','off','ih','radius','dur','fs','isz','bh'].includes(d.key)){applyStyle();place();}});
+</script></body></html>

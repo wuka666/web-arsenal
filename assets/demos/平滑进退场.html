@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平滑进退场演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.toast{background:var(--bc,#323232);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(var(--in,16px));transition:opacity .4s ease,transform .4s ease}
+.toast.on{opacity:1;transform:translateY(0)}
+</style></head><body>
+<div class="toast" id="t">已保存草稿</div>
+<script>
+const t=document.getElementById('t');
+const state={bc:'#323232',inY:16,enter:.4,stay:1.8,exit:.4,ease:'ease'};
+function applyStyle(){t.style.background=state.bc;t.style.transition='opacity '+state.enter+'s '+state.ease+',transform '+state.enter+'s '+state.ease;document.documentElement.style.setProperty('--in',state.inY+'px');}
+function loop(){t.classList.add('on');setTimeout(()=>{t.classList.remove('on');setTimeout(loop,(state.exit+state.stay)*1000);},(state.enter+state.stay)*1000);}
+applyStyle();loop();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','inY','enter','stay','exit','ease'].includes(d.key))applyStyle();});
+</script></body></html>

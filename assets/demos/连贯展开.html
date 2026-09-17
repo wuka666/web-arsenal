@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>连贯展开演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;gap:20px;padding:24px}
+.bell{position:relative;width:46px;height:46px;border-radius:50%;background:#f4f5f7;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.red{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--rc,#ef4444);border:2px solid #fff}
+.pop{position:absolute;top:54px;left:0;width:220px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;font-size:13px;color:#333;box-shadow:0 10px 30px rgba(0,0,0,.18);transform-origin:top left;transform:scale(.2);opacity:0;transition:transform .35s cubic-bezier(.34,1.4,.5,1),opacity .25s;z-index:4}
+.pop.on{transform:scale(1);opacity:1}
+</style></head><body>
+<div class="bell" id="bell">🔔<span class="red" id="red"></span><div class="pop" id="pop">你有 3 条新消息，点击查看详情</div></div>
+<script>
+const bell=document.getElementById('bell'),pop=document.getElementById('pop'),red=document.getElementById('red');
+const state={rc:'#ef4444',dir:'bottom-right',dur:.35,pc:'#ffffff',radius:12};
+function applyStyle(){red.style.background=state.rc;pop.style.borderRadius=state.radius+'px';pop.style.background=state.pc;pop.style.transition='transform '+state.dur+'s cubic-bezier(.34,1.4,.5,1),opacity '+state.dur+'s ease';pop.style.transformOrigin=state.dir==='bottom-right'?'top left':(state.dir==='bottom-left'?'top right':'top center');}
+bell.onclick=()=>pop.classList.toggle('on');
+applyStyle();pop.classList.add('on');
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['rc','dir','dur','pc','radius'].includes(d.key))applyStyle();});
+</script></body></html>

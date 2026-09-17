@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>按钮充能触发演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: #fff; font-family: system-ui, "Microsoft YaHei", sans-serif;
+  }
+  .btn {
+    position: relative; overflow: hidden; cursor: default; user-select: none;
+    background: var(--btnBg, #1a1a1a); color: var(--btnColor, #fff);
+    border: none; outline: none; border-radius: var(--radius, 12px);
+    padding: var(--padY, 14px) var(--padX, 28px);
+    font-size: 15px; font-weight: 700; transition: box-shadow .25s ease;
+  }
+  .btn.armed { cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--fill, #16a34a) 40%, transparent); }
+  .fill {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 0%;
+    background: var(--fill, #16a34a); opacity: .85; z-index: 0;
+  }
+  .fill.center { left: 50%; transform: translateX(-50%); width: 0%; }
+  .label { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+<button class="btn" id="btn"><span class="fill" id="fill"></span><span class="label" id="label">充能 0%</span></button>
+
+<script>
+  const btn = document.getElementById("btn");
+  const fill = document.getElementById("fill");
+  const label = document.getElementById("label");
+  const state = {
+    fillMode: "从左到右",
+    threshold: 100,
+    dur: 2.5,
+    auto: true,
+    fillColor: "#16a34a",
+    btnBg: "#1a1a1a",
+    btnColor: "#ffffff",
+    radius: 12,
+    padX: 28,
+    padY: 14,
+    armedText: "已触发 ✓"
+  };
+  let raf = 0, holding = false, p = 0, firing = false;
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty("--btnBg", state.btnBg);
+    root.style.setProperty("--btnColor", state.btnColor);
+    root.style.setProperty("--fill", state.fillColor);
+    root.style.setProperty("--radius", state.radius + "px");
+    root.style.setProperty("--padX", state.padX + "px");
+    root.style.setProperty("--padY", state.padY + "px");
+    fill.className = "fill" + (state.fillMode === "从中心扩散" ? " center" : "");
+  }
+
+  function setArmed() {
+    const armed = p >= state.threshold;
+    btn.classList.toggle("armed", armed && !firing);
+  }
+  function render() {
+    fill.style.width = p + "%";
+    label.textContent = firing ? state.armedText : (p >= state.threshold ? "点击触发" : "充能 " + Math.round(p) + "%");
+    setArmed();
+  }
+
+  function run() {
+    cancelAnimationFrame(raf);
+    firing = false; p = 0; render();
+    const dur = Math.max(state.dur, 0.2) * 1000;
+    const start = performance.now();
+    function tick(now) {
+      if (!state.auto && !holding) return; // 非自动：按住才充
+      const t = Math.min((now - start) / dur, 1);
+      p = t * state.threshold;
+      render();
+      if (p < state.threshold) raf = requestAnimationFrame(tick);
+      else setArmed();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  btn.addEventListener("mousedown", () => { if (!state.auto) { holding = true; run(); } });
+  window.addEventListener("mouseup", () => { if (!state.auto) holding = false; });
+
+  btn.addEventListener("click", () => {
+    if (p >= state.threshold && !firing) {
+      firing = true; render();
+      setTimeout(() => { firing = false; run(); }, 1200); // 触发后复位重来
+    }
+  });
+
+  document.getElementById("btn");
+  applyStyle();
+  run();
+
+  window.addEventListener("message", (e) => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; applyStyle();
+    if (["fillMode","threshold","dur","auto","fillColor","btnBg","btnColor","radius","padX","padY","armedText"].includes(d.key)) run();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分段控件演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.phone{position:relative;width:280px;height:520px;background:#fff;border:9px solid #1c1c22;border-radius:34px;overflow:hidden}
+.screen{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column}
+.seg{position:relative;margin:14px;display:flex;background:var(--tk,#eef0f3);border-radius:var(--sr,10px);padding:3px;transition:height .3s}
+.s{position:relative;flex:1;text-align:center;padding:9px 0;font-size:var(--fs,13px);color:#666;cursor:pointer;z-index:2;transition:color .3s}
+.s.on{color:var(--sc,#fff)}
+.thumb{position:absolute;top:3px;bottom:3px;background:var(--ac,#2f6bff);border-radius:calc(var(--sr,10px) - 3px);transition:left .3s cubic-bezier(.4,1.2,.5,1),width .3s;left:3px;z-index:1}
+.body{flex:1;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px}
+</style></head><body>
+<div class="phone"><div class="screen" id="sc">
+<div class="seg" id="seg"><div class="thumb" id="th"></div></div>
+<div class="body" id="bd">全部消息</div>
+</div></div>
+<script>
+const seg=document.getElementById('seg'),th=document.getElementById('th'),bd=document.getElementById('bd');
+const labels=['全部','未读'];
+const state={ac:'#2f6bff',tk:'#eef0f3',sc:'#ffffff',n:2,sr:10,dur:.3,fs:13,bh:42};
+let segs=[];
+function build(){seg.querySelectorAll('.s').forEach(e=>e.remove());segs=[];for(let i=0;i<state.n;i++){const el=document.createElement('div');el.className='s'+(i===0?' on':'');el.textContent=labels[i]||('段'+(i+1));el.onclick=()=>select(i);seg.appendChild(el);segs.push(el);}place();}
+function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--tk',state.tk);document.documentElement.style.setProperty('--sc',state.sc);document.documentElement.style.setProperty('--sr',state.sr+'px');document.documentElement.style.setProperty('--fs',state.fs+'px');seg.style.height=state.bh+'px';th.style.transition='left '+state.dur+'s cubic-bezier(.4,1.2,.5,1),width '+state.dur+'s';}
+function place(){const el=segs.find(x=>x.classList.contains('on'));if(!el)return;th.style.left=el.offsetLeft+'px';th.style.width=el.offsetWidth+'px';}
+function select(i){segs.forEach((s,k)=>s.classList.toggle('on',k===i));bd.textContent=(labels[i]||('段'+(i+1)))+'消息';place();}
+applyStyle();build();setTimeout(place,60);
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['ac','tk','sc','n','sr','dur','fs','bh'].includes(d.key)){applyStyle();build();}});
+</script></body></html>

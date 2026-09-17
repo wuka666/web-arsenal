@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>产品导览演示</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
+.hd{color:#333;font-size:15px}
+.app{position:relative;width:340px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feat{background:#f4f5f7;border-radius:12px;padding:18px;text-align:center;color:#444;font-size:14px;transition:.2s}
+.ring{position:absolute;border:3px solid var(--hl,#2f6bff);border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none;transition:.35s cubic-bezier(.4,1.3,.5,1);opacity:0;z-index:4}
+.ring.on{opacity:1}
+.tip{position:absolute;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;width:200px;font-size:13px;color:#222;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(6px);transition:.3s;z-index:6}
+.tip.on{opacity:1;transform:none}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.step{font-size:11px;color:#888}
+.nx{background:var(--hl,#2f6bff);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
+.fin{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
+</style></head><body>
+<div class="hd">示例应用</div>
+<div class="app" id="app">
+  <div class="feat" data-i="0">数据看板</div>
+  <div class="feat" data-i="1">设置中心</div>
+  <div class="feat" data-i="2">消息通知</div>
+  <div class="feat" data-i="3">个人资料</div>
+  <div class="ring" id="ring"></div>
+  <div class="tip" id="tip"><div id="tipText"></div><div class="bar"><span class="step" id="step"></span><span id="tipBtn"></span></div></div>
+</div>
+<script>
+const feats=[...document.querySelectorAll('.feat')];
+const ring=document.getElementById('ring'),tip=document.getElementById('tip'),tipText=document.getElementById('tipText'),stepEl=document.getElementById('step'),tipBtn=document.getElementById('tipBtn');
+const state={steps:4,hl:'#2f6bff',mask:.45,radius:14,fs:13,dur:2.5,auto:true,finText:'开始使用'};
+const caps=['数据看板：一眼看全核心指标','设置中心：调整偏好与权限','消息通知：重要动态不漏接','个人资料：完善后协作更高效'];
+let i=0,timer=0;
+function applyStyle(){document.documentElement.style.setProperty('--hl',state.hl);ring.style.borderRadius=state.radius+'px';tip.style.fontSize=state.fs+'px';ring.style.boxShadow='0 0 0 9999px rgba(0,0,0,'+state.mask+')';}
+function place(){const r=feats[i].getBoundingClientRect(),a=document.getElementById('app').getBoundingClientRect();ring.style.left=(r.left-a.left-6)+'px';ring.style.top=(r.top-a.top-6)+'px';ring.style.width=(r.width+12)+'px';ring.style.height=(r.height+12)+'px';tip.style.left=(r.left-a.left+r.width+14)+'px';tip.style.top=(r.top-a.top)+'px';}
+function show(){applyStyle();place();ring.classList.add('on');tip.classList.add('on');tipText.textContent=caps[i];stepEl.textContent=(i+1)+' / '+state.steps;tipBtn.innerHTML=i<state.steps-1?'<button class="nx" id="nx">下一步</button>':'<button class="fin" id="nx">'+state.finText+'</button>';document.getElementById('nx').onclick=()=>{if(i<state.steps-1){i++;show();}else{ring.classList.remove('on');tip.classList.remove('on');}};}
+function start(){i=0;show();if(state.auto){clearInterval(timer);timer=setInterval(()=>{if(i<state.steps-1){i++;show();}else{clearInterval(timer);ring.classList.remove('on');tip.classList.remove('on');}},state.dur*1000);}}
+window.addEventListener('resize',()=>{if(ring.classList.contains('on'))place();});
+applyStyle();start();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['steps','hl','mask','radius','fs','dur','auto','finText'].includes(d.key))start();});
+</script></body></html>
