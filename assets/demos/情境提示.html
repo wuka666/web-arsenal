@@ -14,10 +14,10 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 <button class="sub" id="sub">保存</button>
 <script>
 const inp=document.getElementById('inp'),tip=document.getElementById('tip'),sub=document.getElementById('sub');
-const state={hl:'#2f6bff',text:'昵称不能为空',dur:.3};
-function applyStyle(){document.documentElement.style.setProperty('--hl',state.hl);tip.textContent=state.text;sub.style.background=state.hl;tip.style.transition='opacity '+state.dur+'s ease,transform '+state.dur+'s ease';}
+const state={hl:'#2f6bff',text:'昵称不能为空',dur:.3,bg:'#ffffff',bd:'#d7dce3',radius:10};
+function applyStyle(){document.body.style.background=state.bg;inp.style.borderColor=state.bd;inp.style.borderRadius=state.radius+'px';document.documentElement.style.setProperty('--hl',state.hl);tip.textContent=state.text;sub.style.background=state.hl;tip.style.transition='opacity '+state.dur+'s ease,transform '+state.dur+'s ease';}
 function check(){if(inp.value.trim()===''){inp.classList.add('bad');tip.classList.add('on');}else{inp.classList.remove('bad');tip.classList.remove('on');}}
 sub.onclick=check;inp.addEventListener('input',()=>{if(inp.value.trim()!==''){inp.classList.remove('bad');tip.classList.remove('on');}});
 applyStyle();
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['hl','text','dur'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['hl','text','dur','bg','bd','radius'].includes(d.key))applyStyle();});
 </script></body></html>

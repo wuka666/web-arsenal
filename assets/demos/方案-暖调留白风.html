@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案·暖调留白风</title>
+<style>
+:root{
+  --di:#F5F5F7;
+  --zi:#1D1D1F;
+  --cizi:#6E6E73;
+  --lian:#0066CC;
+  --zhucai:#1D1D1F;
+  --yuanjiao:980px;
+  --jianju:16px;
+  --zihao:17px;
+  --liubai:90px;
+  --yinying:10;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;}
+body{background:var(--di);color:var(--zi);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--liubai) 20px;}
+.eyebrow{font-size:calc(var(--zihao)*1.4);font-weight:600;color:var(--zi);margin-bottom:6px;}
+.h1{font-size:calc(var(--zihao)*4);font-weight:700;letter-spacing:-2px;line-height:1.05;}
+.sub{margin-top:14px;font-size:calc(var(--zihao)*1.5);color:var(--cizi);font-weight:500;}
+.links{margin-top:22px;display:flex;gap:28px;justify-content:center;font-size:calc(var(--zihao)*1.05);}
+.links a{color:var(--lian);text-decoration:none;}
+.links a:hover{text-decoration:underline;}
+.cta{margin-top:30px;background:var(--zhucai);color:#fff;border:none;border-radius:var(--yuanjiao);padding:12px 26px;font-size:calc(var(--zihao)*.95);font-weight:500;cursor:pointer;}
+.visual{margin-top:42px;width:min(560px,86vw);aspect-ratio:16/10;border-radius:18px;background:linear-gradient(135deg,#E8E8ED,#C9C9D0);box-shadow:0 calc(var(--yinying)*1px) calc(var(--yinying)*3px) rgba(0,0,0,.12);}
+</style>
+</head>
+<body>
+<div class="eyebrow">栖屋家居</div>
+<div class="h1">静，成为一种设计</div>
+<div class="sub">更少，更久，更耐看。</div>
+<div class="links">
+  <a href="#">了解更多 ›</a>
+  <a href="#">购买 ›</a>
+</div>
+<button class="cta">选购系列</button>
+<div class="visual"></div>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+</body>
+</html>

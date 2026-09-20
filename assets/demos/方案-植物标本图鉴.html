@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>植物标本图鉴</title>
+<style>
+:root{
+  --se:#F4F1E8;      /* 标本纸 */
+  --lv:#5C7A48;      /* 苔绿 */
+  --mo:#23281F;      /* 墨字 */
+  --hui:#8C8B7E;     /* 标注 */
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:4px;
+  --gebi:1;          /* 网格密度倍率 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--se);color:var(--mo);min-height:100vh;
+  font-family:Georgia,"Songti SC",serif;display:flex;flex-direction:column}
+nav{display:flex;gap:calc(var(--jianju)*1.2);align-items:center;
+  padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.6);border-bottom:1px solid rgba(35,40,31,.14);
+  font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.16em}
+nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.05);letter-spacing:.1em;font-weight:400}
+nav a{color:var(--hui);text-decoration:none}
+nav a:hover{color:var(--lv)}
+main{flex:1;display:grid;grid-template-columns:minmax(300px,.9fr) 1.1fr;min-height:0}
+.lede{padding:calc(var(--jianju)*2.2) calc(var(--jianju)*1.6);display:flex;flex-direction:column;gap:calc(var(--jianju)*1.1);justify-content:center}
+h1{font-size:calc(var(--zihao)*2.6);line-height:1.24;letter-spacing:.01em}
+h1 em{font-style:normal;color:var(--lv)}
+.lede p{color:var(--hui);font-size:calc(var(--zihao)*.86);line-height:1.85;max-width:30em}
+.meta{display:flex;gap:calc(var(--jianju)*1.4);padding-top:calc(var(--jianju)*.8);border-top:1px solid rgba(35,40,31,.14)}
+.meta div{display:flex;flex-direction:column;gap:5px}
+.meta b{font-family:Consolas,monospace;font-size:calc(var(--zihao)*1.05);font-weight:500}
+.meta span{font-size:10.5px;color:var(--hui);letter-spacing:.16em}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--jianju)*.55/var(--gebi));
+  padding:calc(var(--jianju)*1.4);border-left:1px solid rgba(35,40,31,.14);align-content:start}
+.spec{position:relative;padding-bottom:132%;border:1px solid rgba(35,40,31,.2);border-radius:var(--yuanjiao);
+  overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--lv) 12%,transparent),transparent 62%)}
+.spec i{position:absolute;inset:auto 0 0 0;background:rgba(244,241,232,.94);border-top:1px solid rgba(35,40,31,.16);
+  padding:8px 10px;transform:translateY(100%);transition:transform .28s;
+  font-style:normal;font-size:11.5px;line-height:1.5}
+.spec i span{display:block;font-family:Consolas,monospace;color:var(--lv);letter-spacing:.06em}
+.spec b{position:absolute;top:10px;left:10px;font-family:Consolas,monospace;font-size:10.5px;color:var(--hui)}
+.spec:hover i,.spec:focus-within i{transform:translateY(0)}
+/* 标本轮廓：用 clip-path 做出叶形剪影，完全离线 */
+.spec::after{content:"";position:absolute;left:50%;top:44%;width:46%;height:62%;transform:translate(-50%,-50%);
+  background:color-mix(in srgb,var(--lv) 62%,transparent);
+  clip-path:polygon(50% 0,68% 26%,66% 52%,86% 74%,58% 70%,50% 100%,42% 70%,14% 74%,34% 52%,32% 26%);
+  opacity:.5}
+.spec:nth-child(3n+2)::after{clip-path:polygon(50% 4%,72% 30%,58% 58%,74% 88%,50% 78%,26% 88%,42% 58%,28% 30%);background:color-mix(in srgb,var(--lv) 48%,transparent)}
+.spec:nth-child(3n+3)::after{clip-path:ellipse(30% 48% at 50% 50%);background:color-mix(in srgb,var(--lv) 34%,transparent)}
+@media (max-width:900px){main{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr);border-left:none;border-top:1px solid rgba(35,40,31,.14)}}
+</style>
+</head>
+<body>
+<nav>
+  <b>北岭植物图鉴</b>
+  <a href="#">标本</a><a href="#">采集地</a><a href="#">索引</a><a href="#">关于</a>
+</nav>
+<main>
+  <div class="lede">
+    <h1>把一座山的植物<br>压进<em>四十六张</em>标本纸</h1>
+    <p>每一份标本都记着采集地、海拔与日期。叶脉是被压出来的形状，不是画出来的——所以我们只标注，不美化。</p>
+    <div class="meta">
+      <div><b>46</b><span>标本份数</span></div>
+      <div><b>1,240–2,860</b><span>海拔区间 M</span></div>
+      <div><b>2019–2026</b><span>采集年份</span></div>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+var state = {
+  se:'#F4F1E8', lv:'#5C7A48', mo:'#23281F', hui:'#8C8B7E',
+  zihao:16, jianju:22, yuanjiao:4, gebi:1
+};
+var SPEC = [
+  ['No.014','岩生铁线莲','Clematis rupestris · 海拔 2,140 m'],
+  ['No.021','北岭报春','Primula beilingensis · 海拔 2,680 m'],
+  ['No.029','绢毛忍冬','Lonicera sericea · 海拔 1,860 m'],
+  ['No.033','狭叶龙胆','Gentiana angusta · 海拔 2,860 m'],
+  ['No.038','苔状虎耳草','Saxifraga muscosa · 海拔 2,420 m'],
+  ['No.046','北岭风毛菊','Saussurea beilingii · 海拔 2,260 m']
+];
+var grid=document.getElementById('grid');
+grid.innerHTML=SPEC.map(function(s){
+  return '<div class="spec" tabindex="0"><b>'+s[0]+'</b><i>'+s[1]+'<span>'+s[2]+'</span></i></div>';
+}).join('');
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--se',state.se);r.setProperty('--lv',state.lv);
+  r.setProperty('--mo',state.mo);r.setProperty('--hui',state.hui);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  r.setProperty('--gebi',state.gebi);
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

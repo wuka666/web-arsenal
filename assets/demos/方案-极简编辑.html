@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- 防土法则⑤ 极简编辑：安静双栏阅读页（左索引 + 右正文），全页一个灰，唯一个元素吃强调色 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·极简编辑</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--se);color:var(--zi);min-height:100vh}
+  .doc{display:grid;grid-template-columns:var(--rail) 1fr;gap:var(--pad);min-height:100vh;padding:var(--pad)}
+  .rail{display:flex;flex-direction:column;gap:14px;padding-top:6vh;font-size:14px}
+  .rail .r{color:var(--zi);opacity:.45;transition:opacity .2s}
+  .rail .r.on{color:var(--ac);font-weight:700;opacity:1}
+  .body{padding-top:6vh;max-width:60ch}
+  .body h2{font-size:30px;font-weight:800;letter-spacing:-.01em;margin-bottom:18px}
+  .body p{font-size:16px;line-height:var(--lh);opacity:.78;margin-bottom:14px}
+</style>
+</head>
+<body>
+  <main class="doc">
+    <nav class="rail">
+      <div class="r">引言</div>
+      <div class="r on">方法</div>
+      <div class="r">案例</div>
+      <div class="r">结语</div>
+    </nav>
+    <article class="body">
+      <h2>方法</h2>
+      <p>先把一切都调成同一个灰。等层级靠字重、间距、留白站住之后，再放一处强调色——且只放一处。</p>
+      <p>强调色表达的是优先级，不是装饰。把它留给当前读到的那一行，其余一律安静。</p>
+    </article>
+  </main>
+<script>
+  const state={rail:200,pad:48,lh:1.7,se:'#F2F2F0',zi:'#3A3A38',ac:'#C0432B'};
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--rail',state.rail+'px');
+    s.setProperty('--pad',state.pad+'px');
+    s.setProperty('--lh',state.lh);
+    s.setProperty('--se',state.se);
+    s.setProperty('--zi',state.zi);
+    s.setProperty('--ac',state.ac);
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

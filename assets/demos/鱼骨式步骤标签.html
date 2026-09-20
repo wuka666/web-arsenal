@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!-- M171 鱼骨式步骤标签：chevron 首尾相连，当前蓝填充/已完成灰对勾/未完成空心（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page,#f5f6f8);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+  .stg{display:flex}
+  /* --clip 由 JS 注入（缺口深 --nd 随参数变）；负 margin 让箭头互相咬合成鱼骨 */
+  .step{position:relative;width:var(--w);height:var(--h);margin-left:calc(var(--nd) * -1);
+        display:flex;align-items:center;justify-content:center;font-size:var(--fs);font-weight:600;color:var(--txt);
+        /* 左右各让出缺口深，文字不落进被 clip 裁掉的咬合区 */
+        padding:0 calc(var(--nd) + 6px);white-space:nowrap;overflow:hidden;
+        background:var(--donec);clip-path:var(--clip);cursor:pointer;transition:background var(--dur) ease,color var(--dur) ease}
+  .step:first-child{margin-left:0}
+  .step.cur{background:var(--acc);color:#fff}
+  /* 空心 = 外层描边色打底 + 内层同形挖孔；两层共用同一 clip-path 才不露边 */
+  .step.hollow{background:var(--empty)}
+  .step.hollow .hole{position:absolute;inset:2px;background:var(--page);clip-path:var(--clip)}
+  .step .lb{position:relative;z-index:1;display:flex;align-items:center;gap:4px}
+</style>
+</head>
+<body>
+  <div class="stg" id="stg"></div>
+<script>
+  const state={n:4,cur:2,acc:'#2f6bff',donec:'#e3e8f0',empty:'#c9ced6',txt:'#5b6472',nd:14,h:44,fs:14,chk:true,dur:0.25};
+  const NAMES=['填写信息','确认订单','支付','完成','评价','售后'];
+  const stg=document.getElementById('stg');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--acc',state.acc); s.setProperty('--donec',state.donec); s.setProperty('--empty',state.empty);
+    s.setProperty('--txt',state.txt); s.setProperty('--nd',state.nd+'px'); s.setProperty('--h',state.h+'px');
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--page',getComputedStyle(document.body).backgroundColor);
+    s.setProperty('--dur',state.dur+'s');
+    // 步骤宽 = 高 × 2.6，保证「对勾/序号 + 名称」放得下且不溢出两侧咬合缺口
+    s.setProperty('--w',(state.h*2.6)+'px');
+    s.setProperty('--clip','polygon(0 0,calc(100% - '+state.nd+'px) 0,100% 50%,calc(100% - '+state.nd+'px) 100%,0 100%,'+state.nd+'px 50%)');
+    stg.innerHTML='';
+    for(let i=0;i<state.n;i++){
+      const st=document.createElement('div');
+      const done=i<state.cur-1, isCur=i===state.cur-1;
+      st.className='step'+(isCur?' cur':(done?'':' hollow'));
+      const mark=done&&state.chk?'✓':(i+1);
+      st.innerHTML='<span class="hole"></span><span class="lb">'+mark+' '+(NAMES[i]||('步骤'+(i+1)))+'</span>';
+      st.onclick=()=>{state.cur=i+1;apply();};
+      stg.appendChild(st);
+    }
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

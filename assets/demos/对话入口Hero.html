@@ -13,7 +13,7 @@
   h1 { font-size: calc(var(--zihao)*1px); font-weight: 600; letter-spacing: -.03em; text-align: center; }
   /* 输入框 = 圆角大盒 + 内嵌发送钮；焦点时描边点亮强调色，是整个首屏唯一「跳色」 */
   .ask { width: 100%; margin-top: 28px; display: flex; align-items: flex-end; gap: 10px;
-         background: var(--kuang); border: 1px solid rgba(255,255,255,.1); border-radius: calc(var(--yuanjiao)*1px);
+         background: var(--kuang); border: 1px solid #7A766D; border-radius: calc(var(--yuanjiao)*1px);
          padding: 14px 14px 14px 20px; transition: border-color .25s, box-shadow .25s; }
   .ask:focus-within { border-color: color-mix(in srgb, var(--qiangdiao) 70%, transparent);
          box-shadow: 0 0 0 3px color-mix(in srgb, var(--qiangdiao) 18%, transparent); }
@@ -24,15 +24,15 @@
          transition: transform .2s, filter .2s; }
   .send:hover { transform: scale(1.06); filter: brightness(1.1); }
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
-  .chip { border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px;
+  .chip { border: 1px solid #7A766D; border-radius: 999px; padding: 8px 16px;
          font-size: 13px; color: color-mix(in srgb, var(--zi) 75%, transparent); cursor: pointer;
          transition: background .2s, border-color .2s; }
-  .chip:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.3); }
+  .chip:hover { background: rgba(122,118,109,.12); border-color: rgba(122,118,109,.4); }
   .entries { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 44px; width: 100%; }
-  .entry { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 14px 16px;
+  .entry { border: 1px solid #7A766D; border-radius: 12px; padding: 14px 16px;
          font-size: 13.5px; color: color-mix(in srgb, var(--zi) 85%, transparent); cursor: pointer;
          transition: background .2s, transform .2s; }
-  .entry:hover { background: rgba(255,255,255,.05); transform: translateY(-2px); }
+  .entry:hover { background: rgba(122,118,109,.1); transform: translateY(-2px); }
   .entry b { display: block; color: var(--zi); font-size: 13.5px; margin-bottom: 3px; }
   @media (max-width: 760px){ .entries { grid-template-columns: repeat(2, 1fr); } }
 </style>
@@ -55,7 +55,7 @@
     </div>
   </main>
 <script>
-const state = { di:'#141414', kuang:'#1e1e1e', zi:'#ececec', qiangdiao:'#ff4d6d',
+const state = { di:'#E6E4DF', kuang:'#ffffff', zi:'#26241F', qiangdiao:'#A8482F',
                 zihao:34, kuan:680, yuanjiao:24, bing:4 };
 const CHIPS = ['帮我写周报','解释这段代码','做个旅行计划','润色这段文案','列个学习清单','翻译成英文','头脑风暴','检查语法'];
 const chipsEl = document.getElementById('chips');

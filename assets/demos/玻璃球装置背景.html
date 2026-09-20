@@ -12,7 +12,7 @@
   .copy { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center;
           padding: 0 8vw; pointer-events: none; }
   .copy h1 { font-size: clamp(30px, 4.6vw, 62px); font-weight: 360; letter-spacing: -.035em; line-height: 1.05; max-width: 620px; }
-  .copy p { margin-top: 18px; max-width: 420px; color: #4D5B77; font-size: 15.5px; line-height: 1.6; }
+  .copy p { margin-top: 18px; max-width: 420px; color: #8B7355; font-size: 15.5px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -22,7 +22,7 @@
     <p>影棚底 + 实体玻璃装置的离线底板：球体高光、可调角度玻璃刃、缓慢流动的焦散，前景文字始终清晰。</p>
   </div>
 <script>
-const state = { yan:'#E6EDF6', qiut:'#dfe9f4', guang:'#ffffff', an:'#9db2cb',
+const state = { yan:'#F2E6D8', qiut:'#E8DCC8', guang:'#FFFDF8', an:'#8B7355',
                 qiuda:62, qiujiao:-18, daokuand:26, weiyi:58, guangsu:1, tui:0.4, liang:100 };
 const cv = document.getElementById('plate'), ctx = cv.getContext('2d');
 let W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2), t = 0, raf = 0;
@@ -37,7 +37,7 @@ function resize(){
 function draw(){
   const cx = W*0.62, cy = H * state.weiyi / 100, R = Math.min(W, H) * 0.5 * state.qiuda / 100;
   const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#f7fafd'); bg.addColorStop(0.6, state.yan); bg.addColorStop(1, rgba(state.an, .35));
+  bg.addColorStop(0, '#FFFDF8'); bg.addColorStop(0.6, state.yan); bg.addColorStop(1, rgba(state.an, .35));
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = rgba(state.guang, .28); ctx.fillRect(0, H*0.78, W, H*0.22);
   /* 微推近：周期呼吸，幅度由 tui 控制 */
@@ -56,13 +56,13 @@ function draw(){
   ca.addColorStop(0.5 + 0.18*Math.sin(t*1.3), rgba(state.guang, .55));
   ca.addColorStop(1, rgba(state.guang, 0));
   ctx.fillStyle = ca; ctx.beginPath(); ctx.ellipse(cx, cy + R*0.8, R*0.9, R*0.16, 0, 0, 6.2832); ctx.fill();
-  /* 玻璃刃：穿过球体的薄片，角度/宽度可调 */
+  /* 玻璃刃：穿过球体的薄片，角度/宽度可调；刃口描熔金，呼应工作室熔金语言 */
   ctx.save(); ctx.translate(cx, cy); ctx.rotate(state.qiujiao * Math.PI / 180);
   const bl = ctx.createLinearGradient(0, -state.daokuand, 0, state.daokuand);
   bl.addColorStop(0, rgba(state.guang, .65)); bl.addColorStop(0.5, rgba(state.qiut, .35)); bl.addColorStop(1, rgba(state.an, .6));
   ctx.fillStyle = bl;
   ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, state.daokuand, 0, 0, 6.2832); ctx.fill();
-  ctx.strokeStyle = rgba(state.guang, .85); ctx.lineWidth = 1.1;
+  ctx.strokeStyle = rgba('#C8763C', .85); ctx.lineWidth = 1.1;
   ctx.beginPath(); ctx.ellipse(0, 0, R*1.35, state.daokuand, 0, 0, 6.2832); ctx.stroke();
   ctx.strokeStyle = rgba(state.an, .55);
   ctx.beginPath(); ctx.moveTo(-R*1.3, 0); ctx.lineTo(R*1.3, 0); ctx.stroke();
@@ -81,7 +81,7 @@ still.addEventListener('change', start);
 addEventListener('resize', function(){ resize(); if (still.matches) draw(); });
 function apply(){
   const R = document.documentElement.style;
-  R.setProperty('--yan', state.yan); R.setProperty('--mo', '#020C21');
+  R.setProperty('--yan', state.yan); R.setProperty('--mo', '#2B2118');
   R.setProperty('--qiut', state.qiut); R.setProperty('--an', state.an);
   R.setProperty('--guang', state.guang); R.setProperty('--liang', state.liang);
 }

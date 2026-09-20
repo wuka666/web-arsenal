@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- 防土法则④ 沉浸氛围：整屏氛围层（渐变网 + 颗粒 + 单一光源 + 暗角），玻璃只做浮起小卡，而非全页玻璃 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·沉浸氛围</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+  .atmo{position:relative;overflow:hidden;min-height:100vh;background:
+    radial-gradient(80% 70% at 20% 14%, color-mix(in srgb,var(--hue) 80%, #fff) 0%, transparent 55%),
+    radial-gradient(90% 80% at 86% 28%, color-mix(in srgb,var(--hue) 55%, var(--ac)) 0%, transparent 52%),
+    radial-gradient(120% 100% at 58% 102%, color-mix(in srgb,var(--hue) 92%, #000) 0%, transparent 60%),
+    var(--hue)}
+  .atmo::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--grain);mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .atmo::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 120% at 50% 40%, transparent 38%, rgba(0,0,0,.55) 100%)}
+  .glow{position:absolute;width:62vw;height:62vw;left:8vw;top:-12vw;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb,var(--ac) 55%, transparent) 0%, transparent 62%);opacity:var(--glow);filter:blur(24px)}
+  .card{position:absolute;left:8vw;bottom:14vh;max-width:360px;padding:30px 32px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(calc(var(--bohua) * 1px)) saturate(1.15);color:var(--zi)}
+  .card .k{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.6}
+  .card h2{font-size:34px;line-height:1.08;font-weight:800;letter-spacing:-.01em;margin:14px 0}
+  .card p{font-size:14px;line-height:1.6;opacity:.7;max-width:30ch}
+</style>
+</head>
+<body>
+  <section class="atmo">
+    <div class="glow"></div>
+    <div class="card">
+      <div class="k">Now Playing</div>
+      <h2>夜的<br>厚度。</h2>
+      <p>氛围先开口，信息再跟进。玻璃只是浮起的一层，不抢底色。</p>
+    </div>
+  </section>
+<script>
+  const state={hue:'#2E3A4F',zi:'#F2F4F6',ac:'#79B8FF',bohua:14,glow:0.55,grain:0.30};
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--hue',state.hue);
+    s.setProperty('--zi',state.zi);
+    s.setProperty('--ac',state.ac);
+    s.setProperty('--bohua',state.bohua);
+    s.setProperty('--glow',state.glow);
+    s.setProperty('--grain',state.grain);
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

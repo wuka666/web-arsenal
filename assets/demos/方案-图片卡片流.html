@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>方案·图片卡片流</title>
 <style>
-:root{--zhucai:#E8743B;--zhongdian:#3C7A5E;--di:#FBF7F0;--zi:#2A2722;--cizi:#8A8275;--yuanjiao:14px;--jianju:12px;--zihao:15px;--yinying:18;--faguang:0;--lie:3}
+:root{--zhucai:#E8843C;--zhongdian:#F2C14E;--di:#FBF7F0;--zi:#2a2620;--cizi:#8a8170;--yuanjiao:14px;--jianju:12px;--zihao:15px;--yinying:18;--faguang:0;--lie:3}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
 body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);}
 .nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(var(--jianju)*1.5);}
@@ -26,11 +26,14 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.55;padd
 .card h4{font-size:14px;margin-bottom:6px;}
 .card p{font-size:12px;color:var(--cizi);}
 .tag{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;color:#fff;background:var(--zhucai);padding:3px 9px;border-radius:99px;}
-.tag.go{background:var(--zhongdian);}
+.tag.go{background:var(--zhongdian);color:var(--zi);}
 .aside{width:230px;flex:none;background:#fff;border-radius:var(--yuanjiao);padding:14px;box-shadow:0 calc(var(--yinying)*.25px) calc(var(--yinying)*.6px) rgba(0,0,0,.08);}
 .aside h3{font-size:13px;color:var(--cizi);margin-bottom:10px;font-weight:700;}
 .trip{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee;font-size:12.5px;}
 .trip .dot{width:8px;height:8px;border-radius:50%;background:var(--zhongdian);margin-top:5px;flex:none;}
+
+/* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
+.tag{box-shadow:0 0 calc(var(--faguang)*.45px) var(--zhucai)}
 </style>
 </head>
 <body>

@@ -62,14 +62,41 @@
   .chip-row::-webkit-scrollbar-thumb { background: #dcdcd5; border-radius: 3px; }
   .chip-row::-webkit-scrollbar-thumb:hover { background: #c8c8c0; }
   .chip-row::-webkit-scrollbar-track { background: transparent; }
-  .fchip {
-    border: 1px solid var(--line); background: #fff; color: var(--ink);
-    padding: 4px 11px; border-radius: 999px; cursor: pointer; font-size: 12.5px;
-    transition: background .15s ease, border-color .15s ease;
+  /* 筛选标签：视觉语言取自本库素材「M170 卡片式标签」——扁平卡片，选中后上浮 + 主题色底边 + 文字转主题色 */
+  .chip {
+    position: relative;
+    font-family: inherit;
+    font-size: 12.5px;
+    line-height: 1;
+    padding: 8px 13px;
+    border-radius: 10px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: #eeede8;
+    color: #5b6472;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    transform: translateY(0);
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease;
   }
-  .fchip:hover { border-color: #ccc; }
-  .fchip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .fchip.dim { opacity: .3; }
+  .chip:hover { background: #e7e6e0; }
+  .chip.on {
+    color: var(--accent);
+    background: #fff;
+    font-weight: 600;
+    transform: translateY(-2px);
+    border-bottom-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(30, 40, 80, .14);
+  }
+  .chip.dim { opacity: .32; }
+  .chip .chip-n { font-size: 11px; font-weight: 400; opacity: .7; }
+  .chip.on .chip-n { opacity: .85; }
+  /* 侧栏窄，标签收一档，减少换行 */
+  .sidebar .chip { padding: 6px 10px; font-size: 12px; border-radius: 9px; }
+  .sidebar .chip-row { gap: 6px; }
 
   
   .content { flex: 1; min-width: 0; padding: 26px 34px 80px; }
@@ -90,15 +117,7 @@
   .tools-row .tools-label { font-size: 13px; font-weight: 700; color: var(--ink); min-width: 44px; padding-top: 6px; flex-shrink: 0; }
   .tools-row .tools-label .sel-count { font-size: 11.5px; color: var(--accent); font-weight: 600; margin-left: 4px; font-variant-numeric: tabular-nums; }
   .tools-row .tools-label .sel-count:empty { display: none; }
-  .tools-row .chip-row { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
-  .tools-row .chip {
-    font: 12.5px/1 inherit; padding: 5px 11px; border-radius: 999px;
-    background: #f2f0eb; color: #555; border: none; cursor: pointer; user-select: none;
-    transition: background .15s ease, color .15s ease, opacity .15s ease;
-    display: inline-flex; align-items: center; gap: 3px;
-  }
-  .tools-row .chip:hover { background: #e7e4dc; }
-  .tools-row .chip.dim { opacity: .35; cursor: not-allowed; }
+  .tools-row .chip-row { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; padding-top: 3px; }
   .tools-row .chip.on { background: var(--ink); color: #fff; }
   .tools-row .chip.on .chip-n { opacity: .7; }
   .tools-row .chip-n { font-size: 11px; opacity: .55; font-variant-numeric: tabular-nums; }
@@ -304,15 +323,13 @@
     </div>
 
     <div id="dimFilters">
-      <div class="side-label">筛选区</div>
+      <div class="side-label">分级筛选</div>
+
       <div class="side-label" style="margin-top:4px;">风格<span class="sel-count" id="styleSelSide"></span></div>
       <div class="chip-row" id="styleSideChips" style="margin-bottom:12px;"></div>
 
       <div class="side-label">场景<span class="sel-count" id="sceneSelSide"></span></div>
       <div class="chip-row" id="sceneSideChips" style="margin-bottom:12px;"></div>
-
-      <div class="side-label">元素<span class="sel-count" id="elemSelSide"></span></div>
-      <div class="chip-row" id="elemSideChips" style="margin-bottom:12px;"></div>
     </div>
   </aside>
 
@@ -326,15 +343,14 @@
     </header>
 
     <div class="content-tools" id="contentTools">
-      <div class="tools-row" id="catRow">
-        <div class="tools-label">分类<span class="sel-count" id="catSel"></span></div>
-        <div class="chip-row" id="catChips"></div>
+      <div class="tools-row" id="adaptRow">
+        <div class="tools-label">适配端<span class="sel-count" id="adaptSel"></span></div>
+        <div class="chip-row" id="adaptChips"></div>
       </div>
-      <div class="tools-row" id="subRow">
-        <div class="tools-label">子类<span class="sel-count" id="subSel"></span></div>
-        <div class="chip-row" id="subChips"></div>
+      <div class="tools-row" id="elemRow">
+        <div class="tools-label">元素<span class="sel-count" id="elemSel"></span></div>
+        <div class="chip-row" id="elemChips"></div>
       </div>
-      
     </div>
 
     <div class="grid" id="grid"></div>
@@ -382,11 +398,16 @@
 
   const ITEMS = (window.WEB_ARSENAL || []).slice();
   const SCHEMES = (window.WEB_SCHEMES || []).slice();
-  const CATS = ["文字动画", "动效", "组件", "背景", "布局骨架", "AI反馈"];
   let view = "arsenal";
 
 
-  const filter = { 分类: "全部", 子类: "全部", 风格: new Set(), 场景: new Set(), 元素: new Set() };
+  // 分级筛选：每一级都有「全部」，打开页面时各级默认都是「全部」
+  // 筛选四个维度：同级、无上下级、互为交集（跨维度 AND）
+  // 每个维度**单选**：值为具体选项名，或 "全部"（默认）。同维度内不能同时选中两个值。
+  const FILTER_DIMS = ["适配端", "元素", "风格", "场景"];
+  const ALL = "全部";
+  const filter = { 适配端: ALL, 元素: ALL, 风格: ALL, 场景: ALL };
+  const resetFilter = () => FILTER_DIMS.forEach(d => { filter[d] = ALL; });
 
 
   let cart = [];
@@ -397,6 +418,8 @@
     if (text !== undefined) node.textContent = text;
     return node;
   };
+  // 标签字段统一按数组读：现为单值字符串，兼容将来改回多值
+  const asArr = v => Array.isArray(v) ? v : (v ? [v] : []);
 
   function copyText(text, btn) {
     const done = () => {
@@ -421,108 +444,94 @@
   const byId = id => ITEMS.find(it => it.id === id);
 
 
+  // 四个维度同级、互为交集；素材与方案共用同一套判定
+  // 维度内单选：选中值只需出现在该条目的值数组里即命中（一条允许挂多个端/多个元素）
   function matches(it, ignore) {
-    if (filter.分类 !== "全部" && it.分类 !== filter.分类) return false;
-    if (filter.子类 !== "全部" && it.子类 !== filter.子类) return false;
-    for (const dim of ["风格", "场景", "元素"]) {
+    for (const dim of FILTER_DIMS) {
       if (ignore === dim) continue;
-      if (filter[dim].size) {
-        const arr = it[dim] || [];
-        if (![...filter[dim]].some(v => arr.includes(v))) return false;
-      }
+      const want = filter[dim];
+      if (want !== ALL && !tierVals(it, dim).includes(want)) return false;
     }
     return true;
   }
+  const matchesScheme = matches;
+
+  const curList = () => (view === "schemes" ? SCHEMES : ITEMS);
+  const curMatch = (it, ignore) => matches(it, ignore);
+  const tierVals = (it, dim) => asArr(it[dim]);
 
 
   function dimCount(dim) {
     const map = new Map();
-    ITEMS.forEach(it => {
-      if (!matches(it, dim)) return;
-      const vals = dim === "分类" ? [it.分类] : dim === "子类" ? [it.子类 || ""] : (it[dim] || []);
-      vals.forEach(v => { if (v) map.set(v, (map.get(v) || 0) + 1); });
+    curList().forEach(it => {
+      if (!curMatch(it, dim)) return;
+      tierVals(it, dim).forEach(v => { if (v) map.set(v, (map.get(v) || 0) + 1); });
     });
     return map;
   }
 
   function uniqVals(dim) {
     const s = new Set();
-    ITEMS.forEach(it => {
-      const vals = dim === "分类" ? [it.分类] : dim === "子类" ? [it.子类 || ""] : (it[dim] || []);
-      vals.forEach(v => v && s.add(v));
+    curList().forEach(it => {
+      tierVals(it, dim).forEach(v => v && s.add(v));
     });
     return [...s];
   }
 
 
   function renderFilters() {
-
-    const catBox = document.getElementById("catChips");
-    catBox.innerHTML = "";
-    const catCounts = dimCount("分类");
-    ["全部", ...CATS].forEach(v => {
-      const on = filter.分类 === v;
-      const dimFlag = v !== "全部" && !catCounts.has(v);
-      const c = el("button", "chip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
-      c.type = "button";
-      if (catCounts.has(v)) c.append(el("span", "chip-n", " · " + catCounts.get(v)));
-      c.addEventListener("click", () => {
-        if (filter.分类 === v) return;
-        filter.分类 = v; filter.子类 = "全部";
-        renderFilters(); applyFilter();
-      });
-      catBox.appendChild(c);
-    });
-    document.getElementById("catSel").textContent = filter.分类 !== "全部" ? "1" : "";
-
-
-    const subBox = document.getElementById("subChips");
-    subBox.innerHTML = "";
-    let subs = uniqVals("子类");
-    if (filter.分类 !== "全部") subs = subs.filter(s => ITEMS.some(it => it.分类 === filter.分类 && it.子类 === s));
-    const totalUnderCat = filter.分类 === "全部" ? ITEMS.length : ITEMS.filter(it => it.分类 === filter.分类).length;
-    ["全部", ...subs].forEach(v => {
-      const on = filter.子类 === v;
-      const cnt = v === "全部" ? totalUnderCat : ITEMS.filter(it => it.子类 === v && (filter.分类 === "全部" || it.分类 === filter.分类)).length;
-      const dimFlag = v !== "全部" && cnt === 0;
-      const c = el("button", "chip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
-      c.type = "button";
-      if (cnt > 0 || v === "全部") c.append(el("span", "chip-n", " · " + cnt));
-      c.addEventListener("click", () => {
-        filter.子类 = v;
-        renderFilters(); applyFilter();
-      });
-      subBox.appendChild(c);
-    });
-    document.getElementById("subSel").textContent = filter.子类 !== "全部" ? "1" : "";
-
-
-    renderSideChips("styleSideChips", "风格", "styleSelSide");
-    renderSideChips("sceneSideChips", "场景", "sceneSelSide");
-    renderSideChips("elemSideChips", "元素", "elemSelSide");
+    // 素材库：顶部 适配端 / 元素，左栏 风格 / 场景
+    // 方案库：**没有「元素」**（整站方案不是元素），只有 适配端 / 风格 / 场景
+    const isSchemes = view === "schemes";
+    document.getElementById("elemRow").style.display = isSchemes ? "none" : "";
+    renderTier("adaptChips", "适配端", "adaptSel");
+    if (!isSchemes) renderTier("elemChips", "元素", "elemSel");
+    renderTier("styleSideChips", "风格", "styleSelSide");
+    renderTier("sceneSideChips", "场景", "sceneSelSide");
   }
 
 
-  function renderSideChips(boxId, dim, countId) {
+  // 适配端是闭集（通用 / PC 端 / 移动端）：即使还没标注也先把选项摆出来
+  const ADAPT_VALS = ["通用", "PC 端", "移动端"];
+  const ADAPT_ORDER = { 通用: 0, "PC 端": 1, 移动端: 2 };
+
+  function renderTier(boxId, dim, countId) {
     const box = document.getElementById(boxId);
     if (!box) return;
     box.innerHTML = "";
     const counts = dimCount(dim);
-    const vals = uniqVals(dim);
+    let vals = uniqVals(dim);
+    if (dim === "适配端") vals = [...new Set([...ADAPT_VALS, ...vals])].sort((a, b) => (ADAPT_ORDER[a] ?? 99) - (ADAPT_ORDER[b] ?? 99));
+
+    // 「全部」永远排第一；默认选中（= 该维度无约束）
+    const allOn = filter[dim] === ALL;
+    const all = el("button", "chip" + (allOn ? " on" : ""), ALL);
+    all.type = "button";
+    all.append(el("span", "chip-n", " · " + curList().filter(it => curMatch(it, dim)).length));
+    all.addEventListener("click", () => {
+      filter[dim] = ALL;
+      renderFilters(); applyFilter();
+    });
+    box.appendChild(all);
+
     vals.forEach(v => {
-      const on = filter[dim].has(v);
-      const dimFlag = !counts.has(v);
-      const c = el("button", "fchip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
+      const on = filter[dim] === v;
+      const cnt = counts.get(v) || 0;
+      const dimFlag = cnt === 0 && !on;
+      const c = el("button", "chip" + (on ? " on" : "") + (dimFlag ? " dim" : ""), v);
       c.type = "button";
+      if (cnt > 0) c.append(el("span", "chip-n", " · " + cnt));
       c.addEventListener("click", () => {
-        if (filter[dim].has(v)) filter[dim].delete(v); else filter[dim].add(v);
+        // 单选：点已选中的值 = 取消，回到「全部」；点其它值 = 直接切换（自动取消上一个）
+        filter[dim] = (filter[dim] === v) ? ALL : v;
         renderFilters(); applyFilter();
       });
       box.appendChild(c);
     });
+
     if (countId) {
       const sel = document.getElementById(countId);
-      if (sel) sel.textContent = filter[dim].size ? "已选 " + filter[dim].size : "";
+      if (sel) sel.textContent = filter[dim] === ALL ? "" : "1";
     }
   }
 
@@ -537,15 +546,19 @@
     const gridBox = document.getElementById("grid");
     if (view === "schemes") {
       document.getElementById("catTitle").textContent = "方案库";
-      document.getElementById("catCount").textContent = "共 " + SCHEMES.filter(s => s.id !== "skeleton-01").length + " 套";
+      const shown = SCHEMES.filter(s => matchesScheme(s));
+      document.getElementById("catCount").textContent = "共 " + shown.length + " 套";
+      const okIds = new Set(shown.map(s => s.id));
       document.querySelectorAll(".card").forEach(card => {
-        card.style.display = card.dataset.view === "schemes" ? "" : "none";
+        card.style.display = (card.dataset.view === "schemes" && okIds.has(card.dataset.id)) ? "" : "none";
       });
-      setEmptyHint(gridBox, false);
+      setEmptyHint(gridBox, shown.length === 0);
+      renderFilters();
       return;
     }
-    const title = filter.分类 === "全部" ? "全部素材" : filter.分类 + (filter.子类 !== "全部" ? " · " + filter.子类 : "");
-    document.getElementById("catTitle").textContent = title;
+    // 标题：无筛选时「全部素材」，有筛选则列出当前生效条件（体现四维交集）
+    const active = FILTER_DIMS.filter(d => filter[d] !== ALL).map(d => d + "：" + filter[d]);
+    document.getElementById("catTitle").textContent = active.length ? active.join(" · ") : "全部素材";
     const shown = ITEMS.filter(it => matches(it));
     document.getElementById("catCount").textContent = "共 " + shown.length + " 条";
     document.querySelectorAll(".card").forEach(card => {
@@ -631,7 +644,7 @@
       if (!it) return;
       const row = el("div", "cart-item");
       const info = el("div");
-      info.append(el("div", "ci-name", it.标题), el("div", "ci-cat", it.分类 + (it.子类 ? " · " + it.子类 : "")));
+      info.append(el("div", "ci-name", it.标题), el("div", "ci-cat", (it.适配端 || "") + (it.元素 ? " · " + it.元素 : "")));
       const del = el("button", "ci-del", "×");
       del.addEventListener("click", () => toggleCart(id));
       row.append(info, del);
@@ -682,16 +695,16 @@
 
     const body = el("div", "card-body");
     const top = el("div", "card-top");
-    const chip = el("span", "chip", it.分类 || "未分类");
-    chip.dataset.cat = it.分类;
-    if (it.子类) top.append(chip, el("span", "chip", it.子类));
+    const chip = el("span", "chip", it.适配端 || "通用");
+    chip.dataset.cat = it.适配端 || "";
+    if (it.元素) top.append(chip, el("span", "chip", it.元素));
     else top.append(chip);
     top.append(el("span", "cid", it.id || ""));
     const h2 = el("h2", null, it.标题 || "未命名");
     const tags = el("div", "tags");
+    asArr(it.风格).forEach(t => tags.appendChild(el("span", "tag style", t)));
+    asArr(it.场景).forEach(t => tags.appendChild(el("span", "tag scene", t)));
     (it.标签 || []).forEach(t => tags.appendChild(el("span", "tag", t)));
-    (it.风格 || []).forEach(t => tags.appendChild(el("span", "tag style", t)));
-    (it.场景 || []).forEach(t => tags.appendChild(el("span", "tag scene", t)));
     body.append(top, h2, tags);
 
     if (it.下载) {
@@ -920,7 +933,7 @@
       const it = byId(id);
       if (!it) return;
       const row = el("div", "plan-item");
-      row.append(el("b", null, it.标题), el("span", null, it.分类 + (it.子类 ? "·" + it.子类 : "") + (it.元素 ? " · 元素[" + it.元素.join("/") + "]" : "")));
+      row.append(el("b", null, it.标题), el("span", null, (it.适配端 || "") + (it.元素 ? " · " + it.元素 : "") + (it.场景 ? " · " + it.场景 : "")));
       list.appendChild(row);
     });
     body.appendChild(list);
@@ -933,23 +946,23 @@
   }
   function buildPlanPrompt() {
     const chosen = cart.map(byId).filter(Boolean);
-    const styles = [...new Set(chosen.flatMap(it => it.风格 || []))];
-    // 分组键必须与素材「元素」的实际取值一致，否则素材会被静默丢弃
-    const groups = { "视觉": [], "动效": [], "构成": [], "反馈": [], "布局": [], "3D·粒子": [], "其他": [] };
+    const styles = [...new Set(chosen.flatMap(it => asArr(it.风格)))];
+    // 分组键必须与素材「元素」的实际取值一致（新 10 类闭集），否则素材会被静默丢弃
+    const groups = { "动作": [], "输入": [], "导航": [], "反馈": [], "数据": [], "容器布局": [], "媒体": [], "文字": [], "动效": [], "背景氛围": [], "其他": [] };
     chosen.forEach(it => {
-      const hit = (it.元素 || []).filter(e => groups[e]);
+      const hit = asArr(it.元素).filter(e => groups[e]);
       if (!hit.length) groups["其他"].push(it);
       hit.forEach(e => groups[e].push(it));
     });
     let out = "帮我做一个网页，";
     if (styles.length) out += "整体风格：" + styles.join("、") + "。";
     out += "\n整合以下效果（每个都附了可直接复用的实现提示）：\n";
-    const labels = { "视觉": "【视觉与氛围】", "动效": "【动效与交互】", "构成": "【构成与版面】", "反馈": "【反馈与状态】", "布局": "【布局与结构】", "3D·粒子": "【3D 与粒子】", "其他": "【其他效果】" };
+    const labels = { "动作": "【动作与控件】", "输入": "【输入与选择】", "导航": "【导航与路径】", "反馈": "【反馈与状态】", "数据": "【数据与指标】", "容器布局": "【容器与版面】", "媒体": "【媒体与展示】", "文字": "【文字与排版】", "动效": "【动效与过渡】", "背景氛围": "【背景与氛围】", "其他": "【其他效果】" };
     for (const g in groups) {
       if (!groups[g].length) continue;
       out += "\n" + labels[g] + "\n";
       groups[g].forEach(it => {
-        out += "· " + it.标题 + "（" + (it.子类 || it.分类) + "）：" + (it.效果说明 || "") + "\n";
+        out += "· " + it.标题 + "（" + (it.元素 || "") + "）：" + (it.效果说明 || "") + "\n";
       });
     }
     out += "\n请把以上效果整合成一个完整、风格统一的 HTML 页面，代码要能直接运行。";
@@ -957,11 +970,11 @@
   }
   function buildPlanHTML() {
     const chosen = cart.map(byId).filter(Boolean);
-    const styles = [...new Set(chosen.flatMap(it => it.风格 || []))];
+    const styles = [...new Set(chosen.flatMap(it => asArr(it.风格)))];
     const secs = chosen.map(it => {
       const prompt = (it.提示词 || "").replace(/`/g, "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return '<section style="margin-bottom:24px;border:1px solid #e8e8e4;border-radius:12px;padding:14px;">'
-        + '<h3 style="margin:0 0 6px;font-size:15px;">' + it.标题 + ' <span style="color:#8a8a85;font-size:12px;">' + (it.分类 || "") + '</span></h3>'
+        + '<h3 style="margin:0 0 6px;font-size:15px;">' + it.标题 + ' <span style="color:#8a8a85;font-size:12px;">' + (it.元素 || "") + '</span></h3>'
         + '<iframe src="' + (it.效果演示 || "") + '" style="width:100%;height:300px;border:1px solid #eee;border-radius:8px;background:#fff;"></iframe>'
         + '<pre style="white-space:pre-wrap;font-size:12px;color:#555;background:#f7f6f2;padding:10px;border-radius:8px;">' + prompt + '</pre>'
         + '</section>';
@@ -1011,17 +1024,13 @@
   }
   function setView(v) {
     view = v;
+    // 每次切换视图都重置为「全部」（用户要求：打开页面默认全选「全部」）
+    resetFilter();
     renderViewFilters();
-    const dimFilters = document.getElementById("dimFilters");
-    const contentTools = document.getElementById("contentTools");
-    if (v === "schemes") {
-      dimFilters.style.display = "none";
-      contentTools.style.display = "none";
-    } else {
-      dimFilters.style.display = "";
-      contentTools.style.display = "";
-      renderFilters();
-    }
+    // 适配端 + 元素 在顶部、风格 + 场景 在左侧，两库通用
+    document.getElementById("dimFilters").style.display = "";
+    document.getElementById("contentTools").style.display = "";
+    renderFilters();
     applyFilter();
   }
   function colorBars(配色) {
@@ -1192,7 +1201,7 @@
     });
   }
   // 方案库卡片：默认隐藏，切到「方案库」视图才显示（复用懒加载 io）
-  SCHEMES.filter(s => s.id !== "skeleton-01").forEach(s => {
+  SCHEMES.forEach(s => {
     const card = makeSchemeCard(s);
     card.style.display = "none";
     document.getElementById("grid").appendChild(card);

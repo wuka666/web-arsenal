@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- M177 两端发散透视变形：逐字 scaleX 向两端放大，蝴蝶结隧道纵深（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{display:flex;align-items:center}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);color:var(--c);white-space:pre;transform-origin:50% 50%}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+<script>
+  const state={k:0.9,fs:56,fw:800,c:'#151b2e',c2:'#2f6bff',page:'#eef1f6',ls:2,txt:'TUNNEL'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--c',state.c);
+    s.setProperty('--c2',state.c2); s.setProperty('--page',state.page); s.setProperty('--ls',state.ls+'px');
+    stage.innerHTML='';
+    const arr=[...state.txt], mid=(arr.length-1)/2;
+    arr.forEach((ch,i)=>{
+      const el=document.createElement('span'); el.className='ch'; el.textContent=ch;
+      // 距中心越远 scaleX 越大：蝴蝶结两端张开，中间收窄成隧道深处
+      const dist=Math.abs(i-mid)/(mid||1);
+      el.style.transform='scaleX('+(1+state.k*dist*dist)+')';
+      if(i===0||i===arr.length-1) el.style.color='var(--c2)';
+      el.style.marginLeft=i?state.ls+'px':'0';
+      stage.appendChild(el);
+    });
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

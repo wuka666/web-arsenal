@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>陈列首屏演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    background: var(--di); color: var(--zi);
+    min-height: 100vh; padding: var(--liubai);
+    display: flex; flex-direction: column; gap: var(--jianju);
+  }
+  .kicker { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--hui); }
+  .hero {
+    display: grid; gap: var(--jianju);
+    grid-template-columns: 1fr;
+  }
+  .shot {
+    min-height: calc(var(--datu) * 1vh);
+    border-radius: var(--yuanjiao);
+    background:
+      radial-gradient(circle at 22% 28%, rgba(255,255,255,.55), transparent 42%),
+      linear-gradient(135deg, #5E6AD2 0%, #FF9667 55%, #FFD2A8 100%);
+    box-shadow: 0 10px 34px rgba(0,0,0,.12);
+    display: flex; align-items: flex-end; padding: 14px;
+  }
+  .shot .tagline { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: .04em; }
+  .info { display: flex; align-items: center; gap: 14px; }
+  .info h1 { font-size: var(--zihao); font-weight: 800; letter-spacing: -.8px; line-height: 1.1; }
+  .info .sub { margin-top: 6px; font-size: 12.5px; color: var(--hui); }
+  .badge {
+    flex: none; padding: 10px 14px; border-radius: 999px;
+    background: var(--zhucai); color: #fff;
+    font-size: 15px; font-weight: 800; white-space: nowrap;
+  }
+  .grid-hint { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .grid-hint i { display: block; height: 34px; border-radius: calc(var(--yuanjiao) * 0.6); background: color-mix(in srgb, var(--zi) 8%, transparent); }
+  .hidden { display: none !important; }
+
+  body[data-fangxiang="1"] .hero { grid-template-columns: 1.25fr .75fr; align-items: center; }
+  /* 陈列型的层级可切换：作品当门面时图在前，作品当目录时标题先立住 */
+  body[data-shunxu="1"] .hero > .info { order: -1; }
+</style>
+</head>
+<body data-fangxiang="0" data-shunxu="0">
+  <div class="kicker">编辑精选 · Sep 14, 2026</div>
+  <div class="hero">
+    <div class="shot"><span class="tagline">第一焦点 · 当日最佳作品</span></div>
+    <div class="info">
+      <div>
+        <h1>Studio Nine - Portfolio 2026</h1>
+        <div class="sub">第二焦点 · 评分徽章 + 日期，其余信息做灰阶退让</div>
+      </div>
+      <div class="badge" id="badge">7.69 / 10</div>
+    </div>
+  </div>
+  <div class="grid-hint"><i></i><i></i><i></i><i></i></div>
+</body>
+<script>
+  const state = {
+    datu: 44, liubai: 40, zihao: 34, jianju: 16, yuanjiao: 8,
+    shunxu: 0, fangxiang: 0, xianshi: 1,
+    zhucai: "#FF9667", di: "#ffffff", zi: "#222222", hui: "#8a8a8a"
+  };
+  function apply() {
+    const r = document.documentElement.style;
+    r.setProperty("--datu", state.datu);
+    r.setProperty("--liubai", state.liubai + "px");
+    r.setProperty("--zihao", state.zihao + "px");
+    r.setProperty("--jianju", state.jianju + "px");
+    r.setProperty("--yuanjiao", state.yuanjiao + "px");
+    ["zhucai", "di", "zi", "hui"].forEach(k => r.setProperty("--" + k, state[k]));
+    document.body.dataset.fangxiang = state.fangxiang;
+    document.body.dataset.shunxu = state.shunxu;
+    document.getElementById("badge").classList.toggle("hidden", !state.xianshi);
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</html>

@@ -27,6 +27,7 @@ venv/
 
 # ==== 本地临时文件与调试脚本 ====
 tmp/
+_filter_test.html
 mcp/test_mcp.js
 
 # ==== 系统与编辑器 ====

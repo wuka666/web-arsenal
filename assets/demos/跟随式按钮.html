@@ -18,13 +18,14 @@
 </div>
 
 <script>
-  const state = { follow: 0.5, depth: 14, radius: 14, accent: "#3d5fd6", text: "#ffffff" };
+  const state = { follow: 0.5, depth: 14, radius: 14, accent: "#3d5fd6", text: "#ffffff", bg: "#fafafa" };
   const btn = document.getElementById("btn");
   let down = false, cx = 0, cy = 0, ox = 0, oy = 0;
   function apply() {
     btn.style.background = state.accent;
     btn.style.color = state.text;
     btn.style.borderRadius = state.radius + "px";
+    document.body.style.background = state.bg;
   }
   btn.addEventListener("pointerdown", e => {
     down = true; btn.setPointerCapture(e.pointerId);

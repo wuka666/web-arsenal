@@ -28,7 +28,7 @@
 </div>
 
 <script>
-  const state = { steps: 4, dur: 900, accent: "#3d5fd6", bg: "#fafafa", card: "#ffffff" };
+  const state = { steps: 4, dur: 900, accent: "#3d5fd6", bg: "#fafafa", card: "#ffffff", radius: 16 };
   const stepsEl = document.getElementById("steps");
   const btn = document.getElementById("btn");
   const plan = ["检索本周 git 提交与笔记", "归纳关键进展与卡点", "生成周报草稿", "本地校验格式并落盘"];
@@ -37,6 +37,7 @@
     document.documentElement.style.setProperty("--bg", state.bg);
     document.documentElement.style.setProperty("--card", state.card);
     document.documentElement.style.setProperty("--accent", state.accent);
+    p.style.borderRadius = state.radius + "px";
     stepsEl.innerHTML = "";
     for (let i = 0; i < state.steps; i++) {
       const s = document.createElement("div"); s.className = "step"; s.dataset.i = i;

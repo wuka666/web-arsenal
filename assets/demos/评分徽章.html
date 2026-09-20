@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>评分徽章演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    background: var(--di); color: var(--zi);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 28px 18px;
+  }
+  .stage { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+  .kicker { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--cizi); }
+  .title { font-size: 22px; font-weight: 800; letter-spacing: -.3px; }
+  .row { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+
+  .badge {
+    position: relative;
+    width: var(--size); height: var(--size);
+    border-radius: var(--yuanjiao);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--zhucai); color: #fff;
+    font-size: var(--zihao); font-weight: 800; letter-spacing: -.5px;
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--zhucai) 30%, transparent);
+  }
+  .badge .num { line-height: 1; }
+  .badge .num small { font-size: .5em; opacity: .8; font-weight: 700; }
+
+  /* 第二焦点：徽章以外的信息全部降成灰阶，橙色只留给它 */
+  .meta { display: flex; flex-direction: column; gap: 3px; }
+  .meta .m1 { font-size: 13px; color: var(--cizi); }
+  .meta .m2 { font-size: 12px; color: color-mix(in srgb, var(--cizi) 70%, transparent); }
+
+  .ring { position: absolute; inset: calc(var(--size) * -0.17); }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: var(--huanKuan); }
+  .ring .bg { stroke: var(--xian); }
+  .ring .fg { stroke: var(--zhucai); stroke-linecap: round; }
+
+  .pulse {
+    position: absolute; inset: 0; border-radius: inherit;
+    border: 2px solid var(--zhucai);
+    animation: pl 2s ease-out infinite;
+  }
+  @keyframes pl {
+    0% { transform: scale(1); opacity: .5; }
+    100% { transform: scale(1.45); opacity: 0; }
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="kicker">编辑精选</div>
+  <div class="title">Studio Nine - Portfolio 2026</div>
+  <div class="row">
+    <div class="badge" id="badge">
+      <span class="ring hidden" id="ring">
+        <svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="46"></circle><circle class="fg" cx="50" cy="50" r="46" id="fg"></circle></svg>
+      </span>
+      <span class="pulse hidden" id="pulse"></span>
+      <span class="num" id="num"></span>
+    </div>
+    <div class="meta">
+      <div class="m1">Sep 14, 2026</div>
+      <div class="m2" id="fenmu"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const state = {
+    score: 7.69, manfen: 10, size: 84, zihao: 20, yuanjiao: 42,
+    huan: 1, huanKuan: 4, maichong: 1,
+    zhucai: "#FF9667", di: "#ffffff", zi: "#222222", cizi: "#8a8a8a", xian: "#ededed"
+  };
+  const C = 2 * Math.PI * 46;
+
+  function apply() {
+    ["size", "zihao", "yuanjiao", "huanKuan"].forEach(k => {
+      document.documentElement.style.setProperty("--" + k, state[k] + "px");
+    });
+    ["zhucai", "di", "zi", "cizi", "xian"].forEach(k => {
+      document.documentElement.style.setProperty("--" + k, state[k]);
+    });
+    document.getElementById("num").innerHTML = state.score + '<small>/' + state.manfen + '</small>';
+    document.getElementById("fenmu").textContent = "Score " + state.score + " of " + state.manfen;
+    document.getElementById("pulse").classList.toggle("hidden", !state.maichong);
+    const ring = document.getElementById("ring");
+    ring.classList.toggle("hidden", !state.huan);
+    const pct = Math.max(0, Math.min(1, state.score / state.manfen));
+    document.getElementById("fg").setAttribute("stroke-dasharray", (C * pct) + " " + C);
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</body>
+</html>

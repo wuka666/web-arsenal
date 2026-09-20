@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>陈列网格演示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    background: var(--di); color: var(--zi);
+    min-height: 100vh; padding: 28px 22px;
+  }
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding-bottom: 10px; margin-bottom: var(--jianju);
+    border-bottom: 1px solid var(--xian);
+  }
+  .head h3 { font-size: 15px; font-weight: 800; letter-spacing: -.2px; }
+  .head span { font-size: 12px; color: var(--cizi); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--lie), 1fr);
+    gap: var(--jianju);
+  }
+  .cell { cursor: pointer; }
+  .thumb {
+    width: 100%;
+    aspect-ratio: var(--bili);
+    border-radius: var(--yuanjiao);
+    background: var(--pic);
+    /* 饱和度单独拎出来：底色一乱或饱和度一降，整墙作品立刻发脏 */
+    filter: saturate(calc(var(--baohedu) / 100));
+    box-shadow: 0 calc(var(--yinying) * 0.1px) calc(var(--yinying) * 0.4px) rgba(0,0,0,.10);
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .cell:hover .thumb {
+    transform: translateY(calc(var(--taisheng) * -1));
+    box-shadow: 0 calc(var(--yinying) * 0.25px) calc(var(--yinying) * 0.9px) rgba(0,0,0,.18);
+  }
+  .cell .t { margin-top: 8px; font-size: 13px; font-weight: 700; letter-spacing: -.2px; }
+  .cell .m { margin-top: 3px; font-size: 11.5px; color: var(--cizi); }
+  .cell.king .t { color: var(--zhucai); }
+</style>
+</head>
+<body>
+<div class="head"><h3>Latest</h3><span id="count"></span></div>
+<div class="grid" id="grid"></div>
+
+<script>
+  const state = {
+    lie: 4, bili: 0, jianju: 18, yuanjiao: 6,
+    baohedu: 100, taisheng: 6, yinying: 18,
+    zhucai: "#FF9667", di: "#f8f8f8", xian: "#ededed", zi: "#222222", cizi: "#8a8a8a"
+  };
+  const RATIO = ["4 / 3", "16 / 9", "1 / 1", "3 / 4"];
+  const PIC = [
+    "linear-gradient(135deg,#FF9667,#FFD2A8)",
+    "linear-gradient(140deg,#5E6AD2,#9AA0F0)",
+    "linear-gradient(125deg,#12B981,#8FE3C4)",
+    "linear-gradient(150deg,#111827,#4B5563)",
+    "linear-gradient(135deg,#E1306C,#FCA5C8)",
+    "linear-gradient(120deg,#0EA5E9,#A5E8FF)",
+    "linear-gradient(145deg,#F59E0B,#FCD34D)",
+    "linear-gradient(135deg,#7C3AED,#C4B5FD)"
+  ];
+  const DATA = [
+    { t: "Thoma Lecornu", m: "Portfolio" },
+    { t: "EMO® — Altar II", m: "Electronic Materials Office®" },
+    { t: "Readymag WOTY 2026", m: "Website of the Year" },
+    { t: "STANZZA design", m: "ADELT Agency" },
+    { t: "编辑精选", m: "Awards" },
+    { t: "Nominees", m: "Gallery" },
+    { t: "Collections", m: "Directory" },
+    { t: "Submit your site", m: "Get judged" }
+  ];
+
+  function build() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    DATA.forEach((d, i) => {
+      const cell = document.createElement("a");
+      cell.className = "cell" + (i === 0 ? " king" : "");
+      const th = document.createElement("div");
+      th.className = "thumb";
+      th.style.setProperty("--pic", PIC[i % PIC.length]);
+      const t = document.createElement("div"); t.className = "t"; t.textContent = d.t;
+      const m = document.createElement("div"); m.className = "m"; m.textContent = d.m;
+      cell.append(th, t, m);
+      grid.appendChild(cell);
+    });
+    document.getElementById("count").textContent = DATA.length + " sites · " + state.lie + " 列";
+  }
+  function apply() {
+    const r = document.documentElement.style;
+    r.setProperty("--lie", state.lie);
+    r.setProperty("--bili", RATIO[state.bili] || RATIO[0]);
+    r.setProperty("--baohedu", state.baohedu);
+    r.setProperty("--jianju", state.jianju + "px");
+    r.setProperty("--yuanjiao", state.yuanjiao + "px");
+    r.setProperty("--taisheng", state.taisheng + "px");
+    r.setProperty("--yinying", state.yinying);
+    ["zhucai", "di", "xian", "zi", "cizi"].forEach(k => r.setProperty("--" + k, state[k]));
+    build();
+  }
+  window.addEventListener("message", e => {
+    const d = e.data; if (!d || d.type !== "param") return;
+    state[d.key] = d.value; apply();
+  });
+  apply();
+</script>
+</body>
+</html>

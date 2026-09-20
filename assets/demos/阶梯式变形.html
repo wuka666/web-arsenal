@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- M179 阶梯式上下透视变形：逐字阶梯错位，建筑空间感（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{display:flex;align-items:flex-start}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);white-space:pre;margin-left:var(--ls)}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+<script>
+  const state={step:16,gw:2,fs:60,fw:800,c:'#151b2e',c2:'#8f7bff',page:'#eef1f6',ls:4,txt:'SKYLINE'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--page',state.page);
+    s.setProperty('--ls',state.ls+'px');
+    stage.innerHTML='';
+    const arr=[...state.txt];
+    arr.forEach((ch,i)=>{
+      const el=document.createElement('span'); el.className='ch'; el.textContent=ch;
+      // 每 gw 个字下一级台阶，颜色按组交替强调建筑层叠感
+      const grp=Math.floor(i/state.gw);
+      el.style.transform='translateY('+(grp*state.step)+'px)';
+      el.style.color=grp%2?'var(--c2)':'var(--c)';
+      stage.appendChild(el);
+    });
+    stage.style.marginBottom=(Math.ceil(arr.length/state.gw)-1)*state.step+'px';
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- M175 梯形下扩透视变形：canvas 逐行扫描线缩放，0.72→1.22 线性过渡出平滑梯形（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  canvas{display:block}
+</style>
+</head>
+<body>
+  <canvas id="cv"></canvas>
+<script>
+  const state={st:0.72,sb:1.22,fs:80,fw:800,c:'#151b2e',page:'#eef1f6',ls:4,txt:'SPEED'};
+  const cv=document.getElementById('cv');
+  function apply(){
+    document.documentElement.style.setProperty('--page',state.page);
+    // 文本先画到离屏 canvas，再逐行 drawImage 按线性插值宽度重排——
+    // 两段式 scaleX 在切缝处必然错位，逐行才是真「近大远小」
+    const off=document.createElement('canvas');
+    const mc=off.getContext('2d');
+    const font=state.fw+' '+state.fs+'px system-ui,"PingFang SC","Microsoft YaHei",sans-serif';
+    mc.font=font;
+    const pad=12, h=Math.ceil(state.fs*1.4);
+    const w=Math.ceil(mc.measureText(state.txt).width+state.ls*(state.txt.length-1))+pad*2;
+    off.width=w; off.height=h;
+    mc.font=font; mc.fillStyle=state.c; mc.textBaseline='middle';
+    let x=pad;
+    for(const ch of state.txt){mc.fillText(ch,x,h/2);x+=mc.measureText(ch).width+state.ls;}
+    const maxS=Math.max(state.st,state.sb,1);
+    cv.width=Math.ceil(w*maxS); cv.height=h;
+    const ctx=cv.getContext('2d');
+    ctx.imageSmoothingEnabled=false;
+    for(let y=0;y<h;y++){
+      const s=state.st+(state.sb-state.st)*(y/(h-1));
+      const dw=w*s;
+      ctx.drawImage(off,0,y,w,1,(cv.width-dw)/2,y,dw,1);
+    }
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

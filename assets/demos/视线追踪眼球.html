@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>视线追踪眼球 · 单文件 demo</title>
+<style>
+  /* 瞳孔跟随光标：mousemove 只记目标点，RAF 做线性插值；偏移走 transform，不触发重排 */
+  :root{
+    --di:#141B2B;        /* 背景色 */
+    --yanbai:#E8E0CE;    /* 眼白色 */
+    --hongmo:#B4462F;    /* 虹膜色 */
+    --gaoguang:#2B3448;  /* 高光色 */
+    --yanjing:62px;      /* 眼球直径 */
+    --paixi:14px;        /* 眼球间距 */
+    --shuliang:5;        /* 眼球数量 */
+    --yanchi:.14;        /* 跟随缓动（JS 读取） */
+    --zuidazhi:34;       /* 瞳孔最大偏移（%） */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);display:grid;place-items:center;overflow:hidden}
+  .eyes{display:flex;gap:var(--paixi);flex-wrap:wrap;justify-content:center;padding:20px}
+  .eye{width:var(--yanjing);height:var(--yanjing);border-radius:50%;background:var(--yanbai);position:relative;flex:none;
+       box-shadow:inset 0 -6px 12px rgba(0,0,0,.12)}
+  .eye .iris{position:absolute;left:50%;top:50%;width:52%;height:52%;border-radius:50%;background:var(--hongmo);
+       transform:translate(-50%,-50%);will-change:transform}
+  .eye .iris::after{content:"";position:absolute;left:24%;top:22%;width:26%;height:26%;border-radius:50%;
+       background:var(--gaoguang);opacity:.85}
+</style>
+</head>
+<body>
+<div class="eyes" id="eyes"></div>
+<script>
+(function(){
+  var q=function(s){return document.querySelector(s);};
+  var box=q('#eyes');
+  var state={di:'#141B2B',yanbai:'#E8E0CE',hongmo:'#B4462F',gaoguang:'#2B3448',
+    yanjing:62,paixi:14,shuliang:5,yanchi:.14,zuidazhi:34};
+
+  function build(){
+    box.innerHTML='';
+    var n=Math.max(1,Math.round(state.shuliang));
+    for(var i=0;i<n;i++){
+      var e=document.createElement('div'); e.className='eye';
+      var ir=document.createElement('div'); ir.className='iris';
+      e.appendChild(ir); box.appendChild(e);
+    }
+  }
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','yanbai','hongmo','gaoguang'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--yanjing',state.yanjing+'px');
+    r.setProperty('--paixi',state.paixi+'px');
+    r.setProperty('--shuliang',state.shuliang);
+    r.setProperty('--yanchi',state.yanchi);
+    r.setProperty('--zuidazhi',state.zuidazhi);
+    build();
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  // 没人动鼠标时自动绕圈，否则预览里的瞳孔是死的
+  var target={x:innerWidth/2,y:innerHeight*.92}, cur={x:innerWidth/2,y:innerHeight*.92}, auto=true;
+  addEventListener('mousemove',function(e){ auto=false; target.x=e.clientX; target.y=e.clientY; });
+
+  function iris(el){
+    var r=el.getBoundingClientRect();
+    var dx=cur.x-(r.left+r.width/2), dy=cur.y-(r.top+r.height/2);
+    var dist=Math.sqrt(dx*dx+dy*dy)||1;
+    var k=Math.min(1,dist/260)*r.width*(state.zuidazhi/100);
+    el.firstChild.style.transform='translate(-50%,-50%) translate('+(dx/dist*k).toFixed(2)+'px,'+(dy/dist*k).toFixed(2)+'px)';
+  }
+  function loop(t){
+    if(auto){
+      target.x=innerWidth/2+Math.cos(t/1500)*innerWidth*.3;
+      target.y=innerHeight/2+Math.sin(t/1500)*innerHeight*.26;
+    }
+    cur.x+=(target.x-cur.x)*state.yanchi;
+    cur.y+=(target.y-cur.y)*state.yanchi;
+    [].forEach.call(box.children,function(el){ iris(el); });
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  apply();
+})();
+</script>
+</body>
+</html>

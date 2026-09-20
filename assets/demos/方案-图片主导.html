@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- 防土法则① 图片主导：单侧巨图是首屏主角，文字退到一侧点题；图用 duotone + 胶片颗粒离线生成，零外链 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·图片主导</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--se);color:var(--zi);min-height:100vh}
+  .hero{display:grid;grid-template-columns:calc(100% - var(--imgArea) * 1%) calc(var(--imgArea) * 1%);min-height:100vh}
+  .copy{display:flex;flex-direction:column;justify-content:center;padding:0 6vw}
+  .copy .k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.5}
+  .copy h1{font-size:clamp(30px, calc(var(--hs) * 1vw), 96px);line-height:1.04;letter-spacing:-.02em;font-weight:800;margin:18px 0}
+  .copy p{font-size:16px;line-height:1.7;opacity:.66;max-width:30ch}
+  .rule{width:46px;height:3px;background:var(--duo);margin-top:26px}
+  .pic{position:relative;overflow:hidden;background:#1a1410}
+  .pic .img{position:absolute;inset:0;background:
+    radial-gradient(120% 90% at 28% 18%, color-mix(in srgb,var(--duo) 72%, #fff) 0%, transparent 56%),
+    radial-gradient(100% 120% at 82% 92%, color-mix(in srgb,var(--duo) 82%, #000) 0%, transparent 60%),
+    linear-gradient(135deg, color-mix(in srgb,var(--duo) 38%, #2a2018), color-mix(in srgb,var(--duo) 16%, #0c0907))}
+  .pic::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--grain);mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+  <section class="hero">
+    <div class="copy">
+      <div class="k">Field Notes</div>
+      <h1>让一张图<br>先开口。</h1>
+      <p>图片不是缩在角落的配图，而是首屏的主角。文字退到另一侧，只负责点题。</p>
+      <div class="rule"></div>
+    </div>
+    <div class="pic"><div class="img"></div></div>
+  </section>
+<script>
+  const state={imgArea:60,hs:5.0,se:'#F4F1EA',zi:'#1A1A1A',duo:'#C8743C',grain:0.32};
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--imgArea',state.imgArea);
+    s.setProperty('--hs',state.hs);
+    s.setProperty('--se',state.se);
+    s.setProperty('--zi',state.zi);
+    s.setProperty('--duo',state.duo);
+    s.setProperty('--grain',state.grain);
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@
   .row { display: flex; gap: 10px; margin-top: 8px; }
   .btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; }
   .ok { background: var(--warn); color: #fff; }
-  .no { background: #eee; color: #555; }
+  .no { background: var(--noc); color: #555; }
   .status { margin-top: 12px; font-size: 13px; font-weight: 700; min-height: 18px; }
 
 </style>
@@ -31,11 +31,13 @@
 </div>
 
 <script>
-  const state = { accent: "#3d5fd6", warn: "#e0533d", bg: "#fafafa", card: "#ffffff" };
+  const state = { accent: "#3d5fd6", warn: "#e0533d", bg: "#fafafa", card: "#ffffff", radius: 16, noc: "#eeeeee" };
   const st = document.getElementById("st");
   function apply() {
     document.documentElement.style.setProperty("--bg", state.bg);
     document.documentElement.style.setProperty("--card", state.card);
+    p.style.borderRadius = state.radius + "px";
+    document.documentElement.style.setProperty("--noc", state.noc);
     document.documentElement.style.setProperty("--warn", state.warn);
     document.documentElement.style.setProperty("--accent", state.accent);
   }

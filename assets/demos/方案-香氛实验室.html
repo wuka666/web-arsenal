@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>香氛实验室</title>
+<style>
+:root{
+  --ye:#1A1620;        /* 暗夜调香台 */
+  --wu:#C9A6E8;        /* 香雾淡紫 */
+  --shen:#3B3046;      /* 深香材色 */
+  --zi:#EFE8F2;
+  --ci:#9A8FA8;
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:12px;
+  --miwu:9;            /* 雾团数 */
+  --kuosan:1;          /* 扩散速度 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ye);color:var(--zi);overflow:hidden;min-height:100vh;
+  font-family:Georgia,"Songti SC",serif;display:grid;grid-template-columns:minmax(240px,320px) 1fr;
+  grid-template-rows:1fr auto;grid-template-areas:"card mist" "card book"}
+#mist{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.card{grid-area:card;position:relative;z-index:2;padding:calc(var(--jianju)*1.6) calc(var(--jianju)*1.4);
+  border-right:1px solid rgba(201,166,232,.14);display:flex;flex-direction:column;gap:calc(var(--jianju)*1.1)}
+.brand{font-size:calc(var(--zihao)*1.3);letter-spacing:.14em}
+.brand i{font-style:normal;display:block;margin-top:8px;font-family:Consolas,monospace;font-size:10.5px;
+  letter-spacing:.28em;color:var(--ci)}
+.note{display:flex;flex-direction:column;gap:8px}
+.note h4{font-size:calc(var(--zihao)*.76);font-weight:400;color:var(--ci);letter-spacing:.16em;font-family:Consolas,monospace}
+.note p{font-size:calc(var(--zihao)*.9);line-height:1.7;color:color-mix(in srgb,var(--zi) 88%,transparent)}
+.bar{height:1px;background:rgba(201,166,232,.18)}
+.mist{grid-area:mist;position:relative;z-index:2;display:flex;align-items:center;padding:calc(var(--jianju)*1.6)}
+h1{font-size:calc(var(--zihao)*2.5);line-height:1.28;letter-spacing:.03em;max-width:12em}
+h1 span{color:var(--wu)}
+.book{grid-area:book;position:relative;z-index:2;border-top:1px solid rgba(201,166,232,.14);
+  padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.6);display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+  background:linear-gradient(180deg,transparent,rgba(26,22,32,.72))}
+form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+label{font-size:calc(var(--zihao)*.76);color:var(--ci)}
+input{background:transparent;border:none;border-bottom:1px solid rgba(239,232,242,.26);color:var(--zi);
+  font-family:Consolas,monospace;font-size:calc(var(--zihao)*.82);padding:7px 2px;width:170px;outline:none}
+input:focus{border-color:var(--wu)}
+button{background:var(--wu);color:#1A1620;border:none;border-radius:var(--yuanjiao);
+  padding:10px 18px;font-family:inherit;font-size:calc(var(--zihao)*.78);cursor:pointer}
+.book em{font-style:normal;margin-left:auto;font-family:Consolas,monospace;font-size:11px;color:var(--ci);letter-spacing:.1em}
+@media (max-width:860px){
+  body{grid-template-columns:1fr;grid-template-areas:"mist" "card" "book"}
+  .card{border-right:none;border-top:1px solid rgba(201,166,232,.14)}
+}
+</style>
+</head>
+<body>
+<canvas id="mist"></canvas>
+
+<div class="card">
+  <div class="brand">砚台香研室<i>PERFUME LAB</i></div>
+  <div class="bar"></div>
+  <div class="note">
+    <h4>前调</h4><p>佛手柑、苦橙叶——开场三分钟，先把空气洗一遍。</p>
+  </div>
+  <div class="note">
+    <h4>中调</h4><p>鸢尾、紫罗兰叶、白茶。这一层停留最久，也是它被记住的原因。</p>
+  </div>
+  <div class="note">
+    <h4>后调</h4><p>雪松、琥珀、一点点泥土。留香八小时以上。</p>
+  </div>
+</div>
+
+<div class="mist">
+  <h1>把一段<span>气味</span><br>调成可以带走的形状</h1>
+</div>
+
+<div class="book">
+  <form id="sub">
+    <label for="em">到店试香预约</label>
+    <input id="em" type="email" placeholder="you@example.com" required>
+    <button type="submit">预约</button>
+  </form>
+  <em id="msg">每批次仅 40 瓶 · 需提前三日</em>
+</div>
+
+<script>
+var state = {
+  ye:'#1A1620', wu:'#C9A6E8', shen:'#3B3046', zi:'#EFE8F2',
+  zihao:16, jianju:22, yuanjiao:12, miwu:9, kuosan:1
+};
+var cv=document.getElementById('mist'), ctx=cv.getContext('2d');
+var W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
+var mists=[];
+
+function hex(h){var v=parseInt(String(h).replace('#',''),16);return [(v>>16)&255,(v>>8)&255,v&255];}
+function rgba(h,a){var c=hex(h);return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
+
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  initMist();
+}
+/* 香雾：多个径向雾团各自从核心向外缓慢扩散、衰减、重置（离线 canvas，零外链） */
+function initMist(){
+  mists=[];
+  var n=Math.max(3,Math.round(state.miwu));
+  for(var i=0;i<n;i++){
+    mists.push({x:.25+Math.random()*.7,y:.15+Math.random()*.7,
+      r:.10+Math.random()*.16, v:.05+Math.random()*.09, a:.16+Math.random()*.14,
+      tone:Math.random()>.55?'wu':'shen'});
+  }
+}
+function draw(ts){
+  ctx.clearRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';
+  var minWH=Math.min(W,H);
+  for(var i=0;i<mists.length;i++){
+    var m=mists[i];
+    m.r+=m.v*.0016*state.kuosan;
+    if(m.r>.75){m.r=.10;m.x=.25+Math.random()*.7;m.y=.15+Math.random()*.7;}
+    var x=m.x*W+Math.cos(ts/9000+i)*22, y=m.y*H+Math.sin(ts/11000+i)*16;
+    var R=m.r*minWH;
+    var g=ctx.createRadialGradient(x,y,0,x,y,R);
+    var c=state[m.tone];
+    g.addColorStop(0,rgba(c,m.a*(1-m.r/.8)));
+    g.addColorStop(.55,rgba(c,m.a*.35*(1-m.r/.8)));
+    g.addColorStop(1,rgba(c,0));
+    ctx.fillStyle=g;ctx.fillRect(x-R,y-R,R*2,R*2);
+  }
+}
+var prev=0;
+function loop(ts){
+  /* prefers-reduced-motion 下只画一帧，避免持续动画 */
+  if(!reduce) draw(ts);
+  requestAnimationFrame(loop);
+}
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--ye',state.ye);r.setProperty('--wu',state.wu);
+  r.setProperty('--shen',state.shen);r.setProperty('--zi',state.zi);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  initMist();
+}
+document.getElementById('sub').addEventListener('submit',function(e){
+  e.preventDefault();
+  document.getElementById('msg').textContent='已登记 '+document.getElementById('em').value+' · 到店前一日短信提醒';
+});
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,140);});
+resize();apply();
+draw(0);
+if(!reduce) requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -15,10 +15,10 @@ button{background:var(--cc,#2f6bff);color:#fff;border:none;border-radius:8px;pad
 <div class="controls"><button id="tg">切换横幅</button></div>
 <script>
 const bn=document.getElementById('bn'),pg=document.getElementById('pg');
-const state={cc:'#2f6bff',bh:40,h:.4,text:'新版本已发布，点击查看更新内容'};
-function applyStyle(){document.documentElement.style.setProperty('--cc',state.cc);bn.textContent=state.text;bn.style.transition='height '+state.h+'s ease';pg.style.transition='transform '+state.h+'s ease';}
+const state={cc:'#2f6bff',bh:40,h:.4,text:'新版本已发布，点击查看更新内容',bg:'#f4f5f7',txtc:'#ffffff'};
+function applyStyle(){document.documentElement.style.setProperty('--cc',state.cc);document.querySelector('.status').style.background=state.bg;bn.style.color=state.txtc;bn.textContent=state.text;bn.style.transition='height '+state.h+'s ease';pg.style.transition='transform '+state.h+'s ease';}
 function toggle(on){bn.classList.toggle('on',on);pg.style.transform='translateY('+(on?state.bh:0)+'px)';}
 document.getElementById('tg').onclick=()=>toggle(!bn.classList.contains('on'));
 applyStyle();toggle(true);
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['cc','bh','h','text'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['cc','bh','h','text','bg','txtc'].includes(d.key))applyStyle();});
 </script></body></html>

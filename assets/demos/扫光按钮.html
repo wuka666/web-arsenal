@@ -20,20 +20,20 @@
   .btn:hover::after, .btn.demo::after { transform: translateX(130%); transition: transform var(--sudu) ease; }
   .solid { background: linear-gradient(180deg, var(--zhucai) 0%, color-mix(in srgb, var(--zhucai) 91%, #000) 48%, color-mix(in srgb, var(--zhucai) 81%, #000) 100%);
          color: var(--zi); border: 1px solid var(--zhucai);
-         box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 0 calc(var(--guang)*1px) rgba(186,208,255,.18); }
+         box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 0 calc(var(--guang)*1px) rgba(95,227,208,.22); }
   .solid:hover { filter: brightness(1.05);
-         box-shadow: inset 0 1px 0 #fff, 0 0 calc(var(--guang)*1.6px) rgba(186,208,255,.4), 0 8px 18px rgba(255,255,255,.1); }
-  .ghost { background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(0,0,0,.45) 50%, rgba(160,175,200,.08));
-         color: #fff; border: 1px solid rgba(198,198,198,.45); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
-  .ghost:hover { border-color: rgba(220,230,255,.75);
-         box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 0 calc(var(--guang)*1px) rgba(170,200,255,.22); }
-  .accent { background: linear-gradient(180deg, #f26b1d, #c9500f); color: #fff; border: 1px solid #f26b1d; }
-  .accent:hover { filter: brightness(1.08); box-shadow: 0 0 calc(var(--guang)*1.4px) rgba(242,107,29,.4); }
+         box-shadow: inset 0 1px 0 #fff, 0 0 calc(var(--guang)*1.6px) rgba(95,227,208,.45), 0 8px 18px rgba(2,32,40,.4); }
+  .ghost { background: linear-gradient(135deg, rgba(220,239,234,.08), rgba(2,32,40,.5) 50%, rgba(95,227,208,.1));
+         color: #DCEFEA; border: 1px solid rgba(95,227,208,.4); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+  .ghost:hover { border-color: rgba(220,239,234,.85);
+         box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 0 calc(var(--guang)*1px) rgba(95,227,208,.28); }
+  .accent { background: linear-gradient(180deg, #0E4A56, #062b34); color: #DCEFEA; border: 1px solid #0E4A56; }
+  .accent:hover { filter: brightness(1.08); box-shadow: 0 0 calc(var(--guang)*1.4px) rgba(95,227,208,.4); }
 </style>
 </head>
 <body>
   <div class="row">
-    <button class="btn solid">Start for Free</button>
+    <button class="btn solid">Start free</button>
     <button class="btn ghost">See it in action</button>
     <button class="btn accent">立即升级</button>
   </div>
@@ -41,7 +41,7 @@
     <button class="btn solid">自动演示</button>
   </div>
 <script>
-const state = { di:'#101014', zhucai:'#ffffff', zi:'#111111',
+const state = { di:'#04222B', zhucai:'#5FE3D0', zi:'#032028',
                 saoliang:45, sudu:0.65, guang:22, yuanjiao:6, gao:42, zihao:14 };
 function apply(){
   const R = document.documentElement.style;

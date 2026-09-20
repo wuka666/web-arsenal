@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!-- M172 文件夹标签：选中页签与下方面板同背景连成一体，左折角 + 右斜切（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--desk,#dfe4ec);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{width:520px}
+  .tabs{display:flex;gap:var(--tgap);padding:0 var(--tgap)}
+  .tab{position:relative;height:var(--h);padding:0 22px;display:flex;align-items:center;font-size:var(--fs);
+       color:var(--txt);background:var(--un);cursor:pointer;
+       border-radius:var(--r) var(--r) 0 0;
+       /* 右 30° 斜切：右上角向内收一刀，与下方面板齐平处不断开 */
+       clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% 100%,0 100%);
+       transition:background var(--dur) ease,color var(--dur) ease}
+  /* 左 90° 折角：左下角叠一小块深色三角，模拟页签翻折压在面板上的阴影面 */
+  .tab.sel{background:var(--panel);color:var(--acc);font-weight:600}
+  .tab.sel::after{content:'';position:absolute;left:0;bottom:0;width:var(--fold);height:var(--fold);
+       background:var(--foldc);clip-path:polygon(0 0,100% 100%,0 100%)}
+  .panel{min-height:180px;background:var(--panel);border-radius:0 var(--r) var(--r) var(--r);padding:22px;color:var(--txt)}
+  .panel .ph{height:12px;border-radius:6px;background:var(--desk);margin-bottom:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="tabs" id="tabs"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+<script>
+  const state={n:3,acc:'#2f6bff',panel:'#ffffff',un:'#eef1f6',foldc:'#c9d2e0',fold:10,cut:16,h:42,r:10,fs:14,tgap:6,dur:0.25};
+  const NAMES=['文档','表格','幻灯片','附件','图片'];
+  const tabs=document.getElementById('tabs'),panel=document.getElementById('panel');
+  let sel=0;
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--acc',state.acc); s.setProperty('--panel',state.panel); s.setProperty('--un',state.un);
+    s.setProperty('--foldc',state.foldc); s.setProperty('--fold',state.fold+'px'); s.setProperty('--cut',state.cut+'px');
+    s.setProperty('--h',state.h+'px'); s.setProperty('--r',state.r+'px'); s.setProperty('--fs',state.fs+'px');
+    s.setProperty('--tgap',state.tgap+'px'); s.setProperty('--desk','#e3e8f0');
+    tabs.innerHTML='';
+    for(let i=0;i<state.n;i++){
+      const t=document.createElement('div');
+      t.className='tab'+(i===sel?' sel':''); t.textContent=NAMES[i]||('页签'+(i+1));
+      t.onclick=()=>{sel=i;apply();};
+      tabs.appendChild(t);
+    }
+    // 面板内容用骨架占位条，随选中页签换行数，避免外链图片
+    panel.innerHTML='';
+    const lines=[4,2,3][sel%3]||3;
+    for(let i=0;i<lines;i++){
+      const p=document.createElement('div'); p.className='ph';
+      p.style.width=(86-i*14)+'%'; panel.appendChild(p);
+    }
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

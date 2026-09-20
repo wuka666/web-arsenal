@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- 防土法则③ 大字留白：删到只剩一个巨型标题时刻，紧字距 + 平衡断行，无图无 CTA，唯一个词吃强调色 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·大字留白</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--se);color:var(--zi);min-height:100vh}
+  .stage{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:8vh 8vw}
+  .kicker{font-size:13px;letter-spacing:.24em;text-transform:uppercase;opacity:.45;margin-bottom:4vh}
+  .h{font-family:Georgia,"Times New Roman",serif;font-size:clamp(44px, calc(var(--bs) * 1vw), 220px);line-height:var(--lh);letter-spacing:calc(var(--ls) * 1em);font-weight:800;max-width:13ch}
+  .h.bal{text-wrap:balance}
+  .h .em{color:var(--ac)}
+  .foot{margin-top:6vh;font-size:13px;opacity:.4;letter-spacing:.04em}
+</style>
+</head>
+<body>
+  <main class="stage">
+    <div class="kicker">Manifesto</div>
+    <h1 class="h bal">我们<br>用<span class="em">安静</span><br>说话。</h1>
+    <div class="foot">— studio, 2026</div>
+  </main>
+<script>
+  const state={bs:9.0,ls:-0.02,lh:0.98,bal:true,se:'#F6F4EF',zi:'#16140F',ac:'#C0432B'};
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--bs',state.bs);
+    s.setProperty('--ls',state.ls);
+    s.setProperty('--lh',state.lh);
+    s.setProperty('--se',state.se);
+    s.setProperty('--zi',state.zi);
+    s.setProperty('--ac',state.ac);
+    document.querySelector('.h').classList.toggle('bal',state.bal);
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

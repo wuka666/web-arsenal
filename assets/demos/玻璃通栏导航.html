@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>玻璃通栏导航 · 单文件 demo</title>
+<style>
+  :root{
+    --boli:#0A102499;    /* 导航底色（带透明度） */
+    --bian:#8FA8E82E;    /* 下边框颜色 */
+    --zi:#E8EDF7;        /* 文字色 */
+    --qiang:#FF6B4A52;   /* CTA 描边色 */
+    --mohu:14px;         /* 背景模糊半径 */
+    --gao:64px;          /* 导航高度 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Inter","Helvetica Neue",Arial,sans-serif;background:#0A1024}
+  /* 伪彩 hero 用色块提供可被模糊的内容，替代真实摄影图 */
+  .hero{position:fixed;inset:0;display:grid;place-items:center}
+  .hero i{position:absolute;border-radius:50%;filter:blur(6px);opacity:.5}
+  .hero i:nth-child(1){width:300px;height:300px;left:30%;top:-90px;background:#8FA8E8}
+  .hero i:nth-child(2){width:240px;height:240px;right:14%;top:24%;background:#FF6B4A}
+  .hero i:nth-child(3){width:200px;height:200px;left:42%;bottom:10%;background:#E8EDF7}
+  .hero h1{position:relative;color:#E8EDF7;font-weight:400;font-size:30px;letter-spacing:.02em}
+  /* 通栏吸顶 + backdrop 模糊：blur 半径由 --mohu 驱动 */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:60;height:var(--gao);
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0 clamp(18px,4vw,44px);
+        background:var(--boli);
+        -webkit-backdrop-filter:blur(var(--mohu));backdrop-filter:blur(var(--mohu));
+        border-bottom:1px solid var(--bian)}
+  .nav .logo{font-weight:700;letter-spacing:.06em;color:var(--zi)}
+  .nav .menu{display:flex;gap:28px}
+  .nav .menu a{color:color-mix(in srgb,var(--zi) 72%,transparent);text-decoration:none;font-size:14px;
+        transition:color .2s ease}
+  .nav .menu a:hover{color:var(--zi)}
+  .nav .cta{background:transparent;border:1px solid var(--qiang);color:var(--zi);padding:8px 18px;border-radius:999px;font-size:13px;cursor:pointer;
+        transition:border-color .2s ease}
+  .nav .cta:hover{border-color:var(--zi)}
+  @media (max-width:760px){.nav .menu{display:none}}
+</style>
+</head>
+<body>
+<div class="hero"><i></i><i></i><i></i><h1>Scroll under the glass bar</h1></div>
+<nav class="nav">
+  <span class="logo">APOGEE</span>
+  <div class="menu"><a href="#">Platform</a><a href="#">Numbers</a><a href="#">Company</a></div>
+  <button class="cta" type="button">Sign in</button>
+</nav>
+<script>
+(function(){
+  var r=document.documentElement.style;
+  var state={boli:'#0A102499',bian:'#8FA8E82E',zi:'#E8EDF7',qiang:'#FF6B4A52',mohu:14,gao:64};
+  function apply(){
+    ['boli','bian','zi','qiang'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--mohu',state.mohu+'px');
+    r.setProperty('--gao',state.gao+'px');
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

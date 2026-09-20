@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>霓虹楼体剪影 · 单文件 demo</title>
+<style>
+  :root{
+    --ye:#0B0D0A;        /* 夜空底色 */
+    --lou:#4A5546;       /* 楼体剪影色 */
+    --n1:#B6FF3C;        /* 霓虹窗色一 */
+    --n2:#E9F2E2;        /* 霓虹窗色二 */
+    --chuang:60;         /* 窗格密度（%） */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--ye);overflow:hidden;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .title{position:fixed;left:50%;top:26%;transform:translateX(-50%);text-align:center;color:#F3F0FF;z-index:2}
+  .title b{font-size:clamp(30px,5.5vw,54px);font-weight:700;letter-spacing:.03em;
+        text-shadow:0 0 30px color-mix(in srgb,var(--n1) 60%,transparent)}
+  .title span{display:block;margin-top:10px;font-size:12px;letter-spacing:.3em;color:rgba(243,240,255,.5)}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="title"><b>MIDNIGHT DISTRICT</b><span>CANVAS SKYLINE SILHOUETTE</span></div>
+<script>
+(function(){
+  var cv=document.getElementById('cv'), g=cv.getContext('2d');
+  var state={ye:'#0B0D0A',lou:'#4A5546',n1:'#B6FF3C',n2:'#E9F2E2',chuang:60,zhoushu:1400};
+  // 楼群拓扑由索引伪随机确定，窗口重绘不闪位
+  var towers=[];
+  function build(w){
+    towers=[];
+    var x=-20;
+    while(x<w+40){
+      var bw=46+((x*7)%53), bh=(.22+((x*13)%61)/100)*innerHeight;
+      towers.push({x:x,w:bw,h:bh,seed:x});
+      x+=bw+8+((x*3)%17);
+    }
+  }
+  var tick=0;
+  function draw(){
+    var w=innerWidth,h=innerHeight;
+    if(cv.width!==w*devicePixelRatio){ cv.width=w*devicePixelRatio; cv.height=h*devicePixelRatio; build(w); }
+    g.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    g.fillStyle=state.ye; g.fillRect(0,0,w,h);
+    var sky=g.createLinearGradient(0,0,0,h);
+    sky.addColorStop(0,'rgba(0,0,0,0)');
+    sky.addColorStop(1,'rgba(20,10,40,.55)');
+    g.fillStyle=sky; g.fillRect(0,0,w,h);
+    towers.forEach(function(t){
+      g.fillStyle=state.lou;
+      g.fillRect(t.x,h-t.h,t.w,t.h);
+      // 窗格：种子随 tick 位移，每轮自然有几扇明灭，不做整帧乱闪
+      var step=14, lit=state.chuang/100;
+      for(var wy=h-t.h+10;wy<h-14;wy+=step){
+        for(var wx=t.x+7;wx<t.x+t.w-9;wx+=step){
+          var p=((wx*31+wy*17+t.seed*7+tick*13)%97)/97;
+          if(p>lit)continue;
+          g.fillStyle=(p<lit*.5)?state.n1:state.n2;
+          g.globalAlpha=.25+p*.6;
+          g.fillRect(wx,wy,6,9);
+        }
+      }
+      g.globalAlpha=1;
+    });
+  }
+  var timer=null;
+  function setFlicker(){
+    if(timer)clearInterval(timer);
+    // 减动效环境下只画一帧
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ draw(); return; }
+    timer=setInterval(function(){ tick++; draw(); },state.zhoushu);
+  }
+  addEventListener('resize',function(){ build(innerWidth); draw(); setFlicker(); });
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value;
+    var r=document.documentElement.style;
+    ['ye','lou','n1','n2'].forEach(function(k2){ r.setProperty('--'+k2,state[k2]); });
+    r.setProperty('--chuang',state.chuang);
+    build(innerWidth); draw(); setFlicker();
+  });
+  var r=document.documentElement.style;
+  ['ye','lou','n1','n2'].forEach(function(k2){ r.setProperty('--'+k2,state[k2]); });
+  r.setProperty('--chuang',state.chuang);
+  build(innerWidth); draw(); setFlicker();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>赛博网格背景 · 单文件 demo</title>
+<style>
+  :root{
+    --di:#0B0D0A;        /* 夜空底色 */
+    --wang:#4A5546;      /* 网线颜色 */
+    --hui:#B6FF3C;       /* 地平线辉光 */
+    --wangge:72px;       /* 网格间距 */
+    --touming:55;        /* 网线不透明度（%） */
+    --sudu:9s;           /* 一轮滚动时长 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);overflow:hidden;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .wrap{position:fixed;inset:0}
+  /* 地平线辉光压在网格后面，先画光再画线 */
+  .hui{position:absolute;left:0;right:0;top:44%;height:30%;
+        background:radial-gradient(60% 100% at 50% 100%,color-mix(in srgb,var(--hui) 55%,transparent),transparent 70%)}
+  .floor{position:absolute;left:-50%;right:-50%;top:52%;bottom:-60%;
+        background-image:
+          repeating-linear-gradient(0deg,var(--wang) 0 1.5px,transparent 1.5px var(--wangge)),
+          repeating-linear-gradient(90deg,var(--wang) 0 1.5px,transparent 1.5px var(--wangge));
+        opacity:calc(var(--touming)/100);
+        transform:perspective(340px) rotateX(62deg);
+        transform-origin:50% 0;
+        animation:pao var(--sudu) linear infinite}
+  /* 网格沿 Y 平移一个间距实现无限滚动，translate 用固定 px 便于与间距解耦 */
+  @keyframes pao{to{background-position:0 var(--wangge),0 0}}
+  .sun{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;
+        background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--hui) 85%,white),color-mix(in srgb,var(--hui) 40%,transparent) 62%,transparent 72%);
+        filter:blur(2px)}
+  .title{position:absolute;left:50%;top:22%;transform:translateX(-50%);text-align:center;color:#E9F2E2}
+  .title b{font-size:clamp(30px,5.5vw,52px);font-weight:700;letter-spacing:.04em}
+  .title span{display:block;margin-top:10px;font-size:12px;letter-spacing:.34em;color:rgba(237,235,255,.5)}
+  @media (prefers-reduced-motion:reduce){.floor{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hui"></div>
+  <div class="floor"></div>
+  <div class="sun"></div>
+  <div class="title"><b>NEON HORIZON</b><span>SYNTHWAVE GRID FLOOR</span></div>
+</div>
+<script>
+(function(){
+  var r=document.documentElement.style;
+  var state={di:'#0B0D0A',wang:'#4A5546',hui:'#B6FF3C',wangge:72,touming:55,sudu:9};
+  function apply(){
+    r.setProperty('--di',state.di);
+    r.setProperty('--wang',state.wang);
+    r.setProperty('--hui',state.hui);
+    r.setProperty('--wangge',state.wangge+'px');
+    r.setProperty('--touming',state.touming);
+    r.setProperty('--sudu',state.sudu+'s');
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

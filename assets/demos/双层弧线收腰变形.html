@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!-- M181 双层弧线收腰变形：逐字抛物线弧 + 副色回声层，双月牙柔性张力（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{position:relative}
+  .row{display:flex;align-items:flex-start}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);white-space:pre;margin-left:var(--ls)}
+  /* 回声层：同弧线错位重影，形成双月牙 */
+  .row.echo{position:absolute;left:var(--ox);top:var(--oy);opacity:.35;z-index:-1}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="row echo" id="echo"></div>
+    <div class="row" id="main"></div>
+  </div>
+<script>
+  const state={arc:22,ox:10,oy:8,fs:64,fw:800,c:'#151b2e',c2:'#e8452c',page:'#eef1f6',ls:3,txt:'FLOWING'};
+  const main=document.getElementById('main'),echo=document.getElementById('echo');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--c',state.c);
+    s.setProperty('--c2',state.c2); s.setProperty('--page',state.page); s.setProperty('--ls',state.ls+'px');
+    s.setProperty('--ox',state.ox+'px'); s.setProperty('--oy',state.oy+'px');
+    const build=(row,color)=>{
+      row.innerHTML='';
+      const arr=[...state.txt], mid=(arr.length-1)/2;
+      arr.forEach((ch,i)=>{
+        const el=document.createElement('span'); el.className='ch'; el.textContent=ch;
+        // 抛物线：中间低两端翘的收腰弧（负值翻转成月牙朝向）
+        const y=-state.arc*Math.pow((i-mid)/(mid||1),2)+state.arc;
+        el.style.transform='translateY('+(state.arc-y)+'px)';
+        el.style.color=color;
+        row.appendChild(el);
+      });
+    };
+    build(main,state.c); build(echo,'var(--c2)');
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

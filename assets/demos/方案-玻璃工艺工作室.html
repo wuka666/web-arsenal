@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>玻璃工艺工作室</title>
+<style>
+/* 参数（postMessage 驱动；长度型变量自带 px） */
+:root{
+  --yaodi:#F2E6D8; --mo:#2B2118; --rongjin:#C8763C; --boli:#E8DCC8;
+  --hui:#8B7355; --gaoguang:#FFFDF8;
+  --biaoti:68px; --qiwu:1; --liang:100%;
+  --ziti-biaoti:Georgia,'Songti SC','SimSun',serif;
+  --ziti-zhengwen:system-ui,-apple-system,'Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--ziti-zhengwen); color:var(--mo);
+  background:var(--yaodi); overflow:hidden;
+  filter:brightness(var(--liang));
+}
+.stage{position:relative;height:100%;display:flex;flex-direction:column}
+
+/* 窑火光斑：canvas 铺底，营造窑内暖光 */
+#yaoguang{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* 顶栏：细线分隔，克制 */
+.top{
+  position:relative;z-index:2;display:flex;align-items:baseline;justify-content:space-between;
+  padding:22px 40px 16px;border-bottom:1px solid color-mix(in srgb,var(--mo) 14%,transparent);
+}
+.brand{font-family:var(--ziti-biaoti);font-size:19px;letter-spacing:.14em}
+.brand em{font-style:normal;color:var(--rongjin)}
+.top nav{display:flex;gap:26px;font-size:12.5px;letter-spacing:.08em;color:var(--hui)}
+.top nav span{cursor:default;transition:color .3s}
+.top nav span:hover{color:var(--rongjin)}
+
+/* 主体：左索引 + 右陈列 */
+.main{position:relative;z-index:2;flex:1;display:grid;grid-template-columns:210px 1fr;min-height:0}
+
+.idx{
+  border-right:1px solid color-mix(in srgb,var(--mo) 14%,transparent);
+  padding:34px 26px;display:flex;flex-direction:column;gap:19px;
+}
+.idx a{
+  display:flex;gap:12px;align-items:baseline;text-decoration:none;color:var(--hui);
+  font-size:13px;letter-spacing:.04em;cursor:default;transition:color .35s,transform .35s;
+}
+.idx a b{font-family:var(--ziti-biaoti);font-size:11px;color:var(--rongjin);opacity:.8}
+.idx a:hover,.idx a.on{color:var(--mo);transform:translateX(5px)}
+.idx a.on b{opacity:1}
+
+/* 陈列区：标题在上、器皿在下，互不遮挡 */
+.show{position:relative;display:flex;flex-direction:column;min-height:0;padding:28px 40px 18px}
+.vessels{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:calc(30px*var(--qiwu));flex:1;min-height:0;padding-bottom:18px}
+
+/* 玻璃器皿：靠渐变 + 内外高光模拟窑玻璃的通透感 */
+.v{
+  position:relative;flex-shrink:0;
+  background:
+    radial-gradient(58% 6% at 50% 1.5%,color-mix(in srgb,var(--mo) 30%,transparent),transparent 74%),
+    linear-gradient(168deg,color-mix(in srgb,var(--boli) 86%,transparent),color-mix(in srgb,var(--rongjin) 38%,var(--boli)));
+  border:1px solid color-mix(in srgb,var(--mo) 24%,transparent);
+  box-shadow:
+    inset 3px 4px 16px color-mix(in srgb,var(--gaoguang) 88%,transparent),
+    inset -5px -8px 22px color-mix(in srgb,var(--mo) 17%,transparent),
+    0 18px 36px color-mix(in srgb,var(--mo) 12%,transparent);
+  backdrop-filter:blur(calc(6px*var(--qiwu)));
+  -webkit-backdrop-filter:blur(calc(6px*var(--qiwu)));
+  opacity:0;transform:translateY(26px);
+  animation:rise .95s cubic-bezier(.22,.68,.25,1) forwards;
+}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+
+/* 边缘高光 + 台面折射影，玻璃的通透靠这两层撑起来 */
+.v::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    linear-gradient(102deg,color-mix(in srgb,var(--gaoguang) 96%,transparent) 0%,transparent 17%),
+    linear-gradient(276deg,color-mix(in srgb,var(--gaoguang) 62%,transparent) 0%,transparent 22%),
+    radial-gradient(120% 42% at 50% 104%,color-mix(in srgb,var(--gaoguang) 58%,transparent),transparent 70%);
+}
+.v::after{
+  content:'';position:absolute;left:6%;right:6%;bottom:-8px;height:16px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--mo) 30%,transparent),transparent 72%);
+  filter:blur(4px);
+}
+
+/* 五件器皿：抓各自最像器皿的那一段轮廓 */
+.v1{width:calc(88px*var(--qiwu));height:100%;border-radius:42% 42% 12% 12%/16% 16% 6% 6%}
+.v1::before{border-radius:inherit}
+.v2{width:calc(138px*var(--qiwu));height:52%;border-radius:44% 44% 40% 40%/58% 58% 26% 26%;animation-delay:.1s}
+.v3{width:calc(72px*var(--qiwu));height:66%;border-radius:8px 8px 34% 34%/6px 6px 22% 22%;animation-delay:.2s}
+.v4{width:calc(104px*var(--qiwu));height:44%;border-radius:32% 32% 46% 46%/30% 30% 44% 44%;animation-delay:.3s}
+.v5{width:calc(58px*var(--qiwu));height:30%;border-radius:48% 48% 50% 50%/66% 66% 34% 34%;animation-delay:.4s}
+
+/* 作品名与规格：衬线标题 + 斜体标注（手写感） */
+.label{position:relative;z-index:3;margin-bottom:18px}
+.label h1{
+  font-family:var(--ziti-biaoti);font-size:var(--biaoti);font-weight:400;
+  letter-spacing:.02em;line-height:.95;
+  opacity:0;animation:rise .9s .5s cubic-bezier(.22,.68,.25,1) forwards;
+}
+.label p{
+  margin-top:12px;font-family:var(--ziti-biaoti);font-style:italic;font-size:14.5px;
+  color:var(--hui);letter-spacing:.05em;
+  opacity:0;animation:rise .9s .66s cubic-bezier(.22,.68,.25,1) forwards;
+}
+.label p em{font-style:italic;color:var(--rongjin)}
+
+/* 底栏数据：工艺信息，替代原站的国家数/客户数 */
+.strip{
+  position:relative;z-index:2;display:flex;gap:52px;
+  padding:16px 40px 20px;border-top:1px solid color-mix(in srgb,var(--mo) 14%,transparent);
+}
+.strip div{display:flex;gap:11px;align-items:baseline}
+.strip b{font-family:var(--ziti-biaoti);font-size:10.5px;letter-spacing:.16em;color:var(--rongjin);text-transform:uppercase}
+.strip span{font-size:13px;color:var(--mo)}
+
+@media (max-width:820px){
+  .main{grid-template-columns:1fr}
+  .idx{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid color-mix(in srgb,var(--mo) 14%,transparent);padding:16px 22px;gap:20px}
+  .top{padding:16px 22px 12px}
+  .label h1{font-size:calc(var(--biaoti)*.62)}
+  .strip{gap:22px;padding:12px 22px 14px;flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){
+  .v,.label h1,.label p{animation-duration:.01ms;animation-delay:0s}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <canvas id="yaoguang" aria-hidden="true"></canvas>
+
+  <header class="top">
+    <span class="brand">窑火 <em>·</em> Glass Studio</span>
+    <nav><span>作品</span><span>工艺</span><span>工作室</span><span>联系</span></nav>
+  </header>
+
+  <div class="main">
+    <aside class="idx">
+      <a class="on"><b>01</b>熔金瓶</a>
+      <a><b>02</b>雾面碗</a>
+      <a><b>03</b>窑变杯</a>
+      <a><b>04</b>素纹罐</a>
+      <a><b>05</b>凝霜盏</a>
+    </aside>
+
+    <section class="show">
+      <div class="label">
+        <h1>熔金瓶</h1>
+        <p>H 28 × Ø 14 · 手工吹制 · <em>1180°C</em></p>
+      </div>
+      <div class="vessels">
+        <div class="v v1"></div>
+        <div class="v v2"></div>
+        <div class="v v3"></div>
+        <div class="v v4"></div>
+        <div class="v v5"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="strip">
+    <div><b>工艺</b><span>手工吹制</span></div>
+    <div><b>窑温</b><span>1180°C</span></div>
+    <div><b>编号</b><span>GS-2026-014</span></div>
+    <div><b>出品</b><span>本窑工作室</span></div>
+  </footer>
+</div>
+
+<script>
+const state = {
+  yaodi:'#F2E6D8', mo:'#2B2118', rongjin:'#C8763C', boli:'#E8DCC8',
+  biaoti:68, qiwu:100, guangsu:1, liang:100
+};
+
+function apply(){
+  const r = document.documentElement.style;
+  r.setProperty('--yaodi', state.yaodi);
+  r.setProperty('--mo', state.mo);
+  r.setProperty('--rongjin', state.rongjin);
+  r.setProperty('--boli', state.boli);
+  r.setProperty('--biaoti', state.biaoti + 'px');
+  r.setProperty('--qiwu', state.qiwu / 100);
+  r.setProperty('--liang', state.liang + '%');
+  guang.rate = state.guangsu;
+}
+apply();
+
+// 窑火光斑：缓慢漂移的暖色光团，负责「窑内感」
+const cv = document.getElementById('yaoguang');
+const cx = cv.getContext('2d');
+const guang = { rate:1 };
+let W = 0, H = 0, raf = 0, t = 0;
+const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+const spots = [
+  { x:.2,  y:.32, r:.5,  c:'206,120,58',  a:.42 },
+  { x:.72, y:.2,  r:.44, c:'255,216,170', a:.5  },
+  { x:.56, y:.8,  r:.54, c:'188,98,50',   a:.34 },
+  { x:.92, y:.6,  r:.38, c:'255,238,212', a:.4  },
+  { x:.07, y:.88, r:.34, c:'214,140,80',  a:.3  }
+];
+
+function resize(){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function draw(){
+  cx.clearRect(0, 0, W, H);
+  const m = Math.min(W, H);
+  for (const s of spots){
+    const dx = Math.sin(t * .00035 * guang.rate + s.x * 9) * m * .05;
+    const dy = Math.cos(t * .00028 * guang.rate + s.y * 7) * m * .04;
+    const px = s.x * W + dx, py = s.y * H + dy, pr = s.r * m;
+    const g = cx.createRadialGradient(px, py, 0, px, py, pr);
+    g.addColorStop(0, 'rgba(' + s.c + ',' + s.a + ')');
+    g.addColorStop(1, 'rgba(' + s.c + ',0)');
+    cx.fillStyle = g;
+    cx.beginPath(); cx.arc(px, py, pr, 0, Math.PI * 2); cx.fill();
+  }
+}
+
+function loop(){ t += 16; draw(); raf = requestAnimationFrame(loop); }
+function start(){ cancelAnimationFrame(raf); if (still.matches) draw(); else raf = requestAnimationFrame(loop); }
+
+still.addEventListener('change', start);
+addEventListener('resize', function(){ resize(); if (still.matches) draw(); });
+addEventListener('message', function(e){
+  const d = e.data;
+  if (!d || d.type !== 'param' || !(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+
+resize(); start();
+
+// 索引与陈列联动：点索引切作品名，验证布局能承载不同长度
+const names = ['熔金瓶','雾面碗','窑变杯','素纹罐','凝霜盏'];
+const sizes = ['H 28 × Ø 14','H 12 × Ø 26','H 16 × Ø 9','H 20 × Ø 22','H 8 × Ø 13'];
+const items = document.querySelectorAll('.idx a');
+const h1 = document.querySelector('.label h1');
+const spec = document.querySelector('.label p');
+items.forEach(function(a, i){
+  a.addEventListener('click', function(){
+    items.forEach(function(x){ x.classList.remove('on'); });
+    a.classList.add('on');
+    h1.textContent = names[i];
+    spec.innerHTML = sizes[i] + ' · 手工吹制 · <em>1180°C</em>';
+  });
+});
+</script>
+</body>
+</html>

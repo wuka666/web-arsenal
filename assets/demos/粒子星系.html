@@ -45,7 +45,7 @@
 
 <div class="notice">
   Canvas 2D 预览 · 完整 Three.js 3D 版需 HTTP 服务<br>
-  <a href="https://win-hao.github.io/starflow/" target="_blank">查看在线版 →</a>
+  背景引擎 starflow · 作者 Win-Hao（MIT，仓库 github.com/Win-Hao/starflow）
 </div>
 
 <button class="panel-toggle" id="toggle" aria-label="调参">⚙</button>
@@ -232,7 +232,7 @@
   document.getElementById('bg').addEventListener('input', e => { state.bg = e.target.value })
 
   // postMessage 调参
-  // 把 s209 方案参数键映射到降级版内部 state：核心参数给可见反馈，3D 专属静默接受
+  // 把 M066 方案参数键映射到降级版内部 state：核心参数给可见反馈，3D 专属静默接受
   const PARAM_MAP = {
     starCount: 'count', size: 'size', scatter: 'scatter',
     backgroundRatio: 'bgRatio', rotationDepth: 'rotate',

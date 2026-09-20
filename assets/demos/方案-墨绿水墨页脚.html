@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>墨绿水墨页脚</title>
+<style>
+  /* 原稿用墨绿水墨背景视频；离线演示改 canvas 生成水墨晕染（零外链），字体回退系统栈 */
+  :root{
+    --zhi:#0C1A12;          /* 纸底（深墨绿） */
+    --mo1:#1F4A33;          /* 墨绿晕染 1 */
+    --mo2:#3C7A54;          /* 墨绿晕染 2 */
+    --zi:#EAF3EC;           /* 文字 */
+    --zhucai:#9FD8AE;       /* 强调 / 订阅按钮 */
+    --kuang:1px;            /* 输入框描边 */
+    --midu:7;               /* 水墨晕染数量 */
+    --motu:240;             /* 晕染半径(px) */
+    --biaoti:34;            /* 标题字号 */
+    --jianju:26;            /* 页脚留白 */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#08120c;color:var(--zi);font-family:"Suisse Intl","Helvetica Neue",Arial,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+  /* 独立演示时让页脚铺满视口并垂直居中，避免内容只占上半屏、下方露出 body 底色 */
+  .foot{position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+        padding:calc(var(--jianju)*2.2) calc(var(--jianju)*1.6);background:var(--zhi);border-top:1px solid rgba(159,216,174,.18)}
+  #bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.85}
+  .inner{position:relative;z-index:2;width:100%;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:calc(var(--jianju)*1.5)}
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .logo{font-size:26px;letter-spacing:.04em;color:var(--zi)}
+  .menu{display:flex;gap:calc(var(--jianju)*1.1);font-size:14px}
+  .menu a{color:rgba(234,243,236,.78);text-decoration:none}
+  .menu a:hover{color:var(--zhucai)}
+  .sub{display:grid;grid-template-columns:1.4fr 1fr;gap:calc(var(--jianju)*1.6);align-items:center}
+  .sub h2{margin:0;font-size:var(--biaoti);font-weight:400;line-height:1.12;color:var(--zi);max-width:18ch}
+  .sub h2 em{font-style:normal;color:var(--zhucai)}
+  .form{display:flex;gap:10px;background:rgba(255,255,255,.04);border:var(--kuang) solid rgba(159,216,174,.35);border-radius:14px;padding:8px 8px 8px 16px}
+  .form input{flex:1;min-width:0;background:none;border:0;color:var(--zi);font:inherit;font-size:14px;outline:none}
+  .form input::placeholder{color:rgba(234,243,236,.45)}
+  .form button{border:0;background:var(--zhucai);color:#0C1A12;border-radius:10px;padding:11px 20px;font:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+  .form button:hover{filter:brightness(1.05)}
+  .base{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(159,216,174,.16);padding-top:calc(var(--jianju)*.8);font-size:12px;color:rgba(234,243,236,.5)}
+  @media (max-width:760px){.sub{grid-template-columns:1fr}.menu{display:none}}
+</style>
+</head>
+<body>
+<footer class="foot">
+  <canvas id="bg"></canvas>
+  <div class="inner">
+    <nav class="nav">
+      <span class="logo">常青庭</span>
+      <span class="menu"><a>Grove</a><a>Notes</a><a>Visit</a><a>Support</a></span>
+    </nav>
+    <div class="sub">
+      <h2>Keep close to the <em>growing record</em>.</h2>
+      <form class="form" id="form" autocomplete="off">
+        <input id="email" type="email" placeholder="you@email.com" aria-label="Email" />
+        <button type="submit" id="subBtn">Subscribe</button>
+      </form>
+    </div>
+    <div class="base"><span>© 2026 常青庭</span><span>Grown here, open to everyone.</span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var q=function(s){return document.querySelector(s);};
+  var bg=q('#bg'), bx=bg.getContext('2d');
+  var form=q('#form'), email=q('#email'), subBtn=q('#subBtn');
+
+  var state={
+    zhi:'#0C1A12', mo1:'#1F4A33', mo2:'#3C7A54', zi:'#EAF3EC',
+    zhucai:'#9FD8AE', kuang:1, midu:7, motu:240, biaoti:34, jianju:26
+  };
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['zhi','mo1','mo2','zi','zhucai'].forEach(function(k){r.setProperty('--'+k,state[k]);});
+    r.setProperty('--kuang',state.kuang+'px');
+    r.setProperty('--midu',state.midu);
+    r.setProperty('--motu',state.motu+'px');
+    r.setProperty('--biaoti',state.biaoti+'px');
+    r.setProperty('--jianju',state.jianju+'px');
+    initInk(); resizeBg();
+  }
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  /* 墨绿水墨：多层径向晕染缓慢漂移，模拟水墨在纸上化开（零外链） */
+  var ink=[];
+  function initInk(){
+    ink=[];
+    var n=Math.max(3,Math.round(state.midu));
+    for(var i=0;i<n;i++){
+      ink.push({x:Math.random(),y:Math.random(),
+        vx:(Math.random()-.5)*.0005, vy:(Math.random()-.5)*.0005,
+        r:state.motu*(.6+Math.random()*.8),
+        c:i%2?state.mo1:state.mo2, a:.10+Math.random()*.10});
+    }
+  }
+  function resizeBg(){
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    bg.width=Math.round(bg.clientWidth*dpr); bg.height=Math.round(bg.clientHeight*dpr);
+    bx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function drawBg(){
+    var w=bg.clientWidth,h=bg.clientHeight;
+    bx.clearRect(0,0,w,h);
+    for(var i=0;i<ink.length;i++){
+      var b=ink[i];
+      b.x+=b.vx; b.y+=b.vy;
+      if(b.x<-.3)b.x=1.3; if(b.x>1.3)b.x=-.3; if(b.y<-.3)b.y=1.3; if(b.y>1.3)b.y=-.3;
+      var g=bx.createRadialGradient(b.x*w,b.y*h,0,b.x*w,b.y*h,b.r);
+      g.addColorStop(0,b.c); g.addColorStop(1,'rgba(0,0,0,0)');
+      bx.globalAlpha=b.a; bx.fillStyle=g;
+      bx.beginPath(); bx.arc(b.x*w,b.y*h,b.r,0,Math.PI*2); bx.fill();
+      bx.globalAlpha=1;
+    }
+  }
+
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function loop(){ if(!reduce)drawBg(); requestAnimationFrame(loop); }
+  window.addEventListener('resize',resizeBg);
+
+  // 订阅：纯前端反馈，不真正发送（演示用）
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!email.value||!email.checkValidity()){ subBtn.textContent='Enter email'; return; }
+    subBtn.textContent='Joined ✓'; email.value=''; subBtn.disabled=true;
+    setTimeout(function(){subBtn.textContent='Subscribe';subBtn.disabled=false;},2200);
+  });
+
+  apply(); resizeBg(); loop();
+})();
+</script>
+</body>
+</html>

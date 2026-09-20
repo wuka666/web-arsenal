@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>黑胶唱片店</title>
+<style>
+:root{
+  --di:#16161A;      /* 店里只开一盏灯 */
+  --huang:#E2B33C;   /* 芥末黄标签 */
+  --zhi:#EDE9E0;     /* 纸面字色 */
+  --hui:#7E7C74;     /* 标注 */
+  --zihao:15px;
+  --jianju:20px;
+  --yuanjiao:3px;
+  --lie:4;           /* 陈列列数 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--di);color:var(--zhi);min-height:100vh;font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif;display:flex;flex-direction:column}
+nav{display:flex;gap:calc(var(--jianju)*1.1);align-items:center;
+  padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.5);border-bottom:1px solid rgba(237,233,224,.12);
+  font-family:Consolas,monospace;font-size:11px;letter-spacing:.2em}
+nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.15);letter-spacing:.14em;font-weight:400}
+nav a{color:var(--hui);text-decoration:none}nav a:hover{color:var(--huang)}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  padding:calc(var(--jianju)*1.6) calc(var(--jianju)*1.5) calc(var(--jianju)*.9);flex-wrap:wrap}
+h1{font-size:calc(var(--zihao)*2.1);line-height:1.28;letter-spacing:.02em;max-width:16em}
+h1 em{font-style:normal;color:var(--huang)}
+.top p{color:var(--hui);font-size:calc(var(--zihao)*.82);line-height:1.8;max-width:28em}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb,var(--huang) 62%,transparent);
+  color:var(--huang);border-radius:99px;padding:6px 13px;font-family:Consolas,monospace;font-size:10.5px;letter-spacing:.18em}
+.shelf{flex:1;display:grid;grid-template-columns:repeat(var(--lie),1fr);
+  gap:calc(var(--jianju)*.9);padding:0 calc(var(--jianju)*1.5) calc(var(--jianju)*1.5);align-content:start}
+.rec{border:1px solid rgba(237,233,224,.14);border-radius:var(--yuanjiao);overflow:hidden;
+  background:rgba(255,255,255,.02);transition:border-color .2s,transform .2s;position:relative}
+.rec:hover{border-color:color-mix(in srgb,var(--huang) 55%,transparent);transform:translateY(-3px)}
+/* 封面：用 CSS 圆环叠出唱片外形，零外链 */
+.cov{position:relative;padding-bottom:100%;
+  background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--zhi) 12%,transparent) 0 8%,
+    color-mix(in srgb,var(--hui) 26%,transparent) 8.5% 12%,transparent 12.5%),
+    repeating-radial-gradient(circle at 50% 50%,rgba(237,233,224,.07) 0 1px,transparent 1px 4px),
+    linear-gradient(150deg,color-mix(in srgb,var(--huang) 16%,transparent),transparent 70%)}
+.cov b{position:absolute;left:10px;top:9px;font-family:Consolas,monospace;font-size:10px;color:var(--hui);letter-spacing:.1em}
+.rec dl{padding:11px 12px 13px;display:grid;gap:5px}
+.rec dt{font-size:calc(var(--zihao)*.84);line-height:1.35}
+.rec dd{font-family:Consolas,monospace;font-size:10.5px;color:var(--hui);letter-spacing:.05em}
+.rec .sc{position:absolute;right:10px;bottom:10px;font-family:Consolas,monospace;font-size:11px;color:var(--huang)}
+@media (max-width:900px){:root{--lie:2}}
+</style>
+</head>
+<body>
+<nav>
+  <b>回针唱片</b>
+  <a href="#">在售</a><a href="#">厂牌</a><a href="#">到店试听</a><a href="#">关于</a>
+</nav>
+<div class="top">
+  <h1>每周挑六张，<br>放上<em>试听台</em></h1>
+  <div>
+    <span class="badge">本周精选 · 09-19</span>
+    <p style="margin-top:12px">只卖二手原版，品相按唱片协会标准分级。清单每周五更新，售出即下架。</p>
+  </div>
+</div>
+<div class="shelf" id="shelf"></div>
+<script>
+var state = {
+  di:'#16161A', huang:'#E2B33C', zhi:'#EDE9E0', hui:'#7E7C74',
+  zihao:15, jianju:20, yuanjiao:3, lie:4
+};
+var RECS = [
+  ['SR-0142','《冬眠》原声','厂牌 A24 · 2019 · 双张',92],
+  ['SR-0155','城市夜行','厂牌 Ninja · 2016 · 单张',88],
+  ['SR-0161','海岸线','厂牌 4AD · 2013 · 单张',90],
+  ['SR-0178','木与电','厂牌 Erased · 2021 · 双张',86],
+  ['SR-0184','第七个夏天','厂牌 Sub Pop · 2008 · 单张',84],
+  ['SR-0190','静默频率','厂牌 Kranky · 2018 · 单张',89]
+];
+document.getElementById('shelf').innerHTML = RECS.map(function(r){
+  return '<div class="rec"><div class="cov"><b>'+r[0]+'</b></div><dl><dt>'+r[1]+'</dt><dd>'+r[2]+'</dd></dl><span class="sc">'+r[3]+'</span></div>';
+}).join('');
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--huang',state.huang);
+  r.setProperty('--zhi',state.zhi);r.setProperty('--hui',state.hui);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  r.setProperty('--lie',Math.max(1,Math.round(state.lie)));
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

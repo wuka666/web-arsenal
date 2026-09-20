@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- M178 V字外阔角变形：逐字沿 V 形排布，双翼打破水平基线（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{display:flex;align-items:flex-start}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);color:var(--c);white-space:pre;margin-left:var(--ls)}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+<script>
+  const state={v:46,fs:60,fw:800,c:'#151b2e',c2:'#e8452c',page:'#eef1f6',ls:4,txt:'VICTORY'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--c',state.c);
+    s.setProperty('--c2',state.c2); s.setProperty('--page',state.page); s.setProperty('--ls',state.ls+'px');
+    stage.innerHTML='';
+    const arr=[...state.txt], mid=(arr.length-1)/2;
+    arr.forEach((ch,i)=>{
+      const el=document.createElement('span'); el.className='ch'; el.textContent=ch;
+      // 逐字下落成 V：中间字最低，两端上翘成双翼
+      const y=state.v*(1-Math.abs(i-mid)/(mid||1));
+      el.style.transform='translateY('+(state.v-y)+'px)';
+      if(i===0||i===arr.length-1) el.style.color='var(--c2)';
+      stage.appendChild(el);
+    });
+    stage.style.marginBottom=state.v+'px';
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

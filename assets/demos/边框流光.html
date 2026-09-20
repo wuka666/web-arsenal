@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>边框流光演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.glow{position:relative;width:var(--w,300px);height:var(--h,160px);border-radius:var(--r,16px);overflow:hidden}
+/* 流光=整面 conic 渐变旋转，内卡片 inset 遮住中心，只露 bw 宽的边环 */
+.glow::before{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg,transparent 0%,var(--c1,#2f6bff) 22%,var(--c2,#7c4dff) 42%,transparent 64%,transparent 100%);animation:spin var(--dur,3s) linear infinite}
+.glow.rev::before{animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card{position:absolute;inset:var(--bw,2px);background:var(--bgc,#fff);border-radius:calc(var(--r,16px) - var(--bw,2px));display:flex;align-items:center;justify-content:center;color:#8a8f98;font-size:14px}
+</style></head><body>
+<div class="glow" id="glow"><div class="card">悬浮卡片 · 边框流光</div></div>
+<script>
+const glow=document.getElementById('glow');
+const state={c1:'#2f6bff',c2:'#7c4dff',bw:2,r:16,dur:3,dir:'顺时针',w:300,h:160,bgc:'#ffffff'};
+function applyStyle(){
+  const root=document.documentElement.style;
+  root.setProperty('--c1',state.c1);root.setProperty('--c2',state.c2);root.setProperty('--bw',state.bw+'px');
+  root.setProperty('--r',state.r+'px');root.setProperty('--dur',state.dur+'s');root.setProperty('--w',state.w+'px');
+  root.setProperty('--h',state.h+'px');root.setProperty('--bgc',state.bgc);
+  glow.className='glow'+(state.dir==='逆时针'?' rev':'');
+}
+function apply(){applyStyle();}
+apply();
+// 父页面详情页调参契约：只接受本 demo state 已有的键
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script></body></html>

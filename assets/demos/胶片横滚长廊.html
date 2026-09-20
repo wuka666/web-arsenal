@@ -17,11 +17,11 @@
           background: color-mix(in srgb, var(--jiaojuan) 86%, #fff);
           border-radius: calc(var(--yuanjiao)*1px); padding: 26px 10px; }
   .film::before, .film::after { content: ""; position: absolute; left: 10px; right: 10px; height: calc(var(--chikong)*1px);
-          background-image: radial-gradient(circle, var(--jiaojuan) 42%, transparent 46%);
+          background-image: radial-gradient(circle, #b89c82 42%, transparent 46%);
           background-size: calc(var(--chikong)*2.4px) calc(var(--chikong)*1px);
           background-position: center; background-repeat: repeat-x; }
   .film::before { top: 9px; } .film::after { bottom: 9px; }
-  .frame { height: 300px; border-radius: 4px; display: flex; align-items: flex-end; padding: 14px;
+  .frame { height: 300px; border-radius: 4px; display: flex; align-items: flex-end; padding: 14px; border-top: 2px solid #E8A85C;
            background: linear-gradient(160deg, color-mix(in srgb, var(--qiangdiao) 72%, #1a1108), color-mix(in srgb, var(--ziti) 24%, #14100b)); }
   .film:nth-child(even) .frame { background: linear-gradient(200deg, color-mix(in srgb, var(--ziti) 34%, #14100b), color-mix(in srgb, var(--qiangdiao) 40%, #1a1108)); }
   .frame span { color: var(--ziti); font-size: 13px; letter-spacing: .02em; opacity: .9; }
@@ -34,7 +34,7 @@
   <div class="strip" id="strip"></div>
   <div class="grain" aria-hidden="true"></div>
 <script>
-const state = { jiaojuan:'#15120f', ziti:'#e8ddcc', qiangdiao:'#b3472f',
+const state = { jiaojuan:'#2A211A', ziti:'#F2E9DD', qiangdiao:'#C77B3B',
                 zhakuan:300, chikong:10, sasa:14, yuanjiao:6, sudu:1 };
 const strip = document.getElementById('strip');
 const captions = ['S01 · 出发','S02 · 站台','S03 · 慢车','S04 · 午后','S05 · 车窗','S06 · 终点'];

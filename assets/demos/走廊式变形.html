@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- M180 走廊式透视变形：逐字整体缩放向两端渐大 + 中心微虚，穿梭纵深感（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{display:flex;align-items:center}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);color:var(--c);white-space:pre;margin-left:var(--ls)}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+<script>
+  const state={k:0.5,blur:1.6,fs:54,fw:800,c:'#151b2e',c2:'#39c6a0',page:'#eef1f6',ls:6,txt:'CORRIDOR'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--c',state.c);
+    s.setProperty('--c2',state.c2); s.setProperty('--page',state.page); s.setProperty('--ls',state.ls+'px');
+    stage.innerHTML='';
+    const arr=[...state.txt], mid=(arr.length-1)/2;
+    arr.forEach((ch,i)=>{
+      const el=document.createElement('span'); el.className='ch'; el.textContent=ch;
+      const dist=Math.abs(i-mid)/(mid||1);
+      // 与 M177 的区别：整体等比缩放（不只横向）+ 中心字微模糊退后，营造走廊进深
+      el.style.transform='scale('+(1+state.k*dist)+')';
+      el.style.filter='blur('+(state.blur*(1-dist))+'px)';
+      if(dist>0.85) el.style.color='var(--c2)';
+      stage.appendChild(el);
+    });
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

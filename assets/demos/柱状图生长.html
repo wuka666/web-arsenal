@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>柱状图生长 · 单文件 demo</title>
+<style>
+  /* 柱子用 CSS animation + forwards 定格：不依赖 rAF，缩略图 iframe / 后台标签页里也停在满高 */
+  :root{
+    --di:#0A1024;        /* 背景色 */
+    --zhu:#FF6B4A;       /* 柱色 */
+    --gaoguang:#E8EDF7;  /* 柱顶高光色 */
+    --zhou:#8FA8E8;      /* 轴标签色 */
+    --bian:#8FA8E8;      /* 卡片描边色 */
+    --shuliang:9;        /* 柱数量 */
+    --gaodu:150px;       /* 图表高度 */
+    --jianxi:6px;        /* 柱间距 */
+    --yuanjiao:5px;      /* 柱顶圆角 */
+    --shichang:850ms;    /* 生长时长 */
+    --cuoluo:45ms;       /* 错落延迟 */
+    --zuidi:30;          /* 最矮柱高度（%） */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);display:grid;place-items:center;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .box{width:min(86vw,520px);padding:26px;border-radius:20px;border:1px solid var(--bian);background:rgba(255,255,255,.05)}
+  .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,237,247,.6)}
+  .v{font-size:38px;font-weight:700;color:#E8EDF7;margin:6px 0 2px}
+  .d{font-size:13px;color:var(--zhu)}
+  .chart{display:flex;align-items:flex-end;gap:var(--jianxi);height:var(--gaodu);margin-top:16px}
+  .chart i{flex:1 1 0;min-width:4px;border-radius:var(--yuanjiao) var(--yuanjiao) 2px 2px;
+      background:linear-gradient(180deg,color-mix(in srgb,var(--gaoguang) 34%,transparent),transparent 42%),var(--zhu);
+      transform-origin:50% 100%;animation:growUp var(--shichang) cubic-bezier(.22,1,.36,1) both}
+  @keyframes growUp{from{transform:scaleY(.02);opacity:.25}to{transform:scaleY(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.chart i{animation-duration:.001s}}
+  .legend{display:flex;justify-content:space-between;font-size:11px;color:var(--zhou);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="k">Net revenue · Q3</div>
+  <div class="v">$4.82M</div>
+  <div class="d">▲ 18.4% vs last quarter</div>
+  <div class="chart" id="chart" aria-hidden="true"></div>
+  <div class="legend"><span>Week 1</span><span>Week 12</span></div>
+</div>
+<script>
+(function(){
+  var chart=document.getElementById('chart');
+  var state={di:'#0A1024',zhu:'#FF6B4A',gaoguang:'#E8EDF7',zhou:'#8FA8E8',bian:'#8FA8E8',
+    shuliang:9,gaodu:150,jianxi:6,yuanjiao:5,shichang:850,cuoluo:45,zuidi:30};
+
+  // 目标高度（0–1）；柱数变了就线性插值采样，避免拖滑杆时图形跳变
+  var DATA=[.42,.55,.48,.7,.62,.81,.74,.9,.86];
+  function sample(n){
+    if(n===1)return [DATA[DATA.length-1]];
+    var out=[];
+    for(var i=0;i<n;i++){
+      var t=i/(n-1),idx=t*(DATA.length-1),lo=Math.floor(idx),hi=Math.ceil(idx),f=idx-lo;
+      out.push(DATA[lo]*(1-f)+DATA[hi]*f);
+    }
+    return out;
+  }
+  // 重建节点即重播动画，不必手动重置进度
+  function build(){
+    var n=Math.max(3,Math.round(state.shuliang));
+    var d=sample(n),frag=document.createDocumentFragment();
+    var low=Math.max(.05,state.zuidi/100);
+    for(var i=0;i<n;i++){
+      var el=document.createElement('i');
+      el.style.height=((low+(1-low)*d[i])*100).toFixed(1)+'%';
+      el.style.animationDelay=(i*state.cuoluo)+'ms';
+      frag.appendChild(el);
+    }
+    chart.replaceChildren(frag);
+  }
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','zhu','gaoguang','zhou','bian'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--shuliang',state.shuliang);
+    r.setProperty('--gaodu',state.gaodu+'px');
+    r.setProperty('--jianxi',state.jianxi+'px');
+    r.setProperty('--yuanjiao',state.yuanjiao+'px');
+    r.setProperty('--shichang',state.shichang+'ms');
+    r.setProperty('--cuoluo',state.cuoluo+'ms');
+    r.setProperty('--zuidi',state.zuidi);
+    build();
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

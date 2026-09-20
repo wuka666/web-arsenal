@@ -13,12 +13,12 @@ button{background:var(--cc,#ef4444);color:#fff;border:none;border-radius:8px;pad
 <div class="controls"><button id="dec">-1</button><button id="inc">+1</button></div>
 <script>
 const flip=document.getElementById('flip');
-const state={bc:'#f4f5f7',cc:'#ef4444',start:5,dir:'down',dur:.35};
+const state={bc:'#f4f5f7',cc:'#ef4444',start:5,dir:'down',dur:.35,bg:'#ffffff'};
 let v=state.start;
-function applyStyle(){document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--cc',state.cc);document.documentElement.style.setProperty('--fdur',state.dur+'s');document.documentElement.style.setProperty('--fd',state.dir==='up'?'100%':'-100%');}
+function applyStyle(){document.body.style.background=state.bg;document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--cc',state.cc);document.documentElement.style.setProperty('--fdur',state.dur+'s');document.documentElement.style.setProperty('--fd',state.dir==='up'?'100%':'-100%');}
 function set(n){flip.classList.add('go');setTimeout(()=>{flip.textContent=n;flip.classList.remove('go');},180);}
 document.getElementById('dec').onclick=()=>{v=Math.max(0,v-1);set(v);};
 document.getElementById('inc').onclick=()=>{v=Math.min(99,v+1);set(v);};
 applyStyle();
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','cc','start','dir','dur'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','cc','start','dir','dur','bg'].includes(d.key))applyStyle();});
 </script></body></html>

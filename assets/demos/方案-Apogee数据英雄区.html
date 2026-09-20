@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>数据英雄区</title>
+<style>
+  /* 原稿为玻璃态收入卡片 + 柱状图英雄区；离线演示的图表改用 DOM 柱 + CSS 动画（零外链），字体回退系统栈 */
+  :root{
+    --bg1:#0B1437;          /* 背景渐变起 */
+    --bg2:#1B2A6B;          /* 背景渐变止 */
+    --glass:#AECBFF;        /* 玻璃反光 */
+    --bian:#5B73C9;         /* 卡片描边 */
+    --zhucai:#5BE0C4;       /* 柱状 / CTA 强调 */
+    --zi:#EEF3FF;           /* 文字 */
+    --mo:18;                /* 玻璃模糊(px) */
+    --tu:150;               /* 图表高度(px) */
+    --bars:9;               /* 柱数量 */
+    --biaoti:60;            /* 标题字号 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:"Suisse Intl","Helvetica Neue",Arial,sans-serif;background:var(--bg1);color:var(--zi)}
+  body{background:linear-gradient(160deg,var(--bg1),var(--bg2));min-height:100vh}
+  .nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+       padding:16px 5vw;font-size:14px;color:rgba(238,243,255,.85);
+       background:rgba(255,255,255,.06);backdrop-filter:blur(calc(var(--mo)*1px));-webkit-backdrop-filter:blur(calc(var(--mo)*1px));
+       border-bottom:1px solid rgba(255,255,255,.12)}
+  .nav .logo{font-weight:700;letter-spacing:.04em;color:#fff}
+  .nav .menu{display:flex;gap:26px}
+  .nav .menu a{color:rgba(238,243,255,.72);text-decoration:none}
+  .nav .navcta{border:1px solid rgba(255,255,255,.32);padding:8px 18px;border-radius:999px}
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;
+        padding:120px 5vw 60px;max-width:1180px;margin:0 auto}
+  .copy h1{font-size:calc(var(--biaoti)*1px);font-weight:400;line-height:1.04;letter-spacing:-.02em;color:var(--zi)}
+  .copy p{margin-top:18px;font-size:15px;line-height:1.6;color:rgba(238,243,255,.7);max-width:42ch}
+  .copy .row{margin-top:28px;display:flex;gap:14px}
+  .copy button{border:0;background:var(--zhucai);color:#06251f;border-radius:999px;padding:13px 28px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+  .copy .ghost{border:1px solid rgba(255,255,255,.32);background:transparent;color:var(--zi)}
+  .card{position:relative;border-radius:22px;padding:26px;
+        background:rgba(255,255,255,.07);border:1px solid var(--bian);
+        backdrop-filter:blur(calc(var(--mo)*1px));-webkit-backdrop-filter:blur(calc(var(--mo)*1px));
+        box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  /* 玻璃反光：用 --glass 叠一层左上角斜向高光，制造卡片下沉的厚度感 */
+  .card::before{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;
+        background:linear-gradient(148deg,var(--glass),transparent 44%);opacity:.16}
+  .card>*{position:relative}
+  .card .k{font-size:12px;letter-spacing:.14em;color:rgba(238,243,255,.6);text-transform:uppercase}
+  .card .v{font-size:40px;font-weight:700;color:var(--zi);margin:6px 0 2px}
+  .card .d{font-size:13px;color:var(--zhucai)}
+  /* 柱子用 CSS 动画生长（forwards 定格），不依赖 requestAnimationFrame：缩略图 iframe、后台标签页里同样能出满高图 */
+  .chart{display:flex;align-items:flex-end;gap:6px;height:calc(var(--tu)*1px);margin-top:14px}
+  .chart i{flex:1 1 0;min-width:4px;border-radius:5px 5px 2px 2px;
+        background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0) 42%),var(--zhucai);
+        transform-origin:50% 100%;animation:growUp .85s cubic-bezier(.22,1,.36,1) both}
+  @keyframes growUp{from{transform:scaleY(.02);opacity:.25}to{transform:scaleY(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.chart i{animation-duration:.001s}}
+  .card .legend{display:flex;justify-content:space-between;font-size:11px;color:rgba(238,243,255,.5);margin-top:8px}
+  @media (max-width:860px){.hero{grid-template-columns:1fr}.nav .menu{display:none}}
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <span class="logo">Nimbus</span>
+    <span class="menu"><a>Product</a><a>Metrics</a><a>Pricing</a></span>
+    <span class="navcta">Sign in</span>
+  </nav>
+  <section class="hero">
+    <div class="copy">
+      <h1 id="t1">Numbers, made readable.</h1>
+      <p id="t2">A single surface that turns the quarter's numbers into something a team can actually read at a glance.</p>
+      <div class="row">
+        <button id="cta">Open dashboard</button>
+        <button class="ghost">Book a walkthrough</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="k">Net revenue · Q3</div>
+      <div class="v" id="rv">$4.82M</div>
+      <div class="d" id="rd">▲ 18.4% vs last quarter</div>
+      <div class="chart" id="chart" aria-hidden="true"></div>
+      <div class="legend"><span>Week 1</span><span>Week 12</span></div>
+    </div>
+  </section>
+<script>
+(function(){
+  var q=function(s){return document.querySelector(s);};
+  var chartEl=q('#chart');
+  var t1=q('#t1'), t2=q('#t2'), rv=q('#rv'), rd=q('#rd'), cta=q('#cta');
+
+  var state={bg1:'#0B1437',bg2:'#1B2A6B',glass:'#AECBFF',bian:'#5B73C9',
+    zhucai:'#5BE0C4',zi:'#EEF3FF',mo:18,tu:150,bars:9,biaoti:60};
+
+  // 柱状图目标高度（0–1），数量变了就线性插值采样，避免参数调整后图形跳变
+  var DATA=[.42,.55,.48,.7,.62,.81,.74,.9,.86];
+  function sampleData(n){
+    if(n===1)return [DATA[DATA.length-1]];
+    var out=[];
+    for(var i=0;i<n;i++){
+      var t=i/(n-1), idx=t*(DATA.length-1), lo=Math.floor(idx), hi=Math.ceil(idx), f=idx-lo;
+      out.push(DATA[lo]*(1-f)+DATA[hi]*f);
+    }
+    return out;
+  }
+  // 重建节点即重播生长动画，无需手动重置进度
+  function buildBars(){
+    var n=Math.max(3,Math.round(state.bars));
+    var data=sampleData(n), frag=document.createDocumentFragment();
+    for(var i=0;i<n;i++){
+      var el=document.createElement('i');
+      el.style.height=(data[i]*100).toFixed(1)+'%';
+      el.style.animationDelay=(i*45)+'ms';
+      frag.appendChild(el);
+    }
+    chartEl.replaceChildren(frag);
+  }
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['bg1','bg2','glass','bian','zhucai','zi'].forEach(function(k){r.setProperty('--'+k,state[k]);});
+    r.setProperty('--mo',state.mo);
+    r.setProperty('--tu',state.tu);
+    r.setProperty('--biaoti',state.biaoti);
+    t1.style.color=state.zi; t2.style.color=state.zi;
+    cta.style.background=state.zhucai;
+    buildBars();
+  }
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

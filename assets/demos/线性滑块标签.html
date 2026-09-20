@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- M169 线性滑块标签：选中项下方细线平滑跟随（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page,#f5f6f8);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+  .bar{position:relative;display:flex;gap:var(--gap);padding:var(--pad);background:var(--bg);border-radius:var(--r);box-shadow:0 2px 10px rgba(20,30,50,.06)}
+  .item{position:relative;font-size:var(--fs);color:var(--un);cursor:pointer;white-space:nowrap;transition:color var(--dur) ease;padding-bottom:6px}
+  .item.on{color:var(--ac);font-weight:600}
+  /* 指示线：left/width 由 JS 按选中项几何位置写入，transition 负责平滑跟随 */
+  .line{position:absolute;bottom:0;height:var(--lh);border-radius:999px;background:var(--lc);transition:left var(--dur) cubic-bezier(.4,0,.2,1),width var(--dur) cubic-bezier(.4,0,.2,1)}
+</style>
+</head>
+<body>
+  <nav class="bar" id="bar"><span class="line" id="line"></span></nav>
+<script>
+  const state={n:4,ac:'#2f6bff',un:'#8a93a3',lc:'#2f6bff',lh:3,fs:15,gap:28,pad:16,dur:0.3,bg:'#ffffff'};
+  const LABELS=['推荐','关注','热榜','附近','视频','直播','问答','专栏'];
+  const bar=document.getElementById('bar'),line=document.getElementById('line');
+  let sel=0;
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--ac',state.ac); s.setProperty('--un',state.un); s.setProperty('--lc',state.lc);
+    s.setProperty('--lh',state.lh+'px'); s.setProperty('--fs',state.fs+'px'); s.setProperty('--gap',state.gap+'px');
+    s.setProperty('--pad',state.pad+'px'); s.setProperty('--dur',state.dur+'s'); s.setProperty('--bg',state.bg);
+    // 重建项（n 变化时）
+    bar.querySelectorAll('.item').forEach(el=>el.remove());
+    for(let i=0;i<state.n;i++){
+      const it=document.createElement('span');
+      it.className='item'+(i===sel?' on':''); it.textContent=LABELS[i]||('项'+(i+1));
+      it.onclick=()=>{sel=i;apply();};
+      bar.appendChild(it);
+    }
+    bar.appendChild(line);
+    // 等布局完成后按选中项几何位置定位指示线
+    requestAnimationFrame(()=>{
+      const items=bar.querySelectorAll('.item');
+      const el=items[Math.min(sel,items.length-1)]; if(!el) return;
+      line.style.left=el.offsetLeft+'px'; line.style.width=el.offsetWidth+'px';
+    });
+  }
+  addEventListener('resize',apply);
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

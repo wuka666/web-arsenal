@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- M182 四宫格网格透视变形：文字切四象限各做透视，机械工业感（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{position:relative;font-size:var(--fs);font-weight:var(--fw);color:var(--c);letter-spacing:var(--ls);white-space:nowrap}
+  /* 四份同文叠原位，clip 各留一个象限、变换基点各压象限外角，拼出向中心塌陷的网格透视 */
+  .q{position:absolute;left:0;top:0}
+  .q1{clip-path:inset(0 50% 50% 0);transform:scale(var(--s)) ;transform-origin:100% 100%}
+  .q2{clip-path:inset(0 0 50% 50%);transform:scale(var(--s));transform-origin:0% 100%}
+  .q3{clip-path:inset(50% 50% 0 0);transform:scale(var(--s));transform-origin:100% 0%}
+  .q4{clip-path:inset(50% 0 0 50%);transform:scale(var(--s));transform-origin:0% 0%}
+  .axis{position:absolute;left:0;top:47.5%;width:100%;height:var(--aw);background:var(--lc);z-index:2}
+  .axis.v{left:47.5%;top:0;height:100%;width:var(--aw)}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"><span class="ghost">GRID</span></div>
+<script>
+  const state={s:0.85,aw:3,fs:96,fw:900,c:'#151b2e',lc:'#e8452c',page:'#eef1f6',ls:8,txt:'GRID'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--s',state.s); s.setProperty('--aw',state.aw+'px'); s.setProperty('--fs',state.fs+'px');
+    s.setProperty('--fw',state.fw); s.setProperty('--c',state.c); s.setProperty('--lc',state.lc);
+    s.setProperty('--page',state.page); s.setProperty('--ls',state.ls+'px');
+    stage.innerHTML='<span class="ghost" style="visibility:hidden">'+state.txt+'</span>'
+      +['q1','q2','q3','q4'].map(q=>'<span class="q '+q+'">'+state.txt+'</span>').join('')
+      +'<span class="axis"></span><span class="axis v"></span>';
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@
   .row { display: flex; gap: 10px; }
   .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; }
   .a { background: var(--accent); color: #fff; }
-  .b { background: #eee; color: #555; }
+  .b { background: var(--bc); color: #555; }
 
 </style>
 </head>
@@ -29,10 +29,12 @@
 </div>
 
 <script>
-  const state = { accent: "#3d5fd6", accent2: "#7c4dff", bg: "#fafafa", card: "#ffffff" };
+  const state = { accent: "#3d5fd6", accent2: "#7c4dff", bg: "#fafafa", card: "#ffffff", radius: 16, bc: "#eeeeee" };
   function apply() {
     document.documentElement.style.setProperty("--bg", state.bg);
     document.documentElement.style.setProperty("--card", state.card);
+    p.style.borderRadius = state.radius + "px";
+    document.documentElement.style.setProperty("--bc", state.bc);
     document.documentElement.style.setProperty("--accent", state.accent);
     document.documentElement.style.setProperty("--accent2", state.accent2);
   }

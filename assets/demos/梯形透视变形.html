@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- M174 梯形透视变形：perspective+rotateX 模拟仰视/俯视张力（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .card{padding:var(--pad);background:var(--bg);border-radius:16px}
+  .txt{font-size:var(--fs);font-weight:var(--fw);color:var(--c);letter-spacing:var(--ls);white-space:nowrap;
+       transform:perspective(var(--p)) rotateX(var(--deg));transform-origin:50% var(--oy)%}
+</style>
+</head>
+<body>
+  <div class="card"><div class="txt" id="txt">CYBER PUNK</div></div>
+<script>
+  const state={deg:-50,p:700,fs:72,fw:800,c:'#1c2333',page:'#eef1f6',bg:'#ffffff',ls:6,oy:100,pad:40};
+  const txt=document.getElementById('txt');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--deg',state.deg+'deg'); s.setProperty('--p',state.p+'px'); s.setProperty('--fs',state.fs+'px');
+    s.setProperty('--fw',state.fw); s.setProperty('--c',state.c); s.setProperty('--page',state.page);
+    s.setProperty('--bg',state.bg); s.setProperty('--ls',state.ls+'px'); s.setProperty('--oy',state.oy);
+    s.setProperty('--pad',state.pad+'px');
+    txt.textContent='CYBER PUNK';
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

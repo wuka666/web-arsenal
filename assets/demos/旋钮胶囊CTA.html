@@ -12,7 +12,7 @@
   .knobctl { position: relative; display: inline-flex; align-items: center;
              width: calc(var(--kuan)*1px); height: calc(var(--gao)*1px); border-radius: var(--yuanjiao);
              background: var(--zhu); color: var(--zi); border: 0; cursor: pointer;
-             box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(11,26,50,.18);
+             box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(43,33,24,.22);
              transition: transform .35s cubic-bezier(.2,.7,.3,1); }
   .knobctl span { padding-left: calc(var(--gao)*0.5px); font-size: calc(var(--zihao)*1px);
                   font-weight: 400; letter-spacing: -.044em; white-space: nowrap; }
@@ -22,19 +22,19 @@
   .knobctl i svg { width: calc(var(--niuDa)*0.35px); height: calc(var(--niuDa)*0.35px); }
   .knobctl:hover, .knobctl.demo { transform: translateY(calc(var(--fudong)*-1px)); }
   .knobctl:hover i, .knobctl.demo i { transform: translateX(calc(var(--fudong)*0.6px)); }
-  .knobctl.ghost { background: rgba(255,255,255,.5); color: #1B2A44; border: 1px solid rgba(255,255,255,.85);
-                   box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(11,26,50,.10); }
-  .knobctl.ghost i { background: #1A2B45; }
-  .knobctl.line { background: transparent; color: #0F1B31; border: 1px solid rgba(15,27,49,.35); box-shadow: none; }
-  .knobctl.line i { background: #0F1B31; }
+  .knobctl.ghost { background: color-mix(in srgb, #E8DCC8 62%, transparent); color: #2B2118; border: 1px solid rgba(232,220,200,.85);
+                   box-shadow: 0 calc(var(--gao)*0.14px) calc(var(--gao)*0.34px) rgba(43,33,24,.10); }
+  .knobctl.ghost i { background: #2B2118; }
+  .knobctl.line { background: transparent; color: #8B7355; border: 1px solid rgba(139,115,85,.45); box-shadow: none; }
+  .knobctl.line i { background: #C8763C; }
 </style>
 </head>
 <body>
-  <button class="knobctl demo"><span>Get free plan</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
-  <button class="knobctl ghost"><span>Meet Sentinel</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+  <button class="knobctl demo"><span>Start free now</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+  <button class="knobctl ghost"><span>Meet Nimbus</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
   <button class="knobctl line"><span>See it in action</span><i><svg viewBox="0 0 18 18" fill="none"><path d="m6.6 3.6 6 5.4-6 5.4" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
 <script>
-const state = { di:'#E6EDF6', zhu:'#0F1B31', zi:'#ffffff', niu:'#384B64',
+const state = { di:'#F2E6D8', zhu:'#2B2118', zi:'#FFFDF8', niu:'#C8763C',
                 kuan:217, gao:70, yuanjiao:999, niuDa:49, zihao:17.5, fudong:2 };
 function apply(){
   const R = document.documentElement.style;

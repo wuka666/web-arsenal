@@ -319,7 +319,7 @@ function effectParts(){
       id:m.id, label:m.标题||m.id, demo:demo, srcRaw:raw,
       def:{}, fields:[],
       render:()=>`<iframe src="${demo}" sandbox="allow-scripts"></iframe>`,
-      prompt:()=>`动效组件「${m.标题||m.id}」（${m.分类}/${m.子类}）`
+      prompt:()=>`动效组件「${m.标题||m.id}」（${m.适配端||''}${m.元素?' · '+m.元素:''}）`
     };
   });
 }

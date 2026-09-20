@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>水墨晕染背景 · 单文件 demo</title>
+<style>
+  /* 水墨晕染：多层径向渐变的半透明墨点缓慢漂移，边缘一律柔化，不做任何硬边 */
+  :root{
+    --zhi:#1A1620;      /* 纸底色 */
+    --mo1:#3B3046;      /* 墨色一 */
+    --mo2:#C9A6E8;      /* 墨色二 */
+    --zi:#EFE8F2;       /* 文字色 */
+    --shuliang:9;       /* 墨点数量 */
+    --banding:300px;    /* 晕染半径 */
+    --touming:22;       /* 墨点不透明度（%） */
+    --sudu:12000;       /* 漂移周期（ms，JS 读取） */
+    --kuosan:60;        /* 扩散范围（%，JS 读取） */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--zhi);color:var(--zi);font-family:"Inter","Helvetica Neue",Arial,sans-serif;overflow:hidden}
+  #bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .inner{position:relative;z-index:2;height:100%;display:grid;place-content:center;gap:14px;text-align:center;padding:24px}
+  .inner h2{font-size:34px;font-weight:400;line-height:1.12}
+  .inner span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(239,232,242,.55)}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="inner">
+  <span>常青庭</span>
+  <h2>Keep close to the growing record.</h2>
+</div>
+<script>
+(function(){
+  var cv=document.getElementById('bg'), cx=cv.getContext('2d');
+  var state={zhi:'#1A1620',mo1:'#3B3046',mo2:'#C9A6E8',zi:'#EFE8F2',
+    shuliang:9,banding:300,touming:22,sudu:12000,kuosan:60};
+
+  function hexA(hex,a){
+    var n=parseInt(hex.slice(1),16);
+    return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+  }
+  // 墨点用低差异序列散布：x / y / 半径各用不同无理数常数，否则点会全挤在一条带上
+  function blobs(){
+    var n=Math.max(1,Math.round(state.shuliang)),out=[];
+    for(var i=0;i<n;i++){
+      out.push({
+        x:(i*0.6180339887)%1,
+        y:(i*0.7548776662)%1,
+        r:.55+((i*0.4142135624)%1)*.65,
+        c:(i%2?state.mo1:state.mo2),
+        ph:(i*0.6180339887)%1*6.283
+      });
+    }
+    return out;
+  }
+  function draw(t){
+    var w=cv.clientWidth,h=cv.clientHeight;
+    cx.clearRect(0,0,w,h);
+    cx.fillStyle=state.zhi; cx.fillRect(0,0,w,h);
+    var R=state.banding,a=state.touming/100,ks=state.kuosan/100;
+    blobs().forEach(function(b){
+      var x=b.x*w+Math.cos(t/state.sudu*6.283+b.ph)*w*.08*ks;
+      var y=b.y*h+Math.sin(t/state.sudu*6.283+b.ph*1.3)*h*.08*ks;
+      var rr=R*b.r;
+      var g=cx.createRadialGradient(x,y,0,x,y,rr);
+      g.addColorStop(0,hexA(b.c,a)); g.addColorStop(.42,hexA(b.c,a*.52));
+      g.addColorStop(.72,hexA(b.c,a*.2)); g.addColorStop(1,hexA(b.c,0));
+      cx.fillStyle=g; cx.beginPath(); cx.arc(x,y,rr,0,Math.PI*2); cx.fill();
+    });
+  }
+  function resize(){
+    var dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=Math.round(cv.clientWidth*dpr); cv.height=Math.round(cv.clientHeight*dpr);
+    cx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function apply(){
+    var r=document.documentElement.style;
+    ['zhi','mo1','mo2','zi'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--shuliang',state.shuliang);
+    r.setProperty('--banding',state.banding+'px');
+    r.setProperty('--touming',state.touming);
+    resize();
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  addEventListener('resize',resize);
+
+  apply();
+  // 先画一帧静态稿：即使 rAF 不跑（后台标签页 / 静态截图），背景也不是空的
+  draw(0);
+  requestAnimationFrame(function loop(t){ draw(t); requestAnimationFrame(loop); });
+})();
+</script>
+</body>
+</html>

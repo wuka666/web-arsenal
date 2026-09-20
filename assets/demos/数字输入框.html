@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数字输入框演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{display:flex;align-items:center}
+.btn{width:var(--h,44px);height:var(--h,44px);border:none;background:var(--ac,#2f6bff);color:#fff;font-size:calc(var(--fs,16px)*1.3);line-height:1;cursor:pointer;flex:0 0 auto}
+.btn.l{border-radius:var(--r,10px) 0 0 var(--r,10px)}
+.btn.r{border-radius:0 var(--r,10px) var(--r,10px) 0}
+.btn:active{filter:brightness(.92)}
+.in{width:calc(var(--w,160px) - var(--h,44px)*2);height:var(--h,44px);border:1.5px solid var(--ac,#2f6bff);border-left:none;border-right:none;text-align:center;font-size:var(--fs,16px);color:#1a1a1a;background:var(--bgc,#fff);outline:none}
+</style></head><body>
+<div class="wrap" id="wrap">
+<button class="btn l" id="minus">−</button>
+<input class="in" id="inp" type="text" inputmode="numeric">
+<button class="btn r" id="plus">+</button>
+</div>
+<script>
+const inp=document.getElementById('inp'),minus=document.getElementById('minus'),plus=document.getElementById('plus');
+const state={val:3,min:0,max:10,step:1,r:10,ac:'#2f6bff',bgc:'#ffffff',fs:16,w:160,h:44};
+function clamp(v){return Math.max(state.min,Math.min(state.max,v));}
+function applyStyle(){
+  const root=document.documentElement.style;
+  root.setProperty('--r',state.r+'px');root.setProperty('--ac',state.ac);root.setProperty('--bgc',state.bgc);
+  root.setProperty('--fs',state.fs+'px');root.setProperty('--w',state.w+'px');root.setProperty('--h',state.h+'px');
+}
+function paint(){inp.value=state.val;}
+function dec(){state.val=clamp(state.val-state.step);paint();}
+function inc(){state.val=clamp(state.val+state.step);paint();}
+function onInput(){const v=parseInt(inp.value,10);if(isNaN(v)){paint();return;}state.val=clamp(v);paint();}
+function apply(){applyStyle();paint();}
+minus.onclick=dec;plus.onclick=inc;inp.oninput=onInput;
+apply();
+// 父页面详情页调参契约：只接受本 demo state 已有的键
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script></body></html>

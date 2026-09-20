@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>创意工作室页脚</title>
+<style>
+  /* 原稿用自托管 display 字体 + 背景视频；离线演示回退系统栈、背景改 canvas 生成漂浮色块（零外链） */
+  :root{
+    --beijing:#15131F;      /* 页脚底色 */
+    --qiu1:#FF7A9C;         /* 漂浮色块 1 */
+    --qiu2:#7AD7FF;         /* 漂浮色块 2 */
+    --yanbai:#FBF7F0;       /* 眼白 */
+    --hongmo:#3A2C5A;       /* 虹膜 */
+    --zi:#F4F1EA;           /* 文字 */
+    --zhucai:#FFC24B;       /* 强调 / CTA */
+    --yanchi:.14;           /* 眼睛跟随平滑系数 */
+    --qiu:5;                /* 漂浮色块数量 */
+    --yanjing:62;           /* 眼睛直径(px) */
+    --jianju:24;            /* 页脚上下留白 */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#0e0d16;color:var(--zi);font-family:"Epilogue","Helvetica Neue",Arial,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+  /* 独立演示时让页脚铺满视口并垂直居中：否则内容只占上半屏，下方露出一条 body 底色 */
+  .foot{position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+        padding:calc(var(--jianju)*2.4) calc(var(--jianju)*1.6) calc(var(--jianju)*1.2);
+        background:var(--beijing);border-top:1px solid rgba(255,255,255,.08)}
+  #bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.5}
+  .inner{position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:calc(var(--jianju)*1.6)}
+  .top{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:calc(var(--jianju)*1.4);align-items:start}
+  .brand{font-size:30px;letter-spacing:.02em;color:var(--zi)}
+  .brand small{display:block;font-size:12px;letter-spacing:.18em;color:rgba(244,241,234,.55);margin-top:8px;text-transform:uppercase}
+  .col h4{margin:0 0 12px;font-size:12px;letter-spacing:.16em;color:rgba(244,241,234,.5);font-weight:400;text-transform:uppercase}
+  .col a{display:block;color:var(--zi);text-decoration:none;font-size:14px;line-height:2;opacity:.82}
+  .col a:hover{opacity:1;color:var(--zhucai)}
+  .eyes{display:flex;gap:calc(var(--jianju)*.7);justify-content:center;flex-wrap:wrap;padding:calc(var(--jianju)*.4) 0}
+  .eye{width:var(--yanjing);height:var(--yanjing);border-radius:50%;background:var(--yanbai);position:relative;
+       box-shadow:inset 0 -6px 12px rgba(0,0,0,.12);flex:none}
+  .eye .iris{position:absolute;left:50%;top:50%;width:52%;height:52%;border-radius:50%;background:var(--hongmo);
+             transform:translate(-50%,-50%);transition:transform .05s linear}
+  .eye .iris::after{content:"";position:absolute;left:24%;top:22%;width:26%;height:26%;border-radius:50%;background:rgba(255,255,255,.85)}
+  .cta{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;background:var(--zhucai);color:#1a1320;
+       border:0;border-radius:999px;padding:13px 26px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+  .cta:hover{transform:translateY(-1px)}
+  .base{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+        border-top:1px solid rgba(255,255,255,.1);padding-top:calc(var(--jianju)*.9);font-size:12px;color:rgba(244,241,234,.5)}
+  @media (max-width:760px){.top{grid-template-columns:1fr 1fr}.brand{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<footer class="foot">
+  <canvas id="bg"></canvas>
+  <div class="inner">
+    <div class="top">
+      <div class="brand">Kite Studio<small>Independent design studio</small></div>
+      <div class="col"><h4>Studio</h4><a>Work</a><a>Process</a><a>People</a></div>
+      <div class="col"><h4>Connect</h4><a>Instagram</a><a>Dribbble</a><a>Email</a></div>
+    </div>
+    <div class="eyes" id="eyes" aria-hidden="true"></div>
+    <a class="cta" id="cta">Let's make something →</a>
+    <div class="base"><span>© 2026 Kite Studio</span><span>Made by hand, not by template.</span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var q=function(s){return document.querySelector(s);};
+  var bg=q('#bg'), bx=bg.getContext('2d');
+  var eyesBox=q('#eyes'), cta=q('#cta');
+
+  var state={
+    beijing:'#15131F', qiu1:'#FF7A9C', qiu2:'#7AD7FF', yanbai:'#FBF7F0',
+    hongmo:'#3A2C5A', zi:'#F4F1EA', zhucai:'#FFC24B',
+    yanchi:.14, qiu:5, yanjing:62, jianju:24
+  };
+
+  // 眼睛数量随参数变化：重建 DOM，保持瞳孔跟随逻辑不变
+  function buildEyes(){
+    eyesBox.innerHTML='';
+    var n=Math.max(1,Math.round(state.qiu));
+    for(var i=0;i<n;i++){
+      var e=document.createElement('div'); e.className='eye';
+      var ir=document.createElement('div'); ir.className='iris';
+      e.appendChild(ir); eyesBox.appendChild(e);
+    }
+  }
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['beijing','qiu1','qiu2','yanbai','hongmo','zi','zhucai'].forEach(function(k){r.setProperty('--'+k,state[k]);});
+    r.setProperty('--yanchi',state.yanchi);
+    r.setProperty('--qiu',state.qiu);
+    r.setProperty('--yanjing',state.yanjing+'px');
+    r.setProperty('--jianju',state.jianju+'px');
+    cta.style.background=state.zhucai;
+    buildEyes(); resizeBg();
+  }
+
+  // 调参契约：postMessage({type:'param',key,value})
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  /* 背景：漂浮色块替代原稿视频，纯 canvas 生成（规矩11 零外链） */
+  var blobs=[];
+  function initBlobs(){
+    blobs=[];
+    for(var i=0;i<6;i++){
+      blobs.push({x:Math.random(),y:Math.random(),
+        vx:(Math.random()-.5)*.0006, vy:(Math.random()-.5)*.0006,
+        r:90+Math.random()*120, c:i%2?state.qiu1:state.qiu2});
+    }
+  }
+  function resizeBg(){
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    bg.width=Math.round(bg.clientWidth*dpr); bg.height=Math.round(bg.clientHeight*dpr);
+    bx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function drawBg(){
+    var w=bg.clientWidth,h=bg.clientHeight;
+    bx.clearRect(0,0,w,h);
+    for(var i=0;i<blobs.length;i++){
+      var b=blobs[i];
+      b.x+=b.vx; b.y+=b.vy;
+      if(b.x<-.2)b.x=1.2; if(b.x>1.2)b.x=-.2; if(b.y<-.2)b.y=1.2; if(b.y>1.2)b.y=-.2;
+      var g=bx.createRadialGradient(b.x*w,b.y*h,0,b.x*w,b.y*h,b.r);
+      g.addColorStop(0,b.c); g.addColorStop(1,'rgba(0,0,0,0)');
+      bx.fillStyle=g; bx.beginPath(); bx.arc(b.x*w,b.y*h,b.r,0,Math.PI*2); bx.fill();
+    }
+  }
+
+  /* 眼睛跟随光标：瞳孔朝指针方向偏移，平滑插值避免跳变 */
+  var mx=-999,my=-999, sm=[];
+  function track(){
+    var list=eyesBox.children;
+    for(var i=0;i<list.length;i++){
+      var eye=list[i], ir=eye.firstChild, rect=eye.getBoundingClientRect();
+      var cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+      var dx=mx-cx, dy=my-cy, dist=Math.hypot(dx,dy)||1;
+      var max=rect.width*.22;
+      var tx=(dx/dist)*max, ty=(dy/dist)*max;
+      if(!sm[i])sm[i]={x:0,y:0};
+      sm[i].x+=(tx-sm[i].x)*state.yanchi;
+      sm[i].y+=(ty-sm[i].y)*state.yanchi;
+      ir.style.transform='translate(calc(-50% + '+sm[i].x+'px),calc(-50% + '+sm[i].y+'px))';
+    }
+  }
+  window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;});
+  window.addEventListener('mouseleave',function(){mx=-999;my=-999;});
+
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function loop(){
+    if(!reduce)drawBg();
+    track();
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',function(){resizeBg();});
+
+  apply(); initBlobs(); resizeBg(); loop();
+})();
+</script>
+</body>
+</html>

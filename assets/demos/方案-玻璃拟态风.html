@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>方案·玻璃拟态风</title>
 <style>
-:root{--zhucai:#6D7BF2;--zhongdian:#A78BFA;--di:#E9E4FB;--zi:#1C1F33;--cizi:#5B6080;--yuanjiao:18px;--jianju:14px;--zihao:15px;--yinying:20;--faguang:0;--mo:14}
+:root{--zhucai:#8A8FE5;--zhongdian:#C9B6FF;--di:#F4F3FB;--zi:#26243a;--cizi:#7a769a;--yuanjiao:18px;--jianju:14px;--zihao:15px;--yinying:20;--faguang:0;--mo:14}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
-body{min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);color:var(--zi);background:linear-gradient(135deg,#c3c9f6 0%,#e3d2f7 55%,#f3d9ec 100%);}
-.glass{background:rgba(255,255,255,.32);backdrop-filter:blur(var(--mo));-webkit-backdrop-filter:blur(var(--mo));border:1px solid rgba(255,255,255,.6);box-shadow:0 calc(var(--yinying)*.3px) calc(var(--yinying)*.8px) rgba(60,50,120,.15);border-radius:var(--yuanjiao);}
+body{min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);color:var(--zi);background:linear-gradient(135deg,var(--di) 0%,var(--zhongdian) 55%,var(--zhucai) 100%);}
+.glass{background:rgba(255,255,255,.32);backdrop-filter:blur(var(--mo));-webkit-backdrop-filter:blur(var(--mo));border:1px solid rgba(255,255,255,.6);box-shadow:0 calc(var(--yinying)*.3px) calc(var(--yinying)*.8px) rgba(138,143,229,.18);border-radius:var(--yuanjiao);}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;margin-bottom:var(--jianju);}
 .logo{font-weight:800;font-size:17px;}
 .menu{display:flex;gap:16px;font-size:13px;color:var(--zi);opacity:.8;}
@@ -21,6 +21,10 @@ body{min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);color:var
 .accent2{color:var(--zhongdian);}
 .wide{grid-column:1/4;display:flex;justify-content:space-between;align-items:center;}
 .btn{background:var(--zhucai);color:#fff;border:none;border-radius:calc(var(--yuanjiao)*.7);padding:10px 20px;font-weight:700;font-size:13px;cursor:pointer;}
+
+/* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
+.panel .sub{color:var(--cizi);opacity:.9}
+.btn{box-shadow:0 0 calc(var(--faguang)*.5px) var(--zhucai)}
 </style>
 </head>
 <body>

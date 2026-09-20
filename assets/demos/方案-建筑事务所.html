@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>建筑设计事务所</title>
+<style>
+:root{
+  --di:#E6E4DF;      /* 混凝土 */
+  --zhuan:#A8482F;   /* 砖红 */
+  --mo:#26241F;      /* 墨 */
+  --hui:#7A766D;     /* 标注 */
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:2px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--di);color:var(--mo);min-height:100vh;display:flex;flex-direction:column;
+  font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif}
+nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);padding:calc(var(--jianju)*1) calc(var(--jianju)*1.6);
+  border-bottom:1px solid rgba(38,36,31,.16);font-size:calc(var(--zihao)*.8)}
+nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.15);letter-spacing:.14em;font-weight:400}
+nav a{color:var(--hui);text-decoration:none}nav a:hover{color:var(--zhuan)}
+nav .cta{color:var(--zhuan);border:1px solid color-mix(in srgb,var(--zhuan) 55%,transparent);
+  border-radius:99px;padding:7px 15px}
+main{flex:1;display:grid;grid-template-columns:1.15fr .85fr;min-height:0}
+.lede{padding:calc(var(--jianju)*2) calc(var(--jianju)*1.6);display:flex;flex-direction:column;justify-content:center;gap:calc(var(--jianju)*1.1)}
+.tag{font-family:Consolas,monospace;font-size:11px;letter-spacing:.22em;color:var(--hui)}
+h1{font-size:calc(var(--zihao)*2.7);line-height:1.2;letter-spacing:.01em}
+h1 em{font-style:normal;color:var(--zhuan)}
+.lede p{color:var(--hui);font-size:calc(var(--zihao)*.86);line-height:1.9;max-width:32em}
+.facts{display:flex;gap:calc(var(--jianju)*1.6);padding-top:calc(var(--jianju)*.9);border-top:1px solid rgba(38,36,31,.16)}
+.facts div{display:flex;flex-direction:column;gap:5px}
+.facts b{font-family:Consolas,monospace;font-size:calc(var(--zihao)*1.15);font-weight:500}
+.facts span{font-size:10.5px;color:var(--hui);letter-spacing:.16em}
+/* 立面：用 CSS 渐变与方块堆出建筑剖面感，零外链 */
+.elev{border-left:1px solid rgba(38,36,31,.16);position:relative;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg,rgba(38,36,31,.07) 0 1px,transparent 1px 46px),
+    linear-gradient(180deg,transparent 62%,color-mix(in srgb,var(--mo) 8%,transparent))}
+.elev i{position:absolute;background:color-mix(in srgb,var(--mo) 78%,transparent);border-radius:var(--yuanjiao)}
+.elev i:nth-child(1){left:12%;bottom:22%;width:26%;height:34%}
+.elev i:nth-child(2){left:42%;bottom:22%;width:18%;height:52%}
+.elev i:nth-child(3){left:64%;bottom:22%;width:24%;height:26%}
+.elev i:nth-child(4){left:12%;bottom:58%;width:50%;height:3%;background:var(--zhuan)}
+.elev span{position:absolute;left:12%;bottom:12%;font-family:Consolas,monospace;font-size:10.5px;color:var(--hui);letter-spacing:.14em}
+@media (max-width:880px){main{grid-template-columns:1fr}.elev{min-height:240px;border-left:none;border-top:1px solid rgba(38,36,31,.16)}}
+</style>
+</head>
+<body>
+<nav>
+  <b>素问建筑</b>
+  <a href="#">项目</a><a href="#">团队</a><a href="#">出版</a><a href="#">联系</a>
+  <a class="cta" href="#">委托咨询</a>
+</nav>
+<main>
+  <div class="lede">
+    <span class="tag">TECTONIC · SINCE 2009</span>
+    <h1>把混凝土<br>做成<em>能发光</em>的</h1>
+    <p>我们只做一件事：让结构自己说话。清水混凝土的模板缝、钢节点的焊接痕，都是图纸之外的第二种表达。</p>
+    <div class="facts">
+      <div><b>68</b><span>建成项目</span></div>
+      <div><b>11</b><span>在建</span></div>
+      <div><b>4</b><span>城市</span></div>
+    </div>
+  </div>
+  <div class="elev">
+    <i></i><i></i><i></i><i></i>
+    <span>北立面 · 1:200</span>
+  </div>
+</main>
+<script>
+var state = {
+  di:'#E6E4DF', zhuan:'#A8482F', mo:'#26241F', hui:'#7A766D',
+  zihao:16, jianju:22, yuanjiao:2
+};
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--zhuan',state.zhuan);
+  r.setProperty('--mo',state.mo);r.setProperty('--hui',state.hui);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>独立放映</title>
+<style>
+:root{
+  --di:#0E0E0F;      /* 放映厅黑 */
+  --jin:#C9A227;     /* 米金 */
+  --zi:#F3F1EA;      /* 幕布白 */
+  --hui:#8A8A88;     /* 标注 */
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:2px;
+  --ziju:.01em;      /* 字距：一屏一句话的呼吸 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--di);color:var(--zi);min-height:100vh;display:flex;flex-direction:column;
+  font-family:Georgia,"Songti SC",serif}
+nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.1);padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.6);
+  font-family:Consolas,monospace;font-size:11px;letter-spacing:.2em}
+nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.05);letter-spacing:.16em;font-weight:400}
+nav a{color:var(--hui);text-decoration:none}nav a:hover{color:var(--jin)}
+main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 calc(var(--jianju)*1.8) calc(var(--jianju)*2)}
+h1{font-size:calc(var(--zihao)*3.4);line-height:1.22;letter-spacing:var(--ziju);max-width:22em}
+h1 em{font-style:normal;color:var(--jin)}
+.sub{margin-top:calc(var(--jianju)*1.2);color:var(--hui);font-size:calc(var(--zihao)*.92);line-height:1.9;max-width:34em}
+.row{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);margin-top:calc(var(--jianju)*2.2);flex-wrap:wrap}
+a.go{color:var(--di);background:var(--jin);border-radius:var(--yuanjiao);padding:13px 24px;
+  font-size:calc(var(--zihao)*.86);text-decoration:none;font-family:-apple-system,"PingFang SC",sans-serif;
+  transition:transform .18s}
+a.go:hover{transform:translateY(-2px)}
+.row span{font-family:Consolas,monospace;font-size:11px;color:var(--hui);letter-spacing:.14em}
+footer{padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.8);border-top:1px solid rgba(243,241,234,.12);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-family:Consolas,monospace;font-size:11px;color:var(--hui);letter-spacing:.1em}
+</style>
+</head>
+<body>
+<nav>
+  <b>环幕放映</b>
+  <a href="#">本期片单</a><a href="#">排期</a><a href="#">会员</a><a href="#">关于</a>
+</nav>
+<main>
+  <h1>一屏只放一句话：<br><em>今晚十点，冬眠</em></h1>
+  <p class="sub">十六毫米胶片，四十分钟无对白。放映厅只有二十四把椅子，散场后可以和导演聊到灯灭。</p>
+  <div class="row">
+    <a class="go" href="#">预约座位</a>
+    <span id="seat">余 6 座 · 10-04 22:00 · 环幕厅 B</span>
+  </div>
+</main>
+<footer>
+  <span>独立放映 · 每周一期</span>
+  <span>不接受包场 · 不支持退票</span>
+</footer>
+<script>
+var state = {
+  di:'#0E0E0F', jin:'#C9A227', zi:'#F3F1EA', hui:'#8A8A88',
+  zihao:16, jianju:22, yuanjiao:2, ziju:.01
+};
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--jin',state.jin);
+  r.setProperty('--zi',state.zi);r.setProperty('--hui',state.hui);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  r.setProperty('--ziju',state.ziju+'em');
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

@@ -10,9 +10,9 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 <div class="bell" id="bell">🔔<span class="red" id="red"></span><div class="pop" id="pop">你有 3 条新消息，点击查看详情</div></div>
 <script>
 const bell=document.getElementById('bell'),pop=document.getElementById('pop'),red=document.getElementById('red');
-const state={rc:'#ef4444',dir:'bottom-right',dur:.35,pc:'#ffffff',radius:12};
-function applyStyle(){red.style.background=state.rc;pop.style.borderRadius=state.radius+'px';pop.style.background=state.pc;pop.style.transition='transform '+state.dur+'s cubic-bezier(.34,1.4,.5,1),opacity '+state.dur+'s ease';pop.style.transformOrigin=state.dir==='bottom-right'?'top left':(state.dir==='bottom-left'?'top right':'top center');}
+const state={rc:'#ef4444',dir:'bottom-right',dur:.35,pc:'#ffffff',radius:12,bg:'#ffffff'};
+function applyStyle(){document.body.style.background=state.bg;red.style.background=state.rc;pop.style.borderRadius=state.radius+'px';pop.style.background=state.pc;pop.style.transition='transform '+state.dur+'s cubic-bezier(.34,1.4,.5,1),opacity '+state.dur+'s ease';pop.style.transformOrigin=state.dir==='bottom-right'?'top left':(state.dir==='bottom-left'?'top right':'top center');}
 bell.onclick=()=>pop.classList.toggle('on');
 applyStyle();pop.classList.add('on');
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['rc','dir','dur','pc','radius'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['rc','dir','dur','pc','radius','bg'].includes(d.key))applyStyle();});
 </script></body></html>

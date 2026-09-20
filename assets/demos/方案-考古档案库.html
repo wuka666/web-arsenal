@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>考古档案库</title>
+<style>
+:root{
+  --dimian:#2A2620;      /* 探方底土 */
+  --ceng:#3D3830;        /* 未发掘层 */
+  --zhucai:#C08A3E;      /* 出土沙金 */
+  --zi:#EFE7D8;          /* 铭牌字色 */
+  --ci:#9C927F;          /* 次要标注色 */
+  --banjing:240px;       /* 揭示光圈半径 */
+  --wang:44px;           /* 探方网格 */
+  --zihao:17px;          /* 基准字号 */
+  --yuanjiao:10px;       /* 卡片圆角 */
+  --mx:50%; --my:52%;    /* 光圈位置（光标/自动漂移驱动） */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--dimian);color:var(--zi);
+  font-family:Georgia,"Times New Roman","Songti SC",serif;
+  display:grid;grid-template-columns:132px 1fr;grid-template-rows:1fr auto;
+  grid-template-areas:"ledger viewer" "ledger readout";
+  min-height:100vh;overflow:hidden;
+}
+/* 探方网格：考古现场的方形探方与比例尺（离线 CSS 生成，无外链） */
+.viewer::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:
+    repeating-linear-gradient(0deg,rgba(239,231,216,.07) 0 1px,transparent 1px var(--wang)),
+    repeating-linear-gradient(90deg,rgba(239,231,216,.07) 0 1px,transparent 1px var(--wang));
+}
+/* 层位索引：竖排按钮，切换「第几层」的说明文本 */
+.ledger{
+  grid-area:ledger;border-right:1px solid rgba(239,231,216,.12);
+  padding:26px 0;display:flex;flex-direction:column;gap:18px;align-items:center;
+}
+.ledger .cap{font-family:Consolas,monospace;font-size:10.5px;letter-spacing:.22em;color:var(--ci);writing-mode:vertical-rl}
+.lv{
+  writing-mode:vertical-rl;background:none;border:1px solid transparent;color:var(--ci);
+  font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;padding:12px 6px;cursor:pointer;
+  border-radius:calc(var(--yuanjiao)*.4);transition:color .2s,border-color .2s;
+}
+.lv.on{color:var(--zhucai);border-color:color-mix(in srgb,var(--zhucai) 45%,transparent)}
+.viewer{grid-area:viewer;position:relative;overflow:hidden}
+.layer{position:absolute;inset:0;background-size:cover;background-position:center}
+.reveal{
+  /* 揭示层：光圈由 --mx/--my/--banjing 驱动，这就是「探索发现」的机制本身 */
+  -webkit-mask-image:radial-gradient(circle var(--banjing) at var(--mx) var(--my),#000 52%,transparent 100%);
+  mask-image:radial-gradient(circle var(--banjing) at var(--mx) var(--my),#000 52%,transparent 100%);
+}
+.aperture{
+  position:absolute;width:calc(var(--banjing)*2);height:calc(var(--banjing)*2);
+  left:var(--mx);top:var(--my);transform:translate(-50%,-50%);
+  border:1px solid color-mix(in srgb,var(--zhucai) 55%,transparent);border-radius:50%;
+  box-shadow:0 0 0 1px rgba(0,0,0,.35) inset;pointer-events:none;z-index:6;
+}
+.scale{position:absolute;left:22px;bottom:20px;z-index:7;font-family:Consolas,monospace;font-size:11px;color:var(--ci);letter-spacing:.1em}
+.scale i{display:inline-block;width:88px;height:7px;border-left:1px solid var(--ci);border-right:1px solid var(--ci);border-bottom:1px solid var(--ci);vertical-align:-1px;margin:0 8px}
+.plate{position:absolute;top:22px;left:22px;z-index:7;font-family:Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--ci)}
+.plate b{display:block;color:var(--zhucai);font-weight:400;margin-top:4px}
+.readout{
+  grid-area:readout;border-top:1px solid rgba(239,231,216,.12);padding:26px 34px 30px;
+  display:grid;grid-template-columns:1fr auto;align-items:end;gap:20px;
+}
+h1{font-size:calc(var(--zihao)*2.1);font-weight:400;letter-spacing:.02em}
+.readout p{margin-top:8px;color:var(--ci);font-size:calc(var(--zihao)*.82);letter-spacing:.04em}
+#cta{
+  background:var(--zhucai);color:#241C12;border:none;border-radius:var(--yuanjiao);
+  padding:12px 22px;font-size:calc(var(--zihao)*.82);font-family:inherit;cursor:pointer;
+}
+@media (max-width:760px){
+  body{grid-template-columns:1fr;grid-template-areas:"viewer" "readout"}
+  .ledger{display:none}
+  .readout{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="ledger">
+  <span class="cap">STRATUM</span>
+  <button class="lv on" data-lv="0">第三层</button>
+  <button class="lv" data-lv="1">第二层</button>
+  <button class="lv" data-lv="2">第一层</button>
+</div>
+
+<div class="viewer">
+  <div class="layer base" id="base"></div>
+  <div class="layer reveal" id="reveal"></div>
+  <div class="aperture"></div>
+  <div class="plate">EXC-2026-0412<b>T4 · 东壁</b></div>
+  <div class="scale">比例尺<i></i>10 cm</div>
+</div>
+
+<div class="readout">
+  <div>
+    <h1 id="t1">探方 T4 · 第三层</h1>
+    <p id="t2">编号 12-B · 灰陶残片，出土于东壁灰坑，胎质夹砂</p>
+  </div>
+  <button id="cta">查看发掘记录</button>
+</div>
+
+<script>
+var state = {
+  dimian:'#2A2620', ceng:'#3D3830', zhucai:'#C08A3E', zi:'#EFE7D8',
+  banjing:240, wang:44, zihao:17, yuanjiao:10,
+  t1:'探方 T4 · 第三层', t2:'编号 12-B · 灰陶残片，出土于东壁灰坑，胎质夹砂'
+};
+var LAYERS = [
+  ['探方 T4 · 第三层','编号 12-B · 灰陶残片，出土于东壁灰坑，胎质夹砂'],
+  ['探方 T4 · 第二层','编号 08-A · 绳纹灰陶罐口沿，伴出炭屑与烧土块'],
+  ['探方 T4 · 第一层','编号 03-C · 近现代扰动层，含青花瓷片与砖瓦碎块']
+];
+
+var baseEl = document.getElementById('base');
+var revealEl = document.getElementById('reveal');
+var t1 = document.getElementById('t1'), t2 = document.getElementById('t2'), cta = document.getElementById('cta');
+
+/* 离线合成两层底图：土色渐变 + 探方轮廓，不依赖任何远程链接（规矩11） */
+function genImage(from, to, relic){
+  var w=1280,h=720,cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  var g=cv.getContext('2d');
+  var grd=g.createLinearGradient(0,0,w,h);grd.addColorStop(0,from);grd.addColorStop(1,to);
+  g.fillStyle=grd;g.fillRect(0,0,w,h);
+  if(relic){
+    /* 出土层：画出器物轮廓与探方隔梁，作为「被揭示的东西」 */
+    g.strokeStyle='rgba(36,28,18,.55)';g.lineWidth=3;
+    for(var i=0;i<7;i++){
+      var cx=140+i*160, cy=430+Math.sin(i)*46;
+      g.beginPath();g.ellipse(cx,cy,52,66,0,Math.PI,0);g.stroke();
+      g.beginPath();g.ellipse(cx,cy-66,30,12,0,0,Math.PI*2);g.stroke();
+    }
+    g.strokeStyle='rgba(36,28,18,.28)';g.lineWidth=2;
+    for(var k=0;k<5;k++){g.beginPath();g.moveTo(0,150+k*130);g.lineTo(w,150+k*130);g.stroke();}
+  }else{
+    /* 未发掘层：夯土颗粒 */
+    for(var d=0;d<2400;d++){
+      var x=Math.random()*w,y=Math.random()*h,r=Math.random()*2.2+.4;
+      g.beginPath();g.arc(x,y,r,0,Math.PI*2);
+      g.fillStyle='rgba(255,240,214,'+(Math.random()*.07+.02).toFixed(3)+')';g.fill();
+    }
+  }
+  return cv.toDataURL();
+}
+
+function apply(){
+  var r=document.documentElement.style;
+  /* 长度型变量一律自带 px，避免 CSS 侧静默塌 0 */
+  r.setProperty('--dimian',state.dimian);
+  r.setProperty('--ceng',state.ceng);
+  r.setProperty('--zhucai',state.zhucai);
+  r.setProperty('--zi',state.zi);
+  r.setProperty('--banjing',state.banjing+'px');
+  r.setProperty('--wang',state.wang+'px');
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  baseEl.style.backgroundImage='url('+genImage(state.ceng,shade(state.ceng,-26),false)+')';
+  revealEl.style.backgroundImage='url('+genImage(state.zhucai,shade(state.zhucai,-40),true)+')';
+  t1.textContent=state.t1;t2.textContent=state.t2;
+}
+
+function shade(hex,d){
+  var v=parseInt(hex.replace('#',''),16);
+  var c=[(v>>16)&255,(v>>8)&255,v&255].map(function(x){return Math.max(0,Math.min(255,x+d));});
+  return '#'+c.map(function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+}
+
+/* 光圈状态机：光标驱动 + 空闲时自动巡游（headless 截图不依赖鼠标） */
+var target={x:.5,y:.52}, now={x:.5,y:.52}, idleAt=0;
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelector('.viewer').addEventListener('pointermove',function(e){
+  var b=this.getBoundingClientRect();
+  target.x=(e.clientX-b.left)/b.width; target.y=(e.clientY-b.top)/b.height; idleAt=performance.now();
+});
+function loop(ts){
+  if(!idleAt||ts-idleAt>1400){
+    target.x=.5+Math.cos(ts/5200)*.24; target.y=.52+Math.sin(ts/4100)*.15;
+  }
+  var k=reduce?1:.055;
+  now.x+=(target.x-now.x)*k; now.y+=(target.y-now.y)*k;
+  var r=document.documentElement.style;
+  r.setProperty('--mx',(now.x*100).toFixed(2)+'%');
+  r.setProperty('--my',(now.y*100).toFixed(2)+'%');
+  requestAnimationFrame(loop);
+}
+document.querySelectorAll('.lv').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.lv').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    var L=LAYERS[+b.dataset.lv]; state.t1=L[0]; state.t2=L[1]; apply();
+  });
+});
+addEventListener('message',function(e){
+  var d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+  state[d.key]=d.value;
+  if(d.key==='t1'||d.key==='t2')return;
+  apply();
+});
+apply();
+if(!reduce) requestAnimationFrame(loop);
+</script>
+</body>
+</html>

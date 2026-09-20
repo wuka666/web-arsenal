@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>全屏技术详情层 · 单文件 demo</title>
+<style>
+  :root{
+    --di:#15110D;        /* 详情层底色 */
+    --mianban:#2E2118;   /* 面板色 */
+    --zi:#EFE9DC;        /* 文字色 */
+    --zhucai:#B03A2E;    /* 强调/线稿色 */
+    --xian:70;           /* 线稿不透明度（%） */
+    --shichang:320ms;    /* 进出场时长 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#15110D;display:grid;place-items:center;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .hero{color:#DCE6EC;text-align:center}
+  .hero h1{font-weight:400;font-size:24px;letter-spacing:-.01em;margin-bottom:14px}
+  .open{background:transparent;color:#DCE6EC;border:1px solid rgba(255,255,255,.32);
+        border-radius:999px;padding:9px 22px;font-size:13px;cursor:pointer;letter-spacing:.03em}
+  .open:hover{background:rgba(255,255,255,.08)}
+  /* 全屏信息层：淡入 + 轻微上移，Esc 可退 */
+  .layer{position:fixed;inset:0;z-index:50;background:var(--di);display:grid;grid-template-columns:minmax(280px,420px) 1fr;
+        gap:34px;padding:7vh 6vw;align-items:center;
+        opacity:0;pointer-events:none;transform:translateY(14px);
+        transition:opacity var(--shichang) ease,transform var(--shichang) ease}
+  .layer.show{opacity:1;pointer-events:auto;transform:none}
+  .layer{color:var(--zi)}
+  .layer h2{font-weight:400;font-size:26px;letter-spacing:-.01em;margin-bottom:6px}
+  .layer .sub{font-size:13px;color:rgba(226,234,241,.6);margin-bottom:22px}
+  .row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-top:1px solid rgba(255,255,255,.1);
+        font-size:13px;color:var(--zi)}
+  .row b{font-weight:400;color:var(--zhucai)}
+  .back{margin-top:24px;background:transparent;color:var(--zi);border:1px solid rgba(255,255,255,.3);
+        border-radius:999px;padding:8px 20px;font-size:13px;cursor:pointer}
+  .back:hover{border-color:var(--zhucai);color:var(--zhucai)}
+  canvas{width:100%;max-height:56vh;display:block}
+  @media (max-width:860px){.layer{grid-template-columns:1fr;overflow:auto;align-items:start;padding-top:9vh}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>Modular platform</h1>
+  <button class="open" id="openBtn">See the layout</button>
+</div>
+<div class="layer show" id="layer" role="dialog" aria-modal="true" aria-label="Technical detail">
+  <div>
+    <h2>Inside the build</h2>
+    <p class="sub">Three parts, one shared spine.</p>
+    <div class="row"><span>Drive unit</span><b>340 kW</b></div>
+    <div class="row"><span>Coolant circuit</span><b>Shared loop</b></div>
+    <div class="row"><span>Cell format</span><b>4680 array</b></div>
+    <button class="back" id="backBtn">Back</button>
+  </div>
+  <canvas id="art"></canvas>
+</div>
+<script>
+(function(){
+  var layer=document.getElementById('layer'), cv=document.getElementById('art'), g=cv.getContext('2d');
+  var state={di:'#15110D',mianban:'#2E2118',zi:'#EFE9DC',zhucai:'#B03A2E',xian:70,shichang:320};
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','mianban','zi','zhucai'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--xian',state.xian/100);
+    r.setProperty('--shichang',state.shichang+'ms');
+    draw();
+  }
+  // 线稿剖面：抽象成通用「模块 + 共享总线」，不绑定任何具体产品
+  function draw(){
+    var w=cv.clientWidth, h=Math.max(220,cv.clientHeight);
+    if(!w)return;
+    cv.width=w*devicePixelRatio; cv.height=h*devicePixelRatio;
+    g.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    g.clearRect(0,0,w,h);
+    var c=state.zhucai, a=state.xian/100;
+    g.strokeStyle=c; g.globalAlpha=a; g.lineWidth=1.2;
+    g.fillStyle='rgba(226,234,241,.55)'; g.font='11px Inter,Arial';
+    var bw=Math.min(180,w*.2), y=h*.56, xs=[w*.08,w*.4,w*.72];
+    xs.forEach(function(x,i){
+      g.strokeRect(x,y-bw*.62,bw,bw*.62);
+      for(var r2=0;r2<3;r2++) g.strokeRect(x+8,y-bw*.62+10+r2*(bw*.62-20)/3,8,8);
+      g.fillText('Module '+String.fromCharCode(65+i),x,y+18);
+    });
+    g.beginPath(); g.moveTo(w*.08+8,y-bw*.62-14); g.lineTo(w*.72+bw-8,y-bw*.62-14); g.stroke();
+    g.fillText('shared bus',w*.44,y-bw*.62-22);
+    g.setLineDash([5,5]); g.beginPath(); g.moveTo(0,y+34); g.lineTo(w,y+34); g.stroke(); g.setLineDash([]);
+    g.fillText('baseline',8,y+48);
+  }
+  function setOpen(v){ layer.classList.toggle('show',v); if(v)draw(); }
+  document.getElementById('openBtn').addEventListener('click',function(){ setOpen(true); });
+  document.getElementById('backBtn').addEventListener('click',function(){ setOpen(false); });
+  addEventListener('keydown',function(e){ if(e.key==='Escape')setOpen(false); });
+  addEventListener('resize',draw);
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

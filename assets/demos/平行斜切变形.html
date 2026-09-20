@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- M176 平行斜切变形：整体 skewX + 可选逐字错位，速度感斜面模块（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page)}
+  .stage{display:flex;gap:var(--g)}
+  .ch{display:inline-block;font-size:var(--fs);font-weight:var(--fw);color:var(--c);white-space:pre;
+      transform:skewX(var(--sk)) translateY(var(--dy))}
+  .ch:nth-child(even){color:var(--c2)}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+<script>
+  const state={sk:-14,dy:0,g:2,fs:76,fw:900,c:'#151b2e',c2:'#e8452c',page:'#eef1f6',txt:'RACING'};
+  const stage=document.getElementById('stage');
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--sk',state.sk+'deg'); s.setProperty('--dy',state.dy+'px'); s.setProperty('--g',state.g+'px');
+    s.setProperty('--fs',state.fs+'px'); s.setProperty('--fw',state.fw); s.setProperty('--c',state.c);
+    s.setProperty('--c2',state.c2); s.setProperty('--page',state.page);
+    stage.innerHTML='';
+    [...state.txt].forEach(ch=>{
+      const el=document.createElement('span'); el.className='ch'; el.textContent=ch; stage.appendChild(el);
+    });
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

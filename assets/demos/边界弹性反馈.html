@@ -25,13 +25,14 @@
 </div>
 
 <script>
-  const state = { resistance: 0.25, over: 80, bounce: .5, accent: "#3d5fd6", bg: "#fafafa" };
+  const state = { resistance: 0.25, over: 80, bounce: .5, accent: "#3d5fd6", bg: "#fafafa", radius: 16 };
   const box = document.getElementById("box");
   const inner = document.getElementById("inner");
   const rubber = document.getElementById("rubber");
   let sy = 0, ty = 0, dragging = false;
   function apply() {
     document.documentElement.style.setProperty("--accent", state.accent);
+    box.style.borderRadius = state.radius + "px";
     document.body.style.background = state.bg;
   }
   box.addEventListener("pointerdown", e => { dragging = true; sy = e.clientY; ty = 0; box.setPointerCapture(e.pointerId); inner.style.transition = "none"; rubber.style.transition = "none"; });

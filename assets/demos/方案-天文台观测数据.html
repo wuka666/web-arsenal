@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>天文台观测数据</title>
+<style>
+:root{
+  --di:#0A1024;        /* 高海拔夜空 */
+  --guang:#FF6B4A;     /* 光谱橙红 */
+  --xing:#E8EDF7;      /* 星白 */
+  --bo:#8FA8E8;        /* 玻璃蓝 */
+  --ci:#7C8AAE;
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:14px;
+  --zhu:42;            /* 光谱柱数 */
+  --sudu:1;            /* 采样速度 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(120% 100% at 72% 8%,#132348 0%,var(--di) 58%);
+  color:var(--xing);overflow:hidden;min-height:100vh;
+  font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  display:grid;grid-template-columns:minmax(230px,300px) 1fr;grid-template-rows:1fr auto;
+  grid-template-areas:"log stage" "log read"}
+#sky{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.log{grid-area:log;position:relative;z-index:2;padding:calc(var(--jianju)*1.5) calc(var(--jianju)*1.2);
+  border-right:1px solid rgba(143,168,232,.16);display:flex;flex-direction:column;gap:16px}
+.brand{font-family:Consolas,monospace;font-size:11px;letter-spacing:.24em;color:var(--ci)}
+.brand b{display:block;margin-top:8px;font-family:inherit;font-size:calc(var(--zihao)*1.35);
+  letter-spacing:.1em;color:var(--xing);font-weight:500}
+.entry{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid rgba(143,168,232,.12)}
+.entry i{font-style:normal;font-family:Consolas,monospace;font-size:10.5px;color:var(--ci);letter-spacing:.14em}
+.entry p{font-size:calc(var(--zihao)*.8);line-height:1.75;color:color-mix(in srgb,var(--xing) 84%,transparent)}
+.stage{grid-area:stage;position:relative;z-index:2;min-height:0}
+h1{position:absolute;left:calc(var(--jianju)*1.5);top:calc(var(--jianju)*1.3);
+  font-size:calc(var(--zihao)*2.3);font-weight:600;line-height:1.3;letter-spacing:.01em}
+h1 small{display:block;margin-top:10px;font-size:calc(var(--zihao)*.78);font-weight:400;color:var(--ci);letter-spacing:.06em}
+.read{grid-area:read;position:relative;z-index:2;display:flex;gap:calc(var(--jianju)*1.6);flex-wrap:wrap;
+  align-items:baseline;padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.5);
+  border-top:1px solid rgba(143,168,232,.16);background:linear-gradient(180deg,transparent,rgba(10,16,36,.7))}
+.read div{display:flex;flex-direction:column;gap:4px}
+.read b{font-family:Consolas,monospace;font-size:calc(var(--zihao)*1.25);font-weight:500;color:var(--xing)}
+.read b em{font-style:normal;color:var(--guang)}
+.read span{font-size:10.5px;color:var(--ci);letter-spacing:.16em}
+.read p{margin-left:auto;font-family:Consolas,monospace;font-size:11px;color:var(--ci);letter-spacing:.08em}
+@media (max-width:860px){
+  body{grid-template-columns:1fr;grid-template-areas:"stage" "read" "log"}
+  .log{border-right:none;border-top:1px solid rgba(143,168,232,.16)}
+}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<div class="log">
+  <span class="brand">OBSERVATORY 05<b>北岭观测站</b></span>
+  <div class="entry">
+    <i>2026-09-19 02:14 UT</i>
+    <p>大气视宁度 0.72″，风速 2.1 m/s。海雾未上移，导星稳定。</p>
+  </div>
+  <div class="entry">
+    <i>目标</i>
+    <p>赤经 05h 34m，赤纬 +22°00′。光谱型 K3 III，表面温度约 4300 K。</p>
+  </div>
+  <div class="entry">
+    <i>备注</i>
+    <p>吸收线在 656 nm 处明显加深，疑似星际介质贡献。</p>
+  </div>
+</div>
+
+<div class="stage">
+  <h1>把一夜的星光<small>拆成一条一条可读的谱线</small></h1>
+</div>
+
+<div class="read">
+  <div><b><em>K3</em> III</b><span>光谱型</span></div>
+  <div><b>4300 <em>K</em></b><span>有效温度</span></div>
+  <div><b>6.42</b><span>视星等</span></div>
+  <div><b>18.7 <em>ly</em></b><span>距离</span></div>
+  <p id="stamp">采样 512 帧 · 积分 90 s</p>
+</div>
+
+<script>
+var state = {
+  di:'#0A1024', guang:'#FF6B4A', xing:'#E8EDF7', bo:'#8FA8E8',
+  zihao:16, jianju:22, yuanjiao:14, zhu:42, sudu:1
+};
+var cv=document.getElementById('sky'), ctx=cv.getContext('2d');
+var W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
+var stars=[], bars=[], t=0;
+
+function hex(h){var v=parseInt(String(h).replace('#',''),16);return [(v>>16)&255,(v>>8)&255,v&255];}
+function rgba(h,a){var c=hex(h);return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
+
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  seed();
+}
+function seed(){
+  stars=[];
+  for(var i=0;i<260;i++) stars.push({x:Math.random()*W,y:Math.random()*H*0.8,
+    r:Math.random()*1.5+.25,a:Math.random()*.7+.15,p:Math.random()*Math.PI*2});
+  bars=[];
+  var n=Math.max(12,Math.round(state.zhu));
+  for(var b=0;b<n;b++) bars.push({h:.08+Math.abs(Math.sin(b*1.7))*.42, ph:Math.random()*Math.PI*2,
+    sp:.6+Math.random()*1.6, hot:(b%7===0)});
+}
+/* 星野 + 光谱柱：柱高随时间起伏，代表连续采样出的谱线强度 */
+function draw(now){
+  var dt=Math.min(.05,(now-(draw.last||now))/1000);draw.last=now;
+  t+=dt*state.sudu;
+  ctx.clearRect(0,0,W,H);
+  for(var i=0;i<stars.length;i++){
+    var s=stars[i];
+    var a=s.a*(.62+.38*Math.sin(t*1.6+s.p));
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=rgba(state.xing,a);ctx.fill();
+  }
+  /* 地平线遮挡，让星野落下去 */
+  var hz=H*.80;
+  var g=ctx.createLinearGradient(0,hz-H*.12,0,hz);
+  g.addColorStop(0,rgba(state.di,0));g.addColorStop(1,rgba(state.di,.96));
+  ctx.fillStyle=g;ctx.fillRect(0,hz-H*.12,W,H*.12);
+
+  var n=bars.length, pad=W*.06, span=W-pad*2, bw=span/n;
+  for(var b=0;b<n;b++){
+    var bar=bars[b];
+    var hh=bar.h*(1+.42*Math.sin(t*bar.sp+bar.ph));
+    var top=hz-hh*H*.5, bottom=hz;
+    var col=bar.hot?state.guang:state.bo;
+    var bg=ctx.createLinearGradient(0,top,0,bottom);
+    bg.addColorStop(0,rgba(col,bar.hot?.92:.5));
+    bg.addColorStop(1,rgba(col,.06));
+    ctx.fillStyle=bg;
+    var x=pad+b*bw+bw*.16, w=bw*.68;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,top,w,bottom-top,Math.min(3,w/2));
+    else ctx.rect(x,top,w,bottom-top);
+    ctx.fill();
+  }
+  /* 基线 */
+  ctx.beginPath();ctx.moveTo(pad*0.6,hz);ctx.lineTo(W-pad*0.6,hz);
+  ctx.strokeStyle=rgba(state.bo,.34);ctx.lineWidth=1;ctx.stroke();
+  requestAnimationFrame(draw);
+}
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--guang',state.guang);
+  r.setProperty('--xing',state.xing);r.setProperty('--bo',state.bo);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  if(Math.round(state.zhu)!==bars.length) seed();
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,140);});
+resize();apply();
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ draw(0); } else { requestAnimationFrame(draw); }
+</script>
+</body>
+</html>

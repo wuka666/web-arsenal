@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分页演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.pg{display:flex;align-items:center;gap:var(--gap,6px)}
+.pg button,.pg .el{height:var(--sz,36px);min-width:var(--sz,36px);padding:0 8px;border:1px solid #e5e7eb;border-radius:var(--r,8px);background:#fff;color:var(--mut,#6b7280);font-size:var(--fs,14px);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.pg .el{border:none;cursor:default;color:#9aa0a6}
+.pg .cur{background:var(--ac,#2f6bff);border-color:var(--ac,#2f6bff);color:#fff;font-weight:700}
+.pg button:disabled{opacity:.4;cursor:not-allowed}
+</style></head><body>
+<div class="pg" id="pg"></div>
+<script>
+const pg=document.getElementById('pg');
+const state={total:7,cur:3,ac:'#2f6bff',mut:'#6b7280',r:8,sz:36,gap:6,fs:14,show:true};
+function applyStyle(){
+  const root=document.documentElement.style;
+  root.setProperty('--ac',state.ac);root.setProperty('--mut',state.mut);root.setProperty('--r',state.r+'px');
+  root.setProperty('--sz',state.sz+'px');root.setProperty('--gap',state.gap+'px');root.setProperty('--fs',state.fs+'px');
+}
+function pages(){
+  const t=state.total,c=state.cur,out=[];
+  if(!state.show||t<=7){for(let i=1;i<=t;i++)out.push(i);return out;}
+  out.push(1);
+  if(c>3)out.push('…');
+  for(let i=Math.max(2,c-1);i<=Math.min(t-1,c+1);i++)out.push(i);
+  if(c<t-2)out.push('…');
+  out.push(t);return out;
+}
+function build(){
+  pg.innerHTML='';
+  const mk=(label,opts)=>{opts=opts||{};const b=document.createElement('button');b.textContent=label;if(opts.cur)b.className='cur';if(opts.disabled)b.disabled=true;if(opts.on)b.onclick=opts.on;return b;};
+  pg.appendChild(mk('‹',{disabled:state.cur<=1,on:()=>{if(state.cur>1){state.cur--;apply();}}}));
+  pages().forEach(p=>{
+    if(p==='…'){const e=document.createElement('span');e.className='el';e.textContent='…';pg.appendChild(e);}
+    else pg.appendChild(mk(String(p),{cur:p===state.cur,on:()=>{state.cur=p;apply();}}));
+  });
+  pg.appendChild(mk('›',{disabled:state.cur>=state.total,on:()=>{if(state.cur<state.total){state.cur++;apply();}}}));
+}
+function apply(){applyStyle();build();}
+apply();
+// 父页面详情页调参契约：只接受本 demo state 已有的键
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script></body></html>

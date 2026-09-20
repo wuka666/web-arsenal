@@ -3,18 +3,18 @@
 <title>有序堆叠演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px}
 .stack{position:relative;width:240px;height:160px}
-.n{position:absolute;left:0;width:240px;background:var(--bc,#fff);border:1px solid #e5e7eb;border-left:4px solid var(--ac,#2f6bff);border-radius:10px;padding:12px;font-size:13px;color:#333;box-shadow:0 6px 18px rgba(0,0,0,.1);transition:transform .4s ease,opacity .4s ease;opacity:0}
+.n{position:absolute;left:0;width:240px;background:var(--bc,#fff);border:1px solid #e5e7eb;border-left:4px solid var(--ac,#2f6bff);border-radius:var(--radius);padding:12px;font-size:13px;color:#333;box-shadow:0 6px 18px rgba(0,0,0,.1);transition:transform .4s ease,opacity .4s ease;opacity:0}
 .n.show{opacity:1}
 </style></head><body>
 <div class="stack" id="stack"></div>
 <script>
 const stack=document.getElementById('stack');
-const state={bc:'#ffffff',ac:'#2f6bff',max:3,gap:14,stay:1.4};
+const state={bc:'#ffffff',ac:'#2f6bff',max:3,gap:14,stay:1.4,radius:10};
 const msgs=['有人点赞了你的动态','新评论：讲得真好','关注了你','你的帖子上了热门','收到一条私信'];
 let q=[],n=0;
-function applyStyle(){document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--ac',state.ac);}
+function applyStyle(){document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--radius',state.radius+'px');}
 function render(){const vis=stack.children;for(let k=0;k<vis.length;k++){const el=vis[k];const idx=vis.length-1-k;el.style.transform='translateY('+(idx*state.gap)+'px) scale('+(1-idx*0.03)+')';el.style.opacity=idx<state.max?1:0;el.classList.add('show');}}
 function push(){const el=document.createElement('div');el.className='n';el.textContent=msgs[n%msgs.length];n++;stack.appendChild(el);while(stack.children.length>state.max+1)stack.removeChild(stack.firstChild);render();setTimeout(()=>{if(stack.children.length>state.max){stack.removeChild(stack.firstChild);render();}},state.stay*1000);}
 applyStyle();let timer=setInterval(push,state.stay*1000);push();
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','ac','max','gap','stay'].includes(d.key)){applyStyle();clearInterval(timer);timer=setInterval(push,state.stay*1000);}});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','ac','max','gap','stay','radius'].includes(d.key)){applyStyle();clearInterval(timer);timer=setInterval(push,state.stay*1000);}});
 </script></body></html>

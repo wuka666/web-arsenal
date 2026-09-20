@@ -24,7 +24,7 @@
 <div class="dots" id="dots"></div>
 
 <script>
-  const state = { count: 5, gap: 0, accent: "#3d5fd6", predict: "#e0533d", bg: "#fafafa" };
+  const state = { count: 5, gap: 0, accent: "#3d5fd6", predict: "#e0533d", bg: "#fafafa", radius: 16 };
   const vp = document.getElementById("vp");
   const track = document.getElementById("track");
   const dots = document.getElementById("dots");
@@ -54,6 +54,7 @@
   function apply() {
     document.documentElement.style.setProperty("--accent", state.accent);
     document.documentElement.style.setProperty("--predict", state.predict);
+    vp.style.borderRadius = state.radius + "px";
     document.body.style.background = state.bg;
     build();
   }

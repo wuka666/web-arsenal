@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高山营地</title>
+<style>
+:root{
+  --di:#16211A;      /* 林线以上 */
+  --zhu:#E2703A;     /* 帐篷橙 */
+  --xian:#B9C4B4;    /* 描边与次字 */
+  --zi:#EDEFE8;
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:6px;
+  --kuandu:2px;      /* 虚按钮描边宽度 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(120% 100% at 24% 8%,#20301F 0%,var(--di) 62%);
+  color:var(--zi);min-height:100vh;display:grid;place-items:center;
+  font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif;padding:calc(var(--jianju)*2)}
+main{max-width:760px;width:100%}
+.tag{font-family:Consolas,monospace;font-size:11px;letter-spacing:.24em;color:var(--xian)}
+h1{font-size:calc(var(--zihao)*3);line-height:1.2;letter-spacing:.01em;margin:calc(var(--jianju)*.8) 0 calc(var(--jianju)*.9)}
+p.lede{color:color-mix(in srgb,var(--zi) 76%,transparent);font-size:calc(var(--zihao)*.92);line-height:1.9;max-width:34em}
+.acts{display:flex;gap:calc(var(--jianju)*.8);margin-top:calc(var(--jianju)*1.5);flex-wrap:wrap}
+/* 双按钮机制：实心负责行动，描边负责了解；对比越大指向越清晰 */
+.btn{border-radius:var(--yuanjiao);padding:14px 26px;font-size:calc(var(--zihao)*.88);font-family:inherit;
+  cursor:pointer;transition:transform .18s,background .18s,color .18s;letter-spacing:.02em}
+.btn.solid{background:var(--zhu);color:#1A1208;border:var(--kuandu) solid var(--zhu);font-weight:600}
+.btn.ghost{background:transparent;color:var(--zi);border:var(--kuandu) solid color-mix(in srgb,var(--xian) 62%,transparent)}
+.btn.solid:hover{transform:translateY(-2px)}
+.btn.ghost:hover{background:color-mix(in srgb,var(--xian) 14%,transparent);transform:translateY(-2px)}
+.facts{display:flex;gap:calc(var(--jianju)*1.8);margin-top:calc(var(--jianju)*2.2);
+  padding-top:calc(var(--jianju)*.9);border-top:1px solid rgba(237,239,232,.14)}
+.facts div{display:flex;flex-direction:column;gap:5px}
+.facts b{font-family:Consolas,monospace;font-size:calc(var(--zihao)*1.1);font-weight:500}
+.facts span{font-size:10.5px;color:var(--xian);letter-spacing:.16em}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">CAMP · 海拔 3,120 m</span>
+  <h1>夜宿三千米，<br>帐篷外只有风。</h1>
+  <p class="lede">每个营位配一顶高山帐与零下十五度睡袋，向导随行。林线以上的星空不需要滤镜，也不需要你去开灯。</p>
+  <div class="acts">
+    <button class="btn solid" id="b1">预订营位</button>
+    <button class="btn ghost" id="b2">查看装备清单</button>
+  </div>
+  <div class="facts">
+    <div><b>12</b><span>每期营位</span></div>
+    <div><b>-15°C</b><span>睡袋温标</span></div>
+    <div><b>2:1</b><span>队员与向导</span></div>
+  </div>
+</main>
+<script>
+var state = {
+  di:'#16211A', zhu:'#E2703A', xian:'#B9C4B4', zi:'#EDEFE8',
+  zihao:16, jianju:22, yuanjiao:6, kuandu:2
+};
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--zhu',state.zhu);
+  r.setProperty('--xian',state.xian);r.setProperty('--zi',state.zi);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  r.setProperty('--kuandu',state.kuandu+'px');
+}
+var b1=document.getElementById('b1'), b2=document.getElementById('b2');
+b1.addEventListener('click',function(){b1.textContent=b1.textContent==='预订营位'?'已加入候补':'预订营位';});
+b2.addEventListener('click',function(){b2.textContent=b2.textContent==='查看装备清单'?'收起清单':'查看装备清单';});
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

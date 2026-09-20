@@ -33,10 +33,11 @@
 </div>
 
 <script>
-  const state = { accent: "#3d5fd6", done: "#2bb673", warn: "#e0993d", bg: "#fafafa", card: "#ffffff" };
+  const state = { accent: "#3d5fd6", done: "#2bb673", warn: "#e0993d", bg: "#fafafa", card: "#ffffff", radius: 16 };
   function apply() {
     document.documentElement.style.setProperty("--bg", state.bg);
     document.documentElement.style.setProperty("--card", state.card);
+    p.style.borderRadius = state.radius + "px";
     document.documentElement.style.setProperty("--accent", state.accent);
     document.documentElement.style.setProperty("--done", state.done);
     document.documentElement.style.setProperty("--warn", state.warn);

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- M173 图片预览标签：底部缩略图列表 + 主图淡入切换（图片用 SVG dataURI 渐变生成，零外链） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{width:480px}
+  .main{width:100%;height:var(--mh);border-radius:var(--r);background:#dfe4ec center/cover no-repeat;
+        transition:opacity var(--dur) ease;box-shadow:0 8px 24px rgba(20,30,50,.12)}
+  .thumbs{display:flex;gap:var(--gap);margin-top:var(--gap)}
+  .th{width:var(--th);height:var(--th);border-radius:calc(var(--r) * .6);background:#dfe4ec center/cover no-repeat;
+      cursor:pointer;border:var(--bw) solid transparent;opacity:.75;
+      transition:border-color var(--dur) ease,opacity var(--dur) ease,transform var(--dur) ease}
+  .th.on{border-color:var(--acc);opacity:1;transform:translateY(-2px)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="main" id="main"></div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+<script>
+  const state={n:4,acc:'#2f6bff',bw:2,r:12,th:64,gap:10,mh:300,dur:0.4,bg:'#f5f6f8'};
+  // 渐变主图用内联 SVG dataURI 现场生成——file:// 下零外链也能有"图片"
+  function mk(c1,c2,label){
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">'
+      +'<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+      +'<stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient></defs>'
+      +'<rect width="800" height="500" fill="url(#g)"/>'
+      +'<circle cx="640" cy="130" r="70" fill="rgba(255,255,255,.25)"/>'
+      +'<text x="50%" y="52%" font-family="sans-serif" font-size="40" fill="rgba(255,255,255,.92)" text-anchor="middle">'+label+'</text></svg>';
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  }
+  const PALETTE=[['#5b8cff','#7f5bff','风景 A'],['#ff8f5b','#ff5b8f','风景 B'],['#39c6a0','#2f8fbf','风景 C'],['#f5c04e','#ef7d3b','风景 D'],['#8f7bff','#4e6bff','风景 E'],['#4ec3f5','#3970c6','风景 F']];
+  const main=document.getElementById('main'),thumbs=document.getElementById('thumbs');
+  let sel=0,fading=false;
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--acc',state.acc); s.setProperty('--bw',state.bw+'px'); s.setProperty('--r',state.r+'px');
+    s.setProperty('--th',state.th+'px'); s.setProperty('--gap',state.gap+'px'); s.setProperty('--mh',state.mh+'px');
+    s.setProperty('--dur',state.dur+'s'); s.setProperty('--bg',state.bg);
+    const img=i=>mk(PALETTE[i%PALETTE.length][0],PALETTE[i%PALETTE.length][1],PALETTE[i%PALETTE.length][2]);
+    // 主图淡出→换源→淡入（fading 防连点打断出现叠影）
+    main.style.opacity=0;
+    setTimeout(()=>{
+      main.style.backgroundImage='url("'+img(sel)+'")';
+      main.style.opacity=1;
+    },state.dur*600);
+    thumbs.innerHTML='';
+    for(let i=0;i<state.n;i++){
+      const t=document.createElement('div');
+      t.className='th'+(i===sel?' on':'');
+      t.style.backgroundImage='url("'+img(i)+'")';
+      t.onclick=()=>{if(i===sel||fading)return;fading=true;sel=i;apply();setTimeout(()=>fading=false,state.dur*700);};
+      thumbs.appendChild(t);
+    }
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

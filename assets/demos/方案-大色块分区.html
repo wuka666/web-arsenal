@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>方案·大色块分区</title>
 <style>
-:root{--zhucai:#FF6F61;--zhongdian:#7EC8E3;--di:#16181D;--zi:#FFFFFF;--cizi:#9AA0AA;--yuanjiao:16px;--jianju:12px;--zihao:15px;--yinying:24;--faguang:0;--lie:2}
+:root{--zhucai:#FF6F61;--zhongdian:#7EC8E3;--di:#1a1a1a;--zi:#FFFFFF;--cizi:#b8b8b8;--yuanjiao:16px;--jianju:12px;--zihao:15px;--yinying:24;--faguang:0;--lie:2}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"Microsoft YaHei",sans-serif;}
 body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:var(--yuanjiao);background:color-mix(in srgb,var(--zi) 6%,transparent);margin-bottom:var(--jianju);}
@@ -26,6 +26,9 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.55;padd
 .sage{background:#9CAF88;color:#1f2a17;}
 .cta{margin-top:14px;align-self:flex-start;background:var(--zi);color:var(--di);border:none;border-radius:calc(var(--yuanjiao)*.8);padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;}
 body[data-glow="1"] .coral{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhucai);}
+
+/* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
+.block{box-shadow:0 calc(var(--yinying)*.22px) calc(var(--yinying)*.55px) rgba(0,0,0,.34)}
 </style>
 </head>
 <body>

@@ -10,7 +10,7 @@
   .panel { width: min(460px, 94vw); height: 300px; background: #0f1115; border-radius: 14px; padding: 14px; overflow: auto; color: #d6d6da; font-size: 12.5px; line-height: 1.7; box-shadow: 0 10px 34px rgba(0,0,0,.2); }
   .row { white-space: pre-wrap; }
   .k { color: var(--accent); }
-  .p { color: #ffd27a; }
+  .p { color: var(--accent2); }
   .r { color: #7CFFB2; }
   .btn { padding: 9px 20px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13px; cursor: pointer; font-family: system-ui; }
 
@@ -21,7 +21,7 @@
 <button class="btn" id="btn">运行任务（展示工具调用）</button>
 
 <script>
-  const state = { calls: 4, dur: 700, accent: "#5ad1ff", bg: "#fafafa" };
+  const state = { calls: 4, dur: 700, accent: "#5ad1ff", bg: "#fafafa", radius: 14, accent2: "#ffd27a" };
   const log = document.getElementById("log");
   const calls = [
     ['搜索', '{query:"Web 灵感弹药库"}', "命中 12 条素材"],
@@ -33,6 +33,8 @@
   function apply() {
     document.documentElement.style.setProperty("--bg", state.bg);
     document.documentElement.style.setProperty("--accent", state.accent);
+    document.documentElement.style.setProperty("--accent2", state.accent2);
+    log.style.borderRadius = state.radius + "px";
     log.innerHTML = "";
   }
   btn.addEventListener("click", () => {

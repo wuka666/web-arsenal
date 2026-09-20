@@ -12,8 +12,8 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 <div class="coach" id="coach"><span id="ct">点这里可导出本页数据</span><div class="arrow" id="ar"></div><button id="ok">明白了</button></div>
 <script>
 const btn=document.getElementById('btn'),coach=document.getElementById('coach'),ar=document.getElementById('ar'),ok=document.getElementById('ok'),ct=document.getElementById('ct');
-const state={bc:'#1a1a1a',ac:'#2f6bff',pos:'top',text:'点这里可导出本页数据',radius:10};
-function applyStyle(){document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--ac',state.ac);coach.style.borderRadius=state.radius+'px';ct.textContent=state.text;place();}
+const state={bc:'#1a1a1a',ac:'#2f6bff',pos:'top',text:'点这里可导出本页数据',radius:10,bg:'#ffffff'};
+function applyStyle(){document.body.style.background=state.bg;document.documentElement.style.setProperty('--bc',state.bc);document.documentElement.style.setProperty('--ac',state.ac);coach.style.borderRadius=state.radius+'px';ct.textContent=state.text;place();}
 function place(){const b=btn.getBoundingClientRect();let cl,ctop,al,at;
  if(state.pos==='top'){cl=b.left+(b.width-200)/2;ctop=b.top-90;al=98;at=6;}
  else if(state.pos==='bottom'){cl=b.left+(b.width-200)/2;ctop=b.top+b.height+14;al=98;at=-6;}
@@ -22,5 +22,5 @@ function place(){const b=btn.getBoundingClientRect();let cl,ctop,al,at;
  coach.style.left=cl+'px';coach.style.top=ctop+'px';ar.style.left=al+'px';ar.style.top=at+'px';ar.style.borderLeft=state.pos==='right'?'none':'1px solid #e5e7eb';ar.style.borderTop=state.pos==='bottom'?'none':'1px solid #e5e7eb';ar.style.borderRight=state.pos==='right'?'1px solid #e5e7eb':'none';ar.style.borderBottom=state.pos==='bottom'?'1px solid #e5e7eb':'none';}
 ok.onclick=()=>coach.classList.remove('on');
 applyStyle();coach.classList.add('on');
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','ac','pos','text','radius'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['bc','ac','pos','text','radius','bg'].includes(d.key))applyStyle();});
 </script></body></html>

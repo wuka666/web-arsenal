@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>赛博霓虹英雄区</title>
+<style>
+  /* 原稿 hero 为光标聚光揭示底层图；离线演示两层场景均由 canvas 生成（零外链），字体回退系统栈 */
+  :root{
+    --di:#0A0712;           /* 底图（暗赛博） */
+    --neon1:#FF2E88;        /* 霓虹 1 */
+    --neon2:#27E8FF;        /* 霓虹 2 */
+    --zi:#F4F0FF;           /* 文字 */
+    --zhucai:#FF2E88;       /* CTA */
+    --radius:300;           /* 聚光半径(px) */
+    --ease:.12;             /* 聚光跟随缓动 */
+    --biaoti:96;            /* 标题基准字号 */
+    --faguang:18;           /* 聚光外发光 */
+    --jianju:24;            /* 留白刻度 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:"Orbitron","Helvetica Neue",Arial,sans-serif;background:var(--di);color:var(--zi)}
+  .nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+       padding:18px calc(var(--jianju)*1.4);font-size:14px;color:rgba(244,240,255,.82)}
+  .nav .logo{letter-spacing:.18em;color:#fff}
+  .nav .menu{display:flex;gap:calc(var(--jianju)*1.1)}
+  .nav .menu a{color:rgba(244,240,255,.7);text-decoration:none}
+  .nav .navcta{border:1px solid rgba(255,255,255,.3);padding:8px 18px;border-radius:999px}
+  .stage{position:relative;width:100%;height:100vh;min-height:560px;overflow:hidden;background:var(--di)}
+  .layer{position:absolute;inset:0;background-size:cover;background-position:center}
+  .base{z-index:10}
+  .reveal{z-index:30;pointer-events:none}
+  .glow{position:absolute;z-index:40;width:380px;height:380px;margin:-190px 0 0 -190px;border-radius:50%;pointer-events:none;
+        background:radial-gradient(circle, color-mix(in srgb,var(--zi) calc(var(--faguang)*1%), transparent) 0%, transparent 60%)}
+  .head{position:absolute;top:50%;left:0;right:0;z-index:50;transform:translateY(-52%);text-align:center;pointer-events:none;padding:0 20px}
+  .head h1{font-size:calc(var(--biaoti)*1px);line-height:1.0;letter-spacing:.02em;color:var(--zi);text-shadow:0 8px 40px rgba(0,0,0,.55)}
+  .head p{margin-top:16px;font-size:15px;letter-spacing:.04em;color:rgba(244,240,255,.7);font-family:"Helvetica Neue",Arial,sans-serif}
+  .blurb{position:absolute;left:50%;bottom:calc(var(--jianju)*2.2);transform:translateX(-50%);z-index:50;display:flex;gap:14px}
+  .blurb button{border:0;color:#fff;background:var(--zhucai);border-radius:999px;padding:13px 30px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+  .blurb .ghost{border:1px solid rgba(255,255,255,.35);background:transparent;color:var(--zi)}
+  .tokens{background:#07040f;padding:calc(var(--jianju)*2.2) calc(var(--jianju)*1.6);display:flex;gap:calc(var(--jianju)*1.6);flex-wrap:wrap;align-items:center;font-size:12px;color:rgba(244,240,255,.5)}
+  .sw{width:54px;height:54px;border-radius:12px;border:1px solid rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <span class="logo">NEON KAI</span>
+    <span class="menu"><a>City</a><a>Gear</a><a>Story</a></span>
+    <span class="navcta">Enter</span>
+  </nav>
+  <section class="stage" id="stage">
+    <div class="layer base" id="base"></div>
+    <div class="layer reveal" id="reveal"></div>
+    <div class="glow" id="glow"></div>
+    <div class="head">
+      <h1 id="t1">Signal in the dark</h1>
+      <p id="t2">Move to lift the dark — the city keeps its light.</p>
+    </div>
+    <div class="blurb">
+      <button id="cta">Start Run</button>
+      <button class="ghost">Read Story</button>
+    </div>
+  </section>
+  <section class="tokens">
+    <span>霓虹色板</span>
+    <div class="sw" style="background:var(--neon1)"></div>
+    <div class="sw" style="background:var(--neon2)"></div>
+    <div class="sw" style="background:var(--zi)"></div>
+    <div class="sw" style="background:var(--di)"></div>
+  </section>
+<script>
+(function(){
+  var base=document.getElementById('base'), reveal=document.getElementById('reveal'), glow=document.getElementById('glow');
+  var t1=document.getElementById('t1'), t2=document.getElementById('t2'), cta=document.getElementById('cta');
+  var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
+
+  var state={di:'#0A0712',neon1:'#FF2E88',neon2:'#27E8FF',zi:'#F4F0FF',zhucai:'#FF2E88',
+    radius:300,ease:.12,biaoti:96,faguang:18,jianju:24};
+
+  // 离线生成两层赛博城景：暗底 + 霓虹版（同构图，差别只在发光强度）
+  function genScene(neon){
+    var w=1600,h=900,cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    var g=cv.getContext('2d');
+    // 底图要「暗但成形」：背景微亮、楼体压黑，默认态才看得出是一座城而不是一块黑
+    g.fillStyle=neon?shade(state.di,34):shade(state.di,22); g.fillRect(0,0,w,h);
+    // 远景建筑剪影
+    for(var i=0;i<26;i++){
+      var x=i*64+ (i%2?18:0), bw=52+ (i*7%40), bh=180+(i*53%420), y=h-bh;
+      g.fillStyle=neon?'rgba(20,16,38,.9)':'rgba(4,3,10,.98)';
+      g.fillRect(x,y,bw,bh);
+      // 底图也给极弱的窗格，霓虹层给满强度：两层只差在发光量，聚光扫过才有「通电」感
+      g.strokeStyle= i%2?state.neon1:state.neon2;
+      g.globalAlpha=neon?.5:.09; g.lineWidth=neon?2:1;
+      for(var r=0;r<bh/26;r++){ g.beginPath(); g.moveTo(x+6,y+10+r*24); g.lineTo(x+bw-6,y+10+r*24); g.stroke(); }
+      g.globalAlpha=1;
+    }
+    // 地平线霓虹
+    g.strokeStyle=neon?state.neon2:shade(state.di,40); g.lineWidth=neon?3:1; g.globalAlpha=neon?.8:.4;
+    g.beginPath(); g.moveTo(0,h*0.62); g.lineTo(w,h*0.6); g.stroke(); g.globalAlpha=1;
+    return cv.toDataURL();
+  }
+  function shade(hex,k){var n=parseInt(hex.slice(1),16),r=(n>>16)&255,gg=(n>>8)&255,b=n&255;
+    var f=function(v){return Math.max(0,Math.min(255,v+k));};return 'rgb('+f(r)+','+f(gg)+','+f(b)+')';}
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','neon1','neon2','zi','zhucai'].forEach(function(k){r.setProperty('--'+k,state[k]);});
+    r.setProperty('--radius',state.radius+'px');
+    r.setProperty('--ease',state.ease);
+    r.setProperty('--biaoti',state.biaoti);
+    r.setProperty('--faguang',state.faguang);
+    r.setProperty('--jianju',state.jianju+'px');
+    base.style.backgroundImage='url('+genScene(false)+')';
+    reveal.style.backgroundImage='url('+genScene(true)+')';
+    t1.style.color=state.zi; t2.style.color=state.zi;
+    cta.style.background=state.zhucai;
+    drawMask();
+  }
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  // 聚光揭示：reveal 层用随光标移动的径向渐变作 mask（与 S23 同机制，仅配色赛博化）
+  // 初始落在画面中部：鼠标没进来时也要看得见暗处藏的霓虹，否则默认态就是一块死黑
+  var cur={x:0,y:0}, smooth={x:0,y:0}, mouse={x:0,y:0};
+  function center(){
+    cur.x=smooth.x=mouse.x=window.innerWidth*.5;
+    cur.y=smooth.y=mouse.y=window.innerHeight*.44;
+    glow.style.left=cur.x+'px'; glow.style.top=cur.y+'px';
+  }
+  center();
+  function drawMask(){
+    var w=window.innerWidth,h=window.innerHeight;
+    canvas.width=w; canvas.height=h; ctx.clearRect(0,0,w,h);
+    var cc=state.zi, R=Math.max(1,state.radius), g=ctx.createRadialGradient(cur.x,cur.y,0,cur.x,cur.y,R);
+    g.addColorStop(0,cc); g.addColorStop(.5,cc);
+    g.addColorStop(.72,hexA(cc,.6)); g.addColorStop(.9,hexA(cc,.18)); g.addColorStop(1,hexA(cc,0));
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cur.x,cur.y,R,0,Math.PI*2); ctx.fill();
+    var u=canvas.toDataURL();
+    reveal.style.maskImage='url('+u+')'; reveal.style.webkitMaskImage='url('+u+')';
+    reveal.style.maskSize='100% 100%'; reveal.style.webkitMaskSize='100% 100%';
+  }
+  function hexA(hex,a){var n=parseInt(hex.slice(1),16),r=(n>>16)&255,gg=(n>>8)&255,b=n&255;return 'rgba('+r+','+gg+','+b+','+a+')';}
+  window.addEventListener('mousemove',function(e){
+    mouse.x=e.clientX; mouse.y=e.clientY;
+    glow.style.left=e.clientX+'px'; glow.style.top=e.clientY+'px';
+  });
+  window.addEventListener('resize',drawMask);
+  function loop(){
+    smooth.x+=(mouse.x-smooth.x)*state.ease; smooth.y+=(mouse.y-smooth.y)*state.ease;
+    cur.x=smooth.x; cur.y=smooth.y; drawMask(); requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  apply();
+})();
+</script>
+</body>
+</html>

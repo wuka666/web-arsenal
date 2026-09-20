@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时间轴演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.tl{display:flex}
+.tl.v{flex-direction:column}
+.tl.h{flex-direction:row;align-items:flex-start}
+.cell{display:flex;align-items:flex-start;gap:12px}
+.tl.h .cell{flex-direction:column;align-items:center;text-align:center;gap:8px}
+.bead{flex:0 0 auto;width:var(--node,18px);height:var(--node,18px);border-radius:50%;border:calc(var(--lw,2px)*1.5) solid var(--mut,#c9ced6);background:#fff;z-index:2}
+.bead.done{background:var(--ac,#2f6bff);border-color:var(--ac,#2f6bff)}
+.bead.cur{background:#fff;border-color:var(--ac,#2f6bff);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac,#2f6bff) 22%,transparent)}
+.txt{font-size:var(--fs,13px);color:#444;padding-top:1px;white-space:nowrap}
+.line{background:var(--mut,#c9ced6)}
+.tl.v .line{width:var(--lw,2px);height:calc(var(--gap,64px) - var(--node,18px));margin-left:calc(var(--node,18px)/2 - var(--lw,2px)/2);margin-top:6px;margin-bottom:6px}
+.tl.v .line.done{background:var(--ac,#2f6bff)}
+.tl.h .line{height:var(--lw,2px);width:var(--gap,64px);margin-top:calc(var(--node,18px)/2 - var(--lw,2px)/2)}
+.tl.h .line.done{background:var(--ac,#2f6bff)}
+</style></head><body>
+<div class="tl v" id="tl"></div>
+<script>
+const tl=document.getElementById('tl');
+const labels=['需求评审','设计定稿','开发','测试','上线','发布'];
+const state={count:4,dir:'纵向',done:2,ac:'#2f6bff',mut:'#c9ced6',lw:2,node:18,gap:64,fs:13};
+function applyStyle(){
+  const root=document.documentElement.style;
+  root.setProperty('--ac',state.ac);root.setProperty('--mut',state.mut);root.setProperty('--lw',state.lw+'px');
+  root.setProperty('--node',state.node+'px');root.setProperty('--gap',state.gap+'px');root.setProperty('--fs',state.fs+'px');
+}
+function build(){
+  tl.className='tl '+(state.dir==='横向'?'h':'v');
+  tl.innerHTML='';
+  for(let i=0;i<state.count;i++){
+    const cell=document.createElement('div');cell.className='cell';
+    const bead=document.createElement('div');bead.className='bead'+(i<state.done?' done':(i===state.done?' cur':''));
+    const txt=document.createElement('div');txt.className='txt';txt.textContent=labels[i%labels.length]||('步骤'+(i+1));
+    cell.appendChild(bead);cell.appendChild(txt);tl.appendChild(cell);
+    if(i<state.count-1){const line=document.createElement('div');line.className='line'+(i<state.done?' done':'');tl.appendChild(line);}
+  }
+}
+function apply(){applyStyle();build();}
+apply();
+// 父页面详情页调参契约：只接受本 demo state 已有的键
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script></body></html>

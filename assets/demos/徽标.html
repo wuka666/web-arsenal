@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>徽标演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.holder{position:relative;width:84px;height:84px;border-radius:18px;background:#eef1f5;display:flex;align-items:center;justify-content:center;font-size:36px;color:#9aa0a6}
+.badge{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--bg,#ef4444);color:var(--fg,#fff);font-size:var(--sz,12px);font-weight:700;line-height:1;padding:var(--pad,4px) calc(var(--pad,4px) + 2px);border-radius:var(--rad,999px);min-width:calc(var(--sz,12px) + var(--pad,4px)*2);box-shadow:0 0 0 2px #fff;white-space:nowrap}
+.badge.dot{width:var(--sz,12px);height:var(--sz,12px);padding:0;min-width:0;border-radius:50%}
+.b-tl{top:0;left:0;transform:translate(-35%,-35%)}
+.b-tr{top:0;right:0;transform:translate(35%,-35%)}
+.b-bl{bottom:0;left:0;transform:translate(-35%,35%)}
+.b-br{bottom:0;right:0;transform:translate(35%,35%)}
+</style></head><body>
+<div class="holder">&#128276;
+<span class="badge" id="badge">3</span>
+</div>
+<script>
+const badge=document.getElementById('badge');
+const state={text:'3',pos:'右上',bg:'#ef4444',fg:'#ffffff',dot:false,sz:12,rad:999,pad:4};
+function applyStyle(){
+  const root=document.documentElement.style;
+  root.setProperty('--bg',state.bg);root.setProperty('--fg',state.fg);root.setProperty('--sz',state.sz+'px');
+  root.setProperty('--rad',state.rad+'px');root.setProperty('--pad',state.pad+'px');
+}
+const map={'左上':'b-tl','右上':'b-tr','左下':'b-bl','右下':'b-br'};
+function build(){
+  badge.className='badge '+(state.dot?'dot ':'')+(map[state.pos]||'b-tr');
+  badge.textContent=state.dot?'':state.text;
+}
+function apply(){applyStyle();build();}
+apply();
+// 父页面详情页调参契约：只接受本 demo state 已有的键
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script></body></html>

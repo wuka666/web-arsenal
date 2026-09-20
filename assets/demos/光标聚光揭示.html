@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>光标聚光揭示 · 单文件 demo</title>
+<style>
+  :root{
+    --di:#0B0D0A;        /* 底层（暗态）背景 */
+    --n1:#B6FF3C;        /* 揭示层霓虹一 */
+    --n2:#E9F2E2;        /* 揭示层霓虹二 */
+    --banjing:170px;     /* 聚光半径 */
+    --rou:42%;           /* 光斑软边 */
+    --mx:56%;            /* 光斑横向位置 */
+    --my:42%;            /* 光斑纵向位置 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);font-family:"Inter","Helvetica Neue",Arial,sans-serif;overflow:hidden}
+  .stack{position:fixed;inset:0}
+  /* 两层同构图场景：底层暗态、顶层霓虹，靠 mask 在光斑处露出顶层 */
+  .scene{position:absolute;inset:0;display:grid;place-content:center;gap:14px;text-align:center;
+        background-image:
+          repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 64px),
+          repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 64px)}
+  .scene b{font-size:clamp(34px,7vw,64px);font-weight:700;letter-spacing:.02em}
+  .scene span{font-size:13px;letter-spacing:.28em}
+  .base{color:rgba(235,240,255,.16)}
+  .top{color:#F2F7FF;
+        background-image:
+          linear-gradient(120deg,color-mix(in srgb,var(--n1) 26%,transparent),color-mix(in srgb,var(--n2) 26%,transparent)),
+          repeating-linear-gradient(0deg,color-mix(in srgb,var(--n1) 33%,transparent) 0 1px,transparent 1px 64px),
+          repeating-linear-gradient(90deg,color-mix(in srgb,var(--n2) 33%,transparent) 0 1px,transparent 1px 64px);
+        text-shadow:0 0 26px color-mix(in srgb,var(--n1) 65%,transparent);
+        -webkit-mask-image:radial-gradient(circle var(--banjing) at var(--mx) var(--my),#000 var(--rou),transparent);
+        mask-image:radial-gradient(circle var(--banjing) at var(--mx) var(--my),#000 var(--rou),transparent)}
+  .hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);font-size:11px;
+        letter-spacing:.18em;color:rgba(235,240,255,.3)}
+</style>
+</head>
+<body>
+<div class="stack">
+  <div class="scene base"><span>SIGNAL IN THE DARK</span><b>Hidden City</b></div>
+  <div class="scene top" id="top"><span>SIGNAL IN THE DARK</span><b>Hidden City</b></div>
+</div>
+<span class="hint">MOVE YOUR CURSOR</span>
+<script>
+(function(){
+  var r=document.documentElement.style;
+  var state={di:'#0B0D0A',n1:'#B6FF3C',n2:'#E9F2E2',banjing:170,rou:42,mx:56,my:42};
+  function apply(){
+    r.setProperty('--di',state.di);
+    r.setProperty('--n1',state.n1);
+    r.setProperty('--n2',state.n2);
+    r.setProperty('--banjing',state.banjing+'px');
+    r.setProperty('--rou',state.rou+'%');
+    r.setProperty('--mx',state.mx+'%');
+    r.setProperty('--my',state.my+'%');
+  }
+  // 光斑位置走 CSS 变量而不是 JS 直接改 mask，保证参数与手写值走同一条通路
+  addEventListener('pointermove',function(e){
+    state.mx=Math.round(e.clientX/innerWidth*1000)/10;
+    state.my=Math.round(e.clientY/innerHeight*1000)/10;
+    apply();
+  });
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

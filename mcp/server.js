@@ -17,7 +17,7 @@ function loadData(file, varName) {
 }
 const ARSENAL = loadData(DATA_PATH, 'WEB_ARSENAL');
 
-const SCHEMES = loadData(SCHEME_PATH, 'WEB_SCHEMES').filter(s => s.id !== 'skeleton-01');
+const SCHEMES = loadData(SCHEME_PATH, 'WEB_SCHEMES');
 
 const server = new McpServer({
   name: 'web-arsenal',
@@ -26,16 +26,16 @@ const server = new McpServer({
 
 server.tool(
   'search_materials',
-  '搜索 Web 灵感弹药库里的素材。可按关键词（标题/标签/说明）或 风格/场景/元素/子类 过滤。返回素材摘要列表（id、标题、分类、标签、一句话说明）。',
+  '搜索 Web 灵感弹药库里的素材。可按关键词（标题/标签/说明）或 适配端/风格/场景/元素 过滤。返回素材摘要列表（id、标题、适配端·元素、标签、一句话说明）。',
   {
     keyword: z.string().optional().describe('模糊关键词，匹配标题/标签/效果说明'),
-    风格: z.string().optional().describe('风格筛选，如 克制简约 / 科技感 / 水墨国风'),
-    场景: z.string().optional().describe('使用场景，如 数据看板 / 落地页 / 手机端网页'),
-    元素: z.string().optional().describe('设计元素，如 动效 / 颜色 / 留白'),
-    子类: z.string().optional().describe('子类，如 进度条 / 弹层 / 粒子'),
+    适配端: z.string().optional().describe('适配端（单选），通用 / PC 端 / 移动端'),
+    风格: z.string().optional().describe('风格（单选），如 极简瑞士 / 科技未来 / 暗色 / 国风水墨 / 玻璃拟态'),
+    场景: z.string().optional().describe('场景（单选），如 落地页·发布页 / 官网·品牌站 / 工具·SaaS / 后台·数据看板 / 内容·阅读 / 电商·预订 / 作品集·叙事'),
+    元素: z.string().optional().describe('元素（单选），动作 / 输入 / 导航 / 反馈 / 数据 / 容器布局 / 媒体 / 文字 / 动效 / 背景氛围'),
     limit: z.number().optional().describe('最多返回条数，默认 20'),
   },
-  ({ keyword, 风格, 场景, 元素, 子类, limit = 20 }) => {
+  ({ keyword, 适配端, 风格, 场景, 元素, limit = 20 }) => {
     let list = ARSENAL;
     if (keyword) {
       const k = keyword.toLowerCase();
@@ -44,16 +44,18 @@ server.tool(
       );
     }
 
-    const hit = (arr, v) => (arr || []).some(x => String(x).includes(v));
+    // 四维标签已是单值字符串（兼容将来改回多值）
+    const asArr = v => Array.isArray(v) ? v : (v ? [v] : []);
+    const hit = (v, dim) => asArr(v).some(x => String(x).includes(dim));
+    if (适配端) list = list.filter(it => hit(it.适配端, 适配端));
     if (风格) list = list.filter(it => hit(it.风格, 风格));
     if (场景) list = list.filter(it => hit(it.场景, 场景));
     if (元素) list = list.filter(it => hit(it.元素, 元素));
-    if (子类) list = list.filter(it => it.子类 === 子类);
     const n = Math.min(Math.max(1, Math.floor(limit) || 20), 50); // 上限 50，防止一次拉全库
     list = list.slice(0, n);
     const text = list.length
       ? list.map(it =>
-          `【${it.id}】${it.标题}（${it.分类}）\n  标签：${(it.标签 || []).join('、')}\n  说明：${it.效果说明 || ''}`
+          `【${it.id}】${it.标题}（${it.适配端 || ''}${it.元素 ? " · " + it.元素 : ""}）\n  标签：${(it.标签 || []).join('、')}\n  说明：${it.效果说明 || ''}`
         ).join('\n\n')
       : '没有匹配的素材。';
     return { content: [{ type: 'text', text }] };
@@ -63,14 +65,14 @@ server.tool(
 server.tool(
   'get_material',
   '按 id 取一条素材的完整内容：效果说明、用法、完整提示词（可复制给 AI 复刻）、可运行代码、可调参数。',
-  { id: z.string().describe('素材 id，如 v128 / w006') },
+  { id: z.string().describe('素材 id，如 M001 / M002') },
   ({ id }) => {
     const it = ARSENAL.find(x => x.id === id);
     if (!it) return { content: [{ type: 'text', text: `找不到 id=${id} 的素材。` }] };
     const params = (it.参数 || []).map(p => `- ${p.键}（${p.名}，${p.类型}）默认=${JSON.stringify(p.默认)}`).join('\n');
     const text = [
       `# ${it.标题} [${it.id}]`,
-      `分类：${it.分类}　标签：${(it.标签 || []).join('、')}`,
+      `适配端：${it.适配端 || ''}　元素：${it.元素 || ''}　风格：${it.风格 || ''}　场景：${it.场景 || ''}　标签：${(it.标签 || []).join('、')}`,
       `\n## 效果说明\n${it.效果说明 || ''}`,
       `\n## 用法\n${it.用法 || ''}`,
       `\n## 可调参数（${it.参数 ? it.参数.length : 0} 个）\n${params || '无'}`,
@@ -110,7 +112,8 @@ server.tool(
   { 风格: z.string().optional(), 场景: z.string().optional() },
   ({ 风格, 场景 }) => {
     let list = ARSENAL;
-    const hit = (arr, v) => (arr || []).some(x => String(x).includes(v));
+    const asA = v => Array.isArray(v) ? v : (v ? [v] : []);
+    const hit = (v, dim) => asA(v).some(x => String(x).includes(dim));
     if (风格) list = list.filter(it => hit(it.风格, 风格));
     if (场景) list = list.filter(it => hit(it.场景, 场景));
     if (!list.length) list = ARSENAL;                       // 条件太苛刻 → 回退全库
@@ -153,10 +156,10 @@ server.tool(
 server.tool(
   'get_scheme',
   '按 id 取一套方案的完整内容：配色占比、布局骨架、重色落点、第一屏内容、删减元素、适用与禁忌、可调参数、Agent 提示词（若有）、完整模板代码、可复用片段。',
-  { id: z.string().describe('方案 id，如 f001 / s207') },
+  { id: z.string().describe('方案 id，如 S01 / S02') },
   ({ id }) => {
     const s = SCHEMES.find(x => x.id === id);
-    if (!s) return { content: [{ type: 'text', text: `找不到方案 id=${id}。方案 id 形如 f001 / s203 / s207。` }] };
+    if (!s) return { content: [{ type: 'text', text: `找不到方案 id=${id}。方案 id 形如 S01–S35（两位数）。` }] };
     const params = (s.参数 || []).map(p => `- ${p.键}（${p.名}，${p.类型}）默认=${JSON.stringify(p.默认)}`).join('\n');
     const color = Object.entries(s.配色 || {}).map(([k, v]) => `${k} ${v}`).join(' / ');
     const text = [

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>玻璃数据卡 · 单文件 demo</title>
+<style>
+  /* 玻璃卡 = 描边 + 背景模糊 + 斜向反光三件套；深度靠这三样，不靠堆阴影 */
+  :root{
+    --di1:#0A1024;       /* 背景渐变起 */
+    --di2:#8FA8E8;       /* 背景渐变止 */
+    --boli:#E8EDF7;      /* 玻璃反光色 */
+    --bian:#8FA8E8;      /* 描边色 */
+    --zhucai:#FF6B4A;    /* 强调色 */
+    --zi:#E8EDF7;        /* 文字色 */
+    --mohu:18px;         /* 背景模糊 */
+    --yuanjiao:22px;     /* 圆角 */
+    --neibian:1px;       /* 描边粗细 */
+    --fanguang:16;       /* 反光强度（%） */
+    --yinying:35;        /* 阴影强度（%） */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:linear-gradient(160deg,var(--di1),var(--di2));display:grid;place-items:center;
+       font-family:"Inter","Helvetica Neue",Arial,sans-serif;color:var(--zi)}
+  .card{position:relative;width:min(88vw,420px);border-radius:var(--yuanjiao);padding:28px;
+        background:rgba(255,255,255,.07);border:var(--neibian) solid var(--bian);
+        -webkit-backdrop-filter:blur(var(--mohu));backdrop-filter:blur(var(--mohu));
+        box-shadow:0 30px 80px rgba(0,0,0,calc(var(--yinying)/100))}
+  /* 左上角斜向反光：玻璃感的来源，越亮越像一块厚玻璃 */
+  .card::before{content:"";position:absolute;inset:0;border-radius:var(--yuanjiao);pointer-events:none;
+        background:linear-gradient(148deg,var(--boli),transparent 44%);opacity:calc(var(--fanguang)/100)}
+  .card>*{position:relative}
+  .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,237,247,.6)}
+  .v{font-size:40px;font-weight:700;margin:6px 0 2px;color:var(--zi)}
+  .d{font-size:13px;color:var(--zhucai)}
+  .card p{margin-top:18px;font-size:13px;line-height:1.6;color:rgba(232,237,247,.68)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="k">Net revenue · Q3</div>
+  <div class="v">$4.82M</div>
+  <div class="d">▲ 18.4% vs last quarter</div>
+  <p>Turn the quarter's numbers into something a team can read at a glance.</p>
+</div>
+<script>
+(function(){
+  var state={di1:'#0A1024',di2:'#8FA8E8',boli:'#E8EDF7',bian:'#8FA8E8',zhucai:'#FF6B4A',zi:'#E8EDF7',
+    mohu:18,yuanjiao:22,neibian:1,fanguang:16,yinying:35};
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['di1','di2','boli','bian','zhucai','zi'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--mohu',state.mohu+'px');
+    r.setProperty('--yuanjiao',state.yuanjiao+'px');
+    r.setProperty('--neibian',state.neibian+'px');
+    r.setProperty('--fanguang',state.fanguang);
+    r.setProperty('--yinying',state.yinying);
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

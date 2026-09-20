@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>车辆互动影棚</title>
+<style>
+  /* 原稿用 Space Grotesk 单字重；离线演示回退系统栈，字重仍只用 400，靠字号与间距做层级 */
+  :root{
+    --cheqi:#E8EBEE;      /* 车漆色 */
+    --yingpeng:#6B879D;   /* 影棚底色 */
+    --tianse:#708FA2;     /* 影棚天光 */
+    --diang:#EDFF39;      /* 热点电光绿 */
+    --mianban:#35586E;    /* 面板底色 */
+    --wenzi:#E1EAF0;      /* 主文字色 */
+    --kuang:3px;          /* 3px 白色外框，参数化 */
+    --yuanjiao:16px;
+    --redian:48px;
+    --biaoti:44px;
+    --tuise:18px;
+    --zi:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--yingpeng);color:var(--wenzi);
+    font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;font-weight:400;
+    font-synthesis:none;-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;min-height:100%;padding:22px 26px 0;
+  }
+  .wrap{width:100%;max-width:1240px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0}
+  header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;font-size:13px;flex:none}
+  .back{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:17px}
+  .wm{font-size:19px;letter-spacing:.16em;color:var(--zi);grid-column:1;justify-self:start;margin-left:54px;position:absolute}
+  .hdmid{color:rgba(225,234,240,.72);justify-self:center}
+  .hdright{color:rgba(225,234,240,.72);justify-self:end}
+  .hdr{display:flex;align-items:center;gap:14px;position:relative}
+
+  .titlerow{flex:none;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin:26px 0 18px}
+  h1{margin:0;font-size:var(--biaoti);font-weight:400;line-height:1.06;letter-spacing:-.01em;color:var(--zi)}
+  .titlerow p{margin:2px 0 0;font-size:13px;line-height:1.5;color:rgba(225,234,240,.72);text-align:right}
+
+  .stagewrap{position:relative;display:flex;flex-direction:column;min-height:0;flex:1}
+  /* 媒体平面固定 1672:941：宽高由 JS 按可用空间算，保证热点百分比与画面严格对齐 */
+  .stage{
+    position:relative;margin:0 auto;aspect-ratio:1672/941;
+    border:var(--kuang) solid var(--zi);border-radius:var(--yuanjiao);
+    background:var(--yingpeng);
+  }
+  /* 圆角交给 canvas 自己裁，这样 dock 能骑在舞台下沿而不被裁掉 */
+  .stage canvas{display:block;width:100%;height:100%;border-radius:calc(var(--yuanjiao) - var(--kuang))}
+
+  .hs{
+    position:absolute;width:var(--redian);height:var(--redian);margin:calc(var(--redian)/-2) 0 0 calc(var(--redian)/-2);
+    border:0;border-radius:50%;background:transparent;padding:0;cursor:pointer;
+    display:grid;place-items:center;
+  }
+  .hs::before{
+    content:"";width:calc(var(--redian)*.28);height:calc(var(--redian)*.28);border-radius:50%;
+    background:var(--diang);box-shadow:0 0 0 calc(var(--redian)*.06) rgba(237,255,57,.35);
+    transition:transform .22s ease;
+  }
+  .hs::after{content:"";position:absolute;width:calc(var(--redian)*.34);height:2px;background:#10190C;transform:rotate(0deg)}
+  .hs .plus2{position:absolute;width:2px;height:calc(var(--redian)*.34);background:#10190C}
+  .hs:hover::before,.hs:focus-visible::before{transform:scale(1.14)}
+  .hs:focus{outline:none}
+  .hs:focus-visible{outline:2px solid var(--diang);outline-offset:3px}
+  .hs .lbl{
+    position:absolute;left:calc(100% + 6px);white-space:nowrap;font-size:12px;padding:2px 8px;border-radius:99px;
+    background:#10190C;color:var(--diang);opacity:0;transform:translateX(-4px);transition:opacity .2s ease,transform .2s ease;
+  }
+  .hs:hover .lbl,.hs:focus-visible .lbl{opacity:1;transform:translateX(0)}
+  .hs[aria-disabled="true"]{pointer-events:none;opacity:.32}
+
+  .dock{
+    position:absolute;left:50%;bottom:-34px;z-index:4;transform:translate(-50%,calc(100% + var(--tuise) + 34px));
+    opacity:0;pointer-events:none;transition:opacity .34s ease,transform .34s ease;
+    display:flex;gap:14px;align-items:center;justify-content:space-between;
+    background:var(--mianban);border:1px solid rgba(255,255,255,.22);border-radius:12px;
+    padding:12px 14px;width:min(94%,440px);
+  }
+  .dock.open{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+  .dock h4{margin:0 0 2px;font-size:13px;font-weight:400;color:var(--zi)}
+  .dock .sub{font-size:11px;line-height:1.4;color:rgba(225,234,240,.66);display:block;max-width:190px}
+  .sw{display:flex;gap:9px;align-items:center}
+  .sw button{
+    width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.4);
+    background:transparent;padding:0;cursor:pointer;position:relative;
+  }
+  .sw button i{position:absolute;inset:3px;border-radius:50%;display:block}
+  .sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--zi)}
+
+  .ft{flex:none;margin-top:20px;padding-bottom:14px;border-top:1px solid rgba(255,255,255,.18);padding-top:14px}
+  .ftgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;font-size:12px;line-height:1.6;color:rgba(225,234,240,.78)}
+  .ftgrid b{display:block;color:var(--zi);font-weight:400;margin-bottom:4px;font-size:12.5px}
+  .fbase{display:flex;justify-content:space-between;gap:16px;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.14);font-size:11px;color:rgba(225,234,240,.6)}
+  .ftgrid.hide{opacity:0;transition:opacity .3s ease}
+
+  .detail{
+    position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transform:scale(1.035);
+    transition:opacity .62s cubic-bezier(.4,0,.2,1),transform .62s cubic-bezier(.4,0,.2,1);
+    background:linear-gradient(180deg,#1E3A50,#2A5069);border-radius:var(--yuanjiao);
+    display:flex;flex-direction:column;justify-content:space-between;padding:26px 28px;
+  }
+  .detail.on{opacity:1;transform:scale(1);pointer-events:auto}
+  .detail canvas{position:absolute;inset:0;width:100%;height:100%}
+  .detail .din{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:26px;height:100%}
+  .detail h2{margin:0 0 10px;font-size:26px;font-weight:400;color:var(--zi)}
+  .detail p{margin:0 0 14px;font-size:13px;line-height:1.6;color:rgba(225,234,240,.8);max-width:44ch}
+  .cmp{border-top:1px solid rgba(255,255,255,.2)}
+  .cmp button{
+    display:flex;width:100%;gap:12px;align-items:baseline;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.14);
+    padding:9px 2px;color:var(--wenzi);font:inherit;font-size:12.5px;text-align:left;cursor:pointer;
+  }
+  .cmp button:hover{color:var(--zi)}
+  .cmp button b{font-weight:400;color:var(--diang);font-size:11px;min-width:52px}
+  .cmp .more{display:none;font-size:12px;line-height:1.55;color:rgba(225,234,240,.72);padding:4px 2px 12px}
+  .cmp button[aria-expanded="true"] + .more{display:block}
+  .dclose{position:absolute;right:20px;top:18px;z-index:3;background:rgba(255,255,255,.14);border:0;color:var(--zi);
+    width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:15px}
+  .dstatus{position:relative;z-index:2;font-size:11px;color:rgba(225,234,240,.6)}
+
+  @media (max-width:900px){
+    body{padding:16px 20px 0}
+    .titlerow{flex-direction:column;gap:8px}
+    .titlerow p{text-align:left}
+    .ftgrid{grid-template-columns:1fr 1fr}
+    .detail .din{grid-template-columns:1fr}
+  }
+  @media (max-height:780px){
+    /* 桌面矮屏：技术描述流到媒体下方，媒体本身不缩放、不位移 */
+    .detail .din{grid-template-columns:1fr}
+    .detail .din > div{max-width:58%}   /* 给右侧线稿留白，避免折叠行的分隔线穿过剖面图 */
+    .detail .din > div:last-child{overflow:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hdr">
+      <span class="back">←</span>
+      <span class="wm">AXION</span>
+    </div>
+    <span class="hdmid">Concept study · 概念研究</span>
+    <span class="hdright">Independent study</span>
+  </header>
+
+  <div class="titlerow">
+    <h1>Built quiet, built deep.</h1>
+    <p>Turn it inside out.<br />Pick a point to start.</p>
+  </div>
+
+  <div class="stagewrap">
+    <div class="stage" id="stage">
+      <canvas id="cv"></canvas>
+      <button class="hs" data-sys="drive" style="left:30%;top:56%" aria-label="Drive"><span class="plus2"></span><span class="lbl">Drive</span></button>
+      <button class="hs" data-sys="battery" style="left:51%;top:72%" aria-label="Battery"><span class="plus2"></span><span class="lbl">Battery</span></button>
+      <button class="hs" data-sys="paint" style="left:56%;top:55%" aria-label="Paint"><span class="plus2"></span><span class="lbl">Paint</span></button>
+      <button class="hs" data-sys="wheels" style="left:70%;top:63%" aria-label="Wheels"><span class="plus2"></span><span class="lbl">Wheels</span></button>
+      <!-- dock 挂在舞台内部：它的 bottom 必须相对媒体平面算，挂在外层会掉到页面底部去 -->
+      <div class="dock" id="dock" role="group" aria-label="Appearance">
+        <div>
+          <h4 id="dockTitle">Paint</h4>
+          <span class="sub" id="dockSub">Returning to exterior…</span>
+        </div>
+        <div class="sw" id="sw"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ft">
+    <div class="ftgrid" id="ftgrid">
+      <div><b>Drive unit</b>One motor per axle,<br />torque shaped in software.</div>
+      <div><b>Battery frame</b>Structural pack,<br />cells laid into the floor.</div>
+      <div><b>Surface</b>Five studio paints,<br />matched with matte trim.</div>
+      <div><b>Wheels</b>Multi-spoke, aero disc,<br />forged sport.</div>
+    </div>
+    <div class="fbase"><span>AXION — Design study</span><span id="fnote">Shown closed, body panels in place.</span></div>
+  </footer>
+</div>
+
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="dtitle">
+  <canvas id="dcanvas"></canvas>
+  <button class="dclose" id="dclose" aria-label="Back to overview">✕</button>
+  <div class="din">
+    <div>
+      <h2 id="dtitle">Drive</h2>
+      <p id="ddesc"></p>
+      <div class="cmp" id="dcmp"></div>
+    </div>
+    <div>
+      <p id="dnote"></p>
+    </div>
+  </div>
+  <div class="dstatus" id="dstatus" role="status"></div>
+</div>
+
+<script>
+(function(){
+  var q = function(s){ return document.querySelector(s); };
+  var cv = q('#cv'), ctx = cv.getContext('2d');
+  var stage = q('#stage'), stagewrap = q('.stagewrap'), dock = q('#dock'), swbox = q('#sw'), ftgrid = q('#ftgrid');
+
+  var state = {
+    cheqi:'#E8EBEE', yingpeng:'#6B879D', tianse:'#708FA2', diang:'#EDFF39',
+    mianban:'#35586E', wenzi:'#E1EAF0',
+    kuang:3, yuanjiao:16, redian:48, biaoti:44, kaihe:700, tuise:18
+  };
+  var VAR = { cheqi:'--cheqi', yingpeng:'--yingpeng', tianse:'--tianse', diang:'--diang',
+              mianban:'--mianban', wenzi:'--wenzi' };
+  function apply(){
+    var r = document.documentElement.style;
+    Object.keys(VAR).forEach(function(k){ r.setProperty(VAR[k], state[k]); });
+    r.setProperty('--kuang', state.kuang + 'px');
+    r.setProperty('--yuanjiao', state.yuanjiao + 'px');
+    r.setProperty('--redian', state.redian + 'px');
+    r.setProperty('--biaoti', state.biaoti + 'px');
+    r.setProperty('--tuise', state.tuise + 'px');
+    fitStage(); render(); renderDetail();
+  }
+  window.addEventListener('message', function(e){
+    var d = e.data; if(!d || d.type !== 'param') return;
+    if(!(d.key in state)) return;
+    state[d.key] = d.value; apply();
+  });
+
+  /* ---------- 影棚车辆：canvas 离线绘制（原稿为摄影棚图 + 两段 mp4） ---------- */
+  var PAINTS = ['#E8EBEE','#B9E36B','#9FD47A','#9FC0DA','#5C666E'];
+  var WHEELS = ['multi','aero','forged'];
+  var paint = 0, wheel = 1;
+
+  var pose = { hood:0, battery:0 };      // 当前稳定姿态
+  var W = 1672, H = 941;                 // 舞台设计空间（原稿媒体平面比例 1672:941）
+
+  function shade(hex, k){
+    var n = parseInt(hex.slice(1), 16), r = (n>>16)&255, g = (n>>8)&255, b = n&255;
+    var f = function(v){ return Math.max(0, Math.min(255, Math.round(v * k))); };
+    return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')';
+  }
+
+  function paintCar(g, s, o){
+    // o: {hood, battery, paint, wheel}
+    g.clearRect(0,0,W,H);
+    g.save(); g.translate(0, -30);   // 设计空间里车身偏下，整体上移让车落在 1672×941 媒体平面中央
+    var body = o.paint, dark = shade(body, .56), light = shade(body, 1.1);
+    var fw = {x:500, y:592}, rw = {x:1180, y:592};   // 前后轮心（同时是轮拱圆心）
+    var wheelR = 110, archR = 133, base = 612;       // 轮半径 / 轮拱半径 / 车身下沿
+
+    // 车身剪影：低趴溜背 —— 前唇 → 引擎盖 → A 柱 → 车顶 → C 柱 → 尾部
+    function bodyPath(p){
+      p.beginPath();
+      p.moveTo(212, base);
+      p.bezierCurveTo(206, 566, 230, 528, 292, 506);      // 前唇上翘
+      p.bezierCurveTo(360, 484, 460, 480, 566, 478);      // 引擎盖
+      p.bezierCurveTo(632, 476, 672, 462, 706, 430);      // 盖尾 → 风挡根
+      p.bezierCurveTo(752, 380, 800, 336, 872, 318);      // A 柱
+      p.bezierCurveTo(966, 296, 1076, 296, 1152, 320);    // 车顶
+      p.bezierCurveTo(1230, 344, 1292, 388, 1338, 440);   // C 柱
+      p.bezierCurveTo(1382, 488, 1420, 540, 1444, 580);   // 尾上段
+      p.bezierCurveTo(1462, 600, 1472, 606, 1474, base);  // 尾下段
+      p.closePath();
+    }
+
+    // 车身层：先画满，细节贴着车漆走，最后再给轮拱打孔（轮子透过拱洞露出来）
+    var layer = document.createElement('canvas'); layer.width = W; layer.height = H;
+    var lg = layer.getContext('2d');
+    bodyPath(lg);
+    var grd = lg.createLinearGradient(0, 290, 0, 640);
+    grd.addColorStop(0, light); grd.addColorStop(.42, body); grd.addColorStop(1, dark);
+    lg.fillStyle = grd; lg.fill();
+
+    // 之后的细节一律限制在剪影内，超出车漆的部分自动被丢弃
+    lg.globalCompositeOperation = 'source-atop';
+
+    // 影棚顶灯的横向反射带 —— 车漆光泽主要来自这里
+    var refl = lg.createLinearGradient(0, 320, 0, 620);
+    refl.addColorStop(0,   'rgba(255,255,255,0)');
+    refl.addColorStop(.16, 'rgba(255,255,255,.58)');
+    refl.addColorStop(.28, 'rgba(255,255,255,.10)');
+    refl.addColorStop(.44, 'rgba(255,255,255,.72)');
+    refl.addColorStop(.56, 'rgba(255,255,255,.14)');
+    refl.addColorStop(.76, 'rgba(255,255,255,.30)');
+    refl.addColorStop(1,   'rgba(255,255,255,0)');
+    lg.fillStyle = refl; lg.fillRect(150, 280, 1400, 380);
+
+    // 侧窗带：前挡、侧窗、后窗连成一条深色暗带
+    lg.beginPath();
+    lg.moveTo(716, 438);
+    lg.bezierCurveTo(760, 390, 808, 352, 878, 336);
+    lg.bezierCurveTo(968, 316, 1066, 318, 1138, 342);
+    lg.bezierCurveTo(1204, 364, 1256, 400, 1294, 440);
+    lg.closePath();
+    lg.fillStyle = 'rgba(20,32,42,.84)'; lg.fill();
+    lg.beginPath(); lg.moveTo(716, 440); lg.quadraticCurveTo(1010, 458, 1296, 444);
+    lg.strokeStyle = 'rgba(255,255,255,.5)'; lg.lineWidth = 2.2; lg.stroke();
+
+    // 门缝
+    lg.strokeStyle = 'rgba(26,40,52,.5)'; lg.lineWidth = 2;
+    lg.beginPath(); lg.moveTo(712, 432); lg.bezierCurveTo(716, 500, 716, 560, 712, 612); lg.stroke();
+    lg.beginPath(); lg.moveTo(1126, 350); lg.bezierCurveTo(1134, 470, 1138, 550, 1140, 612); lg.stroke();
+
+    // 腰线：一条从前灯贯穿到尾灯的高光折线
+    lg.beginPath(); lg.moveTo(248, 594); lg.bezierCurveTo(560, 566, 980, 560, 1440, 596);
+    lg.strokeStyle = 'rgba(255,255,255,.32)'; lg.lineWidth = 2.6; lg.stroke();
+
+    // 侧裙暗部，把车身下沿压住
+    var skirt = lg.createLinearGradient(0, 568, 0, 616);
+    skirt.addColorStop(0, 'rgba(18,28,38,0)'); skirt.addColorStop(1, 'rgba(18,28,38,.5)');
+    lg.fillStyle = skirt; lg.fillRect(150, 566, 1400, 52);
+
+    // 后视镜伸出车外，需切回普通合成
+    lg.globalCompositeOperation = 'source-over';
+    lg.beginPath();
+    lg.moveTo(700, 448); lg.bezierCurveTo(680, 432, 656, 430, 648, 442);
+    lg.bezierCurveTo(642, 454, 656, 464, 676, 462); lg.closePath();
+    lg.fillStyle = shade(body, .82); lg.fill();
+
+    // 轮廓描边要在挖拱之前画，否则会留下一条横穿轮拱的直线
+    bodyPath(lg); lg.strokeStyle = 'rgba(255,255,255,.34)'; lg.lineWidth = 1.6; lg.stroke();
+
+    lg.globalCompositeOperation = 'destination-out';
+    lg.beginPath(); lg.arc(fw.x, fw.y, archR, 0, Math.PI*2); lg.fill();
+    lg.beginPath(); lg.arc(rw.x, rw.y, archR, 0, Math.PI*2); lg.fill();
+    lg.globalCompositeOperation = 'source-over';
+
+    g.drawImage(layer, 0, 0);
+
+    // 轮子：轮胎 → 制动盘 → 三款轮毂之一
+    [fw, rw].forEach(function(w){
+      g.save(); g.translate(w.x, w.y);
+      g.beginPath(); g.arc(0,0,wheelR,0,Math.PI*2); g.fillStyle = '#15181B'; g.fill();
+      g.beginPath(); g.arc(0,0,wheelR*.78,0,Math.PI*2); g.fillStyle = '#20252A'; g.fill();
+      g.beginPath(); g.arc(0,0,wheelR*.46,0,Math.PI*2); g.fillStyle = '#454E55'; g.fill();
+      var style = WHEELS[o.wheel];
+      if(style === 'multi'){
+        g.strokeStyle = '#AEB7BE'; g.lineWidth = 5; g.lineCap = 'round';
+        for(var i=0;i<10;i++){
+          g.save(); g.rotate(i*Math.PI/5);
+          g.beginPath(); g.moveTo(0,-wheelR*.24); g.lineTo(0,-wheelR*.66); g.stroke(); g.restore();
+        }
+      } else if(style === 'aero'){
+        // 空气动力学盘面：整片盖住辐条，只留中心孔与五道散热缝
+        g.beginPath(); g.arc(0,0,wheelR*.7,0,Math.PI*2); g.fillStyle = '#C4CDD4'; g.fill();
+        g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = 2; g.stroke();
+        g.fillStyle = '#2A3136';
+        for(var k=0;k<5;k++){
+          g.save(); g.rotate(k*Math.PI*2/5);
+          g.beginPath(); g.ellipse(0,-wheelR*.42,wheelR*.09,wheelR*.16,0,0,Math.PI*2); g.fill(); g.restore();
+        }
+      } else {
+        // 锻造轮：五根粗辐条
+        g.fillStyle = '#B6BEC5';
+        for(var j=0;j<5;j++){
+          g.save(); g.rotate(j*Math.PI*2/5);
+          g.beginPath(); g.moveTo(-wheelR*.16,-wheelR*.2); g.lineTo(wheelR*.16,-wheelR*.2);
+          g.lineTo(wheelR*.07,-wheelR*.68); g.lineTo(-wheelR*.07,-wheelR*.68); g.closePath(); g.fill(); g.restore();
+        }
+      }
+      g.beginPath(); g.arc(0,0,wheelR*.17,0,Math.PI*2); g.fillStyle = '#E3E8EB'; g.fill();
+      g.beginPath(); g.arc(0,0,wheelR*.07,0,Math.PI*2); g.fillStyle = '#5A646B'; g.fill();
+      g.restore();
+    });
+
+    // 前灯带（贯穿式 LED）与尾灯：shadowBlur 充当光晕，省掉外部发光贴图
+    g.save(); g.lineCap = 'round';
+    g.shadowColor = 'rgba(198,238,255,.95)'; g.shadowBlur = 26;
+    g.strokeStyle = '#EDF9FF'; g.lineWidth = 7;
+    g.beginPath(); g.moveTo(236, 570); g.bezierCurveTo(312, 550, 402, 546, 476, 552); g.stroke();
+    g.strokeStyle = '#FF6E80'; g.shadowColor = 'rgba(255,96,120,.9)';
+    g.beginPath(); g.moveTo(1244, 590); g.bezierCurveTo(1324, 572, 1404, 572, 1450, 590); g.stroke();
+    g.restore();
+
+    // 前舱盖：铰链在风挡根部，掀起后先露前备厢腔体，再把盖板压上去
+    var t = o.hood, hx = 706, hy = 432;
+    if(t > .02){
+      g.save(); g.globalAlpha = Math.min(1, t * 1.5);
+      g.beginPath();
+      g.moveTo(296, 606); g.bezierCurveTo(300, 556, 320, 524, 366, 510);
+      g.bezierCurveTo(440, 492, 566, 480, hx, hy + 2);
+      g.lineTo(hx, 606); g.closePath();
+      g.fillStyle = '#0F171E'; g.fill();
+      g.beginPath(); g.ellipse(470, 560, 130, 30, 0, 0, Math.PI*2);
+      g.fillStyle = 'rgba(178,196,208,.22)'; g.fill();
+      g.beginPath(); g.moveTo(366, 510); g.bezierCurveTo(440, 492, 566, 480, hx, hy + 2);
+      g.strokeStyle = 'rgba(206,220,228,.5)'; g.lineWidth = 2; g.stroke();
+      g.restore();
+    }
+    g.save(); g.translate(hx, hy); g.rotate(-t * .8);
+    g.beginPath();
+    g.moveTo(-4, 0); g.bezierCurveTo(-130, -6, -282, 2, -420, 38);
+    g.lineTo(-410, 92); g.bezierCurveTo(-278, 54, -128, 44, -4, 48);
+    g.closePath();
+    var hg = g.createLinearGradient(-420, 0, 0, 60);
+    hg.addColorStop(0, light); hg.addColorStop(.5, body); hg.addColorStop(1, shade(body,.86));
+    g.fillStyle = hg; g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.42)'; g.lineWidth = 1.4; g.stroke();
+    g.restore();
+
+    // 电池：结构包从地板下方滑出，露出电芯阵列
+    var b = o.battery;
+    if(b > .02){
+      g.save(); g.globalAlpha = Math.min(1, b * 1.3);
+      g.translate(0, (1 - b) * 24);
+      var bx = 520, by = 632, bw = 680, bh = 94;
+      g.beginPath();
+      if(g.roundRect) g.roundRect(bx, by, bw, bh, 12); else g.rect(bx, by, bw, bh);
+      g.fillStyle = 'rgba(20,32,42,.92)'; g.fill();
+      g.strokeStyle = 'rgba(159,216,231,.7)'; g.lineWidth = 1.5; g.stroke();
+      for(var r2=0;r2<3;r2++){
+        for(var c2=0;c2<10;c2++){
+          g.fillStyle = 'rgba(159,216,231,' + (0.18 + 0.5*Math.abs(Math.sin((r2*10+c2)*.5))) + ')';
+          g.fillRect(bx + 18 + c2*64, by + 14 + r2*27, 52, 19);
+        }
+      }
+      g.restore();
+    }
+    // 地面投影
+    g.beginPath(); g.ellipse(846, 712, 610, 32, 0, 0, Math.PI*2);
+    g.fillStyle = 'rgba(20,32,42,.4)'; g.fill();
+    g.restore();
+  }
+
+  function fitStage(){
+    var availW = stagewrap.clientWidth, availH = stagewrap.clientHeight;
+    var h = Math.min(availH, availW * H / W);
+    if(h < 120) h = 120;
+    stage.style.height = Math.round(h) + 'px';
+    stage.style.width = Math.round(h * W / H) + 'px';
+  }
+  function render(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = stage.clientWidth, h = stage.clientHeight;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr * (w / W), 0, 0, dpr * (w / W), 0, 0);
+    var bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, state.tianse); bg.addColorStop(.62, state.yingpeng); bg.addColorStop(1, shade(state.yingpeng, .82));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // 影棚地台亮斑，给车一点「被照亮」的理由
+    var fl = ctx.createRadialGradient(846, 690, 20, 846, 690, 660);
+    fl.addColorStop(0, 'rgba(255,255,255,.18)'); fl.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = fl; ctx.fillRect(0, 400, W, H - 400);
+    paintCar(ctx, W, { hood:pose.hood, battery:pose.battery, paint:PAINTS[paint], wheel:wheel });
+  }
+
+  /* ---------- 两段式帧播放：正向段播完才反向，交接处定格在最后一帧 ---------- */
+  var seg = null;   // {sys, dir, from, to, t0}
+  function play(sys, dir){
+    if(mode !== 'overview') return;
+    var key = sys === 'drive' ? 'hood' : 'battery';
+    var from = pose[key], to = dir === 'fwd' ? 1 : 0;
+    if(seg && seg.sys === sys && seg.dir === dir) return;
+    if(seg){
+      // 换目标不叠播：另一系统只在当前段播完后才接手
+      var busy = seg.dir === 'fwd' ? pose[seg.key] < .999 : pose[seg.key] > .001;
+      if(busy && seg.sys !== sys) { pending = {sys:sys, dir:dir}; return; }
+      if(seg.sys === sys && seg.dir === 'fwd' && dir === 'rev' && pose[key] < .999) pending = {sys:sys, dir:dir};
+    }
+    seg = { sys:sys, key:key, dir:dir, from:from, to:to, t0:performance.now() };
+  }
+  var pending = null;
+  function tick(now){
+    if(seg){
+      var p = Math.min(1, (now - seg.t0) / Math.max(120, state.kaihe));
+      var e = p < .5 ? 2*p*p : 1 - Math.pow(-2*p+2, 2)/2;
+      pose[seg.key] = seg.from + (seg.to - seg.from) * e;
+      render();
+      if(p >= 1){
+        pose[seg.key] = seg.to;
+        var s = pending; pending = null;
+        if(s){ seg = null; play(s.sys, s.dir); } else { seg = null; checkNeutral(); }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---------- 外观配置 ---------- */
+  var mode = 'overview';        // overview | entering | detail | returning | configuring
+  var config = null;            // 'paint' | 'wheels'
+  var hoverSys = null;
+  function checkNeutral(){
+    if(config && pose.hood < .01 && pose.battery < .01){
+      q('#dockSub').textContent = config === 'paint' ? 'Five studio paints.' : 'Three forged and cast designs.';
+    }
+  }
+  function openDock(which){
+    if(mode !== 'overview') return;
+    mode = 'configuring'; config = which;
+    hoverSys = null; pose.hood = 0; pose.battery = 0; seg = null; pending = null;
+    render();
+    q('#dockTitle').textContent = which === 'paint' ? 'Paint' : 'Wheels';
+    q('#dockSub').textContent = 'Returning to exterior…';
+    setTimeout(function(){ checkNeutral(); }, 260);
+    swbox.innerHTML = '';
+    var list = which === 'paint' ? PAINTS : null;
+    if(list){
+      list.forEach(function(c, i){
+        var b = document.createElement('button');
+        b.setAttribute('aria-label', 'Paint ' + (i+1));
+        b.setAttribute('aria-pressed', i === paint ? 'true' : 'false');
+        b.innerHTML = '<i style="background:' + c + '"></i>';
+        b.addEventListener('click', function(){
+          paint = i; [].forEach.call(swbox.children, function(n,k){ n.setAttribute('aria-pressed', k === i ? 'true':'false'); });
+          render();
+        });
+        swbox.appendChild(b);
+      });
+    } else {
+      ['Multi','Aero','Forged'].forEach(function(n, i){
+        var b = document.createElement('button');
+        b.setAttribute('aria-label', n); b.setAttribute('aria-pressed', i === wheel ? 'true':'false');
+        b.style.cssText = 'width:auto;padding:0 10px;height:26px;border-radius:99px;font:inherit;font-size:11px;color:var(--wenzi)';
+        b.textContent = n;
+        b.addEventListener('click', function(){
+          wheel = i; [].forEach.call(swbox.children, function(n2,k){ n2.setAttribute('aria-pressed', k === i ? 'true':'false'); });
+          render();
+        });
+        swbox.appendChild(b);
+      });
+    }
+    dock.classList.add('open');
+    ftgrid.classList.add('hide');
+    setOthersDisabled(true);
+  }
+  function closeDock(){
+    if(mode !== 'configuring') return;
+    dock.classList.remove('open'); ftgrid.classList.remove('hide');
+    config = null; mode = 'overview'; setOthersDisabled(false);
+  }
+  function setOthersDisabled(on){
+    [].forEach.call(document.querySelectorAll('.hs'), function(b){
+      var s = b.dataset.sys;
+      var mine = config && ((config === 'paint' && s === 'paint') || (config === 'wheels' && s === 'wheels'));
+      b.setAttribute('aria-disabled', on && !mine ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- 详情视图 ---------- */
+  var DETAILS = {
+    drive: {
+      title:'Drive',
+      desc:'One unit per axle, both fed from the same thermal loop. Torque is metered in software, so the hardware layout never has to argue with the driver.',
+      rows:[
+        ['FRONT','Compact module sits above the axle, keeping the front luggage volume clear.','front drive module'],
+        ['REAR','The rear unit carries the axle and the inverter in one housing.','rear drive unit'],
+        ['HEAT','A single coolant circuit serves both units and the pack.','thermal loop']
+      ],
+      note:'Because both axles are independently driven, the car can be tuned after delivery — the balance you feel is a calibration, not a part.'
+    },
+    battery: {
+      title:'Battery',
+      desc:'A structural pack bonded to the floor. The cells carry load, so the floor can be thinner and the seating position lower.',
+      rows:[
+        ['PACK','Cell-to-body construction, no separate module trays.','structural pack'],
+        ['FLOOR','The pack is the floor: it takes torsion and seals the cabin.','load-bearing floor'],
+        ['SERVICE','Disconnect sits behind the rear seat, reachable without dropping the pack.','service disconnect']
+      ],
+      note:'Charging is metered against pack temperature rather than a fixed curve, so a cold morning does not silently cost you range.'
+    }
+  };
+  var dcanvas = q('#dcanvas'), dctx = dcanvas.getContext('2d');
+  var detail = q('#detail'), curDetail = null;
+  function renderDetail(){
+    if(!detail.classList.contains('on')) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = detail.clientWidth, h = detail.clientHeight;
+    dcanvas.width = Math.round(w*dpr); dcanvas.height = Math.round(h*dpr);
+    dctx.setTransform(dpr,0,0,dpr,0,0);
+    dctx.clearRect(0,0,w,h);
+    // 矮屏下 .din 塌成单列、文字纵向铺满，线稿改到右侧竖排，避免压在正文上
+    var narrow = h < 700;
+    dctx.strokeStyle = 'rgba(190,222,238,.5)'; dctx.lineWidth = 1;
+    dctx.font = '11px "Space Grotesk",Arial'; dctx.fillStyle = 'rgba(225,234,240,.55)';
+    if(curDetail === 'drive'){
+      // 线稿剖面：前后两个驱动单元 + 共享热管理回路
+      if(narrow){
+        var nx = w*.82, nr = Math.min(58, w*.06);
+        [[.26,'Front unit'],[.62,'Rear unit']].forEach(function(p){
+          var y = h*p[0];
+          dctx.beginPath(); dctx.arc(nx, y, nr, 0, Math.PI*2); dctx.stroke();
+          dctx.beginPath(); dctx.arc(nx, y, nr*.55, 0, Math.PI*2); dctx.stroke();
+          dctx.fillText(p[1], nx - 26, y + nr + 14);
+        });
+        dctx.beginPath(); dctx.moveTo(nx, h*.26 + nr); dctx.lineTo(nx, h*.62 - nr);
+        dctx.setLineDash([6,6]); dctx.stroke(); dctx.setLineDash([]);
+      } else {
+        dctx.beginPath(); dctx.moveTo(w*.06,h*.72); dctx.lineTo(w*.94,h*.72); dctx.stroke();
+        [[.2,'Front unit'],[.68,'Rear unit']].forEach(function(p){
+          var x = w*p[0], y = h*.52;
+          dctx.beginPath(); dctx.arc(x+.05*w, y, Math.min(78, w*.07), 0, Math.PI*2); dctx.stroke();
+          dctx.beginPath(); dctx.arc(x+.05*w, y, Math.min(44, w*.04), 0, Math.PI*2); dctx.stroke();
+          dctx.fillText(p[1], x + .05*w - 28, y + 96);
+        });
+        dctx.beginPath(); dctx.moveTo(w*.25,h*.52); dctx.lineTo(w*.73,h*.52);
+        dctx.setLineDash([6,6]); dctx.stroke(); dctx.setLineDash([]);
+        dctx.fillText('shared coolant circuit', w*.42, h*.49);
+      }
+    } else {
+      var bw = w*(narrow ? .3 : .72), bx = narrow ? w*.68 : (w-bw)/2;
+      var by = h*(narrow ? .5 : .42), bh = h*(narrow ? .3 : .26);
+      dctx.beginPath(); dctx.rect(bx,by,bw,bh); dctx.stroke();
+      for(var r=0;r<3;r++) for(var c=0;c<14;c++){
+        dctx.strokeStyle = 'rgba(159,216,231,' + (.25 + .5*Math.abs(Math.sin((r*14+c)*.7))) + ')';
+        dctx.strokeRect(bx+8+c*(bw-16)/14, by+8+r*(bh-16)/3, (bw-16)/14-6, (bh-16)/3-6);
+      }
+      dctx.strokeStyle = 'rgba(190,222,238,.5)';
+      dctx.fillText('cell-to-body pack', bx, by - 10);
+      var mmx = bx + bw/2;
+      dctx.beginPath(); dctx.moveTo(mmx, by+bh); dctx.lineTo(mmx, by+bh+26); dctx.stroke();
+      dctx.fillText('floor', mmx + 8, by+bh+22);
+    }
+  }
+  function openDetail(which){
+    if(mode !== 'overview') return;
+    curDetail = which; mode = 'entering';
+    // 进入前先定格当前悬停帧，等不透明剖面盖住之后再复位
+    seg = null; pending = null;
+    var d = DETAILS[which];
+    q('#dtitle').textContent = d.title;
+    q('#ddesc').textContent = d.desc;
+    q('#dnote').textContent = d.note;
+    var cmp = q('#dcmp'); cmp.innerHTML = '';
+    d.rows.forEach(function(row){
+      var b = document.createElement('button');
+      b.setAttribute('aria-expanded','false');
+      b.innerHTML = '<b>' + row[0] + '</b><span>' + row[2] + '</span>';
+      b.addEventListener('click', function(){ b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') === 'true' ? 'false':'true'); });
+      var m = document.createElement('div'); m.className = 'more'; m.textContent = row[1];
+      cmp.append(b, m);
+    });
+    q('#dstatus').textContent = d.title + ' detail opened. Press Escape or Back to return to the overview.';
+    detail.classList.add('on');
+    setTimeout(function(){ renderDetail(); }, 30);
+    setTimeout(function(){
+      if(mode !== 'entering') return;
+      pose.hood = 0; pose.battery = 0; render();   // 交接完成后再复位
+      mode = 'detail';
+      q('#dclose').focus();
+    }, 640);
+  }
+  function closeDetail(){
+    if(mode !== 'detail' && mode !== 'entering') return;
+    mode = 'returning';
+    detail.classList.remove('on');
+    q('#dstatus').textContent = 'Returned to the overview.';
+    setTimeout(function(){
+      if(mode !== 'returning') return;
+      mode = 'overview'; curDetail = null;
+      document.querySelector('.hs[data-sys="drive"]').focus();
+    }, 660);
+  }
+  q('#dclose').addEventListener('click', closeDetail);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      if(mode === 'detail' || mode === 'entering') closeDetail();
+      else if(mode === 'configuring') closeDock();
+    }
+  });
+
+  /* ---------- 指针 ---------- */
+  [].forEach.call(document.querySelectorAll('.hs'), function(btn){
+    var sys = btn.dataset.sys;
+    btn.addEventListener('pointerenter', function(){
+      if(mode !== 'overview') return;
+      if(sys === 'drive' || sys === 'battery') play(sys, 'fwd');
+    });
+    btn.addEventListener('focus', function(){
+      if(mode !== 'overview') return;
+      if(sys === 'drive' || sys === 'battery') play(sys, 'fwd');
+    });
+    btn.addEventListener('pointerleave', function(){
+      if(mode !== 'overview') return;
+      if(sys === 'drive' || sys === 'battery') play(sys, 'rev');
+    });
+    btn.addEventListener('blur', function(){
+      if(mode !== 'overview') return;
+      if(sys === 'drive' || sys === 'battery') play(sys, 'rev');
+    });
+    btn.addEventListener('click', function(){
+      if(mode === 'configuring'){ if(config === sys) closeDock(); return; }
+      if(mode !== 'overview') return;
+      if(sys === 'drive' || sys === 'battery') openDetail(sys);
+      else openDock(sys);
+    });
+  });
+  document.addEventListener('pointerdown', function(e){
+    if(mode !== 'configuring') return;
+    if(e.target.closest('#dock') || e.target.closest('.hs')) return;
+    closeDock();
+  });
+
+  var rt = null;
+  window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ fitStage(); render(); renderDetail(); }, 120); });
+
+  apply();
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    // 减弱动效：直接显示终态，不做两段播放
+    play = function(sys, dir){
+      if(mode !== 'overview') return;
+      var key = sys === 'drive' ? 'hood' : 'battery';
+      pose[key] = dir === 'fwd' ? 1 : 0; render();
+    };
+  }
+})();
+</script>
+</body>
+</html>

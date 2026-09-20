@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>漂浮光斑背景 · 单文件 demo</title>
+<style>
+  :root{
+    --di:#141B2B;        /* 底色 */
+    --g1:#B4462F;        /* 光斑一 */
+    --g2:#E8E0CE;        /* 光斑二 */
+    --g3:#2B3448;        /* 光斑三 */
+    --mohu:70px;         /* 光斑模糊半径 */
+    --sudu:18s;          /* 一轮漂移时长 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);overflow:hidden;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .field{position:fixed;inset:0}
+  .blob{position:absolute;border-radius:50%;filter:blur(var(--mohu));opacity:.5;
+        animation:piao var(--sudu) ease-in-out infinite alternate}
+  .blob:nth-child(1){width:340px;height:340px;left:8%;top:14%;background:var(--g1)}
+  .blob:nth-child(2){width:280px;height:280px;right:10%;top:30%;background:var(--g2);animation-delay:calc(var(--sudu)/-3)}
+  .blob:nth-child(3){width:240px;height:240px;left:40%;bottom:6%;background:var(--g3);animation-delay:calc(var(--sudu)/-2)}
+  /* 漂移幅度用固定换算，别绑参数，避免用户改时长把位移也改没 */
+  @keyframes piao{
+    from{transform:translate(0,0) scale(1)}
+    to{transform:translate(60px,-44px) scale(1.12)}
+  }
+  .title{position:fixed;left:50%;top:38%;transform:translateX(-50%);text-align:center;color:#E8E0CE;z-index:2}
+  .title b{font-size:clamp(30px,5.5vw,54px);font-weight:700;letter-spacing:-.01em}
+  .title span{display:block;margin-top:12px;font-size:12px;letter-spacing:.3em;color:rgba(232,224,206,.55)}
+  @media (prefers-reduced-motion:reduce){.blob{animation:none}}
+</style>
+</head>
+<body>
+<div class="field">
+  <span class="blob"></span><span class="blob"></span><span class="blob"></span>
+</div>
+<div class="title"><b>Studio, off the clock</b><span>DRIFTING GLOW FIELD</span></div>
+<script>
+(function(){
+  var r=document.documentElement.style;
+  var state={di:'#141B2B',g1:'#B4462F',g2:'#E8E0CE',g3:'#2B3448',mohu:70,sudu:18};
+  function apply(){
+    ['di','g1','g2','g3'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--mohu',state.mohu+'px');
+    r.setProperty('--sudu',state.sudu+'s');
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

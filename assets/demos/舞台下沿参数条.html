@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>舞台下沿参数条 · 单文件 demo</title>
+<style>
+  /* 参数条骑在媒体平面下沿：媒体平面不能有 overflow:hidden，否则一半会被裁掉 */
+  :root{
+    --di:#15110D;        /* 背景色 */
+    --biaomian:#15110D;  /* 媒体平面底色 */
+    --mianban:#2E2118;   /* 参数条底色 */
+    --wenzi:#EFE9DC;     /* 文字色 */
+    --se1:#C7CCD1;       /* 色圈一 */
+    --se2:#B03A2E;       /* 色圈二 */
+    --se3:#C7CCD1;       /* 色圈三 */
+    --tuise:34;          /* 骑出下沿（px） */
+    --yuanjiao:12;       /* 圆角（px） */
+    --kuandu:440;        /* 参数条宽度（px） */
+    --shichang:340ms;    /* 滑入时长 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);display:grid;place-items:center;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .stage{position:relative;width:min(90vw,560px);aspect-ratio:16/9;border-radius:calc(var(--yuanjiao)*1px);
+        border:3px solid #fff;background:var(--biaomian)}
+  .art{position:absolute;inset:0;display:grid;place-content:center;gap:10px;text-align:center;color:rgba(255,255,255,.62)}
+  .art b{font-weight:400;font-size:26px;letter-spacing:-.01em;color:#fff}
+  .art span{font-size:12px;letter-spacing:.02em}
+  .dock{position:absolute;left:50%;bottom:calc(-1 * var(--tuise) * 1px);transform:translateX(-50%);
+        width:min(94%,calc(var(--kuandu)*1px));background:var(--mianban);color:var(--wenzi);
+        border:1px solid rgba(255,255,255,.22);border-radius:calc(var(--yuanjiao)*1px);
+        padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+        box-shadow:0 14px 34px rgba(16,26,34,.3);
+        opacity:0;pointer-events:none;transition:opacity var(--shichang) ease,transform var(--shichang) ease}
+  .dock.open{opacity:1;pointer-events:auto}
+  .dock h4{margin:0 0 2px;font-size:13px;font-weight:400;color:#fff}
+  .dock .sub{font-size:11px;line-height:1.4;color:rgba(225,234,240,.68);display:block;max-width:180px}
+  .sw{display:flex;gap:9px;flex:none}
+  .sw button{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:transparent;padding:0;cursor:pointer;position:relative}
+  .sw button i{position:absolute;inset:3px;border-radius:50%;display:block}
+  .sw button[aria-pressed="true"]{box-shadow:0 0 0 2px #fff}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="art">
+    <b>Built quiet, built deep.</b>
+    <span>Hover the media plane to raise the dock</span>
+  </div>
+  <div class="dock open" id="dock" role="group" aria-label="Appearance">
+    <div>
+      <h4>Paint</h4>
+      <span class="sub">Five studio paints.</span>
+    </div>
+    <div class="sw" id="sw"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var stage=document.getElementById('stage'), dock=document.getElementById('dock'), swbox=document.getElementById('sw');
+  var state={di:'#15110D',biaomian:'#15110D',mianban:'#2E2118',wenzi:'#EFE9DC',
+    se1:'#C7CCD1',se2:'#B03A2E',se3:'#C7CCD1',tuise:34,yuanjiao:12,kuandu:440,shichang:340};
+
+  // 三个色圈：颜色由参数给，选中态用 aria-pressed 驱动外圈
+  function build(){
+    swbox.innerHTML='';
+    ['se1','se2','se3'].forEach(function(k,i){
+      var b=document.createElement('button');
+      b.type='button'; b.setAttribute('aria-label','颜色 '+(i+1));
+      b.setAttribute('aria-pressed', i===0 ? 'true' : 'false');
+      b.innerHTML='<i style="background:'+state[k]+'"></i>';
+      b.addEventListener('click',function(){
+        [].forEach.call(swbox.children,function(n,idx){ n.setAttribute('aria-pressed', idx===i ? 'true':'false'); });
+      });
+      swbox.appendChild(b);
+    });
+  }
+  function setOpen(v){ dock.classList.toggle('open',v); }
+  stage.addEventListener('pointerenter',function(){ setOpen(true); });
+  stage.addEventListener('pointerleave',function(){ setOpen(false); });
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','biaomian','mianban','wenzi','se1','se2','se3'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--tuise',state.tuise);
+    r.setProperty('--yuanjiao',state.yuanjiao);
+    r.setProperty('--kuandu',state.kuandu);
+    r.setProperty('--shichang',state.shichang+'ms');
+    build();
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  apply();
+  // 默认就是骑出态（缩略图要看得见主体），移入移出才做收起/展开
+})();
+</script>
+</body>
+</html>

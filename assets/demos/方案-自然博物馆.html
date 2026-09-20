@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然博物馆导览</title>
+<style>
+:root{
+  --di:#10201F;      /* 展厅暗绿 */
+  --gu:#E9E4D8;      /* 骨白 */
+  --tong:#7A9A7E;    /* 铜绿 */
+  --hui:#7E8B84;
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:4px;
+  --qiangdu:.9;      /* 揭示层强度 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(120% 100% at 70% 20%,#162A29 0%,var(--di) 64%);color:var(--gu);
+  min-height:100vh;display:flex;flex-direction:column;font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif}
+header{display:flex;align-items:center;gap:calc(var(--jianju)*1.1);padding:calc(var(--jianju)*1.1) calc(var(--jianju)*1.6);
+  font-family:Consolas,monospace;font-size:11px;letter-spacing:.2em}
+header b{margin-right:auto;font-size:calc(var(--zihao)*1.05);letter-spacing:.14em;font-weight:400;font-family:Georgia,serif}
+header span{color:var(--hui)}
+main{flex:1;display:grid;grid-template-columns:1fr 1.05fr;min-height:0}
+.copy{padding:calc(var(--jianju)*1.8) calc(var(--jianju)*1.6);display:flex;flex-direction:column;justify-content:center;gap:calc(var(--jianju)*1.1)}
+h1{font-size:calc(var(--zihao)*2.5);line-height:1.26}
+h1 em{font-style:normal;color:var(--tong)}
+.copy p{color:var(--hui);font-size:calc(var(--zihao)*.86);line-height:1.9;max-width:30em}
+.lg{display:flex;gap:calc(var(--jianju)*1.5);padding-top:calc(var(--jianju)*.9);border-top:1px solid rgba(233,228,216,.14)}
+.lg div{display:flex;flex-direction:column;gap:5px}
+.lg b{font-family:Consolas,monospace;font-size:calc(var(--zihao)*1.05);font-weight:500}
+.lg span{font-size:10.5px;color:var(--hui);letter-spacing:.15em}
+/* 展柜：悬停时揭示层升起（原作的「悬停揭示」机制本体） */
+.vitrine{position:relative;border-left:1px solid rgba(233,228,216,.14);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.spec{position:relative;width:78%;max-width:520px;aspect-ratio:1/.86;border:1px solid rgba(233,228,216,.16);
+  border-radius:var(--yuanjiao);cursor:crosshair;transition:border-color .3s;
+  background:linear-gradient(170deg,color-mix(in srgb,var(--tong) 10%,transparent),transparent 62%)}
+.vitrine:hover .spec{border-color:color-mix(in srgb,var(--tong) 62%,transparent)}
+/* 骨架剪影：CSS 拼出脊柱与肋骨（肋骨用 top 定位，translate 百分比只按自身尺寸算，不能跨父级） */
+.spec i{position:absolute;left:50%;top:16%;height:68%;width:4px;transform:translateX(-50%);
+  background:color-mix(in srgb,var(--gu) 72%,transparent);border-radius:99px}
+.spec b{position:absolute;left:50%;width:80%;height:4px;transform:translateX(-50%);
+  background:color-mix(in srgb,var(--gu) 52%,transparent);border-radius:99px;transform-origin:50% 50%}
+.spec b:nth-of-type(1){top:28%;transform:translateX(-50%) scaleX(.72)}
+.spec b:nth-of-type(2){top:39%;transform:translateX(-50%) scaleX(.9)}
+.spec b:nth-of-type(3){top:50%;transform:translateX(-50%) scaleX(1)}
+.spec b:nth-of-type(4){top:61%;transform:translateX(-50%) scaleX(.86)}
+.spec b:nth-of-type(5){top:72%;transform:translateX(-50%) scaleX(.66)}
+.reveal{position:absolute;inset:auto 0 0 0;padding:18px 20px;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--di) 94%,transparent));
+  transform:translateY(calc((1 - var(--qiangdu)) * 100% + 28%));opacity:0;
+  transition:transform .42s cubic-bezier(.2,.7,.2,1),opacity .32s}
+.vitrine:hover .reveal{transform:translateY(0);opacity:var(--qiangdu)}
+.reveal h4{font-size:calc(var(--zihao)*1.05);letter-spacing:.04em}
+.reveal dl{margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:calc(var(--zihao)*.78)}
+.reveal dt{color:var(--hui)}
+.reveal dd{font-family:Consolas,monospace;color:var(--tong)}
+.no{position:absolute;left:18px;top:16px;font-family:Consolas,monospace;font-size:10.5px;color:var(--hui);letter-spacing:.16em}
+@media (max-width:880px){main{grid-template-columns:1fr}.vitrine{border-left:none;border-top:1px solid rgba(233,228,216,.14);padding:calc(var(--jianju)*1.4) 0}}
+</style>
+</head>
+<body>
+<header>
+  <b>南岭自然博物馆</b>
+  <span>常设展 · 第三展厅</span>
+</header>
+<main>
+  <div class="copy">
+    <h1>每件标本<br>都藏着自己的<em>年代</em></h1>
+    <p>展签只写物种与产地，剩下的靠你自己找——它活在哪一层岩层、被谁发现、为什么留在这里。</p>
+    <div class="lg">
+      <div><b>12,480</b><span>馆藏标本</span></div>
+      <div><b>380</b><span>常设展出</span></div>
+      <div><b>1998</b><span>建馆</span></div>
+    </div>
+  </div>
+  <div class="vitrine">
+    <div class="spec">
+      <span class="no">SPECIMEN 0317</span>
+      <i></i><b></b><b></b><b></b><b></b><b></b>
+      <div class="reveal">
+        <h4>南岭始颌龙 · 复原骨架</h4>
+        <dl>
+          <dt>地层</dt><dd>下侏罗统 · 灰岩</dd>
+          <dt>年代</dt><dd>距今约 1.86 亿年</dd>
+          <dt>采集</dt><dd>1998 · 北坡采石场</dd>
+          <dt>完整度</dt><dd>约 62% 骨架</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+var state = {
+  di:'#10201F', gu:'#E9E4D8', tong:'#7A9A7E', hui:'#7E8B84',
+  zihao:16, jianju:22, yuanjiao:4, qiangdu:.9
+};
+function apply(){
+  var r=document.documentElement.style;
+  r.setProperty('--di',state.di);r.setProperty('--gu',state.gu);
+  r.setProperty('--tong',state.tong);r.setProperty('--hui',state.hui);
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  r.setProperty('--qiangdu',state.qiangdu);
+}
+addEventListener('message',function(e){
+  var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
+});
+apply();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>动态消失演示</title><style>*{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
-.row{position:relative;display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid #e5e7eb;border-radius:12px;font-size:13px;color:#333}
+.row{position:relative;display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid #e5e7eb;border-radius:var(--radius);font-size:13px;color:#333}
 .bell{position:relative;width:34px;height:34px;border-radius:50%;background:#f4f5f7;display:flex;align-items:center;justify-content:center;font-size:18px}
 .red{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:var(--rc,#ef4444);border:2px solid #fff;transition:transform .4s ease,opacity .4s ease}
 .red.gone{transform:scale(0);opacity:0}
@@ -11,9 +11,9 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 <div class="row"><span class="bell">🔔<span class="red" id="red"></span></span><span>系统通知</span><button class="handle" id="hd">处理</button></div>
 <script>
 const red=document.getElementById('red'),hd=document.getElementById('hd');
-const state={rc:'#ef4444',hc:'#2f6bff',dur:.4,shrink:0};
-function applyStyle(){red.style.background=state.rc;hd.style.background=state.hc;red.style.transition='transform '+state.dur+'s ease,opacity '+state.dur+'s ease';}
+const state={rc:'#ef4444',hc:'#2f6bff',dur:.4,shrink:0,bg:'#ffffff',radius:12};
+function applyStyle(){document.body.style.background=state.bg;red.style.background=state.rc;hd.style.background=state.hc;red.style.transition='transform '+state.dur+'s ease,opacity '+state.dur+'s ease';}
 hd.onclick=()=>{red.style.transform='scale('+state.shrink+')';red.classList.add('gone');setTimeout(()=>{red.classList.remove('gone');red.style.transform='scale(1)';},1400);};
 applyStyle();
-window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['rc','hc','dur','shrink'].includes(d.key))applyStyle();});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;state[d.key]=d.value;if(['rc','hc','dur','shrink','bg','radius'].includes(d.key))applyStyle();});
 </script></body></html>

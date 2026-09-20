@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>两段式往返揭示 · 单文件 demo</title>
+<style>
+  /* 关键规则：一段动画必须播完才允许反向，中途来的指令排队——避免来回抖动。
+     结构上刻意做到两件事：
+     ① 只留一层绝对定位元素（::after 当盖板，卡片自身当腔体），避开「两个 absolute 兄弟相互全覆盖」时盖板整层不绘制的怪象；
+     ② 揭开用 clip-path 收底边 + skewY 歪斜，完全不做位移——盖板一旦 translateY 离开原位（2D / 3D 都一样）就会被整层裁掉。
+  */
+  :root{
+    --di:#15110D;        /* 背景色 */
+    --wai:#EFE9DC;       /* 盖板色 */
+    --tang:#2E2118;      /* 腔体色 */
+    --zhucai:#B03A2E;    /* 强调色 */
+    --zi:#C7CCD1;        /* 盖板文字色 */
+    --shichang:700;      /* 单程时长（ms） */
+    --danchu:12;         /* 揭开时盖板淡出（%） */
+    --qingxie:7deg;      /* 歪斜角度 */
+    --kuandu:300px;      /* 卡片宽度 */
+    --yuanjiao:16px;     /* 圆角 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--di);display:grid;place-items:center;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  .card{position:relative;width:var(--kuandu);aspect-ratio:4/3;border-radius:var(--yuanjiao);
+        background:var(--tang);
+        display:grid;place-content:center;padding:20px;text-align:center}
+  .inner{display:grid;gap:8px}
+  .inner b{font-size:13px;font-weight:400;color:var(--zhucai)}
+  .inner span{font-size:12px;line-height:1.5;color:rgba(220,230,236,.72);max-width:30ch}
+  /* 盖板：--pot（0→1）由 JS 逐帧写入；底边随进度向上收，同时轻微歪斜并淡出 */
+  .card::after{content:"Structure";position:absolute;left:0;right:0;top:0;bottom:0;
+        border-radius:inherit;background:var(--wai);border:1px solid rgba(0,0,0,.08);
+        transform-origin:50% 100%;
+        clip-path:inset(0 0 calc(var(--pot) * 100%) 0);
+        transform:skewY(calc(var(--qingxie) * var(--pot)));
+        opacity:calc(1 - var(--pot) * var(--danchu) / 100);
+        box-shadow:0 18px 40px rgba(16,26,34,.28);
+        display:grid;place-content:center;font-size:15px;color:var(--zi)}
+  .tip{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);font-size:12px;color:rgba(255,255,255,.7)}
+</style>
+</head>
+<body>
+<div class="card" id="card" tabindex="0">
+  <div class="inner">
+    <b>Front trunk</b>
+    <span>Hinged at the front, lifted clear of the rear volume.</span>
+  </div>
+</div>
+<div class="tip">移入 / 移出，观察往返播放</div>
+<script>
+(function(){
+  var card=document.getElementById('card');
+  var state={di:'#15110D',wai:'#EFE9DC',tang:'#2E2118',zhucai:'#B03A2E',zi:'#C7CCD1',
+    shichang:700,danchu:12,qingxie:7,kuandu:300,yuanjiao:16};
+
+  var prog=0, seg=null, pending=null;
+  function ease(p){ return p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; }
+  function paint(){ card.style.setProperty('--pot', prog.toFixed(4)); }
+  // 有动画在跑就把新目标挂起，等这一段自己播完（segment 是原子操作）
+  function to(v){
+    if(seg){ pending=v; return; }
+    if(Math.abs(prog-v)<.001) return;
+    seg={from:prog,to:v,t0:performance.now()};
+  }
+  function tick(now){
+    if(seg){
+      var p=Math.min(1,(now-seg.t0)/Math.max(120,state.shichang));
+      prog=seg.from+(seg.to-seg.from)*ease(p);
+      paint();
+      if(p>=1){
+        prog=seg.to; seg=null;
+        var nx=pending; pending=null;
+        if(nx!==null) to(nx); else paint();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  card.addEventListener('pointerenter',function(){ to(1); });
+  card.addEventListener('pointerleave',function(){ to(0); });
+  card.addEventListener('focus',function(){ to(1); });
+  card.addEventListener('blur',function(){ to(0); });
+
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','wai','tang','zhucai','zi'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--shichang',state.shichang+'ms');
+    r.setProperty('--danchu',state.danchu);
+    r.setProperty('--qingxie',state.qingxie+'deg');
+    r.setProperty('--kuandu',state.kuandu+'px');
+    r.setProperty('--yuanjiao',state.yuanjiao+'px');
+    paint();
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+
+  apply();
+  // 没人操作时每 5s 自动演示一次，预览里能看到往返过程
+  setInterval(function(){ if(!seg) to(1); setTimeout(function(){ to(0); },1500); },5000);
+})();
+</script>
+</body>
+</html>

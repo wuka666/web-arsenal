@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- M170 卡片式标签：选中卡片上浮 + 主题色底边框联动（file:// 可直接开，零依赖） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page,#eef1f6);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+  .row{display:flex;gap:var(--gap)}
+  .card{position:relative;padding:14px var(--padx);font-size:var(--fs);color:#5b6472;background:var(--bg);
+        border-radius:var(--r);cursor:pointer;user-select:none;
+        border-bottom:var(--bw) solid transparent;transform:translateY(0);
+        transition:transform var(--dur) ease,border-color var(--dur) ease,box-shadow var(--dur) ease,background var(--dur) ease}
+  /* 选中：上浮 + 主题色底边 + 可选阴影（阴影用变量开关，避免 JS 写死） */
+  .card.on{color:var(--ac);background:var(--selbg);font-weight:600;transform:translateY(calc(var(--lift) * -1));border-bottom-color:var(--ac);box-shadow:0 6px 16px rgba(30,40,80,calc(var(--shdw) * .14))}
+</style>
+</head>
+<body>
+  <div class="row" id="row"></div>
+<script>
+  const state={n:4,lift:2,ac:'#2f6bff',bw:3,r:10,bg:'#f5f6f8',selbg:'#ffffff',gap:10,fs:14,padx:18,shdw:true,dur:0.25};
+  const LABELS=['全部','产品','设计','开发','运营','市场','招聘'];
+  const row=document.getElementById('row');
+  let sel=0;
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--lift',state.lift+'px'); s.setProperty('--ac',state.ac); s.setProperty('--bw',state.bw+'px');
+    s.setProperty('--r',state.r+'px'); s.setProperty('--bg',state.bg); s.setProperty('--selbg',state.selbg);
+    s.setProperty('--gap',state.gap+'px'); s.setProperty('--fs',state.fs+'px'); s.setProperty('--padx',state.padx+'px');
+    s.setProperty('--shdw',state.shdw?1:0); s.setProperty('--dur',state.dur+'s');
+    row.innerHTML='';
+    for(let i=0;i<state.n;i++){
+      const c=document.createElement('div');
+      c.className='card'+(i===sel?' on':''); c.textContent=LABELS[i]||('分类'+(i+1));
+      c.onclick=()=>{sel=i;apply();};
+      row.appendChild(c);
+    }
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>热点圆盘 · 单文件 demo</title>
+<style>
+  :root{
+    --di:#15110D;        /* 媒体平面底色 */
+    --pan:#2E2118;       /* 圆盘底色 */
+    --zi:#C7CCD1;        /* 文字色 */
+    --zhucai:#B03A2E;    /* 激活强调色 */
+    --redian:44px;       /* 圆盘直径 */
+    --shichang:260ms;    /* 展开时长 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#15110D;display:grid;place-items:center;font-family:"Inter","Helvetica Neue",Arial,sans-serif}
+  /* 媒体平面用渐变模拟影棚打光，替代真实产品摄影 */
+  .plane{position:relative;width:min(92vw,640px);aspect-ratio:16/9;border-radius:14px;
+        background:radial-gradient(120% 90% at 50% 30%,var(--di),#2E2118 78%);
+        border:1px solid rgba(255,255,255,.08);overflow:hidden}
+  .plane b{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-weight:400;
+        letter-spacing:.14em;font-size:15px;color:rgba(230,237,242,.4)}
+  .tip{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font-size:12px;
+        color:var(--zhucai);letter-spacing:.04em;opacity:0;transition:opacity var(--shichang) ease}
+  .tip.on{opacity:1}
+  /* 圆盘：加号两笔用 ::before/::after，激活后转成实心点 */
+  .spot{position:absolute;width:var(--redian);height:var(--redian);transform:translate(-50%,-50%);
+        border-radius:50%;background:var(--pan);border:1px solid rgba(255,255,255,.28);
+        cursor:pointer;display:flex;align-items:center;justify-content:center;
+        transition:background var(--shichang) ease,border-color var(--shichang) ease}
+  .spot::before,.spot::after{content:"";position:absolute;background:var(--zi);transition:transform var(--shichang) ease,opacity var(--shichang) ease}
+  .spot::before{width:36%;height:1.5px}
+  .spot::after{width:1.5px;height:36%}
+  .spot .lbl{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%) translateX(-6px);
+        white-space:nowrap;font-size:12px;letter-spacing:.03em;color:var(--zi);
+        background:rgba(10,14,18,.78);padding:5px 10px;border-radius:8px;
+        opacity:0;pointer-events:none;transition:opacity var(--shichang) ease,transform var(--shichang) ease}
+  .spot:hover .lbl,.spot.act .lbl{opacity:1;transform:translateY(-50%) translateX(0)}
+  .spot.act{background:var(--zhucai);border-color:var(--zhucai)}
+  .spot.act::before,.spot.act::after{background:#10150F}
+  .spot.act::after{transform:rotate(90deg);opacity:0}
+</style>
+</head>
+<body>
+<div class="plane" id="plane">
+  <b>INTERACTIVE STUDIO</b>
+  <button class="spot" style="left:26%;top:38%" data-tip="Front drive unit — 340 kW"></button>
+  <button class="spot" style="left:62%;top:64%" data-tip="Structural pack — 900 V"></button>
+  <button class="spot" style="left:48%;top:30%" data-tip="Panel swap — 5 paints"></button>
+  <span class="tip" id="tip"></span>
+</div>
+<script>
+(function(){
+  var tip=document.getElementById('tip');
+  var state={di:'#15110D',pan:'#2E2118',zi:'#C7CCD1',zhucai:'#B03A2E',redian:44,shichang:260};
+  function apply(){
+    var r=document.documentElement.style;
+    ['di','pan','zi','zhucai'].forEach(function(k){ r.setProperty('--'+k,state[k]); });
+    r.setProperty('--redian',state.redian+'px');
+    r.setProperty('--shichang',state.shichang+'ms');
+  }
+  addEventListener('message',function(e){
+    var d=e.data; if(!d||d.type!=='param')return;
+    if(!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+  // 点击即激活并互斥：同一时刻只有一个热点处于打开态
+  document.querySelectorAll('.spot').forEach(function(s){
+    var lbl=document.createElement('span');
+    lbl.className='lbl'; lbl.textContent=s.dataset.tip;
+    s.appendChild(lbl);
+    s.addEventListener('click',function(){
+      var on=s.classList.contains('act');
+      document.querySelectorAll('.spot.act').forEach(function(n){ n.classList.remove('act'); });
+      s.classList.toggle('act',!on);
+      tip.textContent=on?'':s.dataset.tip;
+      tip.classList.toggle('on',!on);
+    });
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

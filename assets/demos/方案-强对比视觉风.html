@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案·强对比视觉风</title>
+<style>
+:root{--zhucai:#FFE600;--zhongdian:#111111;--di:#0a0a0a;--zi:#ffffff;--cizi:#cfcfcf;--yuanjiao:0px;--jianju:14px;--zihao:15px;--yinying:0;--faguang:0;--bian:4}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Helvetica Neue",system-ui,sans-serif;}
+body{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;line-height:1.5;}
+.left{background:var(--zhucai);color:var(--zhongdian);padding:calc(var(--jianju)*3);display:flex;flex-direction:column;justify-content:center;}
+.right{background:var(--di);color:var(--zi);padding:calc(var(--jianju)*3);display:flex;flex-direction:column;justify-content:center;border-left:var(--bian) solid var(--zhongdian);}
+.kicker{font-size:12px;letter-spacing:4px;text-transform:uppercase;opacity:.7;margin-bottom:18px;}
+.big{font-size:calc(var(--zihao)*3.4);font-weight:800;line-height:.98;letter-spacing:-1px;}
+.big .red{background:var(--di);color:var(--zhucai);padding:0 .12em;}
+.lead{font-size:calc(var(--zihao)*1.05);margin-top:20px;max-width:24em;opacity:.85;}
+.list{margin-top:24px;font-size:14px;line-height:2;}
+.btn{margin-top:28px;align-self:flex-start;background:var(--zi);color:var(--di);border:none;padding:13px 30px;font-weight:700;font-size:14px;cursor:pointer;}
+
+/* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
+.list{color:var(--cizi)}
+.btn{border-radius:var(--yuanjiao)}
+.right{box-shadow:0 calc(var(--yinying)*.18px) calc(var(--yinying)*.45px) rgba(0,0,0,.2)}
+.red{box-shadow:0 0 calc(var(--faguang)*.5px) var(--zhucai)}
+</style>
+</head>
+<body>
+<div class="left">
+<div class="kicker">Manifesto</div>
+<div class="big">少，<br>但是<span class="red">更好</span>。</div>
+</div>
+<div class="right">
+<div class="kicker">白盒工作室</div>
+<div class="lead">我们相信克制是一种能力。把不必要的东西拿掉，剩下的每一处，都该有它存在的理由。</div>
+<div class="list">· 只做一件事，并把它做到极致<br>· 用结构代替装饰<br>· 让留白替你说话</div>
+<button class="btn">查看作品</button>
+</div>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',bian:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+</body>
+</html>

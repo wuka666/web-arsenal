@@ -23,13 +23,14 @@
 <div class="legend"><b id="h">—</b>　<b id="v">—</b></div>
 
 <script>
-  const state = { threshold: 24, hColor: "#3d5fd6", vColor: "#e0533d", card: "#ffffff", bg: "#fafafa" };
+  const state = { threshold: 24, hColor: "#3d5fd6", vColor: "#e0533d", card: "#ffffff", bg: "#fafafa", radius: 18 };
   const card = document.getElementById("card");
   const badge = document.getElementById("badge");
   const h = document.getElementById("h"), v = document.getElementById("v");
   let sx = 0, sy = 0, axis = null, moved = 0;
   function apply() {
     card.style.background = state.card;
+    card.style.borderRadius = state.radius + "px";
     document.body.style.background = state.bg;
     h.style.color = state.hColor; v.style.color = state.vColor;
     badge.style.background = "#eee"; badge.style.color = "#444";

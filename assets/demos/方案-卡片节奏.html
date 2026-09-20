@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- 防土法则② 卡片节奏：等宽栅格显土，改非对称 bento，卡片大小有意错落，仅首卡一处强调色，近零边框 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案·卡片节奏</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--se);color:var(--zi);min-height:100vh;display:flex;align-items:center}
+  .deck{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:120px;gap:var(--jianju);padding:var(--jianju);width:100%}
+  .card{background:color-mix(in srgb,var(--zi) 4%, var(--se));border-radius:var(--r);padding:18px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+  .card .n{font-size:13px;opacity:.4;font-variant-numeric:tabular-nums}
+  .card .t{font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .card .c{font-size:12px;opacity:.55;margin-top:4px}
+  .lead{grid-column:span 2;grid-row:span 2;background:var(--ac);color:#fff;transform:translateY(calc(var(--lift) * -1px))}
+  .lead .n{opacity:.7}
+  .lead .t{font-size:30px}
+  .lead .c{opacity:.85}
+  .wide{grid-column:span 2}
+  .tall{grid-row:span 2}
+</style>
+</head>
+<body>
+  <section class="deck">
+    <div class="card lead"><span class="n">01</span><div><div class="t">节奏先行</div><div class="c">大小错落，而非等宽方阵</div></div></div>
+    <div class="card"><span class="n">02</span><div class="t">留白即分组</div></div>
+    <div class="card tall"><span class="n">03</span><div><div class="t">一处强调</div><div class="c">全页只此一块色</div></div></div>
+    <div class="card"><span class="n">04</span><div class="t">去边框</div></div>
+    <div class="card wide"><span class="n">05</span><div class="t">网格只做骨架，不抢戏</div></div>
+    <div class="card"><span class="n">06</span><div class="t">间距成刻度</div></div>
+  </section>
+<script>
+  const state={jianju:16,se:'#EDEFF2',zi:'#222831',ac:'#2F6FED',r:16,lift:10};
+  function apply(){
+    const s=document.documentElement.style;
+    s.setProperty('--jianju',state.jianju+'px');
+    s.setProperty('--se',state.se);
+    s.setProperty('--zi',state.zi);
+    s.setProperty('--ac',state.ac);
+    s.setProperty('--r',state.r+'px');
+    s.setProperty('--lift',state.lift);
+  }
+  addEventListener('message',e=>{const d=e.data||{};if(d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+  apply();
+</script>
+</body>
+</html>

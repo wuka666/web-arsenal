@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>深海观测站</title>
+<style>
+:root{
+  --hais:#04222B;        /* 深海底色 */
+  --cengs:#0A3A45;       /* 水层色 */
+  --boxian:#5FE3D0;      /* 声呐青 */
+  --zi:#DCEFEA;          /* 正文 */
+  --ci:#6E8E92;          /* 标注 */
+  --zihao:16px;
+  --jianju:22px;
+  --yuanjiao:6px;
+  --bosu:1;
+  --cengshu:46;
+  --keli:220;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--hais);color:var(--zi);overflow:hidden;
+  font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  display:grid;grid-template-columns:88px 1fr 250px;grid-template-rows:1fr auto;
+  grid-template-areas:"depth stage panel" "depth stage foot";
+  min-height:100vh;
+}
+/* 深度刻度：竖排标尺，读数随参数联动 */
+.depth{grid-area:depth;border-right:1px solid rgba(95,227,208,.16);padding:22px 0;display:flex;flex-direction:column;align-items:center;gap:16px}
+.depth .cap{writing-mode:vertical-rl;font-family:Consolas,monospace;font-size:10px;letter-spacing:.24em;color:var(--ci)}
+.depth .tick{flex:1;width:9px;background:repeating-linear-gradient(180deg,rgba(95,227,208,.5) 0 1px,transparent 1px 34px);position:relative}
+.depth .val{writing-mode:vertical-rl;font-family:Consolas,monospace;font-size:12.5px;color:var(--boxian);letter-spacing:.06em}
+.stage{grid-area:stage;position:relative;overflow:hidden}
+#wave,#mote{position:absolute;inset:0;width:100%;height:100%}
+/* 波带下方压暗，做出水体体积感 */
+.stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--hais) 88%,transparent))}
+h1{position:absolute;left:calc(var(--jianju)*1.6);top:calc(var(--jianju)*1.4);z-index:3;
+  font-size:calc(var(--zihao)*2.4);font-weight:600;letter-spacing:.02em;line-height:1.25}
+h1 small{display:block;margin-top:10px;font-size:calc(var(--zihao)*.8);font-weight:400;color:var(--ci);letter-spacing:.08em}
+.panel{grid-area:panel;border-left:1px solid rgba(95,227,208,.16);padding:calc(var(--jianju)*1.2) calc(var(--jianju)*1.1);display:flex;flex-direction:column;gap:14px}
+.row{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:baseline;font-size:calc(var(--zihao)*.76)}
+.row b{font-family:Consolas,monospace;color:var(--boxian);font-weight:400;letter-spacing:.04em}
+.row span{color:var(--ci)}
+.foot{grid-area:foot;border-left:1px solid rgba(95,227,208,.16);border-top:1px solid rgba(95,227,208,.16);
+  padding:calc(var(--jianju)*.9) calc(var(--jianju)*1.1);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.foot em{font-style:normal;font-family:Consolas,monospace;font-size:11px;color:var(--ci);letter-spacing:.06em;white-space:nowrap}
+#cta{background:var(--boxian);color:#032028;border:none;border-radius:var(--yuanjiao);
+  padding:11px 18px;font-size:calc(var(--zihao)*.78);font-weight:600;cursor:pointer;font-family:inherit}
+@media (max-width:860px){
+  body{grid-template-columns:1fr;grid-template-rows:1fr auto;grid-template-areas:"stage" "foot"}
+  .depth,.panel{display:none}
+}
+</style>
+</head>
+<body>
+<div class="depth">
+  <span class="cap">DEPTH m</span>
+  <span class="val" id="depthVal">-2,480</span>
+  <span class="tick"></span>
+</div>
+
+<div class="stage">
+  <canvas id="wave"></canvas>
+  <canvas id="mote"></canvas>
+  <h1 id="h1">温跃层以下的<br>安静世界<small id="sub">观测站 D-07 · 声呐阵列在线</small></h1>
+</div>
+
+<div class="panel">
+  <div class="row"><b id="v1">34.72</b><span>盐度 PSU</span></div>
+  <div class="row"><b id="v2">2.4°C</b><span>水温</span></div>
+  <div class="row"><b id="v3">-2,480 m</b><span>当前深度</span></div>
+  <div class="row"><b id="v4">04</b><span>声呐阵列</span></div>
+  <div class="row"><b id="v5">在线</b><span>数据链路</span></div>
+</div>
+
+<div class="foot">
+  <em id="est">回传间隔 90 s</em>
+  <button id="cta">查看剖面数据</button>
+</div>
+
+<script>
+var state = {
+  hais:'#04222B', cengs:'#0A3A45', boxian:'#5FE3D0', zi:'#DCEFEA',
+  bosu:1, cengshu:46, keli:220, zihao:16, jianju:22, yuanjiao:6,
+  shendu:-2480, h1:'温跃层以下的<br>安静世界', sub:'观测站 D-07 · 声呐阵列在线'
+};
+
+var wave = document.getElementById('wave'), mote = document.getElementById('mote');
+var wctx = wave.getContext('2d'), mctx = mote.getContext('2d');
+var W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
+var motes=[], seededKeli=0;
+
+function rgb(h){var v=parseInt(String(h).replace('#',''),16);return [(v>>16)&255,(v>>8)&255,v&255];}
+function shade(h,d){var c=rgb(h).map(function(x){return Math.max(0,Math.min(255,x+d));});return '#'+c.map(function(x){return ('0'+x.toString(16)).slice(-2);}).join('');}
+
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  [wave,mote].forEach(function(c){
+    c.width=Math.round(W*DPR);c.height=Math.round(H*DPR);
+    c.style.width=W+'px';c.style.height=H+'px';
+    c.getContext('2d').setTransform(DPR,0,0,DPR,0,0);
+  });
+  seedMotes();
+}
+function seedMotes(){
+  motes=[];
+  for(var i=0;i<state.keli;i++){
+    motes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.25,
+      a:Math.random()*.5+.1,p:Math.random()*Math.PI*2,s:Math.random()*.9+.25});
+  }
+  seededKeli=state.keli;
+}
+function resizeMotes(){
+  /* 颗粒数可调：不够就补，多了就截断，避免整体重建导致的闪烁 */
+  var n=state.keli;
+  while(motes.length<n) motes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.25,
+    a:Math.random()*.5+.1,p:Math.random()*Math.PI*2,s:Math.random()*.9+.25});
+  if(motes.length>n) motes.length=n;
+}
+
+/* 水层轮廓：三个不同频率的正弦叠加 → 同轮廓多条细线 → 叠加成「声呐亮带」 */
+function yAt(x,off){
+  return H*.62
+    + Math.sin(x*.0022 + off*.02 + t*.5)*H*.12
+    + Math.sin(x*.0048 - off*.012 - t*.72)*H*.045
+    + Math.sin(x*.0009 + t*.28)*H*.065
+    + off;
+}
+var t=0,last=0;
+function draw(now){
+  var dt=Math.min(.05,(now-last)/1000||.016);last=now;
+  t+=dt*state.bosu;
+  var c=wctx,C=rgb(state.boxian);
+  c.clearRect(0,0,W,H);
+  c.globalCompositeOperation='lighter';
+  var n=Math.max(8,Math.round(state.cengshu));
+  for(var i=0;i<n;i++){
+    var k=i/(n-1), off=(k-.5)*H*.28;
+    var a=Math.pow(Math.cos((k-.5)*Math.PI),2.2);
+    c.beginPath();
+    for(var x=-40;x<=W+40;x+=14){
+      var y=yAt(x,off);
+      if(x===-40)c.moveTo(x,y);else c.lineTo(x,y);
+    }
+    c.strokeStyle='rgba('+C[0]+','+C[1]+','+C[2]+','+(.035+.4*a).toFixed(3)+')';
+    c.lineWidth=7+18*a;
+    c.stroke();
+  }
+  /* 颗粒场：深海中缓慢下沉的悬浮物 */
+  mctx.clearRect(0,0,W,H);
+  for(var j=0;j<motes.length;j++){
+    var m=motes[j];
+    m.y-=m.s*.18*state.bosu; m.p+=.014;
+    if(m.y<-6){m.y=H+6;m.x=Math.random()*W;}
+    var al=(m.a*(.6+.4*Math.sin(m.p)));
+    mctx.beginPath();mctx.arc(m.x,m.y,m.r,0,Math.PI*2);
+    mctx.fillStyle='rgba('+C[0]+','+C[1]+','+C[2]+','+al.toFixed(3)+')';mctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+
+function apply(){
+  var r=document.documentElement.style;
+  /* 长度型变量自带 px；纯数值（bosu）不加单位 */
+  r.setProperty('--hais',state.hais);
+  r.setProperty('--cengs',state.cengs);
+  r.setProperty('--boxian',state.boxian);
+  r.setProperty('--zi',state.zi);
+  r.setProperty('--jianju',state.jianju+'px');
+  r.setProperty('--zihao',state.zihao+'px');
+  r.setProperty('--yuanjiao',state.yuanjiao+'px');
+  document.getElementById('h1').innerHTML=state.h1+'<small>'+state.sub+'</small>';
+  var d=Math.round(state.shendu);
+  document.getElementById('depthVal').textContent='-'+Math.abs(d).toLocaleString('en-US');
+  document.getElementById('v3').textContent='-'+Math.abs(d).toLocaleString('en-US')+' m';
+  document.getElementById('v1').textContent=(34.72+Math.abs(d)/100000*3).toFixed(2);
+  if(Math.round(state.keli)!==seededKeli) resizeMotes();
+}
+var rt; addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,120);});
+addEventListener('message',function(e){
+  var d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+resize();
+apply();
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduce){ draw(0); } else { requestAnimationFrame(draw); }
+</script>
+</body>
+</html>
