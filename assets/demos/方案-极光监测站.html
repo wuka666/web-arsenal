@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>极光监测站 · 数据幕布</title>
+<style>
+:root{
+  --bg:#000000;
+  --ink:#ffffff;
+  --accent:#a3e635;
+  --muted:rgba(255,255,255,0.40);
+  --counter-duration:1.5;
+  --mask-scale:1.2;
+  --gap:160px;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+section{width:100%;padding:64px 24px}
+@media(min-width:768px){section{padding:96px 48px}}
+@media(min-width:1024px){section{padding:96px 120px}}
+.wrap{width:100%;max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:64px}
+@media(min-width:1024px){.wrap{flex-direction:row;gap:var(--gap);align-items:stretch}}
+.left{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+.right{flex:1;display:flex;justify-content:center;align-items:center;min-height:360px}
+@media(min-width:1024px){.right{justify-content:flex-end}}
+h2{font-size:clamp(1.5rem,4vw,3.5rem);font-weight:500;letter-spacing:-0.02em;line-height:1.1;margin-bottom:24px;width:590px;max-width:100%}
+h2 .serif{font-family:Georgia,"Songti SC","SimSun",serif;font-style:italic;font-weight:400}
+.subtitle{font-size:clamp(1rem,1.2vw,1.125rem);line-height:1.7;font-weight:300;color:var(--muted);max-width:520px;margin-bottom:64px}
+.grid{display:grid;grid-template-columns:repeat(2,max-content);gap:32px 64px}
+@media(min-width:768px){.grid{gap:32px 96px}}
+.stat{display:flex;flex-direction:column}
+.stat .num{font-family:Georgia,"Songti SC","SimSun",serif;font-size:clamp(2.25rem,4vw,3.5rem);letter-spacing:-0.02em;margin-bottom:12px}
+.stat .label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+.mask-box{position:relative;width:100%;max-width:500px;aspect-ratio:1/1;transform:scale(var(--mask-scale));-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;mask-size:contain;mask-repeat:no-repeat;mask-position:center;overflow:hidden;border-radius:var(--radius)}
+.mask-box canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.char{display:inline-block;opacity:0;transform:translateY(4px);transition:opacity 0.04s,transform 0.04s}
+.char.revealed{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<section id="stats">
+  <div class="wrap">
+    <div class="left">
+      <h2 id="h2"></h2>
+      <p class="subtitle" id="sub"></p>
+      <div class="grid">
+        <div class="stat"><span class="num" data-target="500" data-suffix="K+">0</span><span class="label">年度观测点</span></div>
+        <div class="stat"><span class="num" data-target="99.8" data-suffix="%" data-decimals="1">0</span><span class="label">预报准确率</span></div>
+        <div class="stat"><span class="num" data-target="50" data-suffix="+">0</span><span class="label">部署监测站</span></div>
+        <div class="stat"><span class="num" data-target="15" data-suffix="+">0</span><span class="label">覆盖波段</span></div>
+        <div class="stat"><span class="num" data-target="24" data-suffix="/7">0</span><span class="label">季节在线率</span></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="mask-box" id="maskBox">
+        <canvas id="c1"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+const state={
+  bg:'#000000',
+  ink:'#ffffff',
+  accent:'#a3e635',
+  muted:'rgba(255,255,255,0.40)',
+  counterDuration:1.5,
+  maskScale:1.2,
+  gap:'160px',
+  radius:12
+};
+function apply(){
+  const r=document.documentElement;
+  r.style.setProperty('--bg',state.bg);
+  r.style.setProperty('--ink',state.ink);
+  r.style.setProperty('--accent',state.accent);
+  r.style.setProperty('--muted',state.muted);
+  r.style.setProperty('--counter-duration',state.counterDuration);
+  r.style.setProperty('--mask-scale',state.maskScale);
+  r.style.setProperty('--gap',state.gap);
+  r.style.setProperty('--radius',state.radius+'px');
+}
+apply();
+
+// Typewriter: reveal chars one by one
+function typewrite(el,html,delay=0,speed=18){
+  el.innerHTML='';
+  const tokens=[];
+  let i=0;
+  while(i<html.length){
+    if(html[i]==='<'){
+      const end=html.indexOf('>',i);
+      tokens.push({type:'tag',val:html.slice(i,end+1)});
+      i=end+1;
+    }else{
+      let j=i;
+      while(j<html.length && html[j]!=='<')j++;
+      tokens.push({type:'text',val:html.slice(i,j)});
+      i=j;
+    }
+  }
+  const chars=[];
+  tokens.forEach(tok=>{
+    if(tok.type==='tag'){el.insertAdjacentHTML('beforeend',tok.val);}
+    else{
+      const span=document.createElement('span');
+      for(let k=0;k<tok.val.length;k++){
+        const c=document.createElement('span');
+        c.className='char';c.textContent=tok.val[k];
+        span.appendChild(c);chars.push(c);
+      }
+      el.appendChild(span);
+    }
+  });
+  setTimeout(()=>{
+    chars.forEach((c,n)=>setTimeout(()=>c.classList.add('revealed'),n*speed));
+  },delay*1000);
+}
+
+typewrite(document.getElementById('h2'),'守望极光<br><span class="serif">预见每一次爆发</span>',0,14);
+typewrite(document.getElementById('sub'),'十余年来，极地观测网络依赖现代传感器阵列与专业团队，为全球研究者提供高完整度的极光数据，降低预报盲区。',0.1,10);
+
+// Animated counters
+const nums=document.querySelectorAll('.num');
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(!en.isIntersecting)return;
+    const el=en.target;
+    observer.unobserve(el);
+    const target=parseFloat(el.dataset.target);
+    const suffix=el.dataset.suffix||'';
+    const decimals=parseInt(el.dataset.decimals||'0');
+    const dur=(state.counterDuration||1.5)*1000;
+    const start=performance.now();
+    function step(now){
+      const p=Math.min(1,(now-start)/dur);
+      const ease=1-Math.pow(1-p,3);
+      const val=(target*ease).toFixed(decimals);
+      el.textContent=val+suffix;
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+},{threshold:0.2});
+nums.forEach(n=>observer.observe(n));
+
+// Masked canvas aurora (replaces video)
+const maskSvg="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='m53.54,45.42c2.19-3.79,7.67-3.79,9.86,0l4.54,7.87c1.17,2.02,1.17,4.51,0,6.54l-8.15,13.81c-1.68,2.91.42,6.55,3.78,6.55h17.81c3.45,0,5.61-3.74,3.89-6.73l-28.76-49.81c-2.95-5.12-10.34-5.12-13.29,0l-28.46,49.3c-1.86,3.22.46,7.24,4.18,7.24h10.23c2.55,0,4.91-1.36,6.19-3.57l18.18-31.19Z'/%3E%3C/svg%3E";
+const box=document.getElementById('maskBox');
+box.style.webkitMaskImage='url("'+maskSvg+'")';
+box.style.maskImage='url("'+maskSvg+'")';
+const c=document.getElementById('c1');
+const x=c.getContext('2d');
+let W,H;
+function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+window.addEventListener('resize',resize);resize();
+let t=0;
+function draw(){
+  x.fillStyle=state.bg;x.fillRect(0,0,W,H);
+  // aurora bands inside the mask
+  for(let i=0;i<4;i++){
+    const grad=x.createLinearGradient(0,H*0.2,0,H*0.9);
+    grad.addColorStop(0,'rgba(163,230,53,0)');
+    grad.addColorStop(0.5,'rgba(163,230,53,'+(0.18-i*0.03)+')');
+    grad.addColorStop(1,'rgba(163,230,53,0)');
+    x.fillStyle=grad;
+    x.beginPath();
+    const baseY=H*(0.3+i*0.12);
+    for(let px=0;px<=W;px+=8){
+      const y=baseY+Math.sin(px*0.015+t*0.02+i*1.2)*H*0.08+Math.sin(px*0.04-t*0.015)*H*0.04;
+      if(px===0)x.moveTo(px,y);else x.lineTo(px,y);
+    }
+    x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
+  }
+  // subtle stars
+  x.fillStyle='#fff';
+  for(let i=0;i<30;i++){
+    const sx=(Math.sin(i*12.3+t*0.005)*0.5+0.5)*W;
+    const sy=(Math.cos(i*7.1+t*0.003)*0.5+0.5)*H;
+    const alpha=(Math.sin(i+t*0.02)+1)/2*0.6;
+    x.globalAlpha=alpha;
+    x.beginPath();x.arc(sx,sy,1.2,0,Math.PI*2);x.fill();
+  }
+  x.globalAlpha=1;
+  t++;requestAnimationFrame(draw);
+}
+draw();
+
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state))return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

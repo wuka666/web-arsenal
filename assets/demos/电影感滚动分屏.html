@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>电影感滚动分屏 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#7fb4d4;
+  --paper:#fdf1e1;
+  --ink:#111411;
+  --accent:#c45a2b;
+  --splitX:50;
+  --blurMax:14;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0b1110;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.scroll{position:relative;height:calc(100vh + 2200px)}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--bg)}
+.panel{position:absolute;top:0;bottom:0;width:50%;will-change:transform}
+.left{left:0;background:var(--paper)}
+.right{right:0;background:var(--ink)}
+.left svg,.right svg{position:absolute;inset:0;width:100%;height:100%}
+.hero{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:3;text-align:center;color:var(--paper);font-family:Georgia,serif;font-size:clamp(40px,9vw,120px);font-weight:500;line-height:.9;mix-blend-mode:difference;will-change:filter}
+.hero small{display:block;font-size:16px;letter-spacing:.2em;margin-top:14px;font-family:system-ui,sans-serif}
+.title{position:absolute;left:24px;top:24px;z-index:4;color:var(--accent);font-size:13px;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="scroll">
+  <div class="stage">
+    <div class="panel left" id="left"><svg viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice"><rect width="600" height="800" fill="var(--paper)"/><path d="M0,800 L600,800 L600,300 Q300,200 0,360 Z" fill="var(--accent)" opacity=".18"/></svg></div>
+    <div class="panel right" id="right"><svg viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice"><rect width="600" height="800" fill="var(--ink)"/><circle cx="300" cy="300" r="160" fill="var(--paper)" opacity=".12"/></svg></div>
+    <div class="title">山涧廊桥志</div>
+    <div class="hero" id="hero">廊桥<small>SCROLL TO REVEAL</small></div>
+  </div>
+</div>
+<script>
+const state={"bg":"#7fb4d4","paper":"#fdf1e1","ink":"#111411","accent":"#c45a2b","splitX":50,"blurMax":14};
+function apply(){Object.keys(state).forEach(k=>{document.documentElement.style.setProperty("--"+k,String(state[k]));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const left=document.getElementById("left"),right=document.getElementById("right"),hero=document.getElementById("hero");
+function update(){
+  const max=document.querySelector(".scroll").offsetHeight-innerHeight;
+  const p=Math.min(1,Math.max(0,scrollY/max));
+  const x=state.splitX*1.2;
+  left.style.transform="translateX("+(-p*x)+"px)";
+  right.style.transform="translateX("+(p*x)+"px)";
+  hero.style.filter="blur("+(Math.abs(.5-p)*state.blurMax)+"px)";
+}
+addEventListener("scroll",update,{passive:true});update();
+</script>
+</body>
+</html>

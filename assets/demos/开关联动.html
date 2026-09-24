@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>开关联动</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--bd:#e5e7eb;--rad:14px;--sz:54px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,340px);background:var(--c2);border:1px solid var(--bd);border-radius:var(--rad);padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.row{display:flex;align-items:center;gap:12px}
+.row .t{font-weight:600}
+.sw{width:52px;height:30px;border-radius:999px;background:var(--bd);position:relative;cursor:pointer;transition:background .25s;margin-left:auto;flex:0 0 auto}
+.sw.on{background:var(--c1)}
+.sw .kn{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--c2);transition:left .25s}
+.sw.on .kn{left:25px}
+.panel{opacity:0;max-height:0;overflow:hidden;transition:.3s;margin-top:0}
+.box.on .panel{opacity:1;max-height:200px;margin-top:16px}
+.panel .f{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd);font-size:14px}
+.panel .f .d{width:34px;height:34px;border-radius:9px;background:var(--c1);opacity:.8}
+</style></head><body>
+<div class="box" id="box"><div class="row"><span class="t">编辑模式</span><div class="sw" id="sw"><div class="kn"></div></div></div><div class="panel" id="panel"><div class="f"><span class="d"></span>拖拽排序已开启</div><div class="f"><span class="d"></span>批量选择已开启</div><div class="f"><span class="d"></span>快速删除已开启</div></div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#e5e7eb",rad:14,sz:54,on:false};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--sz',state.sz+'px');document.getElementById('box').classList.toggle('on',state.on);document.getElementById('sw').classList.toggle('on',state.on);}
+apply();
+document.getElementById('sw').addEventListener('click',()=>{state.on=!state.on;apply();});
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

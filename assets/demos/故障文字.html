@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>故障文字</title>
+<style>
+:root{--c:#f5f5f5;--bg:#0a0a0a;--g1:#ff2e63;--g2:#08d9ff;--fs:96;--intensity:6;--dur:2.6;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;
+  font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.glitch{position:relative;font-weight:800;font-size:calc(var(--fs)*1px);color:var(--c);letter-spacing:.02em}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;background:var(--bg);overflow:hidden}
+.glitch::before{color:var(--g1);transform:translate(calc(var(--intensity)*-1px),0);
+  clip-path:inset(0 0 55% 0);animation:gl1 calc(var(--dur)*1s) infinite linear alternate}
+.glitch::after{color:var(--g2);transform:translate(calc(var(--intensity)*1px),0);
+  clip-path:inset(55% 0 0 0);animation:gl2 calc(var(--dur)*1s) infinite linear alternate}
+@keyframes gl1{0%{clip-path:inset(0 0 60% 0)}20%{clip-path:inset(10% 0 50% 0)}40%{clip-path:inset(40% 0 30% 0)}60%{clip-path:inset(5% 0 70% 0)}80%{clip-path:inset(30% 0 40% 0)}100%{clip-path:inset(0 0 55% 0)}}
+@keyframes gl2{0%{clip-path:inset(60% 0 0 0)}25%{clip-path:inset(45% 0 10% 0)}50%{clip-path:inset(70% 0 5% 0)}75%{clip-path:inset(35% 0 35% 0)}100%{clip-path:inset(55% 0 0 0)}}
+@media(prefers-reduced-motion:reduce){.glitch::before,.glitch::after{animation:none;opacity:.5}}
+</style>
+</head>
+<body>
+<div class="glitch" id="g" data-text="GLITCH">GLITCH</div>
+<script>
+// 双伪层 RGB 错位 + 切片 clip-path 抖动；intensity 控制位移、dur 控制节奏
+const state={text:"GLITCH",c:"#f5f5f5",bg:"#0a0a0a",g1:"#ff2e63",g2:"#08d9ff",fs:96,intensity:6,dur:2.6};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--bg',state.bg); r.setProperty('--g1',state.g1);
+  r.setProperty('--g2',state.g2); r.setProperty('--fs',state.fs);
+  r.setProperty('--intensity',state.intensity); r.setProperty('--dur',state.dur);
+  const g=document.getElementById('g'); g.textContent=state.text; g.setAttribute('data-text',state.text);
+}
+apply();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

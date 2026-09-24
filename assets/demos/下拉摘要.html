@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>下拉摘要</title>
+<style>
+:root{--c1:#059669;--c2:#ffffff;--c3:#1f2937;--bg:#eef0f4;--bd:#e5e7eb;--rad:16px;--pad:16px;--w:340px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.item{width:min(92vw,var(--w));background:var(--c2);border:1px solid var(--bd);border-radius:var(--rad);box-shadow:0 6px 18px rgba(20,20,40,.08);overflow:hidden}
+.hd{display:flex;align-items:center;gap:12px;padding:var(--pad);cursor:pointer;font-weight:600;color:var(--c3)}
+.hd .ar{margin-left:auto;color:var(--c1);transition:transform .3s}
+.item.on .hd .ar{transform:rotate(180deg)}
+.body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 var(--pad)}
+.item.on .body{max-height:220px}
+.body p{padding-bottom:var(--pad);opacity:.7;line-height:1.6}
+</style></head><body>
+<div class="item on" id="item">
+ <div class="hd" id="hd">本周小结 <span class="ar">▾</span></div>
+ <div class="body"><p>完成 12 项任务，比上周多 3 项；运动打卡 5 天，阅读累计 4.2 小时。下周重点是把「组件库」整理完。</p></div>
+</div>
+<script>
+const state={c1:"#059669",c2:"#ffffff",c3:"#1f2937",bg:"#eef0f4",bd:"#e5e7eb",rad:16,pad:16,w:340};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--pad',state.pad+'px');r.setProperty('--w',state.w+'px');}
+apply();
+document.getElementById('hd').addEventListener('click',()=>document.getElementById('item').classList.toggle('on'));
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

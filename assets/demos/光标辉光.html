@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光标辉光</title>
+<style>
+  :root{
+    --glow:#8b5cf6; --glow2:#22d3ee; --bg:#0b0e1a;
+    --size:240px; --intensity:.65; --blur:40px; --follow:.55;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{background:var(--bg);overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    color:#cbd5e1;display:grid;place-items:center;cursor:crosshair}
+  /* 聚光灯：固定层，径向渐变跟随光标，模拟手电筒打在深色页面上 */
+  .spot{position:fixed;left:0;top:0;width:var(--size);height:var(--size);
+    border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);
+    background:radial-gradient(circle, var(--glow) 0%, var(--glow2) 38%, transparent 70%);
+    opacity:var(--intensity);filter:blur(var(--blur));
+    mix-blend-mode:screen;will-change:left,top}
+  .content{position:relative;z-index:1;text-align:center;padding:24px;max-width:560px}
+  .content h1{font-size:clamp(28px,6vw,56px);font-weight:800;color:#f1f5f9;letter-spacing:.01em}
+  .content p{margin-top:14px;font-size:15px;line-height:1.7;opacity:.7}
+  .tip{position:fixed;left:0;right:0;bottom:20px;text-align:center;font-size:12px;opacity:.4;z-index:1}
+</style>
+</head>
+<body>
+  <div class="spot" id="spot"></div>
+  <div class="content">
+    <h1>光标辉光</h1>
+    <p>把光标当作手电筒，在深色画布上拖出一道柔光。适合官网首屏、作品集的氛围底。移动光标试试。</p>
+  </div>
+  <div class="tip">移动 / 触摸光标</div>
+<script>
+  const state={ text:"光标辉光", glow:"#8b5cf6", glow2:"#22d3ee", bg:"#0b0e1a",
+    size:240, intensity:.65, blur:40, follow:.55 };
+  const r=document.documentElement.style;
+  const spot=document.getElementById('spot');
+  let tx=innerWidth/2, ty=innerHeight/2, cx=tx, cy=ty;
+  function apply(){
+    r.setProperty('--glow',state.glow);
+    r.setProperty('--glow2',state.glow2);
+    r.setProperty('--bg',state.bg);
+    r.setProperty('--size',state.size+'px');
+    r.setProperty('--intensity',state.intensity);
+    r.setProperty('--blur',state.blur+'px');
+    r.setProperty('--follow',state.follow);
+  }
+  apply();
+  // 缓动跟随：光标目标实时更新，光斑每帧按 follow 比例逼近，避免生硬贴手
+  (function loop(){
+    cx+=(tx-cx)*state.follow; cy+=(ty-cy)*state.follow;
+    spot.style.left=cx+'px'; spot.style.top=cy+'px';
+    requestAnimationFrame(loop);
+  })();
+  addEventListener('pointermove',e=>{ tx=e.clientX; ty=e.clientY; },{passive:true});
+  addEventListener('touchmove',e=>{ if(e.touches[0]){tx=e.touches[0].clientX;ty=e.touches[0].clientY;} },{passive:true});
+  addEventListener('message',e=>{
+    const d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+</script>
+</body>
+</html>

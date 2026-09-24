@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>专注分段图</title>
+<style>
+:root{--c1:#6366f1;--c2:#22c55e;--c3:#f59e0b;--c4:#ef4444;--bg:#0f172a;--gap:6px;--h:54px;--pad:18px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:#e5e7eb;min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(94vw,460px)}
+.bar{display:flex;gap:var(--gap);height:var(--h);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.06)}
+.seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;min-width:0;overflow:hidden;white-space:nowrap}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:12px;opacity:.8}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+</style></head><body>
+<div class="box"><div class="bar" id="bar"></div><div class="leg" id="leg"></div></div>
+<script>
+const state={c1:"#6366f1",c2:"#22c55e",c3:"#f59e0b",c4:"#ef4444",bg:"#0f172a",gap:6,h:54,pad:18};
+const r=document.documentElement.style;
+const SEG=[{k:'c1',t:'工作',v:42},{k:'c2',t:'学习',v:26},{k:'c3',t:'运动',v:18},{k:'c4',t:'休息',v:14}];
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--c4',state.c4);r.setProperty('--bg',state.bg);r.setProperty('--gap',state.gap+'px');r.setProperty('--h',state.h+'px');r.setProperty('--pad',state.pad+'px');const bar=document.getElementById('bar');bar.innerHTML='';SEG.forEach(s=>{const d=document.createElement('div');d.className='seg';d.style.background='var(--'+s.k+')';d.style.width=s.v+'%';d.textContent=s.t;bar.appendChild(d);});const leg=document.getElementById('leg');leg.innerHTML='';SEG.forEach(s=>{const d=document.createElement('div');d.innerHTML='<i style="background:var(--'+s.k+')"></i>'+s.t+' '+s.v+'%';leg.appendChild(d);});}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

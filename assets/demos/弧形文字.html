@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>弧形文字</title>
+<style>
+:root{--c:#7fd1ff;--c2:#f472b6;--bg:#0a0e16;--r:170;--fs:32;--dur:12;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;font-family:system-ui,"Segoe UI",Arial,sans-serif}
+svg{width:min(92vw,880px);height:auto;overflow:visible}
+text{font-weight:800;font-size:calc(var(--fs)*1px);letter-spacing:.08em;fill:url(#g)}
+#s1{stop-color:var(--c)}
+#s2{stop-color:var(--c2)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 880 440">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop id="s1" offset="0"/><stop id="s2" offset="1"/></linearGradient>
+    <path id="arc" d=""/>
+  </defs>
+  <text><textPath id="tp" href="#arc" startOffset="0%"></textPath></text>
+</svg>
+<script>
+// 文字沿一条开放的弧线排布，并顺着弧线持续流动；与「闭合圆环自转」是不同的机制
+const state={text:"CURVED",c:"#7fd1ff",c2:"#f472b6",bg:"#0a0e16",r:170,fs:32,dur:12,rep:4};
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+  // 直接写 stop-color（不依赖 CSS 变量，避免描边解析失败导致文字不可见）
+  document.getElementById('s1').setAttribute('stop-color',state.c);
+  document.getElementById('s2').setAttribute('stop-color',state.c2);
+  const tp=document.getElementById('tp');
+  tp.textContent=Array(Math.max(1,state.rep|0)).fill(state.text).join('   ·   ');
+  const cx=440, base=340, bulge=state.r*2;
+  document.getElementById('arc').setAttribute('d','M'+(cx-380)+','+base+' Q'+cx+','+(base-bulge)+' '+(cx+380)+','+base);
+}
+apply();
+// 漂移量限制在一个重复长度内，保证任何时刻路径上都铺着文字（不会像全幅漂移那样整段移出）
+const t0=performance.now();
+function loop(){
+  const off=((performance.now()-t0)/((state.dur||12)*1000))%1;
+  document.getElementById('tp').setAttribute('startOffset',(-off*(100/Math.max(1,state.rep))).toFixed(2)+'%');
+  requestAnimationFrame(loop);
+}
+loop();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

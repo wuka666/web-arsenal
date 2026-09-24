@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>云巅行者 — 登山者英雄页</title>
+<style>
+:root{
+  --bg:#0a0e1c; --screen:#0a0e1c; --ink:#ffffff; --accent:#ed7a1a;
+  --menuRed:#7a2e00; --menuDark:#1a0e00; --blur:6px; --radius:50px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);min-height:100vh;padding:24px;
+  display:flex;align-items:center;justify-content:center}
+.row{display:flex;align-items:flex-end;justify-content:center;gap:var(--gap);flex-wrap:wrap}
+@media(max-width:768px){.row{flex-direction:column;align-items:center;gap:40px}}
+/* 手机框 */
+.phone{position:relative;width:min(300px,86vw);aspect-ratio:390/844;border-radius:var(--radius);
+  background:#000;padding:10px;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.phone .scr{position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;background:var(--screen)}
+.island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:34%;height:4%;background:#000;border-radius:999px;z-index:50}
+/* 顶导航 */
+.nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0}
+.logo{font-weight:800;letter-spacing:.04em;font-size:15px}
+.nav .menu{width:30px;height:30px;display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer}
+.nav .menu i{display:block;height:2px;width:100%;background:var(--ink);border-radius:2px}
+/* 入场 */
+@keyframes fu{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.fu{opacity:0;animation:fu .9s cubic-bezier(.16,1,.3,1) forwards}
+/* 屏1 英雄 */
+.hero-bg{position:absolute;inset:0;background:
+  linear-gradient(180deg,#1b2a4a 0%,#2c3e5e 40%,#0a0e1c 100%);}
+.peak{position:absolute;bottom:0;left:0;right:0;height:55%;
+  background:linear-gradient(160deg,#3a4a66 0%,#222d42 60%,#11161f 100%);
+  clip-path:polygon(0 60%,18% 38%,34% 52%,52% 22%,70% 46%,86% 30%,100% 50%,100% 100%,0 100%)}
+.fig{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:54px;height:120px;
+  background:linear-gradient(180deg,#0c1018,#1c2434);clip-path:polygon(42% 0,58% 0,62% 30%,70% 55%,66% 100%,34% 100%,30% 55%,38% 30%)}
+.blur{position:absolute;bottom:0;left:0;right:0;height:50%;pointer-events:none;
+  backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));
+  -webkit-mask:linear-gradient(to bottom,transparent 0%,#000 50%);mask:linear-gradient(to bottom,transparent 0%,#000 50%)}
+.loc{position:absolute;top:64px;left:18px;z-index:10}
+.loc .c{font-size:13px;color:rgba(255,255,255,.6)}
+.loc .t{font-size:34px;font-weight:400;line-height:.95;letter-spacing:-.03em;margin-top:2px}
+.name{position:absolute;bottom:22px;left:18px;right:18px;z-index:10}
+.name .n{font-size:44px;font-weight:600;line-height:.82;letter-spacing:-.03em}
+/* 屏2 数据 */
+.data-bg{position:absolute;inset:0;background:linear-gradient(180deg,#10203a,#0a0e1c)}
+.circuit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:60px 20px}
+.circuit svg{width:100%;height:auto;opacity:.8;stroke:var(--accent)}
+.stats{position:absolute;bottom:22px;left:18px;right:18px;z-index:10}
+.stats .lab{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.num{font-size:46px;font-weight:600;letter-spacing:-.04em;line-height:.9}
+.num.b{color:var(--accent)}
+/* 屏3 队伍 */
+.team-bg{position:absolute;inset:0;background:linear-gradient(180deg,#16110a,#0a0e1c)}
+.ttl{position:absolute;top:70px;left:18px;z-index:10}
+.ttl .c{font-size:13px;color:rgba(255,255,255,.6)}
+.ttl .t{font-size:38px;font-weight:400;letter-spacing:-.04em;line-height:.85;margin-top:2px}
+.car{position:absolute;bottom:0;left:0;right:0;display:flex}
+.car .m{flex:1;height:150px;background:rgba(20,20,30,.8);border:1px solid rgba(255,255,255,.1);border-bottom:none;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:12px}
+.car .m .pn{font-size:12px;color:rgba(255,255,255,.6)}
+.car .m .bn{font-size:40px;font-weight:600;letter-spacing:-.04em;line-height:.8;margin-top:6px}
+/* 菜单覆盖 */
+.overlay{position:absolute;inset:0;z-index:60;display:none;flex-direction:column;justify-content:center;padding:40px;
+  background:linear-gradient(160deg,var(--menuDark) 0%,#5a2200 40%,var(--menuRed) 100%)}
+.overlay.show{display:flex;animation:of .4s ease forwards}
+@keyframes of{from{opacity:0}to{opacity:1}}
+.overlay a{color:var(--ink);font-size:26px;font-weight:700;letter-spacing:-.02em;text-decoration:none;margin:10px 0;
+  opacity:0;transform:translateX(-20px);animation:si .5s cubic-bezier(.16,1,.3,1) forwards}
+.overlay a:nth-child(1){animation-delay:.1s}.overlay a:nth-child(2){animation-delay:.18s}.overlay a:nth-child(3){animation-delay:.26s}
+.overlay a:hover{color:var(--accent)}
+@keyframes si{to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div class="row">
+  <!-- 屏1 -->
+  <div class="phone fu" style="animation-delay:.3s">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="hero-bg"></div><div class="peak"></div><div class="fig"></div><div class="blur"></div>
+      <div class="nav"><div class="logo">云巅</div><div class="menu" onclick="document.querySelector('.overlay').classList.add('show')"><i></i><i></i><i></i></div></div>
+      <div class="loc fu" style="animation-delay:.4s"><div class="c">中国 · 四川</div><div class="t">四姑娘山</div></div>
+      <div class="name fu" style="animation-delay:.8s"><div class="n">高山<br>行者</div></div>
+      <div class="overlay"><a href="#">简介</a><a href="#">数据</a><a href="#">历程</a></div>
+    </div>
+  </div>
+  <!-- 屏2 -->
+  <div class="phone fu" style="animation-delay:.5s">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="data-bg"></div>
+      <div class="nav"><div class="logo">云巅</div><div class="menu" onclick="document.querySelector('.overlay').classList.add('show')"><i></i><i></i><i></i></div></div>
+      <div class="loc fu" style="animation-delay:.4s"><div class="c">经典环线</div><div class="t">大峰路线</div></div>
+      <div class="circuit fu" style="animation-delay:.6s">
+        <svg viewBox="0 0 200 120" fill="none" stroke="#ed7a1a" stroke-width="2"><path d="M10 100 C60 40 90 90 120 50 S180 20 190 60"/><circle cx="120" cy="50" r="4" fill="#ed7a1a" stroke="none"/></svg>
+      </div>
+      <div class="stats fu" style="animation-delay:.8s">
+        <div class="lab">累计海拔</div>
+        <div class="num" data-to="4200">0</div>
+        <div class="lab" style="margin-top:8px">环线里程</div>
+        <div class="num b" data-to="58">0</div>
+      </div>
+      <div class="overlay"><a href="#">简介</a><a href="#">数据</a><a href="#">历程</a></div>
+    </div>
+  </div>
+  <!-- 屏3 -->
+  <div class="phone fu" style="animation-delay:.7s">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="team-bg"></div>
+      <div class="nav"><div class="logo">云巅</div><div class="menu" onclick="document.querySelector('.overlay').classList.add('show')"><i></i><i></i><i></i></div></div>
+      <div class="ttl fu" style="animation-delay:.3s"><div class="c">登山队</div><div class="t">云巅<br>纵队</div></div>
+      <div class="car fu" style="animation-delay:.9s">
+        <div class="m"><div class="pn">阿木</div><div class="bn">07</div></div>
+        <div class="m"><div class="pn">林溪</div><div class="bn">12</div></div>
+      </div>
+      <div class="overlay"><a href="#">简介</a><a href="#">数据</a><a href="#">历程</a></div>
+    </div>
+  </div>
+</div>
+<script>
+// 数字滚动
+document.querySelectorAll('.num[data-to]').forEach(function(el){
+  var to=+el.dataset.to,dur=2200,st=null;
+  function step(t){if(!st)st=t;var p=Math.min(1,(t-st)/dur);var e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
+  setTimeout(function(){requestAnimationFrame(step);},900);
+});
+</script>
+</body>
+</html>

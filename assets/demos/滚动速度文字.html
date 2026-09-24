@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滚动速度文字</title>
+<style>
+:root{--c:#9fe7ff;--bg:#0a0e16;--fs:120;--maxSkew:26;--sens:0.05}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0a0e16);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .02em;font-weight:900;font-size:calc(var(--fs)*1px);color:var(--c)}
+.row span{display:inline-block;transform-origin:center;will-change:transform}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+const state={"text":"SCROLL","c":"#9fe7ff","bg":"#0a0e16","fs":120,"maxSkew":26,"sens":0.05};
+let mx=innerWidth/2,my=innerHeight/2,wheel=0;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+addEventListener('wheel',e=>{wheel+=e.deltaY;},{passive:true});
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+const row=document.getElementById('row');row.innerHTML=[...state.text].map(ch=>'<span>'+(ch===' '?'&nbsp;':ch)+'</span>').join('');
+}
+function loop(){wheel*=0.9;const s=document.querySelectorAll('#row span');const v=Math.max(-1,Math.min(1,wheel/40));s.forEach((sp,idx)=>{const f=Math.abs(v);sp.style.transform='skewX('+(v*state.maxSkew)+'deg) translateY('+(f*(idx%2?6:-6))+'px)';});requestAnimationFrame(loop);}loop();
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

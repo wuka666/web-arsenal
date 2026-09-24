@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>密集规格卡</title>
+<style>
+:root{
+  --card:#FFFFFF;
+  --line:#DDD7CE;
+  --accent:#A8452B;
+  --ink:#1E1B18;
+  --sub:#8B8279;
+  --radius:6px;
+  --gap:10px;
+  --bg:#F5F3EF;
+  --pad:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:14px;line-height:1.5;padding:16px;
+}
+.grid{
+  max-width:900px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);
+}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.grid{grid-template-columns:1fr}}
+
+/* ===== 密集规格卡本体 ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:border-color .18s ease,transform .18s ease;
+}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+
+.thumb{
+  aspect-ratio:1/1;background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+}
+.thumb svg{width:54%;height:54%;display:block;color:var(--sub)}
+
+.body{padding:var(--pad);display:flex;flex-direction:column;gap:var(--gap);flex:1 1 auto}
+.name{font-size:13px;font-weight:600;line-height:1.35}
+.name em{font-style:normal;color:var(--accent)}
+.spec{font-size:11px;color:var(--sub);line-height:1.5}
+.spec span{display:inline-block;margin-right:6px}
+.price{display:flex;align-items:baseline;gap:5px}
+.price .n{font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em}
+.price .u{font-size:11px;color:var(--sub)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{
+  font-size:10px;padding:1px 6px;border-radius:3px;
+  background:var(--bg);color:var(--sub);border:1px solid var(--line);
+}
+.tag.hot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.meta{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:var(--sub);
+  padding-top:6px;border-top:1px dashed var(--line);margin-top:auto;
+}
+</style>
+</head>
+<body>
+<div class="grid">
+
+  <div class="card">
+    <div class="thumb"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4">
+      <path d="M50 14 L74 27 V47 L50 60 L26 47 V27 Z"/><path d="M50 60 V88"/>
+    </svg></div>
+    <div class="body">
+      <div class="name">外六角螺栓 <em>M8×40</em></div>
+      <div class="spec"><span>304 不锈钢</span><span>8.8 级</span><span>本色</span></div>
+      <div class="price"><span class="n">0.86</span><span class="u">元 / 件</span></div>
+      <div class="tags"><span class="tag hot">现货</span><span class="tag">起订 100</span></div>
+      <div class="meta"><span>永年 · 标准件厂</span><span>月销 4.2万</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="thumb"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4">
+      <path d="M50 16 L78 32 V68 L50 84 L22 68 V32 Z"/><circle cx="50" cy="50" r="16"/>
+    </svg></div>
+    <div class="body">
+      <div class="name">六角螺母 <em>M8</em></div>
+      <div class="spec"><span>304 不锈钢</span><span>GB/T 6170</span><span>本色</span></div>
+      <div class="price"><span class="n">0.24</span><span class="u">元 / 件</span></div>
+      <div class="tags"><span class="tag hot">现货</span><span class="tag">起订 500</span></div>
+      <div class="meta"><span>永年 · 紧固件</span><span>月销 9.6万</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="thumb"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4">
+      <circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="14"/><circle cx="50" cy="20" r="4"/><circle cx="80" cy="50" r="4"/><circle cx="50" cy="80" r="4"/><circle cx="20" cy="50" r="4"/>
+    </svg></div>
+    <div class="body">
+      <div class="name">深沟球轴承 <em>6204</em></div>
+      <div class="spec"><span>铬钢</span><span>内径 20mm</span><span>ZZ 防尘</span></div>
+      <div class="price"><span class="n">6.40</span><span class="u">元 / 件</span></div>
+      <div class="tags"><span class="tag hot">现货</span><span class="tag">起订 20</span></div>
+      <div class="meta"><span>洛阳 · 轴承</span><span>月销 1.8万</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="thumb"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4">
+      <circle cx="50" cy="50" r="30" stroke-dasharray="8 6"/><circle cx="50" cy="50" r="14"/>
+    </svg></div>
+    <div class="body">
+      <div class="name">直齿齿轮 <em>20 齿</em></div>
+      <div class="spec"><span>45# 钢</span><span>模数 2</span><span>发黑</span></div>
+      <div class="price"><span class="n">12.80</span><span class="u">元 / 件</span></div>
+      <div class="tags"><span class="tag hot">可定制</span><span class="tag">起订 10</span></div>
+      <div class="meta"><span>台州 · 传动件</span><span>月销 3400</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

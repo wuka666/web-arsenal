@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>弹簧弹出徽章</title>
+<style>
+:root{
+  --badge-bg:#ef476f;
+  --badge-ink:#ffffff;
+  --card-bg:#16203a;
+  --accent:#7ee7ff;
+  --radius:12;
+  --badge-size:28;
+  --pop-dur:.6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070b14;min-height:100vh;display:grid;place-items:center;
+  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.card{position:relative;width:min(420px,92vw);height:240px;border-radius:calc(var(--radius)*1px);
+  background:var(--card-bg);color:#e8eefc;display:grid;place-items:center;font-size:22px;font-weight:800;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);overflow:hidden}
+/* 徽章：默认缩到 0，弹簧曲线 overshoot 弹出（cubic-bezier 末段 >1 制造回弹） */
+.badge{position:absolute;top:16px;right:16px;background:var(--badge-bg);color:var(--badge-ink);
+  font-size:calc(var(--badge-size)*1px);font-weight:800;padding:6px 14px;border-radius:20px;
+  transform:scale(0);transform-origin:top right;
+  box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.badge.show{transform:scale(1);
+  transition:transform calc(var(--pop-dur)*1s) cubic-bezier(.34,1.56,.64,1)}
+.btn{margin-top:18px;align-self:center;background:var(--accent);color:#04121a;border:0;
+  border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer}
+.wrap{display:flex;flex-direction:column;align-items:center}
+@media(prefers-reduced-motion:reduce){.badge.show{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">会员专享内容<div class="badge" id="badge">推荐</div></div>
+  <button class="btn" id="replay">重新弹出徽章</button>
+</div>
+<script>
+// 参数集中管理，与上方 :root 对应
+var state={badgeBg:"#ef476f",badgeInk:"#ffffff",cardBg:"#16203a",
+  accent:"#7ee7ff",radius:12,badgeSize:28,popDur:.6};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k, state[k]); }
+}
+function pop(){
+  var b=document.getElementById('badge');
+  b.classList.remove('show');
+  void b.offsetWidth;
+  b.classList.add('show');
+}
+apply();
+// 自动演示：进入视口即弹出；同时兜底 setTimeout 保证预览可见
+var done=false;
+function trigger(){ if(done)return; done=true; pop(); }
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)trigger();});});
+  io.observe(document.getElementById('card'));
+}
+setTimeout(trigger,500);
+document.getElementById('replay').addEventListener('click',function(){done=false;pop();done=true;});
+// 外部调参契约
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

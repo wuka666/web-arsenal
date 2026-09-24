@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分层拉开</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0b1020);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+:root{--bg:#0b1020;--panel:#1b3a6b;--accent:#5fd0ff;--gap:70;--tilt:28;--dur:6;--radius:12}
+.stage{position:relative;width:340px;height:300px;transform-style:preserve-3d;transform:perspective(900px) rotateX(calc(var(--tilt)*1deg))}
+.guide{position:absolute;left:18px;top:10px;bottom:10px;width:2px;background:linear-gradient(var(--accent,#5fd0ff),transparent);opacity:.5}
+.layer{position:absolute;left:40px;width:260px;height:54px;border-radius:calc(var(--radius)*1px);background:var(--panel,#1b3a6b);color:#dceaff;display:flex;align-items:center;padding:0 16px;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent,#5fd0ff);flex:0 0 auto}
+.lt{font-weight:800;font-size:14px}
+.ls{font-size:11px;opacity:.7;margin-left:auto}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+<div class="guide"></div>
+<div class="layer" data-i="0"><span class="dot"></span><span class="lt">层 1 · 顶栏</span><span class="ls">导航</span></div>
+<div class="layer" data-i="1"><span class="dot"></span><span class="lt">层 2 · 内容</span><span class="ls">正文</span></div>
+<div class="layer" data-i="2"><span class="dot"></span><span class="lt">层 3 · 侧栏</span><span class="ls">工具</span></div>
+<div class="layer" data-i="3"><span class="dot"></span><span class="lt">层 4 · 底栏</span><span class="ls">操作</span></div>
+</div>
+<script>
+const state={"bg":"#0b1020","panel":"#1b3a6b","accent":"#5fd0ff","gap":70,"tilt":28,"dur":6,"radius":12};
+function apply(){const r=document.documentElement.style;r.setProperty("--bg",state.bg);r.setProperty("--panel",state.panel);r.setProperty("--accent",state.accent);r.setProperty("--gap",state.gap);r.setProperty("--tilt",state.tilt);r.setProperty("--dur",state.dur);r.setProperty("--radius",state.radius);}
+const layers=[].slice.call(document.querySelectorAll(".layer"));const N=layers.length;
+function draw(t){const e=Math.sin(t*Math.PI*2)*0.5+0.5;const base=34,sp=base+e*state.gap;layers.forEach(function(el,i){const y=(i-(N-1)/2)*sp;el.style.transform="translateY("+y+"px) translateZ("+(i*18)+"px)";});}
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function frame(now){const t=(now/1000/state.dur)%1;draw(t);if(!reduce)requestAnimationFrame(frame);}
+apply();if(reduce)draw(0.5);else requestAnimationFrame(frame);
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

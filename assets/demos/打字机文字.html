@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>打字机文字</title>
+<style>
+:root{--c:#d8f3dc;--bg:#0b1f17;--caret:#52ffa8;--fs:64;--blink:1.06;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.box{font-weight:700;font-size:calc(var(--fs)*1px);color:var(--c);min-height:1.2em;text-align:center}
+.caret{display:inline-block;width:.5em;height:1.05em;background:var(--caret);
+  margin-left:.08em;vertical-align:-.12em;animation:blink calc(var(--blink)*1s) steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.caret{animation:none}}
+</style>
+</head>
+<body>
+<div class="box"><span id="t"></span><span class="caret"></span></div>
+<script>
+// 逐字打字 + 删除，循环多个词；speed 控制每步毫秒
+const state={words:"设计,构建,部署,进化",c:"#d8f3dc",bg:"#0b1f17",caret:"#52ffa8",speed:90,fs:64,blink:1.06};
+let wi=0, ci=0, del=false, timer=null;
+function list(){ return state.words.split(/[,，]/).map(s=>s.trim()).filter(Boolean); }
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--bg',state.bg);
+  r.setProperty('--caret',state.caret); r.setProperty('--fs',state.fs); r.setProperty('--blink',state.blink);
+  if(timer)clearInterval(timer);
+  wi=0; ci=0; del=false; document.getElementById('t').textContent='';
+  timer=setInterval(tick, state.speed);
+}
+function tick(){
+  const L=list(), cur=L[wi]||'';
+  const el=document.getElementById('t');
+  if(!del){ ci++; el.textContent=cur.slice(0,ci);
+    if(ci>=cur.length){ del=true; clearInterval(timer); timer=setTimeout(()=>{timer=setInterval(tick,state.speed);},1100); }
+  } else { ci--; el.textContent=cur.slice(0,ci);
+    if(ci<=0){ del=false; wi=(wi+1)%L.length; clearInterval(timer); timer=setTimeout(()=>{timer=setInterval(tick,state.speed);},260); }
+  }
+}
+apply();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

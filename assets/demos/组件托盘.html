@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>组件托盘</title>
+<style>
+:root{--c1:#6366f1;--c2:#ffffff;--c3:#1f2937;--bg:#0f172a;--rad:18px;--w:360px;--h:96px;--sz:52px;--mag:1.6;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c2);min-height:100vh;display:grid;place-items:center;padding:24px}
+.dock{display:flex;gap:10px;align-items:flex-end;justify-content:center;height:var(--h);padding:0 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rad);backdrop-filter:blur(10px)}
+.ic{width:var(--sz);height:var(--sz);border-radius:14px;background:var(--c1);display:grid;place-items:center;color:var(--c2);font-weight:800;transition:transform .15s;transform-origin:bottom center;cursor:pointer;user-select:none}
+</style></head><body>
+<div class="dock" id="dock">
+ <div class="ic">A</div><div class="ic">B</div><div class="ic">C</div><div class="ic">D</div><div class="ic">E</div>
+</div>
+<script>
+const state={c1:"#6366f1",c2:"#ffffff",c3:"#1f2937",bg:"#0f172a",rad:18,w:360,h:96,sz:52,mag:1.6};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--rad',state.rad+'px');r.setProperty('--w',state.w+'px');r.setProperty('--h',state.h+'px');r.setProperty('--sz',state.sz+'px');r.setProperty('--mag',state.mag);}
+apply();
+const dock=document.getElementById('dock');
+dock.addEventListener('mousemove',e=>{[...dock.children].forEach(ic=>{const b=ic.getBoundingClientRect();const c=b.left+b.width/2;const d=Math.abs(e.clientX-c);const s=Math.max(1,1+(state.mag-1)*(1-Math.min(d,120)/120));ic.style.transform='scale('+s.toFixed(3)+')';});});
+dock.addEventListener('mouseleave',()=>[...dock.children].forEach(ic=>ic.style.transform='scale(1)'));
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

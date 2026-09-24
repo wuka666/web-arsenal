@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>环形占比图</title>
+<style>
+:root{--c1:#6366f1;--c2:#22c55e;--c3:#f59e0b;--c4:#ef4444;--bg:#0f172a;--lw:22;--gap:0;--sz:220;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:#e5e7eb;min-height:100vh;display:grid;place-items:center;padding:24px}
+.wrap{width:min(86vw,var(--sz));position:relative}
+svg{width:100%;height:auto;display:block;transform:rotate(-90deg)}
+.seg{fill:none;stroke-width:var(--lw)}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(90deg)}
+.center b{font-size:26px;font-weight:800}
+.center span{font-size:12px;opacity:.6}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;justify-content:center;font-size:12px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+</style></head><body>
+<div class="box" style="width:min(94vw,460px)"><div class="wrap"><svg viewBox="0 0 120 120" id="svg"></svg><div class="center"><b id="tot">100%</b><span>占比</span></div></div><div class="leg" id="leg"></div></div>
+<script>
+const C=2*Math.PI*50;
+const state={c1:"#6366f1",c2:"#22c55e",c3:"#f59e0b",c4:"#ef4444",bg:"#0f172a",lw:22,gap:0,sz:220};
+const r=document.documentElement.style;
+const SEG=[{k:'c1',t:'A',v:40},{k:'c2',t:'B',v:28},{k:'c3',t:'C',v:20},{k:'c4',t:'D',v:12}];
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--c4',state.c4);r.setProperty('--bg',state.bg);r.setProperty('--lw',state.lw+'px');r.setProperty('--gap',state.gap+'px');r.setProperty('--sz',state.sz+'px');let off=0,html='';SEG.forEach(s=>{const len=C*s.v/100;html+='<circle class="seg" cx="60" cy="60" r="50" stroke="var(--'+s.k+')" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'"/>';off+=len;});document.getElementById('svg').innerHTML=html;document.getElementById('tot').textContent='100%';const leg=document.getElementById('leg');leg.innerHTML='';SEG.forEach(s=>{const d=document.createElement('div');d.innerHTML='<i style="background:var(--'+s.k+')"></i>'+s.t+' '+s.v+'%';leg.appendChild(d);});}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

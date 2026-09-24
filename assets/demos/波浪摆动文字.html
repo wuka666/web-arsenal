@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>波浪摆动文字</title>
+<style>
+:root{--c:#eaf6ff;--bg:#0a0e16;--fs:84;--amp:22;--dur:1.4;--ph:.09;--sh:#1b3a5c;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .01em;font-weight:900;font-size:calc(var(--fs)*1px);color:var(--c);text-shadow:0 calc(var(--fs)*.06px) 0 var(--sh)}
+.row span{display:inline-block;transform-origin:center;
+  animation:wave calc(var(--dur)*1s) ease-in-out infinite;
+  animation-delay:calc(var(--i) * var(--ph) * -1s)}
+@keyframes wave{0%,100%{transform:translateY(calc(var(--amp)*-1px))}50%{transform:translateY(calc(var(--amp)*1px))}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+// 每个字按正弦上下摆动，靠负 animation-delay 让相位逐字错开，形成沿文字行进的波
+const state={text:"WAVE",c:"#eaf6ff",bg:"#0a0e16",fs:84,amp:22,dur:1.4,ph:.09,sh:"#1b3a5c"};
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+  document.getElementById('row').innerHTML=[...state.text].map((ch,i)=>'<span style="--i:'+i+'">'+(ch===' '?'&nbsp;':ch)+'</span>').join('');
+}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ const w = {};
 new Function("window", fs.readFileSync(path.join(root, "data/方案.js"), "utf8"))(w);
 const schemes = w.WEB_SCHEMES;
 
-const norm = s => String(s || "").trim().toLowerCase();
+const norm = s => String(s || "").trim().toLowerCase().replace(/\s+/g, '');
 const rows = [];
 schemes.forEach(s => {
   const demo = s.演示页;
@@ -15,7 +15,9 @@ schemes.forEach(s => {
   const fp = path.join(root, demo);
   if (!fs.existsSync(fp)) { rows.push({ id: s.id, name: s.名称 || "", n: 0, tot: colors.length, miss: colors, demo: demo + " [缺失]" }); return; }
   const html = fs.readFileSync(fp, "utf8").toLowerCase();
-  const used = new Set([...html.matchAll(/#[0-9a-f]{3,8}\b/g)].map(m => m[0]));
+  const used = new Set();
+  for (const m of html.matchAll(/#[0-9a-f]{3,8}\b/g)) used.add(m[0]);
+  for (const m of html.matchAll(/rgba?\([^)]*\)/g)) used.add(m[0].replace(/\s+/g, ''));
   const hit = colors.filter(c => {
     if (used.has(c)) return true;
     // 容忍 8 位（带 alpha）与 6 位、3 位缩写互转

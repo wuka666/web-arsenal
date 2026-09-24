@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>路径装配</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0b1020);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+:root{--bg:#0b1020;--shell:#2b6cb0;--core:#ffce5a;--dist:95;--dur:7;--spin:20;--radius:10}
+.scene{width:200px;height:200px;transform-style:preserve-3d;transform:perspective(900px)}
+.box{position:absolute;inset:0;transform-style:preserve-3d}
+.face{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:calc(var(--radius)*1px);background:color-mix(in srgb,var(--shell) 80%,transparent);border:1px solid rgba(255,255,255,.25)}
+.core{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:10px;background:var(--core,#ffce5a);box-shadow:0 0 28px var(--core,#ffce5a)}
+</style>
+</head>
+<body>
+<div class="scene"><div class="box" id="box">
+<div class="face" data-r=""></div>
+<div class="face" data-r="rotateY(180deg)"></div>
+<div class="face" data-r="rotateY(90deg)"></div>
+<div class="face" data-r="rotateY(-90deg)"></div>
+<div class="face" data-r="rotateX(90deg)"></div>
+<div class="face" data-r="rotateX(-90deg)"></div>
+<div class="core" id="core"></div>
+</div></div>
+<script>
+const state={"bg":"#0b1020","shell":"#2b6cb0","core":"#ffce5a","dist":95,"dur":7,"spin":20,"radius":10};
+function apply(){const r=document.documentElement.style;r.setProperty("--bg",state.bg);r.setProperty("--shell",state.shell);r.setProperty("--core",state.core);r.setProperty("--dist",state.dist);r.setProperty("--dur",state.dur);r.setProperty("--spin",state.spin);r.setProperty("--radius",state.radius);}
+const box=document.getElementById("box"),core=document.getElementById("core");const faces=[].slice.call(document.querySelectorAll(".face"));const half=60;let ang=0;
+function draw(t){let coreS,e;if(t<0.2){coreS=0;e=1;}else if(t<0.5){coreS=(t-0.2)/0.3;e=1;}else if(t<0.85){coreS=1;e=1-(t-0.5)/0.35;}else{coreS=1;e=0;}ang+=state.spin/60;const tz=half+e*state.dist;faces.forEach(function(f){f.style.transform=f.dataset.r+" translateZ("+tz+"px)";});core.style.transform="scale("+coreS+")";box.style.transform="rotateX(-18deg) rotateY("+ang+"deg)";}
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function frame(now){const t=(now/1000/state.dur)%1;draw(t);if(!reduce)requestAnimationFrame(frame);}
+apply();if(reduce)draw(0.5);else requestAnimationFrame(frame);
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

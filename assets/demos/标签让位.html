@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>标签让位</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2933;--bg:#f2f2f7;--bd:#e5e7eb;--rad:999px;--gap:10px;--pad:10px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,360px);background:var(--c2);border:1px solid var(--bd);border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.tags{display:flex;flex-wrap:wrap;gap:var(--gap)}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:var(--pad) calc(var(--pad) + 4px);background:rgba(0,122,255,.1);color:var(--c1);border-radius:var(--rad);font-size:14px;transition:opacity .25s,transform .25s,width .25s}
+.tag.out{opacity:0;transform:scale(.7);width:0;padding:0;margin:0;overflow:hidden}
+.tag .x{width:18px;height:18px;border-radius:50%;background:var(--c1);color:var(--c2);display:grid;place-items:center;font-size:12px;cursor:pointer}
+</style></head><body>
+<div class="box"><div class="tags" id="tags"></div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2933",bg:"#f2f2f7",bd:"#e5e7eb",rad:999,gap:10,pad:10};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--gap',state.gap+'px');r.setProperty('--pad',state.pad+'px');}
+let tags=['设计','前端','后端','数据','运维','测试','产品'];
+function render(){const t=document.getElementById('tags');t.innerHTML='';tags.forEach((x,i)=>{const d=document.createElement('span');d.className='tag';d.innerHTML=x+'<span class="x">×</span>';d.querySelector('.x').addEventListener('click',e=>{e.stopPropagation();d.classList.add('out');d.addEventListener('transitionend',()=>{tags.splice(i,1);render();},{once:true});});t.appendChild(d);});}
+apply();render();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

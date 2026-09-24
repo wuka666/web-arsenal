@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>媒体就绪门控错位入场</title>
+<style>
+:root{
+  --bg:#0b1020;
+  --ink:#e8eefc;
+  --accent:#7ee7ff;
+  --gap:18;
+  --dur:.7;
+  --step:.12;
+  --radius:14;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);min-height:100vh;display:grid;place-items:center;
+  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.wrap{width:min(520px,92vw);display:flex;flex-direction:column;gap:calc(var(--gap)*1px)}
+/* 入场前全部收起；.ready 门控后才逐个错位揭示 */
+.item{opacity:0;transform:translateY(26px);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:calc(var(--radius)*1px);padding:18px 20px;color:var(--ink)}
+.ready .item{opacity:1;transform:none;
+  transition:opacity calc(var(--dur)*1s) ease,transform calc(var(--dur)*1s) cubic-bezier(.16,1,.3,1);
+  transition-delay:calc(var(--i)*var(--step)*1s)}
+.item h3{font-size:20px;margin-bottom:8px}
+.item p{font-size:14px;opacity:.7;line-height:1.6}
+.badge{display:inline-block;background:var(--accent);color:#04121a;font-weight:800;
+  font-size:12px;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.btn{margin-top:8px;align-self:flex-start;background:var(--accent);color:#04121a;
+  border:0;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.item{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="item" style="--i:0"><span class="badge">新品</span><h3>第一屏标题</h3><p>门控入场：内容默认隐藏，等媒体就绪后才逐个错位浮起。</p></div>
+  <div class="item" style="--i:1"><h3>功能要点</h3><p>每个条目按索引错开 0.12s 揭示，形成节奏感。</p></div>
+  <div class="item" style="--i:2"><h3>定价信息</h3><p>原站用视频 loadeddata 做门控，这里用定时模拟同一时刻。</p></div>
+  <button class="btn" id="replay">重新播放入场</button>
+</div>
+<script>
+// 参数集中管理，与上方 :root 对应
+var state={bg:"#0b1020",ink:"#e8eefc",accent:"#7ee7ff",gap:18,dur:.7,step:.12,radius:14};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k, state[k]); }
+}
+// ready 门控：模拟「视频 loadeddata 已就绪」再放行入场动画
+function play(){
+  var w=document.getElementById('wrap');
+  w.classList.remove('ready');
+  // 强制重排后再加类，保证过渡重新触发
+  void w.offsetWidth;
+  w.classList.add('ready');
+}
+apply();
+// 自动演示：加载后 600ms 模拟媒体就绪（原站有 5s 超时兜底，这里缩短便于预览）
+setTimeout(play,600);
+document.getElementById('replay').addEventListener('click',play);
+// 外部调参契约
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>透视显露内部</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0b1020);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+:root{--bg:#0b1020;--shell:#2b6cb0;--inner:#ffce5a;--mina:0.15;--glow:#ff9d5a;--dur:6;--radius:10}
+.scene{width:200px;height:200px;transform-style:preserve-3d;transform:perspective(900px) rotateX(-16deg) rotateY(-24deg)}
+.box{position:absolute;inset:0;transform-style:preserve-3d}
+.face{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:calc(var(--radius)*1px);background:var(--shell,#2b6cb0);border:1px solid rgba(255,255,255,.3)}
+.core{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:10px;background:var(--inner,#ffce5a);box-shadow:0 0 30px var(--glow,#ff9d5a)}
+</style>
+</head>
+<body>
+<div class="scene"><div class="box" id="box">
+<div class="face" style="transform:translateZ(60px)"></div>
+<div class="face" style="transform:rotateY(180deg) translateZ(60px)"></div>
+<div class="face" style="transform:rotateY(90deg) translateZ(60px)"></div>
+<div class="face" style="transform:rotateY(-90deg) translateZ(60px)"></div>
+<div class="face" style="transform:rotateX(90deg) translateZ(60px)"></div>
+<div class="face" style="transform:rotateX(-90deg) translateZ(60px)"></div>
+<div class="core" id="core"></div>
+</div></div>
+<script>
+const state={"bg":"#0b1020","shell":"#2b6cb0","inner":"#ffce5a","mina":0.15,"glow":"#ff9d5a","dur":6,"radius":10};
+function apply(){const r=document.documentElement.style;r.setProperty("--bg",state.bg);r.setProperty("--shell",state.shell);r.setProperty("--inner",state.inner);r.setProperty("--mina",state.mina);r.setProperty("--glow",state.glow);r.setProperty("--dur",state.dur);r.setProperty("--radius",state.radius);}
+const faces=[].slice.call(document.querySelectorAll(".face")),core=document.getElementById("core");
+function draw(t){const o=t<0.4?t/0.4:t<0.7?1:1-(t-0.7)/0.3;const op=1-(1-state.mina)*o;faces.forEach(function(f){f.style.opacity=op;});core.style.transform="scale("+(0.8+0.2*o)+")";}
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function frame(now){const t=(now/1000/state.dur)%1;draw(t);if(!reduce)requestAnimationFrame(frame);}
+apply();if(reduce)draw(0.5);else requestAnimationFrame(frame);
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

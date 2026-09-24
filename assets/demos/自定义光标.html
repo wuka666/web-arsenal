@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自定义光标 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#0b0d12;
+  --ink:#ffffff;
+  --ring:#d77a3a;
+  --dot:#ffffff;
+  --cursorSize:36px;
+  --label:"查看";
+  --scale:1.16;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;display:grid;place-items:center;min-height:100vh;overflow:hidden;cursor:none}
+.stage{text-align:center;max-width:560px;padding:24px}
+h1{font-size:clamp(28px,5vw,52px);font-weight:600;letter-spacing:-.02em;margin:0 0 16px}
+p{opacity:.7;line-height:1.7;font-size:15px}
+.hot{margin-top:28px;display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.hot span{border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:12px 22px;cursor:pointer}
+.custom-cursor{position:fixed;left:0;top:0;z-index:100;pointer-events:none;opacity:0;transition:opacity .2s}
+.custom-cursor.show{opacity:1}
+.cursor-dot{position:absolute;left:0;top:0;width:10px;height:10px;border-radius:50%;background:var(--dot);transform:translate(-50%,-50%)}
+.cursor-orbit{position:absolute;left:0;top:0;width:var(--cursorSize);height:var(--cursorSize);border:1.5px solid var(--ring);border-radius:50%;transform:translate(-50%,-50%);transition:width .25s cubic-bezier(.22,1,.36,1),height .25s cubic-bezier(.22,1,.36,1)}
+.custom-cursor.enter .cursor-orbit{width:calc(var(--cursorSize)*var(--scale));height:calc(var(--cursorSize)*var(--scale))}
+.cursor-label{position:absolute;left:0;top:26px;transform:translateX(-50%);font-size:14px;color:var(--ring);white-space:nowrap;opacity:0;transition:opacity .2s}
+.custom-cursor.enter .cursor-label{opacity:1}
+</style>
+</head>
+<body>
+<div class="stage">
+  <h1>把原生光标藏起来</h1>
+  <p>用一个圆点 + 圆环代替系统光标；指向可点击元素时圆环放大并显示标签，离开即复位。PC 端沉浸站常用。</p>
+  <div class="hot">
+    <span data-cursor>进入</span><span data-cursor>了解更多</span><span data-cursor>立即体验</span>
+  </div>
+</div>
+<div class="custom-cursor" id="cur">
+  <div class="cursor-dot"></div>
+  <div class="cursor-orbit"></div>
+  <div class="cursor-label" id="curLabel"></div>
+</div>
+<script>
+const state={"bg":"#0b0d12","ink":"#ffffff","ring":"#d77a3a","dot":"#ffffff","cursorSize":36,"label":"查看","scale":1.16};
+function apply(){Object.keys(state).forEach(k=>{let v=state[k];if(k==="cursorSize")v+="px";document.documentElement.style.setProperty("--"+k,String(v));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const cur=document.getElementById("cur"),label=document.getElementById("curLabel");
+let x=0,y=0,tx=0,ty=0;
+addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;cur.classList.add("show");});
+function loop(){x+=(tx-x)*.22;y+=(ty-y)*.22;cur.style.transform="translate("+x+"px,"+y+"px)";requestAnimationFrame(loop);}
+loop();
+document.querySelectorAll("[data-cursor]").forEach(el=>{
+  el.addEventListener("pointerenter",()=>{cur.classList.add("enter");label.textContent=state.label;});
+  el.addEventListener("pointerleave",()=>cur.classList.remove("enter"));
+});
+</script>
+</body>
+</html>

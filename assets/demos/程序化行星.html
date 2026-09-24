@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>程序化行星 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#070a12;
+  --p1:#d77a3a;
+  --p2:#3a6ea5;
+  --ring:#caa46a;
+  --star:#ffffff;
+  --starCount:220;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);overflow:hidden}
+canvas{display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<script>
+const state={"bg":"#070a12","p1":"#d77a3a","p2":"#3a6ea5","ring":"#caa46a","star":"#ffffff","starCount":220};
+function apply(){Object.keys(state).forEach(k=>{document.documentElement.style.setProperty("--"+k,String(state[k]));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim()||"#fff";
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+let W,H,DPR=Math.min(devicePixelRatio||1,2);
+function resize(){W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+resize();addEventListener("resize",resize);
+function draw(){
+  const w=innerWidth,h=innerHeight;
+  ctx.fillStyle=css("--bg");ctx.fillRect(0,0,w,h);
+  const n=+state.starCount;
+  ctx.fillStyle=css("--star");
+  for(let i=0;i<n;i++){
+    const x=(i*97.13)%w,y=(i*53.77)%h,a=0.3+0.7*((i*31)%100)/100;
+    ctx.globalAlpha=a;ctx.fillRect(x,y,1.4,1.4);
+  }
+  ctx.globalAlpha=1;
+  const cx=w/2,cy=h/2,R=Math.min(w,h)*0.18;
+  const g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.1,cx,cy,R);
+  g.addColorStop(0,css("--p1"));g.addColorStop(1,css("--p2"));
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(-0.4);ctx.scale(1,0.32);
+  ctx.beginPath();ctx.arc(0,0,R*1.7,0,Math.PI*2);ctx.lineWidth=8;ctx.strokeStyle=css("--ring");ctx.stroke();ctx.restore();
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>加载预填计数器 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#0a0c10;
+  --ink:#ffffff;
+  --accent:#d77a3a;
+  --speed:1;
+  --logoSize:64px;
+  --dock:24px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden}
+.preloader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
+.preloader.done{opacity:0;pointer-events:none}
+.logo{position:fixed;z-index:60;left:50%;top:50%;width:var(--logoSize);height:var(--logoSize);transform:translate(-50%,-50%);transition:left .9s cubic-bezier(.16,1,.3,1),top .9s cubic-bezier(.16,1,.3,1),width .9s cubic-bezier(.16,1,.3,1),height .9s cubic-bezier(.16,1,.3,1);will-change:left,top,width,height}
+.logo.docked{left:var(--dock);top:var(--dock);width:32px;height:32px;transform:none}
+.logo svg{width:100%;height:100%;display:block}
+.count{position:fixed;left:50%;bottom:42px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:4px;font-weight:100;font-size:64px}
+.count .pct{font-size:24px;padding-bottom:6px}
+.content{position:fixed;inset:0;display:grid;place-items:center;opacity:0;transition:opacity .6s ease .3s;text-align:center;padding:24px}
+.content.show{opacity:1}
+.content h1{font-size:clamp(28px,5vw,52px);margin:0 0 12px}
+.content p{opacity:.7;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="preloader" id="pre">
+  <div class="count"><span id="num">0</span><span class="pct">%</span></div>
+</div>
+<div class="logo" id="logo"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent)" stroke-width="6"/><circle cx="50" cy="50" r="14" fill="var(--accent)"/></svg></div>
+<div class="content" id="content"><h1>欢迎回来</h1><p>加载完成，内容已就绪。</p></div>
+<script>
+const state={"bg":"#0a0c10","ink":"#ffffff","accent":"#d77a3a","speed":1,"logoSize":64,"dock":24};
+function apply(){Object.keys(state).forEach(k=>{document.documentElement.style.setProperty("--"+k,String(state[k]));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const num=document.getElementById("num"),pre=document.getElementById("pre"),logo=document.getElementById("logo"),content=document.getElementById("content");
+let p=0;
+function step(){
+  p+=Math.max(1,Math.round(100*(0.02*state.speed)));
+  if(p>=100){p=100;num.textContent=100;finish();return;}
+  num.textContent=p;setTimeout(step,30/state.speed);
+}
+function finish(){logo.classList.add("docked");setTimeout(()=>{pre.classList.add("done");content.classList.add("show");},500);}
+step();
+</script>
+</body>
+</html>

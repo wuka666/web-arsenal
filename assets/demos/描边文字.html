@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>描边文字</title>
+<style>
+:root{ --c:#7fd1ff; --fill:#ffffff; --bg:#0a0e16; --w:2; --fs:120; --dur:2.4; }
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;
+  font-family:system-ui,"Segoe UI",Arial,sans-serif}
+svg{width:min(92vw,920px);height:auto;overflow:visible}
+text{font-weight:800;font-size:calc(var(--fs)*1px);letter-spacing:.04em;
+  fill:var(--fill);stroke:var(--c);stroke-width:calc(var(--w)*1px);paint-order:stroke;
+  stroke-dasharray:4000;stroke-dashoffset:4000;
+  animation:draw calc(var(--dur)*1s) ease forwards, fillin calc(var(--dur)*1s) ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fillin{0%,55%{fill:transparent}to{fill:var(--fill)}}
+@media(prefers-reduced-motion:reduce){text{animation:none;stroke-dashoffset:0;fill:var(--fill)}}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 920 220"><text id="t" x="50%" y="60%" text-anchor="middle">STROKE</text></svg>
+<script>
+// state 键 = 可调参数键；apply() 把它们映射到 CSS 变量与 DOM
+const state={text:"STROKE",c:"#7fd1ff",fill:"#ffffff",bg:"#0a0e16",w:2,fs:120,dur:2.4};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--fill',state.fill); r.setProperty('--bg',state.bg);
+  r.setProperty('--w',state.w); r.setProperty('--fs',state.fs); r.setProperty('--dur',state.dur);
+  document.getElementById('t').textContent=state.text;
+}
+apply();
+// 双轨预览契约：仅接受 type==='param' 且键存在于 state 的消息
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>渐变流光文字</title>
+<style>
+:root{--c1:#6ee7ff;--c2:#a78bfa;--c3:#f472b6;--bg:#0a0e16;--fs:96;--sp:6;--ang:90}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0a0e16);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.txt{font-weight:900;font-size:calc(var(--fs)*1px);letter-spacing:.02em;line-height:1.1;
+  background:linear-gradient(calc(var(--ang)*1deg),var(--c1),var(--c2),var(--c3),var(--c1));
+  background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:flow calc(var(--sp)*1s) linear infinite;text-align:center}
+@keyframes flow{to{background-position:300% 0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="txt" id="t">GRADIENT</div>
+<script>
+const state={"text":"GRADIENT","c1":"#6ee7ff","c2":"#a78bfa","c3":"#f472b6","bg":"#0a0e16","fs":96,"sp":6,"ang":90};
+let mx=innerWidth/2,my=innerHeight/2,wheel=0;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+addEventListener('wheel',e=>{wheel+=e.deltaY;},{passive:true});
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+document.getElementById('t').textContent=state.text;
+}
+
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

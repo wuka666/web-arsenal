@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光线背景</title>
+<style>
+:root{--c:#bfe9ff;--bg:#05070d;--rays:14;--speed:24;--spread:.34;--core:#9fdcff;}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);overflow:hidden}
+.rays{position:fixed;inset:-20%;background:repeating-conic-gradient(from 0deg at 50% 50%,
+  var(--c) 0deg, transparent calc(360deg / var(--rays) * var(--spread)), transparent calc(360deg / var(--rays)));
+  animation:spin calc(var(--speed)*1s) linear infinite;opacity:.5}
+.core{position:fixed;inset:0;background:radial-gradient(circle at 50% 50%, var(--core) 0%, transparent 26%);opacity:.55;mix-blend-mode:screen}
+@media(prefers-reduced-motion:reduce){.rays{animation:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="rays"></div><div class="core"></div>
+<script>
+// 居中放射光线（repeating-conic-gradient），rays 控制数量、spread 控制宽度、core 中心辉光
+const state={c:"#bfe9ff",bg:"#05070d",rays:14,speed:24,spread:.34,core:"#9fdcff"};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--bg',state.bg); r.setProperty('--rays',state.rays);
+  r.setProperty('--speed',state.speed); r.setProperty('--spread',state.spread); r.setProperty('--core',state.core);
+}
+apply();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>像素拖尾光标</title>
+<style>
+:root{--c:#36f9c0;--bg:#07090f;--size:14;--life:600;--gap:18;--count:140;}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{background:var(--bg);overflow:hidden;cursor:crosshair}
+canvas{display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<script>
+// 鼠标移动留下渐隐像素方块拖尾；gap 控制采样间距、life 控制淡出时长、count 控制上限
+const state={c:"#36f9c0",bg:"#07090f",size:14,life:600,gap:18,count:140};
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+function resize(){cv.width=innerWidth;cv.height=innerHeight;}
+addEventListener('resize',resize);resize();
+let parts=[],last=null,lastUser=-1e9;
+function apply(){
+  document.documentElement.style.setProperty('--c',state.c);
+  document.documentElement.style.setProperty('--bg',state.bg);
+  document.documentElement.style.setProperty('--size',state.size);
+  document.documentElement.style.setProperty('--life',state.life);
+  document.documentElement.style.setProperty('--gap',state.gap);
+  document.documentElement.style.setProperty('--count',state.count);
+}
+function push(x,y){
+  if(last){const dx=x-last.x,dy=y-last.y;if(Math.hypot(dx,dy)<state.gap){last={x,y};return;}}
+  last={x,y};
+  if(parts.length>=state.count)parts.shift();
+  parts.push({x,y,born:performance.now()});
+}
+addEventListener('mousemove',e=>{lastUser=performance.now();push(e.clientX,e.clientY);});
+function frame(){
+  const now=performance.now();
+  ctx.fillStyle=state.bg;ctx.fillRect(0,0,cv.width,cv.height);
+  if(now-lastUser>800){
+    // 自动演示：直接沿李萨如曲线铺一条渐隐拖尾，不靠累积——挂机/缩略图/headless 截图恒定可见
+    const N=52;
+    for(let k=0;k<N;k++){
+      const tt=now/1000-k*0.02;
+      const x=cv.width*(0.5+0.32*Math.sin(tt*0.9)),y=cv.height*(0.5+0.26*Math.sin(tt*1.4+1));
+      const a=1-k/N;ctx.globalAlpha=a;ctx.fillStyle=state.c;
+      const s=state.size*(0.4+a*0.6);ctx.fillRect(x-s/2,y-s/2,s,s);
+    }
+  }else{
+    for(const p of parts){const a=Math.max(0,1-(now-p.born)/state.life);
+      ctx.globalAlpha=a;ctx.fillStyle=state.c;
+      const s=state.size*(0.4+a*0.6);
+      ctx.fillRect(p.x-s/2,p.y-s/2,s,s);}
+  }
+  ctx.globalAlpha=1;
+  requestAnimationFrame(frame);
+}
+apply();frame();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

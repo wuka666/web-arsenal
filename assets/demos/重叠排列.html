@@ -1,0 +1,29 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>重叠排列</title>
+<style>
+:root{--c1:#4f46e5;--c2:#ffffff;--c3:#1f2937;--bg:#eef0f4;--gap:16px;--rad:16px;--pad:16px;--w:300px;--h:120px;--sp:1;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.stack{position:relative;width:min(90vw,var(--w));height:calc(var(--h) * 3 + var(--gap) * 2);transform:scale(var(--sp));transform-origin:center}
+.card{position:absolute;left:0;width:100%;height:var(--h);background:var(--c2);border-radius:var(--rad);padding:var(--pad);box-shadow:0 8px 24px rgba(20,20,40,.12);border:1px solid rgba(0,0,0,.05);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;display:flex;align-items:center;gap:12px}
+.card .dot{width:34px;height:34px;border-radius:50%;background:var(--c1);flex:0 0 auto}
+.card .t{font-weight:600}
+.card .s{font-size:13px;opacity:.6}
+.card:nth-child(1){top:0;transform:translateY(0) rotate(-2deg)}
+.card:nth-child(2){top:calc(var(--h) + var(--gap));transform:translateY(0)}
+.card:nth-child(3){top:calc((var(--h) + var(--gap)) * 2);transform:translateY(0) rotate(2deg)}
+.stack:hover .card:nth-child(1){transform:translateY(-12px) rotate(-3deg)}
+.stack:hover .card:nth-child(2){transform:translateY(0) scale(1.04);z-index:3;box-shadow:0 16px 40px rgba(20,20,40,.2)}
+.stack:hover .card:nth-child(3){transform:translateY(12px) rotate(3deg)}
+</style></head><body>
+<div class="stack">
+ <div class="card"><span class="dot"></span><div><div class="t">设计稿 v3</div><div class="s">2 小时前更新</div></div></div>
+ <div class="card"><span class="dot"></span><div><div class="t">需求评审</div><div class="s">今天 14:00</div></div></div>
+ <div class="card"><span class="dot"></span><div><div class="t">上线清单</div><div class="s">共 8 项</div></div></div>
+</div>
+<script>
+const state={c1:"#4f46e5",c2:"#ffffff",c3:"#1f2937",bg:"#eef0f4",gap:16,rad:16,pad:16,w:300,h:120,sp:1};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--gap',state.gap+'px');r.setProperty('--rad',state.rad+'px');r.setProperty('--pad',state.pad+'px');r.setProperty('--w',state.w+'px');r.setProperty('--h',state.h+'px');r.setProperty('--sp',state.sp);}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

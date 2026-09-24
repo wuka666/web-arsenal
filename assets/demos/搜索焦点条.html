@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>搜索焦点条</title>
+<style>
+:root{
+  --bg:#F5F3EF;
+  --ink:#1E1B18;
+  --accent:#A8452B;
+  --line:#DDD7CE;
+  --radius:6px;
+  --barH:64px;
+  --gap:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  padding:var(--gap);line-height:1.5;
+}
+.wrap{max-width:760px;margin:0 auto;padding-top:40px}
+
+/* 焦点层：通栏大搜索条。强调色描边 + 实心按钮，是全页唯一的高对比块 */
+.searchbar{
+  display:flex;align-items:stretch;gap:var(--gap);
+  height:var(--barH);
+  background:#FFFFFF;
+  border:2px solid var(--accent);
+  border-radius:var(--radius);
+  padding:6px;
+  box-shadow:0 2px 0 var(--line), 0 10px 26px rgba(168,69,43,.16);
+}
+.searchbar .ico{
+  flex:0 0 auto;display:grid;place-items:center;width:44px;color:var(--accent);
+}
+.searchbar .ico svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:6}
+.searchbar input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);
+  font-size:17px;font-family:inherit;
+}
+.searchbar button{
+  flex:0 0 auto;border:0;background:var(--accent);color:#FFFFFF;
+  font-size:15px;font-weight:600;padding:0 26px;border-radius:var(--radius);
+  cursor:pointer;font-family:inherit;white-space:nowrap;
+}
+
+/* 退让区：焦点之外的全部内容压低对比，让眼睛只剩一个落点 */
+.hint{
+  margin-top:var(--gap);font-size:12px;color:var(--ink);opacity:.5;
+}
+.rows{margin-top:var(--gap);display:flex;flex-direction:column;gap:var(--gap)}
+.row{
+  background:#FFFFFF;border:1px solid var(--line);border-radius:var(--radius);
+  height:56px;display:flex;align-items:center;gap:12px;padding:0 14px;
+}
+.row .sq{width:28px;height:28px;border-radius:var(--radius);background:var(--line);flex:0 0 auto}
+.row .ln{height:10px;border-radius:999px;background:var(--line);opacity:.75}
+.row .ln.w1{width:38%}
+.row .ln.w2{width:22%;margin-left:auto}
+.rows{opacity:.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="searchbar">
+    <span class="ico"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="M15.5 15.5 21 21"/></svg></span>
+    <input placeholder="检索型号 / 规格 / 材质">
+    <button>检索</button>
+  </div>
+  <div class="hint">焦点层：全页唯一高对比块＝搜索条；下方内容统一压低对比退让</div>
+  <div class="rows">
+    <div class="row"><span class="sq"></span><span class="ln w1"></span><span class="ln w2"></span></div>
+    <div class="row"><span class="sq"></span><span class="ln w1"></span><span class="ln w2"></span></div>
+    <div class="row"><span class="sq"></span><span class="ln w1"></span><span class="ln w2"></span></div>
+  </div>
+</div>
+</body>
+</html>

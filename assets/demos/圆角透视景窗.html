@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>圆角透视景窗 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#0a0e16;
+  --frame:#cdd6e6;
+  --radius:90;
+  --tilt:14;
+  --maskSoft:18;
+  --glow:#d77a3a;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);display:grid;place-items:center;min-height:100vh;overflow:hidden;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.portal{position:relative;width:min(320px,72vw);aspect-ratio:320/350;cursor:pointer;border-radius:calc(var(--radius)*1px);overflow:hidden;transform:perspective(900px) rotateY(calc(var(--tilt)*1deg));box-shadow:0 0 0 2px var(--frame),0 30px 80px rgba(0,0,0,.5),0 0 40px color-mix(in srgb,var(--glow) 40%,transparent);transition:transform .4s ease}
+.portal canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.portal .cap{position:absolute;left:14px;bottom:12px;right:14px;z-index:2;color:#fff;font-size:15px;display:flex;justify-content:space-between;align-items:center;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.portal .cap b{font-size:17px}
+</style>
+</head>
+<body>
+<div class="portal" id="portal">
+  <canvas id="cv"></canvas>
+  <div class="cap"><span>深空门户</span><b>进入 ›</b></div>
+</div>
+<script>
+const state={"bg":"#0a0e16","frame":"#cdd6e6","radius":90,"tilt":14,"maskSoft":18,"glow":"#d77a3a"};
+function apply(){Object.keys(state).forEach(k=>{let v=state[k];if(k==="radius"||k==="tilt"||k==="maskSoft")v+="px";document.documentElement.style.setProperty("--"+k,String(v));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim()||"#fff";
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+let W,H,DPR=Math.min(devicePixelRatio||1,2);
+function resize(){const r=cv.getBoundingClientRect();W=cv.width=r.width*DPR;H=cv.height=r.height*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+if(window.ResizeObserver){new ResizeObserver(resize).observe(cv);}resize();
+// 假 3D 遮罩：用 40 点投影把方画面映射成带透视的曲面（上窄下宽 + 轻微鼓起）
+function fake3d(){
+  const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle=css("--bg");ctx.fillRect(0,0,w,h);
+  const N=40,soft=2+(+state.maskSoft)*0.04;
+  for(let i=0;i<N;i++){
+    const a=i/N*Math.PI*2;
+    const x=w/2+Math.cos(a)*w*0.32;
+    const y=h/2+Math.sin(a)*h*0.30*(1+0.12*Math.cos(a));
+    ctx.globalAlpha=0.5;ctx.fillStyle=css("--frame");
+    ctx.beginPath();ctx.arc(x,y,soft,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  const cx=w/2,cy=h/2,R=Math.min(w,h)*0.2;
+  const g=ctx.createRadialGradient(cx-R*.3,cy-R*.3,R*.1,cx,cy,R);
+  g.addColorStop(0,css("--glow"));g.addColorStop(1,"#23304a");
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+}
+(function loop(){fake3d();requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>

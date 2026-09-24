@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>动态柱状图</title>
+<style>
+:root{--c1:#22d3ee;--c2:#0e7490;--c3:#e5e7eb;--bg:#0f172a;--gap:14;--n:9;--speed:1;--max:100;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(94vw,460px);background:#111827;border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+canvas{width:100%;height:240px;display:block}
+</style></head><body>
+<div class="box"><canvas id="cv"></canvas></div>
+<script>
+const state={c1:"#22d3ee",c2:"#0e7490",c3:"#e5e7eb",bg:"#0f172a",gap:14,n:9,speed:1,max:100};
+const r=document.documentElement.style;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+function data(){const a=[];for(let i=0;i<state.n;i++){a.push(20+Math.abs(Math.sin(i*1.7)*state.max*0.8)+ (i%3)*6);}return a;}
+let t0=performance.now();
+function resize(){const dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--gap',state.gap+'px');r.setProperty('--n',state.n);r.setProperty('--speed',state.speed);r.setProperty('--max',state.max);resize();t0=performance.now();}
+apply();
+function draw(e){const w=cv.clientWidth,h=cv.height?cv.clientHeight:240,pad=18;ctx.clearRect(0,0,w,h);const arr=data();const max=Math.max.apply(null,arr);const bw=(w-pad*2)/arr.length-state.gap;ctx.fillStyle=state.c2;ctx.fillRect(pad,h-22,w-pad*2,2);
+ arr.forEach((v,i)=>{const bh=(v/max)*(h-50)*e;const x=pad+i*(bw+state.gap);ctx.fillStyle=state.c1;ctx.fillRect(x,pad+(h-50-pad)-bh+0,bw,bh);});}
+function loop(now){const p=Math.min(1,(now-t0)/(900/state.speed));const e=1-Math.pow(1-p,3);draw(e);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

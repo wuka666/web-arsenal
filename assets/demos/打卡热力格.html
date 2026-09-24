@@ -1,0 +1,19 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>打卡热力格</title>
+<style>
+:root{--c1:#2563eb;--c2:#334155;--c3:#e5e7eb;--bg:#0f172a;--cols:18;--gap:4px;--cell:14px;--rad:3px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(94vw,520px)}
+.grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--cell));gap:var(--gap)}
+.cell{width:var(--cell);height:var(--cell);border-radius:var(--rad);background:var(--c2)}
+.cap{margin-top:12px;font-size:12px;opacity:.6;text-align:center}
+</style></head><body>
+<div class="box"><div class="grid" id="grid"></div><div class="cap" id="cap"></div></div>
+<script>
+const state={c1:"#2563eb",c2:"#334155",c3:"#e5e7eb",bg:"#0f172a",cols:18,gap:4,cell:14,rad:3};
+const r=document.documentElement.style;
+function val(i){const x=Math.sin(i*12.9898)*43758.5453;return Math.abs(x-Math.floor(x));}
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--cols',state.cols);r.setProperty('--gap',state.gap+'px');r.setProperty('--cell',state.cell+'px');r.setProperty('--rad',state.rad+'px');const g=document.getElementById('grid');g.innerHTML='';let sum=0;for(let i=0;i<7*state.cols;i++){const v=val(i);sum+=Math.round(v*4);const c=document.createElement('div');c.className='cell';if(v>.04){c.style.background='var(--c1)';c.style.opacity=v.toFixed(2);}g.appendChild(c);}document.getElementById('cap').textContent='近 '+state.cols+' 周共打卡 '+sum+' 次';}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

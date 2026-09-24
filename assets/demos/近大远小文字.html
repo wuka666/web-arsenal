@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>近大远小文字</title>
+<style>
+:root{--c:#cdeaff;--bg:#0a0e16;--fs:84;--maxScale:1.8;--radius:220}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0a0e16);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .01em;font-weight:900;font-size:calc(var(--fs)*1px);color:var(--c)}
+.row span{display:inline-block;transform-origin:center;will-change:transform}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+const state={"text":"PROXIMITY","c":"#cdeaff","bg":"#0a0e16","fs":84,"maxScale":1.8,"radius":220};
+let mx=innerWidth/2,my=innerHeight/2,wheel=0;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+addEventListener('wheel',e=>{wheel+=e.deltaY;},{passive:true});
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+const row=document.getElementById('row');row.innerHTML=[...state.text].map(ch=>'<span>'+(ch===' '?'&nbsp;':ch)+'</span>').join('');
+}
+function loop(){const s=document.querySelectorAll('#row span');s.forEach(sp=>{const r=sp.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2;const d=Math.hypot(cx-mx,cy-my);const t=Math.max(0,(state.radius-d)/state.radius);const sc=1+t*(state.maxScale-1);sp.style.transform='scale('+sc.toFixed(3)+')';});requestAnimationFrame(loop);}loop();
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

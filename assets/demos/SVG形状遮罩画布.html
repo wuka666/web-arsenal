@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVG形状遮罩画布</title>
+<style>
+:root{
+  --bg:#06121f;
+  --mask-color:#a3e635;
+  --inner-c1:#16e0a0;
+  --inner-c2:#3b82f6;
+  --shape-scale:1.2;
+  --radius:16;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);overflow:hidden;display:grid;place-items:center;
+  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+/* 用内联 SVG path 当 mask：三角形（或山峰）轮廓决定可见区域，把画布内容裁切进形状 */
+.mask-box{width:min(60vmin,420px);aspect-ratio:1/1;transform:scale(var(--shape-scale));
+  border-radius:calc(var(--radius)*1px);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23000' d='M50 10 L90 88 L10 88 Z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23000' d='M50 10 L90 88 L10 88 Z'/%3E%3C/svg%3E") center/contain no-repeat}
+canvas{width:100%;height:100%;display:block}
+.note{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  color:#cfe9ff;opacity:.6;font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="mask-box"><canvas id="cv"></canvas></div>
+<div class="note">内联 SVG 形状遮罩 + canvas 动画，替代远程视频 logo 遮罩</div>
+<script>
+// 参数集中管理，与上方 :root 对应
+var state={bg:"#06121f",maskColor:"#a3e635",innerC1:"#16e0a0",
+  innerC2:"#3b82f6",shapeScale:1.2,radius:16};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k, state[k]); }
+}
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W,H,t=0;
+function resize(){ W=cv.width=cv.clientWidth; H=cv.height=cv.clientHeight; }
+addEventListener('resize',resize); resize();
+function hex(h){ var v=parseInt(h.slice(1),16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+// 画布内容：底色 maskColor + 两色斜向流光，被外层 SVG 形状裁切
+function draw(){
+  t+=0.016;
+  var c1=hex(state.innerC1),c2=hex(state.innerC2),base=hex(state.maskColor);
+  ctx.fillStyle=state.maskColor; ctx.fillRect(0,0,W,H);
+  var x=((t*60)%(W+300))-150;
+  var grad=ctx.createLinearGradient(x,0,x+300,H);
+  grad.addColorStop(0,'rgba('+base[0]+','+base[1]+','+base[2]+',0)');
+  grad.addColorStop(.5,'rgba('+c1[0]+','+c1[1]+','+c1[2]+',.85)');
+  grad.addColorStop(.75,'rgba('+c2[0]+','+c2[1]+','+c2[2]+',.7)');
+  grad.addColorStop(1,'rgba('+base[0]+','+base[1]+','+base[2]+',0)');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+  requestAnimationFrame(draw);
+}
+draw();
+// 外部调参契约
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

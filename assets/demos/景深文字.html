@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>景深文字</title>
+<style>
+:root{--c:#1a1a1a;--bg:#efece3;--depth:34;--blur:5;--fs:108;--rot:16;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;
+  font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.scene{position:relative;perspective:900px}
+.word{display:flex;transform-style:preserve-3d;
+  transform:rotateX(calc(var(--rot)*1deg)) rotateY(-12deg);transition:transform .18s ease-out}
+.word span{display:inline-block;font-weight:800;font-size:calc(var(--fs)*1px);color:var(--c);transform-style:preserve-3d}
+</style>
+</head>
+<body>
+<div class="scene"><div class="word" id="w"></div></div>
+<script>
+// 每个字按位置推远 + 模糊，形成 3D 景深；鼠标视差微调
+const state={text:"DEPTH",c:"#1a1a1a",bg:"#efece3",depth:34,blur:5,fs:108,rot:16};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--bg',state.bg);
+  r.setProperty('--depth',state.depth); r.setProperty('--blur',state.blur);
+  r.setProperty('--fs',state.fs); r.setProperty('--rot',state.rot);
+  const w=document.getElementById('w'); w.innerHTML='';
+  const n=state.text.length;
+  for(let i=0;i<n;i++){
+    const s=document.createElement('span'); s.textContent=state.text[i];
+    const z=(i-(n-1)/2)*state.depth;
+    const b=Math.abs(i-(n-1)/2)*state.blur*0.12;
+    s.style.transform='translateZ('+z+'px)';
+    s.style.filter='blur('+b.toFixed(2)+'px)';
+    s.style.opacity=String(Math.max(.25,1-b*0.04));
+    w.appendChild(s);
+  }
+}
+apply();
+const sc=document.querySelector('.scene');
+sc.addEventListener('mousemove',e=>{
+  const b=sc.getBoundingClientRect();
+  const x=(e.clientX-b.left)/b.width-.5, y=(e.clientY-b.top)/b.height-.5;
+  sc.querySelector('.word').style.transform='rotateX('+(state.rot-y*10)+'deg) rotateY('+(-12+x*18)+'deg)';
+});
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

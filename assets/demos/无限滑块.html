@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>无限滑块 · 单文件 demo</title>
+<style>
+:root{
+  --bg:#f4f2ee;
+  --card:#ffffff;
+  --ink:#1c1a17;
+  --accent:#c45a2b;
+  --cardW:300;
+  --gap:20;
+  --radius:22;
+  --autoSpeed:1;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;display:grid;place-items:center;min-height:100vh;overflow:hidden}
+.wrap{width:min(92vw,1100px);overflow:hidden}
+.track{display:flex;gap:calc(var(--gap)*1px);will-change:transform;transition:transform .55s cubic-bezier(.22,1,.36,1)}
+.track.jump{transition:none}
+.card{flex:0 0 calc(var(--cardW)*1px);height:200px;border-radius:calc(var(--radius)*1px);background:var(--card);border:1px solid rgba(0,0,0,.08);box-shadow:0 14px 40px rgba(0,0,0,.08);padding:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none}
+.card .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.card h3{margin:0;font-size:22px;font-weight:800}
+.card p{margin:0;font-size:14px;opacity:.7}
+.nav{display:flex;gap:12px;justify-content:center;margin-top:18px}
+.nav button{width:46px;height:46px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font-size:18px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="track" id="track"></div>
+  <div class="nav"><button id="prev">‹</button><button id="next">›</button></div>
+</div>
+<script>
+const state={"bg":"#f4f2ee","card":"#ffffff","ink":"#1c1a17","accent":"#c45a2b","cardW":300,"gap":20,"radius":22,"autoSpeed":1};
+function apply(){Object.keys(state).forEach(k=>{document.documentElement.style.setProperty("--"+k,String(state[k]));});}
+apply();
+addEventListener("message",e=>{const d=e.data;if(!d||d.type!=="param"||!(d.key in state))return;state[d.key]=d.value;apply();});
+const items=[
+  {k:"古桥",t:"通济廊桥",b:"单孔石拱横跨山涧"},
+  {k:"水岸",t:"溪埠头",b:"洗衣停船的石阶"},
+  {k:"街巷",t:"老街面馆",b:"桥头第一碗手擀面"},
+  {k:"院落",t:"祠堂天井",b:"四水归堂的格局"},
+  {k:"观景",t:"半山亭",b:"看廊桥卧在山坳"}
+];
+const track=document.getElementById("track");
+const step=()=>items.length*(state.cardW+state.gap);
+function build(){
+  track.innerHTML="";
+  const seq=[...items,...items,...items]; // 3 套克隆保证无缝循环
+  seq.forEach((c,i)=>{const a=document.createElement("article");a.className="card";a.dataset.index=i%items.length;a.innerHTML='<span class="k">'+c.k+'</span><h3>'+c.t+'</h3><p>'+c.b+'</p>';track.appendChild(a);});
+}
+let pos=0;
+function render(){track.style.transform="translateX("+(-pos)+"px)";}
+function shift(dir){pos+=dir*step();track.classList.remove("jump");render();}
+function normalize(){const s=step();if(pos<0){pos+=s*items.length;track.classList.add("jump");render();}if(pos>=s*items.length*2){pos-=s*items.length;track.classList.add("jump");render();}}
+document.getElementById("next").onclick=()=>{shift(1);normalize();};
+document.getElementById("prev").onclick=()=>{shift(-1);normalize();};
+let auto=setInterval(()=>{shift(1);normalize();},2600/state.autoSpeed);
+build();render();
+</script>
+</body>
+</html>

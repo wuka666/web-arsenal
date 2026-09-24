@@ -65,6 +65,17 @@ M.forEach(m => (m.搭配 || []).forEach(d => {
   if (/^(v|m|s|f|a|w|r|soa)\d/i.test(d) && !mIds.has(d) && !sIds.has(d)) bad(`素材 ${m.id} 搭配「${d}」不存在`);
 }));
 
+// 3.5) 渲染层按数组消费的字段，类型必须是数组
+//   （index.html 用 (it.标签||[]).forEach 与 s.参考站.forEach；字段被写成字符串会直接抛错，
+//    中断卡片生成 → 整个画廊白屏。2026-09-23 M219–M228「标签」被写成字符串正是因此崩掉。）
+const mustBeArr = (obj, key, label) => {
+  if (obj[key] === undefined) return;
+  if (!Array.isArray(obj[key])) { bad(`${label} ${obj.id} ${obj.标题 || obj.风格名 || ""} ${key} 应为数组（现为 ${typeof obj[key]}）`); return; }
+  obj[key].forEach((v, i) => { if (typeof v !== "string" && typeof v !== "number") bad(`${label} ${obj.id} ${key}[${i}] 应为字符串`); });
+};
+M.forEach(m => mustBeArr(m, "标签", "素材"));
+S.forEach(s => { mustBeArr(s, "参考站", "方案"); mustBeArr(s, "标签", "方案"); });
+
 // 4) 标签闭集：四维取值必须落在词表内（防止以后又长出新碎片），且必须是单值字符串
 const TAXONOMY = {
   "适配端": ["通用", "PC 端", "移动端"],

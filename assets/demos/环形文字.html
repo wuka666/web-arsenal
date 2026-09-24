@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>环形文字</title>
+<style>
+:root{--c:#e9c46a;--bg:#101418;--fs:30;--speed:18;--dir:1;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;
+  font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.spin{width:min(86vw,440px);height:min(86vw,440px);animation:spin calc(var(--speed)*1s) linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+text{fill:var(--c);font-weight:700;font-size:calc(var(--fs)*1px);letter-spacing:.18em;text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+<svg class="spin" viewBox="0 0 400 400"><defs><path id="circ" d=""></path></defs>
+<text><textPath id="tp" href="#circ" startOffset="0"></textPath></text></svg>
+<script>
+// 文字沿圆形 path 排布并整体旋转；r 控制半径、dir 控制方向
+const state={text:"CIRCULAR TEXT",c:"#e9c46a",bg:"#101418",r:150,fs:30,speed:18,dir:1};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c',state.c); r.setProperty('--bg',state.bg);
+  r.setProperty('--fs',state.fs); r.setProperty('--speed',state.speed);
+  document.querySelector('.spin').style.animationDirection = state.dir<0 ? 'reverse':'normal';
+  const rad=state.r, cx=200, cy=200;
+  document.getElementById('circ').setAttribute('d',
+    'M'+cx+','+cy+' m'+(-rad)+',0 a'+rad+','+rad+' 0 1,1 '+(rad*2)+',0 a'+rad+','+rad+' 0 1,1 '+(-rad*2)+',0');
+  document.getElementById('tp').textContent = state.text.toUpperCase()+'  •  ';
+}
+apply();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

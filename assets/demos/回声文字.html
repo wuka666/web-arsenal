@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>回声文字</title>
+<style>
+  :root{
+    --fs:80px; --c:#151b2e; --echo:#6366f1; --bg:#eef1f6;
+    --count:4; --spread:14px; --dur:600ms;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{min-height:100vh;display:grid;place-items:center;background:var(--bg);
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    padding:24px;overflow:hidden}
+  .wrap{position:relative;display:grid;place-items:center;width:min(92vw,720px);height:min(60vh,360px)}
+  .echo{position:absolute;font-weight:800;font-size:var(--fs);letter-spacing:.02em;
+    color:var(--echo);opacity:0;pointer-events:none;will-change:transform,opacity;white-space:nowrap}
+  .main{position:relative;font-weight:800;font-size:var(--fs);letter-spacing:.02em;
+    color:var(--c);will-change:transform;white-space:nowrap}
+  /* 回声：每道余像比上一道更透明、更远，沿移动反方向拖尾 */
+  .echo.go{animation:echoOut var(--dur) ease-out forwards}
+  @keyframes echoOut{
+    from{opacity:.55; transform:translate(var(--dx),var(--dy)) scale(1)}
+    to{opacity:0; transform:translate(calc(var(--dx)*3),calc(var(--dy)*3)) scale(1.04)}
+  }
+  .main.go{transition:transform .12s ease-out}
+</style>
+</head>
+<body>
+  <div class="wrap" id="wrap">
+    <div class="main" id="main">ECHO</div>
+  </div>
+<script>
+  const state={ text:"ECHO", fs:80, c:"#151b2e", echo:"#6366f1",
+    bg:"#eef1f6", count:4, spread:14, dur:600 };
+  const r=document.documentElement.style;
+  const wrap=document.getElementById('wrap');
+  const main=document.getElementById('main');
+  function apply(){
+    r.setProperty('--fs',state.fs+'px');
+    r.setProperty('--c',state.c);
+    r.setProperty('--echo',state.echo);
+    r.setProperty('--bg',state.bg);
+    r.setProperty('--count',state.count);
+    r.setProperty('--spread',state.spread+'px');
+    r.setProperty('--dur',state.dur+'ms');
+    main.textContent=state.text;
+  }
+  apply();
+  let lastX=0,lastY=0,lastT=0,throttle=0;
+  wrap.addEventListener('pointermove',e=>{
+    const now=performance.now();
+    if(now-throttle<38) return; throttle=now;
+    const rect=wrap.getBoundingClientRect();
+    const x=e.clientX-rect.left, y=e.clientY-rect.top;
+    const dx=x-lastX, dy=y-lastY; lastX=x; lastY=y; lastT=now;
+    // 主文字朝光标轻微偏移；反向拖出 count 道渐隐回声
+    main.style.transform='translate('+(dx*0.12)+'px,'+(dy*0.12)+'px)';
+    for(let i=1;i<=state.count;i++){
+      const ec=document.createElement('div');
+      ec.className='echo go';
+      ec.textContent=state.text;
+      const ax=-dx*(state.spread/14)*i*0.5;
+      const ay=-dy*(state.spread/14)*i*0.5;
+      ec.style.setProperty('--dx',ax+'px');
+      ec.style.setProperty('--dy',ay+'px');
+      ec.style.opacity=(0.55/i).toFixed(3);
+      wrap.appendChild(ec);
+      setTimeout(()=>ec.remove(), state.dur+40);
+    }
+  });
+  wrap.addEventListener('pointerleave',()=>{ main.style.transform='translate(0,0)'; });
+  addEventListener('message',e=>{
+    const d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+</script>
+</body>
+</html>

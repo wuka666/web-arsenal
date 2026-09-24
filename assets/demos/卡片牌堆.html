@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>卡片堆叠</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--bd:#e5e7eb;--rad:16px;--sz:220px;--gap:18px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.stage{position:relative;width:min(86vw,var(--sz));height:calc(var(--sz) * .62);cursor:pointer}
+.pc{position:absolute;left:50%;top:30%;width:160px;height:200px;margin-left:-80px;border-radius:var(--rad);background:var(--c2);border:1px solid var(--bd);box-shadow:0 12px 30px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:var(--c1);transition:transform .4s cubic-bezier(.2,.8,.2,1);transform-origin:center bottom}
+.cap{margin-top:14px;text-align:center;font-size:12px;opacity:.6}
+</style></head><body>
+<div class="stage" id="stage"></div><div class="cap" id="cap">点最上面的卡片，把它翻到最底</div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#e5e7eb",rad:16,sz:220,gap:18};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--sz',state.sz+'px');r.setProperty('--gap',state.gap+'px');}
+let deck=['A','B','C','D'];
+function render(){const st=document.getElementById('stage');st.innerHTML='';deck.forEach((t,i)=>{const d=document.createElement('div');d.className='pc';const ty=i*14, sc=1-i*0.06, rot=(i-1.5)*5;d.style.transform='translateY('+ty+'px) scale('+sc+') rotate('+rot+'deg)';d.style.zIndex=deck.length-i;d.textContent=t;st.appendChild(d);});}
+apply();render();
+document.getElementById('stage').addEventListener('click',()=>{deck.push(deck.shift());render();});
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

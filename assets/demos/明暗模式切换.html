@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>主题切换</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--bd:#e5e7eb;--rad:14px;--pad:18px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,340px);background:var(--c2);border:1px solid var(--bd);border-radius:var(--rad);padding:var(--pad);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.row .t{font-weight:600}
+.sw{width:52px;height:30px;border-radius:999px;background:var(--bd);position:relative;cursor:pointer;transition:background .25s;margin-left:auto}
+.sw.on{background:var(--c1)}
+.sw .kn{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--c2);transition:left .25s}
+.sw.on .kn{left:25px}
+.preview{border-radius:12px;padding:16px;transition:.3s}
+.preview.light{background:#f8fafc;color:#1f2937}
+.preview.dark{background:#1e293b;color:#e5e7eb}
+.preview h4{margin:0 0 8px;color:var(--c1)}
+.preview p{margin:0;font-size:13px;opacity:.8;line-height:1.6}
+</style></head><body>
+<div class="box"><div class="row"><span class="t">深色模式</span><div class="sw" id="sw"><div class="kn"></div></div></div><div class="preview light" id="pv"><h4>预览卡片</h4><p>切换上面的开关，这张卡片会在浅色和深色之间平滑过渡，文字与背景自动适配。</p></div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#e5e7eb",rad:14,pad:18,on:false};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--pad',state.pad+'px');document.getElementById('sw').classList.toggle('on',state.on);document.getElementById('pv').className='preview '+(state.on?'dark':'light');}
+apply();
+document.getElementById('sw').addEventListener('click',()=>{state.on=!state.on;apply();});
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

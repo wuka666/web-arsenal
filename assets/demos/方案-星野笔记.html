@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星野笔记 · 双机登场</title>
+<style>
+:root{
+  --stage-bg:#F4F4F4;
+  --screen1-bg:#02040c;
+  --screen2-bg:#14151d;
+  --ink:#ffffff;
+  --accent:#7ee7ff;
+  --glow:34px;
+  --scale:0.95;
+  --star-count:120;
+  --aurora-speed:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--stage-bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  display:flex;align-items:center;justify-content:center;
+}
+#stage{
+  display:flex;gap:70px;padding:40px;
+  transform-origin:center center;
+  will-change:transform;
+}
+.phone{
+  width:370px;height:790px;border-radius:48px;
+  position:relative;overflow:hidden;
+  background:#000;
+  box-shadow:0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12);
+  flex-shrink:0;
+}
+.phone.light{background:#F2F2F7}
+.notch{
+  position:absolute;left:50%;top:11px;transform:translateX(-50%);
+  width:126px;height:37px;border-radius:24px;background:#000;z-index:50;
+}
+.status{
+  position:absolute;top:0;left:0;right:0;height:52px;z-index:45;
+  display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+  pointer-events:none;
+}
+.status .time{font-size:17px;font-weight:590;color:#fff;letter-spacing:0.2px}
+.status .icons{display:flex;align-items:center;gap:5px}
+.status svg{vertical-align:middle}
+.home{
+  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  width:139px;height:5px;border-radius:100px;z-index:50;
+}
+.light .home{background:rgba(0,0,0,0.25)}
+.screen{
+  position:absolute;inset:0;border-radius:48px;overflow:hidden;
+  color:var(--ink);
+}
+.screen > canvas{
+  position:absolute;inset:0;width:100%;height:100%;z-index:0;
+}
+.overlay{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+}
+.screen1 .overlay{
+  background:linear-gradient(to bottom,
+    rgba(2,4,12,0) 0%, rgba(2,4,12,0) 54%,
+    rgba(2,4,12,.35) 70%, rgba(2,4,12,.72) 100%);
+}
+.screen2 .overlay{
+  background:linear-gradient(to bottom,
+    rgba(20,21,29,0) 0%, rgba(20,21,29,0) 40%,
+    rgba(20,21,29,0.55) 55%, rgba(20,21,29,0.92) 66%,
+    var(--screen2-bg) 74%, var(--screen2-bg) 100%);
+}
+.content{position:relative;z-index:4;height:100%;display:flex;flex-direction:column;align-items:center}
+.logo{
+  margin-top:74px;width:118px;height:118px;
+  filter:drop-shadow(0 0 7px rgba(126,231,255,.28));
+  opacity:0;transform:translateY(-16px) scale(0.90);
+}
+.title{
+  margin-top:46px;text-align:center;
+  font-size:66px;line-height:68px;letter-spacing:0.2px;
+  font-weight:300;color:var(--ink);
+  text-shadow:0 0 var(--glow) rgba(255,255,255,.22), 0 1px 2px rgba(0,0,0,.35);
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.title .italic{
+  font-style:italic;font-weight:400;
+  text-shadow:0 0 10px rgba(255,255,255,.6), 0 0 20px rgba(255,235,190,.5), 0 0 40px rgba(255,210,140,.32);
+}
+.subtitle{
+  margin-top:20px;text-align:center;
+  font-size:16.5px;font-weight:400;line-height:26px;
+  color:rgba(255,255,255,.52);
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.btn-apple{
+  margin-top:42px;width:306px;height:55px;border-radius:28px;
+  background:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 26px rgba(0,0,0,.28);
+  font-size:18px;font-weight:500;color:#1a1a1a;
+  -webkit-text-stroke:0.6px #1a1a1a;
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.terms{
+  margin-top:20px;text-align:center;font-size:12px;font-weight:400;
+  color:rgba(255,255,255,.42);
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.terms strong{color:rgba(255,255,255,.82);font-weight:400}
+.screen2 .content{align-items:flex-start;padding:0 28px}
+.s2-heading{
+  margin-top:386px;font-size:26px;line-height:1;font-weight:500;
+  letter-spacing:0.2px;color:#fff;
+  text-shadow:0 0 18px rgba(120,180,220,0.35);
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.s2-divider{
+  margin-top:12px;width:265px;height:1px;
+  background:linear-gradient(to right, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.30) 70%, rgba(255,255,255,0) 100%);
+  transform-origin:left;transform:scaleX(0);
+}
+.feature-list{
+  margin-top:10px;width:314px;display:flex;flex-direction:column;gap:8px;
+}
+.feature-row{
+  display:flex;align-items:center;height:24px;gap:4px;
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.feature-row svg{flex:0 0 22px;width:22px;height:22px}
+.feature-row span{font-size:13.5px;font-weight:400;color:#fff;margin-left:4px}
+.pricing{
+  margin-top:30px;display:flex;gap:10px;width:314px;
+}
+.card{
+  height:123px;border-radius:14px;border:1px solid rgba(255,255,255,0.11);
+  padding:14px 14px 15px 15px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.card.monthly{width:144px;background:linear-gradient(135deg,#2a1f3d 0%,#1a253a 100%)}
+.card.yearly{width:160px;background:#1e212a}
+.card-label{font-size:13px;font-weight:400;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.35)}
+.card-price{font-size:19px;font-weight:500;letter-spacing:0.3px;color:#fff;margin-top:6px;text-shadow:0 1px 6px rgba(0,0,0,0.35)}
+.card-note{font-size:12px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.35)}
+.yearly .card-label,.yearly .card-note{color:rgba(255,255,255,0.50)}
+.yearly .card-price{color:rgba(255,255,255,0.62)}
+.save-badge{
+  position:absolute;left:15px;top:66px;
+  display:inline-flex;padding:5px 8px;border-radius:11px;background:#4d5057;
+  font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:0.2px;
+  opacity:0;transform:translateY(8px) scale(0.78);
+}
+.btn-sub{
+  margin-top:22px;width:314px;height:50px;border-radius:26px;
+  background:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:16px;font-weight:500;color:#0c0c0e;
+  -webkit-text-stroke:0.4px #0c0c0e;
+  opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px);
+}
+.btn-sub svg{stroke:#0c0c0e;stroke-width:2}
+
+.ze-ready .logo{animation:zeDrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.45s}
+.ze-ready .title{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.62s}
+.ze-ready .subtitle{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.78s}
+.ze-ready .btn-apple{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.94s}
+.ze-ready .terms{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.06s}
+.ze-ready .s2-heading{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.58s}
+.ze-ready .s2-divider{animation:zeLine 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.72s}
+.ze-ready .feature-row:nth-child(1){animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.80s}
+.ze-ready .feature-row:nth-child(2){animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.88s}
+.ze-ready .feature-row:nth-child(3){animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.96s}
+.ze-ready .feature-row:nth-child(4){animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.04s}
+.ze-ready .feature-row:nth-child(5){animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.12s}
+.ze-ready .card.monthly{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.22s}
+.ze-ready .card.yearly{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.30s}
+.ze-ready .btn-sub{animation:zeReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:1.42s}
+.ze-ready .save-badge{animation:zePop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;animation-delay:1.55s}
+
+@keyframes zeReveal{
+  from{opacity:0;transform:translateY(26px) scale(0.985);filter:blur(7px)}
+  to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+@keyframes zeDrop{
+  from{opacity:0;transform:translateY(-16px) scale(0.90)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes zeLine{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+@keyframes zePop{
+  0%{opacity:0;transform:translateY(8px) scale(0.78)}
+  70%{transform:translateY(0) scale(1.07)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .logo,.title,.subtitle,.btn-apple,.terms,.s2-heading,.s2-divider,.feature-row,.card,.btn-sub,.save-badge{animation:none!important;opacity:1;transform:none;filter:none}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="phone light">
+    <div class="notch"></div>
+    <div class="status">
+      <div class="time">11:11</div>
+      <div class="icons">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2c2.5 0 4.5 1.8 5 4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M8 0c3.5 0 6.5 2.5 7 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10" r="1.5" fill="#fff"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="2" y="2" width="18" height="8" rx="2" stroke="#fff" stroke-width="1.2"/><rect x="4" y="4" width="14" height="4" rx="1" fill="#fff"/><path d="M22 4v4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="screen screen1" id="s1">
+      <canvas id="c1"></canvas>
+      <div class="overlay"></div>
+      <div class="content">
+        <svg class="logo" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="54" stroke="var(--accent)" stroke-width="2" opacity="0.35"/>
+          <path d="M60 18 L60 102 M18 60 L102 60" stroke="var(--accent)" stroke-width="1.5" opacity="0.25"/>
+          <circle cx="60" cy="60" r="8" fill="var(--accent)"/>
+          <path d="M60 38c12 0 22 10 22 22s-10 22-22 22" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M60 30c17 0 30 13 30 30s-13 30-30 30" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+        </svg>
+        <div class="title">记录你头顶的<br><span class="italic">每一片星空</span></div>
+        <div class="subtitle">保存、整理与分享<br>你最爱的观星地点</div>
+        <button class="btn-apple">
+          <svg width="18" height="21" viewBox="0 0 18 21" fill="#1a1a1a"><path d="M14.7 11.2c0-2.6 2.1-3.9 2.2-4-1.2-1.7-3.1-2-3.8-2-1.6 0-3.2 1-4 1-2.1 0-3.6 1.4-4.5 3.2-2 3.4-.5 8.4 1.4 11.2 1 1.4 2.1 3 3.6 3 1.5 0 2-.9 3.8-.9 1.8 0 2.2.9 3.7.9 1.5 0 2.5-1.4 3.5-2.9.9-1.4 1.4-2.7 1.4-2.8-.1-.1-2.7-1-2.7-4.1zm-2.5-7.5c.8-1 1.3-2.3 1.2-3.6-1.1.1-2.5.7-3.3 1.7-.7.9-1.3 2.2-1.1 3.5 1.2.1 2.4-.6 3.2-1.6z"/></svg>
+          通过 Apple 继续
+        </button>
+        <div class="terms">继续即表示你同意 <strong>使用条款</strong></div>
+      </div>
+    </div>
+    <div class="home"></div>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="status">
+      <div class="time">11:11</div>
+      <div class="icons">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2c2.5 0 4.5 1.8 5 4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M8 0c3.5 0 6.5 2.5 7 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10" r="1.5" fill="#fff"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="2" y="2" width="18" height="8" rx="2" stroke="#fff" stroke-width="1.2"/><rect x="4" y="4" width="14" height="4" rx="1" fill="#fff"/><path d="M22 4v4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="screen screen2" id="s2">
+      <canvas id="c2"></canvas>
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="s2-heading">解锁 Pro：</div>
+        <div class="s2-divider"></div>
+        <div class="feature-list">
+          <div class="feature-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/></svg>
+            <span>创建私人星图集</span>
+          </div>
+          <div class="feature-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
+            <span>从相册导入观测照片</span>
+          </div>
+          <div class="feature-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.988-8-13.083-8-5.096 0-5.096 8 0 8 5.095 0 7.988-8 13.083-8z"/></svg>
+            <span>无限观测清单</span>
+          </div>
+          <div class="feature-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M12 3c.4 3.6 1.4 4.6 5 5-3.6.4-4.6 1.4-5 5-.4-3.6-1.4-4.6-5-5 3.6-.4 4.6-1.4 5-5Z"/></svg>
+            <span>AI 星体识别</span>
+          </div>
+          <div class="feature-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="8.5" cy="8" r="3"/><path d="M4 17c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5"/><circle cx="16.5" cy="8" r="2.5"/><path d="M13.5 17c0-2 1.6-3.8 3.5-3.8s3.5 1.8 3.5 3.8"/></svg>
+            <span>与好友共建观星地图</span>
+          </div>
+        </div>
+        <div class="pricing">
+          <div class="card monthly">
+            <div class="card-label">按月</div>
+            <div class="card-price">¥20</div>
+            <div class="card-note">每月结算</div>
+          </div>
+          <div class="card yearly">
+            <div class="card-label">按年</div>
+            <div class="card-price">¥200</div>
+            <div class="card-note">每年结算</div>
+            <div class="save-badge">省 ¥40</div>
+          </div>
+        </div>
+        <button class="btn-sub">订阅 <svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M1.5 1.5 7 7.5 1.5 13.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+    <div class="home"></div>
+  </div>
+</div>
+<script>
+const state={
+  stageBg:'#F4F4F4',
+  screen1Bg:'#02040c',
+  screen2Bg:'#14151d',
+  ink:'#ffffff',
+  accent:'#7ee7ff',
+  glow:34,
+  scale:0.95,
+  starCount:120,
+  auroraSpeed:1
+};
+function apply(){
+  const r=document.documentElement;
+  r.style.setProperty('--stage-bg',state.stageBg);
+  r.style.setProperty('--screen1-bg',state.screen1Bg);
+  r.style.setProperty('--screen2-bg',state.screen2Bg);
+  r.style.setProperty('--ink',state.ink);
+  r.style.setProperty('--accent',state.accent);
+  r.style.setProperty('--glow',state.glow+'px');
+  r.style.setProperty('--scale',state.scale);
+  r.style.setProperty('--star-count',state.starCount);
+  r.style.setProperty('--aurora-speed',state.auroraSpeed);
+  initStars();
+}
+function fit(){
+  const stage=document.getElementById('stage');
+  const vw=window.innerWidth-80,vh=window.innerHeight-80;
+  const sw=370*2+70,sh=790;
+  const ratio=Math.min(vw/sw,vh/sh,1)*state.scale;
+  stage.style.transform='scale('+ratio+')';
+}
+
+// Screen 1: starfield canvas (replaces video)
+const c1=document.getElementById('c1');
+const x1=c1.getContext('2d');
+let stars=[],W,H;
+function resize1(){W=c1.width=c1.offsetWidth;H=c1.height=c1.offsetHeight;initStars();}
+function initStars(){
+  stars=[];
+  const n=Math.max(30,Math.min(400,state.starCount));
+  for(let i=0;i<n;i++){
+    stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,a:Math.random(),s:Math.random()*0.02+0.005});
+  }
+}
+let t=0;
+function draw1(){
+  x1.fillStyle=state.screen1Bg;x1.fillRect(0,0,W,H);
+  // nebula glow center-bottom
+  const g=x1.createRadialGradient(W/2,H*0.85,0,W/2,H*0.85,W*0.8);
+  g.addColorStop(0,'rgba(126,231,255,0.18)');
+  g.addColorStop(0.5,'rgba(80,100,180,0.08)');
+  g.addColorStop(1,'rgba(2,4,12,0)');
+  x1.fillStyle=g;x1.fillRect(0,0,W,H);
+  for(const s of stars){
+    s.a+=s.s;if(s.a>1)s.a=0;
+    const alpha=s.a<0.5?s.a*2:(1-s.a)*2;
+    x1.beginPath();
+    x1.arc(s.x,s.y,s.r,0,Math.PI*2);
+    x1.fillStyle='rgba(255,255,255,'+(alpha*0.8)+')';
+    x1.fill();
+  }
+  // occasional shooting star
+  if((t|0)%200===0 && Math.random()>0.3){
+    const sx=Math.random()*W*0.5+W*0.25,sy=Math.random()*H*0.3;
+    x1.beginPath();x1.moveTo(sx,sy);x1.lineTo(sx+40,sy+10);
+    x1.strokeStyle='rgba(255,255,255,0.35)';x1.lineWidth=1;x1.stroke();
+  }
+  t+=0.5;requestAnimationFrame(draw1);
+}
+
+// Screen 2: aurora canvas (replaces video)
+const c2=document.getElementById('c2');
+const x2=c2.getContext('2d');
+let W2,H2;
+function resize2(){W2=c2.width=c2.offsetWidth;H2=c2.height=c2.offsetHeight;}
+let at=0;
+function draw2(){
+  x2.fillStyle=state.screen2Bg;x2.fillRect(0,0,W2,H2);
+  const bands=3;
+  const speed=state.auroraSpeed;
+  for(let i=0;i<bands;i++){
+    x2.beginPath();
+    const baseY=H2*(0.15+i*0.08);
+    for(let x=0;x<=W2;x+=10){
+      const y=baseY+Math.sin(x*0.01+at*0.02*speed+i*1.5)*30+Math.sin(x*0.03-at*0.03*speed)*15;
+      if(x===0)x2.moveTo(x,y);else x2.lineTo(x,y);
+    }
+    x2.lineTo(W2,H2);x2.lineTo(0,H2);x2.closePath();
+    const grad=x2.createLinearGradient(0,baseY-40,0,H2);
+    grad.addColorStop(0,'rgba(126,231,255,'+(0.12-i*0.03)+')');
+    grad.addColorStop(1,'rgba(20,21,29,0)');
+    x2.fillStyle=grad;x2.fill();
+  }
+  at++;requestAnimationFrame(draw2);
+}
+
+window.addEventListener('resize',()=>{resize1();resize2();fit();});
+resize1();resize2();fit();draw1();draw2();
+
+// ready gate: simulated video loadeddata + font timeout
+let ready=false;
+function setReady(){if(ready)return;ready=true;document.body.classList.add('ze-ready');}
+setTimeout(setReady,1500);
+
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state))return;
+  state[d.key]=d.value;apply();fit();
+});
+</script>
+</body>
+</html>

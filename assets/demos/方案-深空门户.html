@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深空门户 · 行星档案馆</title>
+<style>
+:root{
+  --bg:#090807;
+  --ink:#ffffff;
+  --accent:#d77a3a;
+  --muted:#9e9a94;
+  --portalRadius:90;
+  --portalTilt:37;
+  --shade:.88;
+  --cursorSize:36;
+  --preloaderSpeed:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-synthesis:none}
+.experience{position:relative;width:100%;height:100%;min-height:540px;overflow:hidden;background:var(--bg)}
+.backgrounds,.background,.shade,.transition-layer{position:absolute;inset:0;width:100%;height:100%}
+.background{object-fit:cover;opacity:0;transition:opacity .8s ease}
+.background.is-visible{opacity:1}
+.shade{z-index:1;background:linear-gradient(to bottom,transparent 52%,rgba(0,0,0,var(--shade)) 100%);pointer-events:none}
+.chrome{position:absolute;z-index:4;transition:opacity .45s ease,filter .45s ease}
+.experience.is-transitioning .chrome{opacity:0;filter:blur(8px);pointer-events:none}
+
+.header{left:clamp(18px,1.95vw,28px);right:clamp(18px,1.95vw,28px);top:clamp(18px,3.1vh,28px);display:flex;justify-content:space-between;align-items:center}
+.header-actions{margin-left:auto;display:flex;align-items:center}
+.nav{display:flex;align-items:center;height:42px;padding:4px 5px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);backdrop-filter:blur(12px);border-radius:999px}
+.nav a{color:var(--ink);text-decoration:none;padding:8px 19px;border-radius:999px;line-height:1}
+.nav a.active{background:var(--ink);color:var(--bg)}
+.menu{height:42px;padding:0 20px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);cursor:pointer}
+
+.planet-list{left:clamp(18px,1.95vw,28px);top:50%;transform:translateY(-43%);display:flex;flex-direction:column;gap:6px;font-size:16px}
+.planet-item{display:flex;align-items:center;min-height:20px}
+.planet-item.active{font-size:18px;font-weight:700;gap:8px}
+.planet-item.active:before{content:'';width:16px;height:16px;border-radius:50%;background:var(--ink)}
+
+.portal-wrap{left:50%;top:50%;width:min(320px,31vw);transform:translate(-50%,-54%);perspective:none}
+.portal-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:16px;opacity:0}
+.portal-heading strong{font-size:18px;margin-left:8px}
+.portal{position:relative;display:block;width:100%;aspect-ratio:320/350;padding:0;overflow:visible;border:0;border-radius:calc(var(--portalRadius)*1px);background:transparent;cursor:pointer;box-shadow:none;transform:none!important}
+.portal video,.portal img,.portal canvas{visibility:hidden;position:absolute;width:1px;height:1px;pointer-events:none}
+.portal-canvas{position:fixed;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}
+
+.planet-content{left:clamp(28px,4vw,58px);right:clamp(28px,3vw,44px);bottom:clamp(24px,3vh,30px);display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.planet-content h1{font-family:Impact,'Arial Narrow',sans-serif;font-size:clamp(128px,21.8vw,314px);font-weight:400;line-height:.72;margin:0 0 -.04em;letter-spacing:0;transform:translateX(-32px);opacity:0}
+.planet-content dl{width:min(447px,34vw);margin:0;font-size:16px}
+.fact{display:grid;grid-template-columns:138px 1fr;gap:18px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.48);opacity:0}
+.fact:last-child{border-bottom:0}
+.fact dt{font-weight:700}
+.fact dd{margin:0}
+
+.transition-layer{display:none}
+.loading{position:absolute;z-index:12;left:50%;bottom:30px;transform:translateX(-50%);opacity:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;transition:opacity .2s}
+.experience.is-loading .loading{opacity:.8}
+.experience.is-transitioning .header,.experience.is-transitioning .planet-list{opacity:1;filter:none;pointer-events:auto}
+.experience.is-transitioning .shade{opacity:1}
+.experience.is-committing .background{transition:none!important}
+
+.preloader{position:absolute;inset:0;z-index:20;background:#000;overflow:hidden}
+#preloader-canvas{position:absolute;inset:0;width:100%;height:100%}
+.preloader-shade{position:absolute;inset:auto 0 0;height:35%;background:linear-gradient(to bottom,transparent,#000)}
+.preloader.is-background{z-index:0}
+.preloader.is-background .preloader-shade{opacity:0}
+.floating-logo{position:fixed;z-index:22;left:50%;top:50%;width:59px;height:58px;transform:translate(-50%,-50%);will-change:left,top,width,height,transform;transition:left 2s cubic-bezier(.16,1,.3,1),top 2s cubic-bezier(.16,1,.3,1),width 2s cubic-bezier(.16,1,.3,1),height 2s cubic-bezier(.16,1,.3,1),transform 2s cubic-bezier(.16,1,.3,1)}
+.floating-logo svg{width:100%;height:100%;display:block}
+.floating-logo.is-docked{left:clamp(18px,1.95vw,28px);top:clamp(18px,3.1vh,28px);width:37px;height:36px;transform:none}
+.floating-logo.is-settled{z-index:5}
+.preloader-count{position:fixed;z-index:22;left:50%;bottom:clamp(22px,3.1vh,28px);display:flex;align-items:flex-end;gap:4px;transform:translateX(-50%);line-height:1}
+.preloader-count>span:first-child{font-weight:100;font-size:64px}
+.preloader-count .percent{font-size:24px;padding-bottom:4px}
+.preloader-count.is-leaving{animation:preload-count-out .75s cubic-bezier(.22,1,.36,1) both}
+@keyframes preload-count-out{to{opacity:0;filter:blur(7px);transform:translate(-50%,-34px)}}
+body:not(.preload-complete) .custom-cursor{opacity:0!important}
+
+html,body,button,a,.portal{cursor:none!important}
+.custom-cursor{display:block;position:fixed;left:0;top:0;z-index:100;width:1px;height:1px;pointer-events:none;opacity:0;transition:opacity .2s ease}
+.custom-cursor.is-visible{opacity:1}
+.cursor-dot,.cursor-orbit{position:absolute;left:0;top:0;border-radius:50%;transform:translate(-50%,-50%)}
+.cursor-dot{width:12px;height:12px;background:var(--ink)}
+.cursor-orbit{width:var(--cursorSize);height:var(--cursorSize);border:1px solid var(--ink);background:rgba(255,255,255,.4);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.custom-cursor.is-enter .cursor-orbit{transform:translate(-50%,-50%) scale(1.16)}
+.cursor-label{position:absolute;top:26px;left:0;transform:translateX(-50%) translateY(-4px);font:16px/1.2 system-ui,Arial,sans-serif;white-space:nowrap;opacity:0;transition:opacity .2s ease,transform .3s cubic-bezier(.22,1,.36,1)}
+.custom-cursor.is-enter .cursor-label{opacity:1;transform:translateX(-50%) translateY(0)}
+
+body:not(.intro-ready) .header,.intro-ready .planet-list,.intro-ready .planet-content h1,.intro-ready .planet-content .fact{opacity:0}
+.intro-ready .header{animation:reveal-down .9s cubic-bezier(.22,1,.36,1) .1s both}
+.intro-ready .planet-list{animation:reveal-side .9s cubic-bezier(.22,1,.36,1) .65s both}
+.content-revealing h1{animation:title-rise 1.05s cubic-bezier(.16,1,.3,1) both}
+.content-revealing .fact{animation:fact-rise .72s cubic-bezier(.22,1,.36,1) both}
+.fact:nth-child(1){animation-delay:.52s}
+.fact:nth-child(2){animation-delay:.68s}
+.fact:nth-child(3){animation-delay:.84s}
+.fact:nth-child(4){animation-delay:1s}
+.mask-revealing .portal-heading{animation:portal-caption .85s cubic-bezier(.22,1,.36,1) both}
+.planet-list.is-switching .planet-item{animation:menu-row .58s cubic-bezier(.22,1,.36,1) both}
+.planet-item:nth-child(1){animation-delay:.02s}
+.planet-item:nth-child(2){animation-delay:.05s}
+.planet-item:nth-child(3){animation-delay:.08s}
+.planet-item:nth-child(4){animation-delay:.11s}
+.planet-item:nth-child(5){animation-delay:.14s}
+.planet-item:nth-child(6){animation-delay:.17s}
+.planet-item:nth-child(7){animation-delay:.2s}
+.planet-item:nth-child(8){animation-delay:.23s}
+.planet-list.is-switching .planet-item.active:before{animation:active-dot .55s cubic-bezier(.22,1,.36,1) .18s both}
+
+@keyframes reveal-down{from{opacity:0;filter:blur(8px);transform:translateY(-18px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes reveal-side{from{opacity:0;filter:blur(8px);transform:translate(-20px,-43%)}to{opacity:1;filter:blur(0);transform:translate(0,-43%)}}
+@keyframes title-rise{from{opacity:0;filter:blur(12px);transform:translate(-32px,42px)}to{opacity:1;filter:blur(0);transform:translate(-32px,0)}}
+@keyframes fact-rise{from{opacity:0;filter:blur(7px);transform:translateY(18px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes portal-caption{from{opacity:0;filter:blur(7px);transform:translateY(22px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes menu-row{from{opacity:.35;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes active-dot{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+
+@media(max-width:900px){
+  .nav{display:none}
+  .portal-wrap{width:min(300px,48vw)}
+  .planet-content h1{font-size:clamp(105px,24vw,190px)}
+  .planet-content dl{width:43vw}
+  .fact{grid-template-columns:110px 1fr}
+  .planet-list{font-size:14px}
+  .planet-item.active{font-size:16px}
+}
+@media(max-width:640px){
+  .experience{min-height:600px}
+  .planet-list{display:none}
+  .portal-wrap{top:44%;width:min(260px,66vw)}
+  .planet-content{left:18px;right:18px;bottom:18px;display:block}
+  .planet-content h1{font-size:clamp(98px,30vw,160px);margin-bottom:20px}
+  .planet-content dl{width:100%;font-size:13px}
+  .fact{grid-template-columns:92px 1fr;padding:5px 0}
+  .portal-heading{font-size:14px}
+  .portal-heading strong{font-size:16px}
+  .menu{height:38px}
+  .portal{border-radius:70px}
+}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}.portal{transform:none!important}}
+</style>
+</head>
+<body>
+<main class="experience" data-planet="yanhe">
+  <div class="backgrounds" aria-hidden="true" id="bg-wrap"></div>
+  <div class="preloader" id="preloader" aria-label="Loading">
+    <canvas id="preloader-canvas"></canvas>
+    <div class="preloader-shade"></div>
+  </div>
+  <div class="floating-logo" id="floating-logo" aria-hidden="true">
+    <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="var(--ink)" stroke-width="3"/><path d="M14 24l7 7 13-13" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="preloader-count" id="preloader-count" aria-live="polite"><span id="preloader-value">0</span><span class="percent">%</span></div>
+  <canvas id="scene-canvas" class="scene-canvas" aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+
+  <header class="header chrome">
+    <div class="header-actions">
+      <nav class="nav" aria-label="Primary navigation"><a class="active" href="#about">关于</a><a href="#explore">探索</a><a href="#archive">档案</a></nav>
+      <button class="menu" type="button">菜单</button>
+    </div>
+  </header>
+
+  <aside class="planet-list chrome" aria-label="Planets"></aside>
+
+  <canvas id="portal-canvas" class="portal-canvas" aria-hidden="true"></canvas>
+  <section class="portal-wrap chrome" aria-label="Next destination">
+    <div class="portal-heading"><span>下一站：</span><span><span id="next-number">[02]</span> <strong id="next-name">沧澜</strong></span></div>
+    <button class="portal" id="portal" type="button" aria-label="Travel">
+      <canvas id="portal-media" aria-hidden="true"></canvas>
+    </button>
+  </section>
+
+  <section class="planet-content chrome" aria-live="polite">
+    <h1 id="planet-title">岩核</h1>
+    <dl id="facts"></dl>
+  </section>
+
+  <div class="transition-layer" aria-hidden="true"><canvas id="transition-canvas"></canvas></div>
+  <div class="loading" aria-hidden="true">准备轨道…</div>
+  <div class="custom-cursor" aria-hidden="true"><span class="cursor-orbit"></span><span class="cursor-dot"></span><span class="cursor-label">进入</span></div>
+</main>
+
+<script>
+(function(){
+  const state={bg:'#090807',ink:'#ffffff',accent:'#d77a3a',portalRadius:90,portalTilt:37,shade:.88,cursorSize:36,preloaderSpeed:1};
+  function apply(){Object.keys(state).forEach(k=>{let v=state[k];if(k==='portalRadius'||k==='cursorSize')v+='px';document.documentElement.style.setProperty('--'+k, k==='shade'?state[k]:String(v))});}
+  apply();
+  addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();});
+
+  const planets=['岩核','沧澜','星火','荧惑','青丘','玄冰','银环','橙雾'];
+  const states={
+    yanhe:{name:'岩核',next:'沧澜',number:'[02]',background:'yanhe',facts:[['距档案中心：','约 4.2 光分。'],['公转周期：','687 个标准日。'],['表面均温：','-60 °C，两极可达 -125 °C。'],['大气成分：','以二氧化碳为主，尘暴季节性强。']]},
+    canglan:{name:'沧澜',next:'星火',number:'[03]',background:'canglan',facts:[['距档案中心：','约 2.5 光分。'],['公转周期：','365.25 标准日。'],['表面均温：','+15 °C。'],['大气成分：','氮氧混合，液态水覆盖近七成表面。']]},
+    xinghuo:{name:'星火',next:'星火',number:'[08]',background:'xinghuo',facts:[['距档案中心：','约 0.4 光分。'],['公转周期：','225 标准日。'],['表面均温：','+465 °C。'],['大气成分：','极厚二氧化碳，硫酸云层。']]}
+  };
+  let current='yanhe';
+  let busy=false, transitionActive=false, expansion=0, maskScale=0, rotX=0, rotY=0, targetX=0, targetY=0, canvasOpacity=1;
+
+  function makePlanetCanvas(id, hue, rings){
+    const c=document.createElement('canvas');c.id=id;c.className='background';c.width=window.innerWidth||1280;c.height=window.innerHeight||720;
+    const ctx=c.getContext('2d');drawSpace(ctx,c.width,c.height,hue,rings);return c;
+  }
+  function drawSpace(ctx,W,H,hue,rings){
+    ctx.fillStyle='#'+state.bg.slice(1);ctx.fillRect(0,0,W,H);
+    const g=ctx.createRadialGradient(W*.7,H*.3,0,W*.7,H*.3,W*1.2);
+    g.addColorStop(0,'hsl('+(hue+20)+',55%,18%)');g.addColorStop(.55,'hsl('+(hue-10)+',45%,8%)');g.addColorStop(1,'#000');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    for(let i=0;i<240;i++){
+      const x=Math.random()*W,y=Math.random()*H,r=Math.random()*1.5,a=.2+Math.random()*.8;
+      ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    }
+    const cx=W*.65,cy=H*.55,R=Math.min(W,H)*.28;
+    const pg=ctx.createRadialGradient(cx-R*.4,cy-R*.4,R*.1,cx,cy,R);
+    pg.addColorStop(0,'hsl('+hue+',70%,60%)');pg.addColorStop(.4,'hsl('+hue+',55%,35%)');pg.addColorStop(1,'hsl('+hue+',50%,12%)');
+    ctx.fillStyle=pg;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+    ctx.save();ctx.globalCompositeOperation='source-atop';
+    for(let i=0;i<8;i++){ctx.fillStyle='rgba(0,0,0,'+.05+Math.random()*.1+')';ctx.beginPath();const a=Math.random()*Math.PI*2,rr=R*(.5+Math.random()*.45);ctx.arc(cx+Math.cos(a)*rr*.6,cy+Math.sin(a)*rr*.6,rr*.25,0,Math.PI*2);ctx.fill();}
+    ctx.restore();
+    if(rings){
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(-.15);ctx.beginPath();ctx.ellipse(0,0,R*1.6,R*.35,0,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=R*.08;ctx.stroke();ctx.restore();
+    }
+  }
+
+  const bgWrap=document.getElementById('bg-wrap');
+  bgWrap.appendChild(makePlanetCanvas('bg-yanhe',25,false));
+  bgWrap.appendChild(makePlanetCanvas('bg-canglan',200,true));
+  bgWrap.appendChild(makePlanetCanvas('bg-xinghuo',15,false));
+  document.getElementById('bg-yanhe').classList.add('is-visible');
+
+  const sceneCanvas=document.getElementById('scene-canvas'), sceneCtx=sceneCanvas.getContext('2d');
+  const portalCanvas=document.getElementById('portal-canvas'), portalCtx=portalCanvas.getContext('2d');
+  const portalMedia=document.getElementById('portal-media'), portalMediaCtx=portalMedia.getContext('2d');
+  const transitionCanvas=document.getElementById('transition-canvas'), transitionCtx=transitionCanvas.getContext('2d');
+
+  function resize(){
+    const d=Math.min(window.devicePixelRatio||1,2);
+    [sceneCanvas,portalCanvas,transitionCanvas].forEach(c=>{
+      c.width=innerWidth*d;c.height=innerHeight*d;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
+      const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);
+    });
+    portalMedia.width=320;portalMedia.height=350;
+    drawPortalMedia();
+  }
+
+  function drawPortalMedia(){
+    const ctx=portalMediaCtx,w=portalMedia.width,h=portalMedia.height;
+    const st=states[current]; const next=st.next===st.name?st.name:states[st.next].name;
+    const hue=next==='沧澜'?200:(next==='星火'?15:25);
+    drawSpace(ctx,w,h,hue,next==='沧澜');
+  }
+
+  function drawRoundedPath(ctx,cx,cy,w,h,r){
+    r=Math.min(r,w/2,h/2);
+    const pts=[];
+    for(let i=0;i<=10;i++){const a=-Math.PI/2+i*(Math.PI/2)/10;pts.push([w/2-r+Math.cos(a)*r, -h/2+r+Math.sin(a)*r]);}
+    for(let i=0;i<=10;i++){const a=i*(Math.PI/2)/10;pts.push([w/2-r+Math.cos(a)*r, h/2-r+Math.sin(a)*r]);}
+    for(let i=0;i<=10;i++){const a=Math.PI/2+i*(Math.PI/2)/10;pts.push([-w/2+r+Math.cos(a)*r, h/2-r+Math.sin(a)*r]);}
+    for(let i=0;i<=10;i++){const a=Math.PI+i*(Math.PI/2)/10;pts.push([-w/2+r+Math.cos(a)*r, -h/2+r+Math.sin(a)*r]);}
+    const ax=rotX*Math.PI/180, ay=rotY*Math.PI/180;
+    ctx.beginPath();
+    pts.forEach((p,idx)=>{
+      const x=p[0],y=p[1];const xx=x*Math.cos(ay);const yy=y*Math.cos(ax);const z=x*Math.sin(ay)-y*Math.sin(ax);const pp=850/(850+z);
+      const sx=cx+xx*pp, sy=cy+yy*pp;
+      if(idx===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);
+    });
+    ctx.closePath();
+  }
+
+  function drawCover(ctx,media){
+    const mw=media.width||media.videoWidth||media.naturalWidth||media.clientWidth,mh=media.height||media.videoHeight||media.naturalHeight||media.clientHeight;
+    if(!mw||!mh)return;
+    const s=Math.max(innerWidth/mw,innerHeight/mh),w=mw*s,h=mh*s;
+    ctx.drawImage(media,(innerWidth-w)/2,(innerHeight-h)/2,w,h);
+  }
+
+  function drawShade(ctx){
+    const g=ctx.createLinearGradient(0,innerHeight*.52,0,innerHeight);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.88)');
+    ctx.fillStyle=g;ctx.fillRect(0,innerHeight*.52,innerWidth,innerHeight*.48);
+  }
+
+  function portalLoop(){
+    const ctx=portalCtx;ctx.clearRect(0,0,innerWidth,innerHeight);
+    if(transitionActive){drawCover(ctx,transitionCanvas);drawShade(ctx);}
+    else if(expansion>0.001){drawCover(ctx,document.getElementById('bg-'+states[current].background)||document.querySelector('.background.is-visible'));drawShade(ctx);}
+    const rect=document.getElementById('portal').getBoundingClientRect();
+    const e=expansion;
+    const cx=rect.left+rect.width/2+(innerWidth/2-(rect.left+rect.width/2))*e;
+    const cy=rect.top+rect.height/2+(innerHeight/2-(rect.top+rect.height/2))*e;
+    const bw=rect.width+(innerWidth-rect.width)*e, bh=rect.height+(innerHeight-rect.height)*e;
+    const sc=e?1:maskScale;const w=bw*sc,h=bh*sc;
+    if(w<=1||h<=1){requestAnimationFrame(portalLoop);return;}
+    const r=(state.portalRadius*(1-e))*sc;
+    const rx=rotX*(1-e), ry=rotY*(1-e);
+    ctx.save();ctx.globalAlpha=canvasOpacity;
+    drawRoundedPath(ctx,cx,cy,w,h,r,rx,ry);
+    ctx.clip();
+    ctx.fillStyle='#'+state.bg.slice(1);ctx.fillRect(0,0,innerWidth,innerHeight);
+    drawCover(ctx,transitionActive?transitionCanvas:portalMedia);
+    if(transitionActive)drawShade(ctx);
+    ctx.restore();
+    requestAnimationFrame(portalLoop);
+  }
+
+  function cursorLoop(){
+    const c=document.querySelector('.custom-cursor');rotX+=(targetX-rotX)*.08;rotY+=(targetY-rotY)*.08;
+    const orbit=c.querySelector('.cursor-orbit');
+    if(orbit)orbit.style.transform='translate(-50%,-50%)';
+    requestAnimationFrame(cursorLoop);
+  }
+
+  function render(){
+    const st=states[current];
+    document.querySelector('.experience').setAttribute('data-planet',current);
+    document.getElementById('planet-title').textContent=st.name.toUpperCase();
+    document.getElementById('next-name').textContent=st.next===st.name?st.name:states[st.next].name;
+    document.getElementById('next-number').textContent=st.number;
+    document.getElementById('portal').setAttribute('aria-label','前往 '+document.getElementById('next-name').textContent);
+    const dl=document.getElementById('facts');dl.innerHTML='';
+    st.facts.forEach(f=>{dl.innerHTML+='<div class="fact"><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';});
+    const list=document.querySelector('.planet-list');list.innerHTML='';
+    planets.forEach(p=>{const sp=document.createElement('span');sp.className='planet-item'+(p===st.name?' active':'');sp.textContent=p;list.appendChild(sp);});
+    document.querySelectorAll('.background').forEach(b=>b.classList.remove('is-visible'));
+    const bg=document.getElementById('bg-'+st.background);if(bg)bg.classList.add('is-visible');
+    drawPortalMedia();
+    if(current!=='yanhe'){list.classList.remove('is-switching');void list.offsetWidth;list.classList.add('is-switching');}
+  }
+
+  function revealMask(){
+    document.querySelector('.experience').classList.remove('mask-revealing');void document.querySelector('.experience').offsetWidth;
+    document.querySelector('.experience').classList.add('mask-revealing');maskScale=0;
+    let start=null;const dur=1050;
+    function step(t){if(!start)start=t;const p=Math.min(1,(t-start)/dur);maskScale=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function revealContent(){
+    document.querySelector('.experience').classList.remove('content-revealing');void document.querySelector('.experience').offsetWidth;
+    document.querySelector('.experience').classList.add('content-revealing');
+  }
+
+  function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  function animateValue(setter,dur){return new Promise(res=>{let start=null;function step(t){if(!start)start=t;const p=Math.min(1,(t-start)/dur);setter(easeInOutCubic(p));if(p<1)requestAnimationFrame(step);else res();}requestAnimationFrame(step);});}
+
+  async function travel(){
+    if(busy||current==='xinghuo')return;busy=true;
+    targetX=0;targetY=0;
+    const next=current==='yanhe'?'canglan':'xinghuo';
+    drawSpace(transitionCtx,innerWidth,innerHeight,next==='canglan'?200:15,next==='canglan');
+    document.querySelector('.experience').classList.add('is-loading');
+    await new Promise(r=>setTimeout(r,400));
+    document.querySelector('.experience').classList.remove('is-loading','content-revealing','mask-revealing');
+    document.querySelector('.experience').classList.add('is-transitioning');
+    canvasOpacity=1;transitionActive=true;
+    await animateValue(v=>expansion=v,1100);
+    current=next;document.querySelector('.experience').classList.add('is-committing');render();
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    transitionActive=false;expansion=0;maskScale=0;canvasOpacity=1;
+    document.querySelector('.experience').classList.remove('is-transitioning','is-committing');
+    revealMask();setTimeout(revealContent,100);
+    busy=false;
+  }
+
+  function startExperience(){
+    document.querySelector('.experience').classList.add('intro-ready');
+    setTimeout(revealMask,300);setTimeout(revealContent,850);
+  }
+
+  function runPreloader(){
+    const c=document.getElementById('preloader-canvas'),ctx=c.getContext('2d');
+    c.width=innerWidth;c.height=innerHeight;
+    const dur=3000/state.preloaderSpeed;let start=null;
+    function step(t){
+      if(!start)start=t;const p=Math.min(1,(t-start)/dur);
+      ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
+      const cx=c.width/2,cy=c.height/2;
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,c.width*.6);
+      g.addColorStop(0,'rgba(215,122,58,'+(p*.35)+')');g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,c.width*.6,0,Math.PI*2);ctx.fill();
+      const R=Math.min(c.width,c.height)*.18*(.2+p*.8);
+      ctx.fillStyle='hsl(25,60%,'+(35+p*25)+'%)';ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+      for(let i=0;i<80;i++){
+        const a=i*7+p*4,rr=R*1.3+i*4;
+        ctx.fillStyle='rgba(255,255,255,'+(p*.6)+')';ctx.beginPath();ctx.arc(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,1.2,0,Math.PI*2);ctx.fill();
+      }
+      document.getElementById('preloader-value').textContent=Math.round(p*100);
+      if(p<1){requestAnimationFrame(step);}else finishPreloader();
+    }
+    requestAnimationFrame(step);
+  }
+  function finishPreloader(){
+    document.getElementById('preloader-value').textContent='100';
+    document.getElementById('preloader-count').classList.add('is-leaving');
+    document.getElementById('floating-logo').classList.add('is-docked');
+    document.getElementById('preloader').classList.add('is-background');
+    document.body.classList.add('preload-complete');
+    setTimeout(()=>{document.getElementById('preloader-count').style.display='none';},750);
+    setTimeout(()=>{document.getElementById('floating-logo').classList.add('is-settled');},2000);
+    startExperience();
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  render();
+  requestAnimationFrame(portalLoop);
+  requestAnimationFrame(cursorLoop);
+  setTimeout(runPreloader,200);
+
+  const cursor=document.querySelector('.custom-cursor');
+  document.addEventListener('pointermove',e=>{
+    cursor.classList.add('is-visible');
+    cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';
+    targetY=(e.clientX/innerWidth-.5)*state.portalTilt;
+    targetX=(e.clientY/innerHeight-.5)*-state.portalTilt;
+  });
+  document.addEventListener('pointerleave',()=>{targetX=0;targetY=0;cursor.classList.remove('is-visible');});
+  const portalBtn=document.getElementById('portal');
+  portalBtn.addEventListener('pointerenter',()=>cursor.classList.add('is-enter'));
+  portalBtn.addEventListener('pointerleave',()=>cursor.classList.remove('is-enter'));
+  portalBtn.addEventListener('click',travel);
+
+  if(location.search.includes('autoshot')){
+    setTimeout(()=>{if(current==='yanhe')travel();},5500);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>极光canvas背景</title>
+<style>
+:root{
+  --bg:#04101a;
+  --c1:#16e0a0;
+  --c2:#3b82f6;
+  --op:.5;
+  --speed:.5;
+  --bands:4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);overflow:hidden;
+  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.note{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  color:#cfe9ff;opacity:.6;font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="note">纯 canvas 极光幕布，替代远程视频作暗色背景</div>
+<script>
+// 参数集中管理，与上方 :root 对应
+var state={bg:"#04101a",c1:"#16e0a0",c2:"#3b82f6",op:.5,speed:.5,bands:4};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k, state[k]); }
+}
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W,H,t=0;
+function resize(){ W=cv.width=innerWidth; H=cv.height=innerHeight; }
+addEventListener('resize',resize); resize();
+function hex(h){ var v=parseInt(h.slice(1),16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+// 极光：多条 sine 波带，用竖直渐变 + 加法混合模拟流光；speed 控制漂移，bands 控制条数
+function draw(){
+  t+=0.016*state.speed;
+  ctx.fillStyle=state.bg; ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';
+  ctx.globalAlpha=state.op;
+  var c1=hex(state.c1),c2=hex(state.c2);
+  var n=state.bands|0;
+  for(var b=0;b<n;b++){
+    var yBase=H*(0.35+b*0.12);
+    var amp=H*0.10*(1+b*0.15);
+    var grad=ctx.createLinearGradient(0,yBase-amp,0,yBase+amp);
+    grad.addColorStop(0,'rgba('+c1[0]+','+c1[1]+','+c1[2]+',0)');
+    grad.addColorStop(.5,'rgba('+c2[0]+','+c2[1]+','+c2[2]+',.9)');
+    grad.addColorStop(1,'rgba('+c1[0]+','+c1[1]+','+c1[2]+',0)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    for(var x=0;x<=W;x+=12){
+      var y=yBase+Math.sin(x*0.004+t+b)*amp + Math.sin(x*0.011-t*1.3+b)*amp*0.4;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+  }
+  ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+  requestAnimationFrame(draw);
+}
+draw();
+// 外部调参契约
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

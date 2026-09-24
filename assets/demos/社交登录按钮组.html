@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社交登录按钮组</title>
+<style>
+:root{--bg:#ffffff;--ink:#1c1c1c;--border:#d9d9d2;--accent:#d98a3d;--radius:12;--gap:10;--h:46}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0eee9;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+.col{width:min(300px,calc(100vw - 32px));display:flex;flex-direction:column;gap:calc(var(--gap)*1px)}
+.soc{display:flex;align-items:center;gap:10px;height:calc(var(--h)*1px);background:var(--bg);border:1px solid var(--border);border-radius:calc(var(--radius)*1px);padding:0 14px;color:var(--ink);font-size:14px;cursor:pointer}
+.soc b{margin-left:auto;color:var(--accent);font-size:12px;font-weight:400}
+.soc svg{width:20px;height:20px;flex:none}
+</style>
+</head>
+<body>
+<div class="col">
+<div class="soc"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M21 12a9 9 0 1 0-3 6.7l-3-2.5A5 5 0 1 1 17 12h-2v2h2z"/></svg>Google 继续<b>›</b></div>
+<div class="soc"><svg viewBox="0 0 24 24" fill="#07C160"><path d="M9 4C5 4 2 7 2 11c0 2 1 3.7 2.7 4.8L4 20l3.8-2c.9.2 1.8.3 2.7.3 4 0 7-3 7-7s-3-7-7-7z"/></svg>微信登录<b>›</b></div>
+<div class="soc"><svg viewBox="0 0 24 24" fill="#222222"><path d="M12 2a10 10 0 0 0-3 19.6c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9 9 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub 继续<b>›</b></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>闪烁指针文字</title>
+<style>
+:root{--c:#0f172a;--bg:#f3f5f9;--fs:60;--dur:2.6;--caret:#ef4444;}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;background:var(--bg);overflow:hidden;font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.wrap{display:flex;align-items:flex-end;gap:.08em;font-weight:800;font-size:calc(var(--fs)*1px);color:var(--c)}
+.wrap span{display:inline-block;opacity:0;animation:fin calc(var(--dur)*1s) ease infinite;animation-delay:calc(var(--i) * .07s)}
+@keyframes fin{0%{opacity:0;transform:translateY(.55em)}18%,68%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-.35em)}}
+.car{width:.07em;height:1.05em;background:var(--caret);display:inline-block;animation:blink 1s steps(1) infinite;flex:none}
+@keyframes blink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.wrap span{opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap"><span id="w"></span><i class="car"></i></div>
+<script>
+// 每个字用 CSS 错峰淡入上浮（非 JS 逐字增减），末尾光标独立闪烁
+const state={text:"逐字浮现",c:"#0f172a",bg:"#f3f5f9",fs:60,dur:2.6,caret:"#ef4444"};
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+  document.getElementById('w').innerHTML=[...state.text].map((ch,i)=>'<span style="--i:'+i+'">'+(ch===' '?'&nbsp;':ch)+'</span>').join('');
+}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

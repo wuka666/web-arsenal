@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滑动确认</title>
+<style>
+:root{--track:#e7e3da;--thumb:#d98a3d;--ok:#2e7d4f;--ink:#1c1c1c;--radius:24px;--threshold:85;--w:300}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f3f0ea;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{width:min(calc(var(--w)*1px),calc(100vw - 32px))}
+.slider{position:relative;height:54px;background:var(--track);border-radius:var(--radius);overflow:hidden;user-select:none;touch-action:none}
+.fill{position:absolute;top:0;bottom:0;left:0;width:54px;background:var(--thumb);border-radius:var(--radius);transition:width .05s}
+.thumb{position:absolute;left:0;top:0;width:54px;height:54px;border-radius:50%;background:#ffffff;box-shadow:0 2px 8px #00000033;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:20px;cursor:grab;z-index:2}
+.slider.done .fill{width:100%!important;background:var(--ok)}
+.label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:14px;pointer-events:none;opacity:.6}
+.slider.done .label{color:#ffffff;opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="slider" id="s"><div class="fill"></div><div class="label" id="lab">滑动确认</div><div class="thumb" id="t">›</div></div></div>
+<script>
+(function(){
+  var s=document.getElementById('s'),t=document.getElementById('t'),f=s.querySelector('.fill'),lab=document.getElementById('lab');
+  var max=s.clientWidth-54, drag=false, x=0;
+  var th=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--threshold'))||85;
+  function set(p){x=Math.max(0,Math.min(max,p));t.style.left=x+'px';f.style.width=(x+54)+'px';}
+  function down(e){drag=true;move(e);}
+  function move(e){if(!drag)return;var cx=(e.touches?e.touches[0].clientX:e.clientX)-s.getBoundingClientRect().left-27;set(cx);}
+  function up(){if(!drag)return;drag=false;if(x>=max*th/100){s.classList.add('done');lab.textContent='已确认';t.style.left=max+'px';f.style.width='100%';}else{set(0);}}
+  t.addEventListener('mousedown',down);t.addEventListener('touchstart',down);
+  window.addEventListener('mousemove',move);window.addEventListener('touchmove',move);
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+})();
+</script>
+</body>
+</html>

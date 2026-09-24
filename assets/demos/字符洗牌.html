@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>字符洗牌</title>
+<style>
+  :root{
+    --fs:72px; --c:#151b2e; --bg:#eef1f6; --speed:6; --dur:700ms; --auto:0;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{min-height:100vh;display:grid;place-items:center;background:var(--bg);
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    padding:24px}
+  .txt{font-weight:800;font-size:var(--fs);letter-spacing:.06em;color:var(--c);
+    cursor:pointer;user-select:none;white-space:nowrap}
+  .txt .ch{display:inline-block;transition:opacity .1s}
+  .hint{position:absolute;bottom:22px;left:0;right:0;text-align:center;
+    font-size:12px;opacity:.45;color:var(--c)}
+</style>
+</head>
+<body>
+  <div class="txt" id="txt">SHUFFLE</div>
+  <div class="hint" id="hint">悬停洗牌 · 切换“自动循环”后持续滚动</div>
+<script>
+  const GLY="!<>-_/[]{}—=+*^?#________";
+  const state={ text:"SHUFFLE", c:"#151b2e", bg:"#eef1f6",
+    chars:"!<>-_/[]{}—=+*^?#", speed:6, dur:700, auto:false };
+  const r=document.documentElement.style;
+  const txt=document.getElementById('txt');
+  const hint=document.getElementById('hint');
+  let running=false, timer=null, loopTimer=null;
+  function apply(){
+    r.setProperty('--fs',state.fs+'px');
+    r.setProperty('--c',state.c);
+    r.setProperty('--bg',state.bg);
+    r.setProperty('--speed',state.speed);
+    r.setProperty('--dur',state.dur+'ms');
+    r.setProperty('--auto',state.auto?1:0);
+    txt.textContent=state.text;
+  }
+  // 悬停：每字符在 dur 内从随机字形逐步收敛到目标字符
+  function shuffle(){
+    if(running) return; running=true;
+    const target=state.text.split('');
+    const spans=target.map(ch=>{ const s=document.createElement('span');
+      s.className='ch'; s.textContent=GLY[0]; txt.appendChild(s); return s; });
+    const start=performance.now();
+    const tick=()=>{
+      const p=Math.min(1,(performance.now()-start)/state.dur);
+      const reveal=Math.floor(p*target.length);
+      spans.forEach((s,i)=>{
+        if(i<reveal){ s.textContent=target[i]; s.style.opacity=1; }
+        else { const g=state.chars[Math.floor(Math.random()*state.chars.length)];
+               s.textContent=g; s.style.opacity=(0.4+Math.random()*0.6).toFixed(2); }
+      });
+      if(p<1) requestAnimationFrame(tick);
+      else { txt.textContent=state.text; running=false; }
+    };
+    txt.textContent=''; requestAnimationFrame(tick);
+  }
+  txt.addEventListener('pointerenter',()=>{ if(!state.auto) shuffle(); });
+  // 自动循环：每隔一阵重新洗牌一次
+  function autoLoop(){
+    if(state.auto && !running) shuffle();
+    loopTimer=setTimeout(autoLoop, state.dur+900);
+  }
+  apply();
+  loopTimer=setTimeout(autoLoop, state.dur+900);
+  addEventListener('message',e=>{
+    const d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+    state[d.key]=d.value;
+    if(d.key==='auto'){ hint.textContent=state.auto?'自动循环开启':'悬停洗牌 · 切换“自动循环”后持续滚动'; }
+    apply();
+  });
+</script>
+</body>
+</html>

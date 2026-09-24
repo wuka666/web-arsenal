@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>地图路线绘制</title>
+<style>
+:root{--mapbg:#eef1f4;--route:#d98a3d;--node:#2e7d4f;--ink:#1c1c1c;--radius:16;--dur:3;--pad:14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#dfe4e8;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+.map{width:min(320px,calc(100vw - 32px));background:var(--mapbg);border-radius:calc(var(--radius)*1px);padding:calc(var(--pad)*1px);position:relative}
+.map svg{width:100%;height:160px;display:block}
+.route{fill:none;stroke:var(--route);stroke-width:3;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw calc(var(--dur)*1s) ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.node{fill:var(--node)}
+.cap{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="map"><svg viewBox="0 0 300 160" preserveAspectRatio="none">
+<path class="route" d="M20 130 C 80 130, 70 50, 130 60 S 210 120, 280 30"/>
+<circle class="node" cx="20" cy="130" r="7"/><circle class="node" cx="280" cy="30" r="7"/></svg>
+<div class="cap"><span>起点</span><span>终点</span></div></div>
+</body>
+</html>

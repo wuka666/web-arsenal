@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>密码显隐切换</title>
+<style>
+:root{--field:#ffffff;--ink:#1c1c1c;--border:#d9d9d2;--accent:#d98a3d;--radius:12;--w:300;--h:46}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0eee9;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+.box{position:relative;width:min(calc(var(--w)*1px),calc(100vw - 32px))}
+.box input{width:100%;height:calc(var(--h)*1px);background:var(--field);border:1px solid var(--border);border-radius:calc(var(--radius)*1px);padding:0 44px 0 14px;color:var(--ink);font-size:14px;font-family:inherit}
+.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:0;background:none;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="box"><input id="pw" type="password" placeholder="密码"><button class="eye" id="eye" aria-label="切换显隐"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+<script>
+(function(){var pw=document.getElementById('pw'),eye=document.getElementById('eye');
+eye.addEventListener('click',function(){pw.type=pw.type==='password'?'text':'password';});})();
+</script>
+</body>
+</html>

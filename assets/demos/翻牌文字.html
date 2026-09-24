@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>翻牌文字</title>
+<style>
+  :root{
+    --fs:48px; --flap:#1f2937; --text:#f8fafc; --bg:#eef1f6;
+    --cell:44px; --dur:420ms; --gap:6px;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{min-height:100vh;display:grid;place-items:center;background:var(--bg);
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    padding:24px}
+  .board{display:flex;gap:var(--gap);padding:18px;border-radius:16px;
+    background:color-mix(in srgb,var(--bg) 70%, #000 4%);
+    box-shadow:0 12px 30px rgba(20,24,40,.14)}
+  .cell{position:relative;width:var(--cell);height:calc(var(--cell)*1.32);
+    perspective:calc(var(--cell)*3);font-size:var(--fs);font-weight:800}
+  .cell .top,.cell .bot{position:absolute;left:0;right:0;height:50%;overflow:hidden;
+    background:var(--flap);color:var(--text);display:flex;justify-content:center;
+    border-radius:6px;backface-visibility:hidden}
+  .cell .top{align-items:flex-end;padding-bottom:2px}
+  .cell .bot{align-items:flex-start;padding-top:2px;top:50%}
+  /* 翻动叶片：上半固定、下半随翻转，制造机械翻牌的上下咬合 */
+  .cell .leaf{position:absolute;left:0;right:0;top:0;height:50%;overflow:hidden;
+    background:var(--flap);color:var(--text);display:flex;justify-content:center;
+    align-items:flex-end;padding-bottom:2px;border-radius:6px;
+    transform-origin:bottom;transform:rotateX(0deg);backface-visibility:hidden;z-index:3}
+  .cell .leaf span{transform:translateY(0)}
+  .cell.flip .leaf{animation:flip var(--dur) linear forwards}
+  @keyframes flip{from{transform:rotateX(0)}to{transform:rotateX(-180deg)}}
+  .cell.dim .top,.cell.dim .bot{filter:brightness(.82)}
+</style>
+</head>
+<body>
+  <div class="board" id="board"></div>
+<script>
+  // 翻牌文字：轮播若干词条，字符像机场航班牌一样逐格翻动到目标字母
+  const GLY="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const state={ words:"HELLO,NEURAL,REACT,WORLD", fs:48, flap:"#1f2937",
+    text:"#f8fafc", bg:"#eef1f6", cell:44, dur:420, gap:6 };
+  const r=document.documentElement.style;
+  const board=document.getElementById('board');
+  const wordList=()=>state.words.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+  let cur="", idx=0;
+
+  function build(n){
+    board.innerHTML='';
+    for(let i=0;i<n;i++){
+      const c=document.createElement('div'); c.className='cell';
+      c.innerHTML='<div class="top"><span></span></div>'+
+                  '<div class="bot"><span></span></div>'+
+                  '<div class="leaf"><span></span></div>';
+      board.appendChild(c);
+    }
+  }
+  function show(str){
+    const cells=board.children;
+    for(let i=0;i<cells.length;i++){
+      const ch=str[i]||'';
+      cells[i].querySelector('.top span').textContent=ch;
+      cells[i].querySelector('.bot span').textContent=ch;
+      cells[i].classList.toggle('dim',!ch);
+    }
+  }
+  // 把某格从 old 翻到 target：叶片带着旧字符下翻，上半先露出 target，下半在落定后补成 target
+  function flipCell(cell,oldC,target){
+    if(oldC===target){ cell.querySelector('.top span').textContent=target;
+      cell.querySelector('.bot span').textContent=target; return; }
+    const leaf=cell.querySelector('.leaf');
+    const leafSpan=leaf.querySelector('span');
+    const topSpan=cell.querySelector('.top span');
+    const botSpan=cell.querySelector('.bot span');
+    topSpan.textContent=target;   // 叶片翻过 90° 后露出的上半 = 目标
+    botSpan.textContent=oldC;     // 翻转期间下半仍是旧字符
+    leafSpan.textContent=oldC;
+    cell.classList.remove('flip'); void cell.offsetWidth; cell.classList.add('flip');
+    // 叶片正面滚过几个字符增加机械感，结束落在 target
+    let step=0; const total=8;
+    const iv=setInterval(()=>{
+      step++;
+      const ch=GLY[(GLY.indexOf(oldC)+step*3)%GLY.length];
+      leafSpan.textContent=ch;
+      if(step>=total){ clearInterval(iv); leafSpan.textContent=target; }
+    }, state.dur/total);
+    setTimeout(()=>{ botSpan.textContent=target; leafSpan.textContent=target; }, state.dur);
+  }
+  function advance(){
+    const list=wordList();
+    if(!list.length) return;
+    const next=list[idx % list.length]; idx++;
+    const w=Math.max(next.length, cur.length, 4);
+    if(board.children.length!==w) build(w);
+    const cells=board.children;
+    const old=cur;
+    for(let i=0;i<w;i++){
+      const oc=old[i]||' '; const tc=next[i]||' ';
+      // 上半/下半的落定交给 flipCell 处理，这里只错峰触发翻动
+      setTimeout(()=>flipCell(cells[i],oc,tc), i*70);
+    }
+    cur=next;
+  }
+  function apply(){
+    r.setProperty('--fs',state.fs+'px');
+    r.setProperty('--flap',state.flap);
+    r.setProperty('--text',state.text);
+    r.setProperty('--bg',state.bg);
+    r.setProperty('--cell',state.cell+'px');
+    r.setProperty('--dur',state.dur+'ms');
+    r.setProperty('--gap',state.gap+'px');
+  }
+  apply(); build(Math.max((wordList()[0]||'').length,4)); show(wordList()[0]||''); cur=wordList()[0]||'';
+  setInterval(advance, 2200);
+  addEventListener('message',e=>{
+    const d=e.data; if(!d||d.type!=='param'||!(d.key in state))return;
+    state[d.key]=d.value; apply();
+  });
+</script>
+</body>
+</html>

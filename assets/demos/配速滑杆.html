@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>配速滑杆</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--rad:14px;--w:340px;--h:14px;--sz:30px;--val:50;--speed:1;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,var(--w));background:var(--c2);border-radius:var(--rad);padding:28px 20px 22px;box-shadow:0 6px 18px rgba(0,0,0,.06);text-align:center}
+.track{position:relative;height:var(--h);background:#d1d1d6;border-radius:999px;margin:34px 0 14px;touch-action:none}
+.fill{position:absolute;left:0;top:0;height:100%;background:var(--c1);border-radius:999px;width:calc(var(--val) * 1%)}
+.knob{position:absolute;top:50%;width:var(--sz);height:var(--sz);border-radius:50%;background:var(--c2);box-shadow:0 2px 10px rgba(0,0,0,.25);transform:translate(-50%,-50%);left:calc(var(--val) * 1%);cursor:grab}
+.read{font-weight:800;font-size:22px;color:var(--c1);font-variant-numeric:tabular-nums}
+.sub{font-size:12px;opacity:.6}
+</style></head><body>
+<div class="box"><div class="track" id="track"><div class="fill"></div><div class="knob" id="knob"></div></div><div class="read" id="read">7.0</div><div class="sub" id="sub">配速 分/公里</div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",rad:14,w:340,h:14,sz:30,val:50,speed:1};
+const r=document.documentElement.style;
+let target=state.val,cur=state.val;
+function show(){const pace=(10-state.val/100*6);document.getElementById('read').textContent=pace.toFixed(1);document.getElementById('sub').textContent='配速 '+(Math.floor(pace))+'分'+(Math.round((pace%1)*60))+'秒 / 公里';}
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--rad',state.rad+'px');r.setProperty('--w',state.w+'px');r.setProperty('--h',state.h+'px');r.setProperty('--sz',state.sz+'px');r.setProperty('--val',state.val);r.setProperty('--speed',state.speed);show();}
+apply();
+const track=document.getElementById('track');let drag=false;
+function setT(x){const b=track.getBoundingClientRect();let p=(x-b.left)/b.width*100;target=Math.max(0,Math.min(100,p));}
+track.addEventListener('pointerdown',e=>{drag=true;track.setPointerCapture(e.pointerId);setT(e.clientX);});
+track.addEventListener('pointermove',e=>{if(drag)setT(e.clientX);});
+track.addEventListener('pointerup',()=>{drag=false;target=Math.round(target*2)/2;});
+(function loop(){cur+=(target-cur)*0.2*state.speed;if(Math.abs(target-cur)<0.05)cur=target;state.val=cur;r.setProperty('--val',cur.toFixed(2));requestAnimationFrame(loop);})();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;if(d.key==='val')target=d.value;apply();}});
+</script></body></html>

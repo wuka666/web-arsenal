@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>范围折线图</title>
+<style>
+:root{--c1:#22d3ee;--c2:#22d3ee;--c3:#64748b;--bg:#0f172a;--gap:10;--n:12;--lw:3;--pad:18;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(94vw,480px);background:#111827;border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+svg{width:100%;height:auto;display:block}
+.band{fill:var(--c2);opacity:.16}
+.avg{fill:none;stroke:var(--c1);stroke-width:var(--lw);stroke-linejoin:round}
+.axis{stroke:var(--c3);opacity:.3}
+</style></head><body>
+<div class="box"><svg viewBox="0 0 320 170" id="svg"></svg></div>
+<script>
+const state={c1:"#22d3ee",c2:"#22d3ee",c3:"#64748b",bg:"#0f172a",gap:10,n:12,lw:3,pad:18};
+const r=document.documentElement.style;
+function series(){const mn=[],mx=[],av=[];for(let i=0;i<state.n;i++){const base=70+34*Math.sin(i/2)+14*Math.cos(i*0.8);mn.push(Math.max(4,base-14));mx.push(Math.min(100,base+14));av.push(base);}return{mn,mx,av};}
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--gap',state.gap+'px');r.setProperty('--n',state.n);r.setProperty('--lw',state.lw+'px');r.setProperty('--pad',state.pad+'px');const W=320,H=170,p=state.pad;const s=series();const X=i=>p+i/(state.n-1)*(W-p*2);const Y=v=>H-p-v/100*(H-p*2);let band='M'+X(0)+' '+Y(s.mn[0]);for(let i=0;i<state.n;i++)band+=' L'+X(i)+' '+Y(s.mn[i]);for(let i=state.n-1;i>=0;i--)band+=' L'+X(i)+' '+Y(s.mx[i]);band+=' Z';let av='';for(let i=0;i<state.n;i++)av+=(i?' L':'M')+X(i)+' '+Y(s.av[i]);document.getElementById('svg').innerHTML='<line class="axis" x1="'+p+'" y1="'+(H-p)+'" x2="'+(W-p)+'" y2="'+(H-p)+'"/><path class="band" d="'+band+'"/><path class="avg" d="'+av+'"/>';}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

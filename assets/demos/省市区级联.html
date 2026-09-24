@@ -1,0 +1,30 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>级联选择器</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--bd:#d1d1d6;--rad:12px;--w:340px;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,var(--w));background:var(--c2);border-radius:var(--rad);padding:22px;box-shadow:0 6px 18px rgba(20,20,40,.08)}
+.cas{display:flex;flex-direction:column;gap:12px}
+.sel{position:relative}
+.cas select{width:100%;padding:13px 14px;border:1px solid var(--bd);border-radius:var(--rad);background:var(--c2);color:var(--c3);font:inherit;outline:none}
+.cas select:focus{border-color:var(--c1)}
+.out{margin-top:14px;font-size:13px;opacity:.65;text-align:center}
+</style></head><body>
+<div class="box"><div class="cas">
+ <div class="sel"><select id="p"></select></div>
+ <div class="sel"><select id="c"></select></div>
+ <div class="sel"><select id="d"></select></div>
+</div><div class="out" id="out"></div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#d1d1d6",rad:12,w:340};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--w',state.w+'px');}
+apply();
+const DATA={北京:{朝阳区:["三里屯","望京"],海淀区:["中关村","五道口"]},上海:{浦东新区:["陆家嘴","张江"],徐汇区:["徐家汇","漕河泾"]}};
+const p=document.getElementById('p'),c=document.getElementById('c'),d=document.getElementById('d'),out=document.getElementById('out');
+function fill(sel,arr){sel.innerHTML='';arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}
+function sync(){const city=DATA[p.value];fill(c,Object.keys(city));const dist=city[c.value];fill(d,dist);out.textContent=p.value+' / '+c.value+' / '+d.value;}
+p.addEventListener('change',sync);c.addEventListener('change',sync);
+fill(p,Object.keys(DATA));sync();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

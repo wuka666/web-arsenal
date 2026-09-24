@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>文本展开</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--bd:#e5e7eb;--rad:14px;--pad:18px;--ls:3.4em;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.card{width:min(92vw,360px);background:var(--c2);border:1px solid var(--bd);border-radius:var(--rad);padding:var(--pad);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.txt{max-height:var(--ls);overflow:hidden;transition:max-height .4s ease;line-height:1.7}
+.card.on .txt{max-height:30em}
+.more{margin-top:10px;color:var(--c1);font-weight:600;cursor:pointer;user-select:none;display:inline-block}
+</style></head><body>
+<div class="card" id="card"><p class="txt">卡片式标签是一种把筛选项拍平成一排卡片的导航模式：每张卡片代表一个维度值，选中态用上浮、主题色描边和文字变色来区分。它比下拉菜单更扁平、更一眼可见，适合筛选条件不多、需要常驻展示的场景。配合「全部」按钮和单选互斥，就能组成一套轻量的分级筛选器，用户不需要打开二级面板就能完成组合筛选。</p><span class="more" id="more">展开全文</span></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#e5e7eb",rad:14,pad:18,ls:"3.4em"};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--bd',state.bd);r.setProperty('--rad',state.rad+'px');r.setProperty('--pad',state.pad+'px');r.setProperty('--ls',state.ls);}
+apply();
+const card=document.getElementById('card'),more=document.getElementById('more');
+more.addEventListener('click',()=>{card.classList.toggle('on');more.textContent=card.classList.contains('on')?'收起':'展开全文';});
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

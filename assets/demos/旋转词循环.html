@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>旋转词循环</title>
+<style>
+:root{--c:#ffffff;--bar:#6ee7ff;--bg:#0a0e16;--fs:96;--sp:2.2}
+*{box-sizing:border-box;margin:0}
+body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0a0e16);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+.box{display:grid;place-items:center;gap:.4em;text-align:center}
+.word{font-weight:900;font-size:calc(var(--fs)*1px);color:var(--c);transition:opacity .45s,transform .45s}
+.bar{width:3.2em;height:.16em;background:var(--bar);border-radius:2px;margin:0 auto}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="box"><span class="word" id="w">设计师</span><i class="bar"></i></div>
+<script>
+const state={"words":"设计师,开发者,创造者,思考者","c":"#ffffff","bar":"#6ee7ff","bg":"#0a0e16","fs":96,"sp":2.2};
+let mx=innerWidth/2,my=innerHeight/2,wheel=0;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+addEventListener('wheel',e=>{wheel+=e.deltaY;},{passive:true});
+function apply(){
+  const r=document.documentElement.style;
+  for(const k in state){ r.setProperty('--'+k, state[k]); }
+document.getElementById('w').textContent=(state.words.split(',').map(s=>s.trim()).filter(Boolean)[0]||'');
+}
+const el=document.getElementById('w');let i=0;
+function tick(){const a=state.words.split(',').map(s=>s.trim()).filter(Boolean);if(a.length){i=(i+1)%a.length;el.style.opacity=0;el.style.transform='translateY(-.4em)';setTimeout(()=>{el.textContent=a[i];el.style.opacity=1;el.style.transform='translateY(0)';},260);}setTimeout(tick,(state.sp||2)*1000);}
+tick();
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>滑动标尺</title>
+<style>
+:root{--c1:#007aff;--c2:#ffffff;--c3:#1f2937;--bg:#f2f2f7;--rad:14px;--w:340px;--h:14px;--sz:28px;--val:46;--min:0;--max:100;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;display:grid;place-items:center;padding:24px}
+.box{width:min(92vw,var(--w));background:var(--c2);border-radius:var(--rad);padding:34px 18px 22px;box-shadow:0 6px 18px rgba(20,20,40,.08)}
+.slider{position:relative;height:64px;margin-top:6px;touch-action:none}
+.ticks{position:absolute;left:0;right:0;top:30px;height:14px;display:flex;justify-content:space-between;pointer-events:none}
+.ticks i{flex:0 0 1px;background:#c7c7cc;height:9px}
+.track{position:absolute;left:0;right:0;top:24px;height:var(--h);background:#d1d1d6;border-radius:999px}
+.fill{position:absolute;left:0;top:24px;height:var(--h);background:var(--c1);border-radius:999px;width:calc(var(--val) * 1%)}
+.hd{position:absolute;top:24px;width:var(--sz);height:var(--sz);border-radius:50%;background:var(--c2);box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translate(-50%,-7px);left:calc(var(--val) * 1%);cursor:grab}
+.val{position:absolute;top:-4px;left:calc(var(--val) * 1%);transform:translateX(-50%);font-weight:700;color:var(--c1);font-variant-numeric:tabular-nums}
+</style></head><body>
+<div class="box"><div class="slider" id="slider"><div class="ticks" id="ticks"></div><div class="track"></div><div class="fill"></div><div class="val" id="val">46</div><div class="hd" id="hd"></div></div></div>
+<script>
+const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",rad:14,w:340,h:14,sz:28,val:46,min:0,max:100};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);r.setProperty('--bg',state.bg);r.setProperty('--rad',state.rad+'px');r.setProperty('--w',state.w+'px');r.setProperty('--h',state.h+'px');r.setProperty('--sz',state.sz+'px');r.setProperty('--val',state.val);r.setProperty('--min',state.min);r.setProperty('--max',state.max);document.getElementById('val').textContent=state.val;}
+const ticks=document.getElementById('ticks');for(let i=0;i<=10;i++)ticks.appendChild(document.createElement('i'));
+apply();
+const slider=document.getElementById('slider');let drag=false;
+function setVal(x){const b=slider.getBoundingClientRect();let p=(x-b.left)/b.width*100;p=Math.max(state.min,Math.min(state.max,p));state.val=Math.round(p);apply();}
+slider.addEventListener('pointerdown',e=>{drag=true;slider.setPointerCapture(e.pointerId);setVal(e.clientX);});
+slider.addEventListener('pointermove',e=>{if(drag)setVal(e.clientX);});
+slider.addEventListener('pointerup',()=>drag=false);
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script></body></html>

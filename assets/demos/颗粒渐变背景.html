@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>颗粒渐变背景</title>
+<style>
+:root{--c1:#6a5cff;--c2:#ff5ca8;--c3:#ffd166;--bg:#101526;--grain:.16;--speed:14;--angle:120;}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);overflow:hidden;font-family:system-ui,sans-serif}
+.grad{position:fixed;inset:0;background:linear-gradient(calc(var(--angle)*1deg),var(--c1),var(--c2),var(--c3),var(--bg));
+  background-size:300% 300%;animation:flow calc(var(--speed)*1s) ease-in-out infinite alternate}
+@keyframes flow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.grain{position:fixed;inset:0;opacity:var(--grain);mix-blend-mode:overlay;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.grad{animation:none}}
+</style>
+</head>
+<body>
+<div class="grad"></div>
+<svg class="grain" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+<script>
+// 流动的青紫粉渐变 + feTurbulence 颗粒叠加；angle 控制方向、grain 控制颗粒强度
+const state={c1:"#6a5cff",c2:"#ff5ca8",c3:"#ffd166",bg:"#101526",grain:.16,speed:14,angle:120};
+function apply(){
+  const r=document.documentElement.style;
+  r.setProperty('--c1',state.c1); r.setProperty('--c2',state.c2); r.setProperty('--c3',state.c3);
+  r.setProperty('--bg',state.bg); r.setProperty('--grain',state.grain);
+  r.setProperty('--speed',state.speed); r.setProperty('--angle',state.angle);
+}
+apply();
+window.addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>
