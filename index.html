@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Web 灵感弹药库 · 弹药包</title>
+<title>Web 灵感书房 · 技法册</title>
 <style>
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,6 +29,18 @@
     --dur: .6s;
     --maxr: 160%;
     --ui-scale: 1;            /* 基础字号缩放（设置·布局） */
+    /* —— 书皮肤（暗室书房美学） —— */
+    --cover: #efe6d2;         /* 书封暖纸 */
+    --cover-edge: #c9b489;    /* 书封描边 / 硬壳角 */
+    --paper: #f6efdd;         /* 内页纸 */
+    --paper2: #ece2c8;        /* 内页纸（暗格） */
+    --gold: #b5893f;          /* 烫金 */
+    --gold-soft: #d8b878;
+    --shelf: #6f5640;         /* 书架木 */
+    --shelf-edge: #4f3c2b;
+    --spine: var(--accent);    /* 书脊取强调色 */
+    --ease-silk: cubic-bezier(.16,1,.3,1);     /* M003 翻页过渡 */
+    --ease-sheet: cubic-bezier(.32,.72,0,1);   /* M026 背景后退 */
   }
   body.dark {
     color-scheme: dark;
@@ -45,6 +57,18 @@
     --bench: #0e1014;
     --leather: #2e2118;
     --glow: rgba(61,95,214,.18);
+    /* —— 书皮肤（暗室书房美学 · 暗室） —— */
+    --cover: #2a241c;
+    --cover-edge: #473d2e;
+    --paper: #262019;
+    --paper2: #2f281f;
+    --gold: #d8b878;
+    --gold-soft: #e7cf9c;
+    --shelf: #3a2f24;
+    --shelf-edge: #231b13;
+    --spine: var(--accent);
+    --ease-silk: cubic-bezier(.16,1,.3,1);
+    --ease-sheet: cubic-bezier(.32,.72,0,1);
   }
 
   html, body { height: 100%; }
@@ -227,26 +251,29 @@
   .tools-row .chip.on { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); border-color: var(--accent); }
   .tools-row .chip.on .chip-n { opacity: .7; }
 
-  /* ============ 卡片 = 子弹 / 书脊 ============ */
+  /* ============ 卡片 = 书 / 书脊 ============ */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
   .card {
-    background: var(--panel2); border: 1px solid var(--line); border-radius: 14px;
+    background: var(--cover); border: 1px solid var(--cover-edge); border-radius: 4px 9px 9px 4px;
     overflow: hidden; cursor: pointer; position: relative;
-    transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+    transition: box-shadow .25s var(--ease-silk), border-color .2s ease, transform .25s var(--ease-silk);
+    box-shadow: 0 4px 14px rgba(40,28,12,.10), inset 4px 0 0 var(--spine), inset 0 0 0 1px var(--cover-edge);
   }
-  /* 弹药包：左侧「弹链 / 书脊」色条；装填后染朱 */
+  /* 书脊：左侧色条；收藏（上架）后染烫金 */
   .card::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-    background: var(--steel); transition: background .2s ease; z-index: 3;
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--spine) 78%, #000 22%), var(--spine));
+    box-shadow: inset -2px 0 3px rgba(0,0,0,.28); transition: background .25s ease; z-index: 3;
   }
-  .card.loaded::before { background: var(--accent2); }
-  .card:hover { border-color: var(--steel); box-shadow: 0 10px 26px rgba(0,0,0,.10); transform: translateY(-2px); }
-  body.dark .card:hover { box-shadow: 0 10px 30px rgba(0,0,0,.45); }
-  .card.open { grid-column: 1 / -1; cursor: default; transform: none; }
+  .card.loaded::before { background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 78%, #000 22%), var(--gold)); }
+  .card:hover { border-color: var(--gold); box-shadow: 0 14px 30px rgba(40,28,12,.18), inset 4px 0 0 var(--spine), inset 0 0 0 1px var(--gold); transform: translateY(-4px); }
+  body.dark .card { box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 4px 0 0 var(--spine), inset 0 0 0 1px var(--cover-edge); }
+  body.dark .card:hover { box-shadow: 0 16px 34px rgba(0,0,0,.6), inset 4px 0 0 var(--spine), inset 0 0 0 1px var(--gold); }
+  .card.open { cursor: default; }
 
   /* iframe 必须绝对定位：fitThumbFrame 会把它设成 1000px 宽再 scale，
      若留在文档流里会把靠 aspect-ratio 定高的 .thumb 撑爆（卡片只剩空白） */
-  .thumb { position: relative; aspect-ratio: 16 / 10; background: radial-gradient(120% 120% at 70% 10%, var(--panel), var(--bench)); overflow: hidden; }
+  .thumb { position: relative; aspect-ratio: 16 / 10; background: var(--panel2); overflow: hidden; box-shadow: inset 0 0 0 3px var(--cover), inset 0 0 0 4px color-mix(in srgb, var(--gold) 38%, var(--cover-edge)); }
   .thumb iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; transform-origin: 0 0; background: var(--panel2); }
   .thumb .loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; pointer-events: none; }
 
@@ -259,7 +286,7 @@
     transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
   }
   .add-btn:hover { background: var(--steel); color: var(--bench); transform: scale(1.06); }
-  .add-btn.in { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .add-btn.in { background: var(--gold); border-color: var(--gold); color: #2a2018; }
   .preview-badge {
     position: absolute; bottom: 8px; right: 8px; z-index: 3;
     background: color-mix(in srgb, var(--accent2) 85%, #000); color: #fff; font-size: 11px; font-weight: 700;
@@ -340,6 +367,42 @@
   .copy-btn.done { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+
+  /* ============ 书·往前翻开（覆盖式阅读器） ============ */
+  #grid.away { filter: blur(6px) brightness(.84); transform: scale(.97); transform-origin: center top;
+    transition: filter .5s var(--ease-sheet), transform .5s var(--ease-sheet); pointer-events: none; }
+  .reader-mask { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .3s var(--ease-sheet); padding: 24px; }
+  .reader-mask.show { opacity: 1; pointer-events: auto; }
+  .reader-scrim { position: absolute; inset: 0; background: rgba(22,17,10,.46);
+    -webkit-backdrop-filter: blur(6px) brightness(.82); backdrop-filter: blur(6px) brightness(.82); cursor: zoom-out; }
+  .book-open { position: relative; width: min(880px, 94vw); height: min(560px, 86vh);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    background: linear-gradient(180deg, var(--paper), var(--paper2)); border-radius: 6px; overflow: hidden;
+    box-shadow: 0 34px 90px rgba(0,0,0,.6), inset 0 0 0 1px var(--cover-edge);
+    transform: translateY(24px) scale(.96); opacity: 0;
+    transition: transform .42s var(--ease-silk), opacity .3s ease; }
+  .reader-mask.show .book-open { transform: translateY(0) scale(1); opacity: 1; }
+  .book-open::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 22px; transform: translateX(-50%);
+    z-index: 4; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(0,0,0,.28) 45%, rgba(0,0,0,.28) 55%, transparent); box-shadow: inset 0 0 16px rgba(0,0,0,.32); }
+  .page { position: relative; padding: 26px 24px; min-height: 100%; overflow: auto;
+    background: repeating-linear-gradient(180deg, transparent 0 27px, color-mix(in srgb, var(--ink) 6%, transparent) 27px 28px), var(--paper); }
+  .page h4 { margin: 0 0 14px; font-size: 13px; letter-spacing: 1px; color: var(--gold);
+    font-family: system-ui, sans-serif; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+  .reader-demo { position: absolute; inset: 56px 22px 22px; border-radius: 4px; background: var(--panel2);
+    border: 1px solid var(--line); overflow: hidden; box-shadow: inset 0 0 0 3px var(--cover), inset 0 2px 10px rgba(0,0,0,.12); }
+  .reader-demo iframe { position: absolute; top: 0; left: 0; transform-origin: 0 0; border: 0; background: var(--panel2); }
+  .reader-close { position: absolute; top: 14px; right: 16px; z-index: 6; width: 34px; height: 34px; border: 1px solid var(--line);
+    border-radius: 50%; background: var(--panel2); color: var(--ink); font-size: 17px; cursor: pointer; box-shadow: 0 2px 8px var(--shadow); }
+  .reader-close:hover { border-color: var(--gold); }
+  .page.right::after { content: ""; position: absolute; right: 0; bottom: 0; width: 26px; height: 26px;
+    background: linear-gradient(135deg, transparent 50%, color-mix(in srgb, var(--ink) 16%, transparent) 50%); }
+  /* M011 擦显：左→右擦出 */
+  .reveal { clip-path: inset(0 100% 0 0); transition: clip-path .5s var(--ease-silk) .1s; }
+  .reader-mask.show .reveal { clip-path: inset(0 0 0 0); }
+  .reveal.d2 { transition-delay: .17s; }
+  .reveal.d3 { transition-delay: .24s; }
+  @media (max-width: 720px) { .book-open { grid-template-columns: 1fr; height: min(88vh, 760px); } .page.right { border-top: 1px solid var(--line); } }
 
   /* ============ 弹匣抽屉（原购物车） ============ */
   .cart-panel {
@@ -507,7 +570,7 @@
   <!-- ===== 系统坞 ===== -->
   <aside class="dock">
     <div class="brand">
-      <h1>灵感弹药库</h1>
+      <h1>灵感书房</h1>
       <p>WEB · ARSENAL · 取子弹的地方</p>
     </div>
 
@@ -542,7 +605,7 @@
         </div>
         <button class="settings-btn" id="settingsBtn" title="设置（快捷键 Ctrl/⌘ + ,）">⚙ 设置</button>
         <button class="avatar-slot" id="avatarSlot" title="账户" aria-label="账户">👤</button>
-        <button class="cart-btn" id="cartBtn">弹匣 <span class="badge" id="cartBadge"></span></button>
+        <button class="cart-btn" id="cartBtn">书架 <span class="badge" id="cartBadge"></span></button>
       </div>
     </header>
 
@@ -560,24 +623,24 @@
     <div class="grid" id="grid"></div>
 
     <footer class="stage-foot">
-      <div class="hint">点卡片右上角圆点装填进弹匣 · 右上角「设置」可调整主题 / 快捷键 / 布局</div>
+      <div class="hint">点卡片右上角 ＋ 把素材收进书架 · 右上角「设置」可调整主题 / 快捷键 / 布局</div>
     </footer>
   </main>
 </div>
 
 <button id="cvFab" class="btn primary" style="position:fixed;right:22px;bottom:22px;z-index:55">画布</button>
 
-<!-- ===== 弹匣抽屉 ===== -->
+<!-- ===== 书架抽屉 ===== -->
 <aside class="cart-panel" id="cartPanel">
   <div class="cart-head">
-    <h3>弹匣装填</h3>
+    <h3>书架收藏</h3>
     <button class="cart-close" id="cartClose">×</button>
   </div>
   <div class="cart-list" id="cartList"></div>
   <div class="cart-foot">
     <div class="row">
       <button class="btn ghost" id="cartClear">清空</button>
-      <button class="btn ghost" id="cartCanvas" title="把已装填素材铺到画布上，可视化调整">生成画布</button>
+      <button class="btn ghost" id="cartCanvas" title="把已收藏素材铺到画布上，可视化调整">生成画布</button>
       <button class="btn primary" id="cartGen">生成方案</button>
     </div>
   </div>
@@ -598,21 +661,34 @@
   </div>
 </div>
 
-<!-- ===== 新手引导 ===== -->
+<!-- ===== 新手引导（首访一次） ===== -->
 <div class="onboard-mask" id="onboardMask" hidden>
   <div class="onboard-card">
-    <h2>欢迎来到灵感弹药库</h2>
-    <div class="sub">这里像一支暗室里的弹药包——素材是待装填的子弹，方案是待挑的书。</div>
+    <h2>欢迎来到灵感书房</h2>
+    <div class="sub">这里像一间书房——素材是一册册可观摩的「技法册」，方案是成体系的「设计专著」。</div>
     <div class="onboard-list">
-      <div class="onboard-item"><div class="k">1</div><div class="v"><b>取子弹</b><p>在卡片右上角的圆点（热点）点一下，把素材装填进弹匣；装填后左侧色条会变朱红。</p></div></div>
-      <div class="onboard-item"><div class="k">2</div><div class="v"><b>抽出来看</b><p>点卡片本体，下方会抽出详情：演示、可拖动的参数、提示词与完整代码，一键复制。</p></div></div>
-      <div class="onboard-item"><div class="k">3</div><div class="v"><b>挑一本书</b><p>切到「方案库」是按整站设计语言归档的方案，每张卡片直接演示效果，展开看配色与 Agent 提示词。</p></div></div>
-      <div class="onboard-item"><div class="k">4</div><div class="v"><b>调光照</b><p>点右上角「⚙ 设置」→ 外观，可在亮色 / 暗室工坊之间切换（带扩散动画）；快捷键也能在这里改。</p></div></div>
+      <div class="onboard-item"><div class="k">1</div><div class="v"><b>取书入架</b><p>点卡片右上角的 ＋，把喜欢的素材收进「书架」；入架后左侧书脊会染上烫金。</p></div></div>
+      <div class="onboard-item"><div class="k">2</div><div class="v"><b>翻开研读</b><p>点卡片本体，书会往前翻开成双页：左页是实时演示，右页是参数、提示词与完整代码，可一键复制。</p></div></div>
+      <div class="onboard-item"><div class="k">3</div><div class="v"><b>挑本专著</b><p>切到「方案库」是按整站设计语言归档的专著，每张卡片直接演示效果，翻开看配色与 Agent 提示词。</p></div></div>
+      <div class="onboard-item"><div class="k">4</div><div class="v"><b>调灯光</b><p>点右上角「⚙ 设置」→ 外观，可在亮色书房 / 暗室之间切换（带扩散动画）；快捷键也在这里改。</p></div></div>
     </div>
     <div class="onboard-foot">
       <label class="chk"><input type="checkbox" id="onboardNoMore" checked> 不再提示</label>
       <button class="btn primary" id="onboardClose">开始探索</button>
     </div>
+  </div>
+</div>
+
+<!-- ===== 书·往前翻开（覆盖式阅读器） ===== -->
+<div class="reader-mask" id="readerMask" hidden>
+  <div class="reader-scrim" id="readerScrim"></div>
+  <div class="book-open" id="bookOpen" role="dialog" aria-modal="true" aria-label="书籍展开">
+    <button class="reader-close" id="readerClose" aria-label="合上书">✕</button>
+    <div class="page page-left">
+      <h4 class="reveal">实时演示</h4>
+      <div class="reader-demo" id="readerDemo"></div>
+    </div>
+    <div class="page page-right" id="readerInfoPage"></div>
   </div>
 </div>
 
@@ -917,7 +993,7 @@
   function renderCartList() {
     const box = document.getElementById("cartList");
     box.innerHTML = "";
-    if (!cart.length) { box.appendChild(el("p", "cart-empty", "弹匣还空着，去卡片右上角点 ＋ 装填")); return; }
+    if (!cart.length) { box.appendChild(el("p", "cart-empty", "书架还空着，去卡片右上角点 ＋ 收藏")); return; }
     cart.forEach(id => {
       const it = byId(id);
       if (!it) return;
@@ -935,7 +1011,7 @@
   document.getElementById("cartClose").addEventListener("click", () => document.getElementById("cartPanel").classList.remove("show"));
   document.getElementById("cartClear").addEventListener("click", () => { cart = []; syncCart(); });
   document.getElementById("cartGen").addEventListener("click", () => {
-    if (!cart.length) { alert("先装填几个素材"); return; }
+    if (!cart.length) { alert("先收藏几个素材"); return; }
     document.getElementById("cartPanel").classList.remove("show");
     openPlan();
   });
@@ -963,8 +1039,8 @@
     iframe.addEventListener("load", () => loading.remove());
     const add = el("button", "add-btn", "+");
     add.dataset.id = it.id;
-    add.title = "装填进弹匣";
-    add.setAttribute("aria-label", "装填 " + it.标题 + " 进弹匣");
+    add.title = "加入书架";
+    add.setAttribute("aria-label", "把 " + it.标题 + " 加入书架");
     add.addEventListener("click", (e) => { e.stopPropagation(); toggleCart(it.id); });
     thumb.append(loading, iframe, add);
     // 降级预览标识：有 ThreeJS演示 字段的素材，卡片上标注"预览版"
@@ -998,41 +1074,60 @@
       body.appendChild(dlBtn);
     }
 
-    const detail = el("div", "detail");
-    detail.hidden = true;
-    const demoBig = el("div", "demo-big");
-    detail.append(demoBig, makeInfo(it, iframe));
-
-    card.append(thumb, body, detail);
+    card.append(thumb, body);
     card.addEventListener("click", (e) => {
-      if (e.target.closest(".detail") || e.target.closest(".add-btn")) return;
-      toggle(card, thumb, demoBig, iframe, detail);
+      if (e.target.closest(".add-btn")) return;
+      openReader(it, card, thumb, iframe, false);
     });
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
-      if (e.target.closest(".detail") || e.target.closest(".add-btn")) return;
+      if (e.target.closest(".add-btn")) return;
       e.preventDefault();
-      toggle(card, thumb, demoBig, iframe, detail);
+      openReader(it, card, thumb, iframe, false);
     });
     return card;
   }
 
-  function toggle(card, thumb, demoBig, iframe, detail) {
-    const open = card.classList.toggle("open");
-    card.setAttribute("aria-expanded", open ? "true" : "false");
-    detail.hidden = !open;
+  let readerCard = null;
+  function openReader(data, card, thumb, iframe, isScheme) {
     if (!iframe.src) iframe.src = iframe.dataset.src;
-    if (open) {
-      thumb.style.display = "none";
-      demoBig.appendChild(iframe);
-      fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
-      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else {
-      thumb.style.display = "";
-      thumb.appendChild(iframe);
-      fitThumbFrame(iframe);
-    }
+    const demo = document.getElementById("readerDemo");
+    const infoPage = document.getElementById("readerInfoPage");
+    demo.appendChild(iframe);
+    infoPage.innerHTML = "";
+    const info = isScheme ? makeSchemeInfo(data, iframe) : makeInfo(data, iframe);
+    info.classList.add("reveal", "d2");
+    infoPage.appendChild(info);
+    const mask = document.getElementById("readerMask");
+    mask.hidden = false;
+    document.getElementById("grid").classList.add("away");
+    card.classList.add("open");
+    card.setAttribute("aria-expanded", "true");
+    readerCard = card;
+    requestAnimationFrame(() => requestAnimationFrame(() => mask.classList.add("show")));
+    document.getElementById("readerClose").focus();
+    fitThumbFrame(iframe);
   }
+  function closeReader() {
+    const mask = document.getElementById("readerMask");
+    if (mask.hidden) return;
+    mask.classList.remove("show");
+    const card = readerCard;
+    if (card) {
+      const thumb = card.querySelector(".thumb");
+      const iframe = document.querySelector("#readerDemo iframe");
+      if (iframe && thumb) { thumb.appendChild(iframe); fitThumbFrame(iframe); }
+      card.classList.remove("open");
+      card.setAttribute("aria-expanded", "false");
+      readerCard = null;
+    }
+    document.getElementById("grid").classList.remove("away");
+    const done = () => { mask.hidden = true; mask.removeEventListener("transitionend", done); };
+    mask.addEventListener("transitionend", done);
+    setTimeout(() => { if (!mask.classList.contains("show")) mask.hidden = true; }, 460);
+  }
+  document.getElementById("readerClose").addEventListener("click", closeReader);
+  document.getElementById("readerScrim").addEventListener("click", closeReader);
 
   function sendParam(iframe, key, value) {
     if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage({ type: "param", key, value }, "*");
@@ -1413,22 +1508,6 @@
     }
     return info;
   }
-  function toggleScheme(card, thumb, demoBig, iframe, detail) {
-    const open = card.classList.toggle("open");
-    card.setAttribute("aria-expanded", open ? "true" : "false");
-    detail.hidden = !open;
-    if (!iframe.src) iframe.src = iframe.dataset.src;
-    if (open) {
-      thumb.style.display = "none";
-      demoBig.appendChild(iframe);
-      fitThumbFrame(iframe);   // 换到展开框后必须重算，否则沿用缩略图的 scale 会缩成一小块
-      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else {
-      thumb.style.display = "";
-      thumb.appendChild(iframe);
-      fitThumbFrame(iframe);   // 收回缩略图，重新按缩略图尺寸适配
-    }
-  }
   function makeSchemeCard(s) {
     const card = el("article", "card");
     card.dataset.id = s.id;
@@ -1460,21 +1539,16 @@
     if (s.重色落点) tags.appendChild(el("span", "tag style", s.重色落点));
     body.append(top, h2, tags);
 
-    const detail = el("div", "detail");
-    detail.hidden = true;
-    const demoBig = el("div", "demo-big");
-    detail.append(demoBig, makeSchemeInfo(s, iframe));
-
-    card.append(thumb, body, detail);
+    card.append(thumb, body);
     card.addEventListener("click", (e) => {
-      if (e.target.closest(".detail") || e.target.closest(".scheme-link")) return;
-      toggleScheme(card, thumb, demoBig, iframe, detail);
+      if (e.target.closest(".scheme-link") || e.target.closest(".add-btn")) return;
+      openReader(s, card, thumb, iframe, true);
     });
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
-      if (e.target.closest(".detail") || e.target.closest(".scheme-link")) return;
+      if (e.target.closest(".scheme-link") || e.target.closest(".add-btn")) return;
       e.preventDefault();
-      toggleScheme(card, thumb, demoBig, iframe, detail);
+      openReader(s, card, thumb, iframe, true);
     });
     return card;
   }
@@ -1614,6 +1688,10 @@
     if (noMore) { try { localStorage.setItem("arsenal-onboarded", "1"); } catch (e) {} }
     document.getElementById("onboardMask").hidden = true;
   });
+  function replayOnboard() {
+    const ob = document.getElementById("onboardMask");
+    if (ob) ob.hidden = false;
+  }
 
   // =====================================================================
   //  设置系统：外观 / 布局 / 快捷键（可重绑） / 账户（预留） / 数据
@@ -1668,10 +1746,10 @@
     viewArsenal:  { label: "切到「素材库」",   def: "1" },
     viewSchemes:  { label: "切到「方案库」",   def: "2" },
     toggleTheme:  { label: "切换亮 / 暗主题",  def: "t" },
-    openCart:     { label: "打开弹匣",        def: "c" },
-    randomFill:   { label: "随机装填一枚",    def: "r" },
+    openCart:     { label: "打开书架",        def: "c" },
+    randomFill:   { label: "随机收藏一枚",    def: "r" },
     showHelp:     { label: "显示快捷键清单",  def: "?" },
-    closeOverlay: { label: "关闭浮层 / 弹匣 / 设置", def: "Escape" },
+    closeOverlay: { label: "关闭浮层 / 书架 / 设置", def: "Escape" },
   };
   // 默认快捷键：网页通用（Mod+, 打开设置；/ 聚焦搜索；? 帮助）+ GitHub 风格（1/2 数字直达视图；t 切换主题）融合而成。
   // 不暴露「预设」选择，直接作为内置默认；用户在下方逐条改即可。
@@ -1934,8 +2012,10 @@
         <div class="set-field"><button class="btn ghost" id="dataExport">导出</button></div></div>
       <div class="set-row"><div><div class="lbl">导入设置</div><div class="desc">从 JSON 恢复</div></div>
         <div class="set-field"><button class="btn ghost" id="dataImportBtn">选择文件</button><input type="file" id="dataImport" accept="application/json" hidden></div></div>
-      <div class="set-row"><div><div class="lbl">清空弹匣</div><div class="desc">移除所有已装填的素材 / 方案</div></div>
+      <div class="set-row"><div><div class="lbl">清空书架</div><div class="desc">移除所有已收藏的素材 / 方案</div></div>
         <div class="set-field"><button class="btn danger" id="dataClearCart">清空</button></div></div>
+      <div class="set-row"><div><div class="lbl">重新观看新手引导</div><div class="desc">再次弹出首访引导（书架 / 翻开 / 方案 / 灯光）</div></div>
+        <div class="set-field"><button class="btn ghost" id="dataReplayOnboard">观看</button></div></div>
     `;
     setContent.querySelector('#dataReset').addEventListener('click', () => {
       settings = Object.assign({}, DEFAULT_SETTINGS); saveSettings();
@@ -1961,6 +2041,7 @@
       rd.readAsText(f);
     });
     setContent.querySelector('#dataClearCart').addEventListener('click', () => { cart = []; syncCart(); });
+    setContent.querySelector('#dataReplayOnboard').addEventListener('click', replayOnboard);
   }
 
   // ---- 快捷键清单（?）----
@@ -1998,7 +2079,7 @@
     io.observe(card);
   });
 
-  // 从 localStorage 恢复弹匣（过滤掉数据里已不存在的 id）
+  // 从 localStorage 恢复书架（过滤掉数据里已不存在的 id）
   try {
     const saved = JSON.parse(localStorage.getItem("arsenal-cart") || "[]");
     if (Array.isArray(saved)) cart = saved.filter(id => byId(id));
