@@ -1,7 +1,24 @@
-# BUGS · Web 灵感弹药库
+# BUGS · Web 灵感书房
 
 > 本文件记录画廊 `index.html` 在真实使用中发现的交互/视觉缺陷与修复。
 > 每次修复后必须：① 补一条记录 ② 跑 `node scripts/check_all.js` / 冒烟测试 ③ 更新本文件状态。
+
+---
+
+## 2026-09-25 · 书皮肤重构后的大检查
+
+### 5. Esc 无法关闭阅读器（本次修复）
+- **现象**：覆盖式阅读器（书·往前翻开）打开后按 Esc 无反应；快捷键清单却写着「关闭浮层」。
+- **原因**：Esc 处理（closeOverlay 分支 + 兜底监听）只列了 planMask / cartPanel / onboardMask / settingsMask / helpMask，新增的 readerMask 未纳入；anyModalOpen / focusSearch 同样漏掉（阅读器开着时按 `/` 会去聚焦搜索框）。
+- **修复**：closeOverlay 优先关 readerMask（走 closeReader）；anyModalOpen / focusSearch 补入 readerMask 判定。
+- **状态**：已修复 ✅
+
+### 大检查结论（宪法逐条，2026-09-25）
+- 规矩 15①②：`.thumb iframe` 与 `.reader-demo iframe` 均满足 `position:absolute` + `transform-origin:0 0` ✅
+- 规矩 15③：headless 实测截图（首屏缩略图 + 自动点开的阅读器），demo 真实渲染非灰白、阅读器铺满容器 ✅
+- 规矩 23/24/25/26：阅读器 scrim 为 modal 标准层、书脊装饰不压 iframe、书隐喻经用户确认、无新增预设 UI ✅
+- 规矩 27：引导 / hint / title / 空态 / 快捷键清单 / 注释措辞已全部同步书词汇 ✅
+- 规矩 28：`%TEMP%` 备份 + jsdom 真实数据冒烟（319 卡/0 错，按 E3 补齐 getContext/scrollTo/scrollIntoView 桩）+ `check_all.js` 全过 ✅
 
 ---
 

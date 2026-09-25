@@ -20,7 +20,7 @@
     --ink: #1a1a1a;
     --muted: #6b6f76;
     --accent: #3d5fd6;
-    --accent2: #b23a2e;          /* 朱 — 仅「装填」/ 重色落点使用 */
+    --accent2: #b23a2e;          /* 朱 — 方案/风格标签与重色落点使用 */
     --steel: #3a4150;            /* 精钢 — 描边 / 可点元素 */
     --enamel: #efe9dc;           /* 珐琅表盘 — 面板 */
     --bench: #15171c;            /* 工作台底 */
@@ -131,7 +131,7 @@
   .chip-row::-webkit-scrollbar-thumb { background: var(--steel); opacity: .4; border-radius: 3px; }
   .chip-row::-webkit-scrollbar-track { background: transparent; }
 
-  /* 筛选标签 = 描边式按钮，选中提亮描边 + 文字（弹药包·系统坞规范） */
+  /* 筛选标签 = 描边式按钮，选中提亮描边 + 文字（书房·系统坞规范） */
   .chip {
     position: relative; font-family: inherit; font-size: 12.5px; line-height: 1;
     padding: 7px 12px; border-radius: 9px;
@@ -225,7 +225,7 @@
   .avatar-slot:hover { border-color: var(--accent); color: var(--accent); }
   .avatar-slot.logged { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border-color: var(--accent); }
 
-  /* 弹匣按钮（原购物车） */
+  /* 书架按钮（原购物车） */
   .cart-btn {
     position: relative; border: 1px solid var(--line); background: var(--panel2); color: var(--ink);
     padding: 0 16px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 13.5px; font-weight: 600;
@@ -277,7 +277,7 @@
   .thumb iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; transform-origin: 0 0; background: var(--panel2); }
   .thumb .loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; pointer-events: none; }
 
-  /* 热点 = 28px 圆，深半透底 + 精钢描边，hover 反色（弹药包组件规范） */
+  /* 热点 = 28px 圆，深半透底 + 精钢描边，hover 反色（书房组件规范） */
   .add-btn {
     position: absolute; top: 9px; right: 9px; z-index: 4;
     border: 1px solid var(--steel); background: rgba(20,23,28,.55); color: #fff;
@@ -404,7 +404,7 @@
   .reveal.d3 { transition-delay: .24s; }
   @media (max-width: 720px) { .book-open { grid-template-columns: 1fr; height: min(88vh, 760px); } .page.right { border-top: 1px solid var(--line); } }
 
-  /* ============ 弹匣抽屉（原购物车） ============ */
+  /* ============ 书架抽屉（原购物车） ============ */
   .cart-panel {
     position: fixed; top: 0; right: 0; width: 320px; height: 100vh; z-index: 60;
     background: var(--panel); border-left: 1px solid var(--line); box-shadow: -10px 0 30px rgba(0,0,0,.10);
@@ -571,7 +571,7 @@
   <aside class="dock">
     <div class="brand">
       <h1>灵感书房</h1>
-      <p>WEB · ARSENAL · 取子弹的地方</p>
+      <p>WEB · 灵感书房 · 取书研读</p>
     </div>
 
     <div>
@@ -977,7 +977,7 @@
       btn.classList.toggle("in", cart.includes(btn.dataset.id));
       btn.textContent = cart.includes(btn.dataset.id) ? "✓" : "+";
     });
-    // 装填后卡片左侧色条染朱
+    // 收藏后书脊染烫金
     document.querySelectorAll(".card").forEach(c => c.classList.toggle("loaded", cart.includes(c.dataset.id)));
     const badge = document.getElementById("cartBadge");
     badge.textContent = cart.length ? cart.length : "";
@@ -1378,7 +1378,7 @@
   });
   document.getElementById("planClose").addEventListener("click", () => document.getElementById("planMask").hidden = true);
   document.getElementById("planMask").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
-  // Esc 关闭方案弹窗 / 弹匣抽屉 / 新手引导（键盘可用性）
+  // Esc 关闭阅读器 / 方案弹窗 / 书架抽屉 / 新手引导（键盘可用性）
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     const mask = document.getElementById("planMask");
@@ -1784,12 +1784,14 @@
       || (document.getElementById("cartPanel") && document.getElementById("cartPanel").classList.contains("show"))
       || (document.getElementById("onboardMask") && !document.getElementById("onboardMask").hidden)
       || (document.getElementById("settingsMask") && !document.getElementById("settingsMask").hidden)
-      || (document.getElementById("helpMask") && !document.getElementById("helpMask").hidden);
+      || (document.getElementById("helpMask") && !document.getElementById("helpMask").hidden)
+      || (document.getElementById("readerMask") && !document.getElementById("readerMask").hidden);
   }
   function focusSearch() {
     const inp = document.getElementById("searchInput");
     const am = document.getElementById("planMask"), cp = document.getElementById("cartPanel"), ob = document.getElementById("onboardMask");
-    if ((am && !am.hidden) || (cp && cp.classList.contains("show")) || (ob && !ob.hidden)) return;
+    const rm = document.getElementById("readerMask");
+    if ((am && !am.hidden) || (cp && cp.classList.contains("show")) || (ob && !ob.hidden) || (rm && !rm.hidden)) return;
     inp.focus(); inp.select();
   }
   function randomFillOne() {
@@ -1805,6 +1807,8 @@
     const action = actionFor(str);
     if (!action) return;
     if (action === "closeOverlay") {
+      const rm = document.getElementById("readerMask");
+      if (rm && !rm.hidden) { closeReader(); e.preventDefault(); return; }
       if (document.getElementById("helpMask") && !document.getElementById("helpMask").hidden) { closeHelp(); e.preventDefault(); return; }
       if (document.getElementById("settingsMask") && !document.getElementById("settingsMask").hidden) { closeSettings(); e.preventDefault(); return; }
       return; // 其余浮层交给既有 Esc 处理

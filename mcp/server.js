@@ -26,7 +26,7 @@ const server = new McpServer({
 
 server.tool(
   'search_materials',
-  '搜索 Web 灵感弹药库里的素材。可按关键词（标题/标签/说明）或 适配端/风格/场景/元素 过滤。返回素材摘要列表（id、标题、适配端·元素、标签、一句话说明）。',
+  '搜索 Web 灵感书房里的素材。可按关键词（标题/标签/说明）或 适配端/风格/场景/元素 过滤。返回素材摘要列表（id、标题、适配端·元素、标签、一句话说明）。',
   {
     keyword: z.string().optional().describe('模糊关键词，匹配标题/标签/效果说明'),
     适配端: z.string().optional().describe('适配端（单选），通用 / PC 端 / 移动端'),
@@ -117,7 +117,7 @@ server.tool(
     if (风格) list = list.filter(it => hit(it.风格, 风格));
     if (场景) list = list.filter(it => hit(it.场景, 场景));
     if (!list.length) list = ARSENAL;                       // 条件太苛刻 → 回退全库
-    if (!list.length) return { content: [{ type: 'text', text: '弹药库为空，请检查 data/素材.js。' }] };
+    if (!list.length) return { content: [{ type: 'text', text: '素材库为空，请检查 data/素材.js。' }] };
     const it = list[Math.floor(Math.random() * list.length)];
     return {
       content: [{
