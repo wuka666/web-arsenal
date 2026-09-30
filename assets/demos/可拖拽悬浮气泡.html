@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>可拖拽悬浮气泡</title>
+<style>
+:root{
+  --size:56; --bubbleColor:#007aff; --iconColor:#ffffff; --margin:16;
+  --expandScale:1.6; --shadow:16; --radius:28;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#f2f3f5;min-height:100vh;position:relative;overflow:hidden}
+.fab{position:fixed;right:calc(var(--margin)*1px);bottom:calc(var(--margin)*1px);width:calc(var(--size)*1px);height:calc(var(--size)*1px);background:var(--bubbleColor);color:var(--iconColor);border-radius:calc(var(--radius)*1px);box-shadow:0 calc(var(--shadow)*1px) calc(var(--shadow)*2px) rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:grab;user-select:none;touch-action:none;transition:transform .2s ease}
+.fab.expanded{transform:scale(var(--expandScale))}
+.menu{position:fixed;right:calc(var(--margin)*1px);bottom:calc((var(--size) + var(--margin) + 8)*1px);display:none;flex-direction:column;gap:8px;align-items:flex-end}
+.menu.show{display:flex}
+.mi{background:#fff;color:#333;padding:8px 14px;border-radius:14px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+</style>
+</head>
+<body>
+<div class="fab" id="fab">+</div>
+<div class="menu" id="menu"><div class="mi">分享</div><div class="mi">收藏</div><div class="mi">设置</div></div>
+<script>
+var state={size:56,bubbleColor:"#007aff",iconColor:"#ffffff",margin:16,expandScale:1.6,shadow:16,radius:28};
+var UNIT={size:"px",margin:"px",shadow:"px",radius:"px",expandScale:""};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+var fab=document.getElementById("fab"),menu=document.getElementById("menu");
+var drag=false,sx=0,sy=0,ox=0,oy=0,moved=false;
+fab.addEventListener("touchstart",function(e){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=fab.offsetLeft;oy=fab.offsetTop;moved=false;},{passive:true});
+fab.addEventListener("touchmove",function(e){if(!drag)return;var nx=ox+(e.touches[0].clientX-sx),ny=oy+(e.touches[0].clientY-sy);clampPos(nx,ny);moved=true;e.preventDefault();},{passive:false});
+fab.addEventListener("touchend",function(){if(drag){snapEdge();drag=false;}});
+fab.addEventListener("mousedown",function(e){drag=true;sx=e.clientX;sy=e.clientY;ox=fab.offsetLeft;oy=fab.offsetTop;moved=false;});
+window.addEventListener("mousemove",function(e){if(!drag)return;clampPos(ox+(e.clientX-sx),oy+(e.clientY-sy));moved=true;});
+window.addEventListener("mouseup",function(){if(drag){snapEdge();drag=false;}});
+function clampPos(nx,ny){var w=window.innerWidth-fab.offsetWidth,hh=window.innerHeight-fab.offsetHeight;nx=Math.max(0,Math.min(nx,w));ny=Math.max(0,Math.min(ny,hh));fab.style.left=nx+"px";fab.style.top=ny+"px";fab.style.right="auto";fab.style.bottom="auto";}
+function snapEdge(){var m=state.margin;var cx=fab.offsetLeft+fab.offsetWidth/2;if(cx<window.innerWidth/2)fab.style.left=m+"px";else fab.style.left=(window.innerWidth-fab.offsetWidth-m)+"px";fab.style.top=Math.min(fab.offsetTop,window.innerHeight-fab.offsetHeight-m)+"px";fab.style.right="auto";fab.style.bottom="auto";}
+fab.addEventListener("click",function(){if(moved)return;var ex=fab.classList.toggle("expanded");menu.classList.toggle("show",ex);});
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

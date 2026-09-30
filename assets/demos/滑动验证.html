@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>滑动验证</title>
+<style>
+:root{--trackH:48;--knobW:48;--trackBg:#eef0f4;--fillBg:#4f6bff;--fg:#8a8f99;--fs:14;--radius:24;--dur:0.6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:#fff;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden;padding:40px 22px;display:flex;flex-direction:column;justify-content:center}
+.track{position:relative;height:calc(var(--trackH) * 1px);background:var(--trackBg);border-radius:calc(var(--radius) * 1px);overflow:hidden;user-select:none;touch-action:none}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;background:color-mix(in srgb,var(--fillBg) 22%,transparent);transition:width calc(var(--dur) * 1s) ease}
+.txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--fs) * 1px);color:var(--fg);pointer-events:none;transition:color .3s}
+.knob{position:absolute;left:0;top:0;width:calc(var(--knobW) * 1px);height:calc(var(--trackH) * 1px);background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:calc(var(--radius) * 1px);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--fillBg);box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:grab;transition:left calc(var(--dur) * 1s) ease}
+.done .fill{background:var(--fillBg)}
+.done .txt{color:#fff}
+.done .knob{color:#fff;background:var(--fillBg)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="track" id="track">
+    <div class="fill" id="fill"></div>
+    <div class="txt" id="txt">按住滑块，拖动到最右侧</div>
+    <div class="knob" id="knob">›</div>
+  </div>
+</div>
+<script>
+var state={trackH:48,knobW:48,trackBg:"#eef0f4",fillBg:"#4f6bff",fg:"#8a8f99",fs:14,radius:24,dur:0.6};
+var r=document.documentElement.style;
+/* 尺寸类参数在 CSS 里以 calc(var*1px) 换算，apply() 不追加单位；颜色参数原样输出 */
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]);}}
+var track=document.getElementById("track"),knob=document.getElementById("knob"),fill=document.getElementById("fill"),txt=document.getElementById("txt");
+function move(p,anim){
+  var tw=track.clientWidth,kw=knob.offsetWidth,x=p*(tw-kw);
+  if(!anim){knob.style.transition="none";fill.style.transition="none";}
+  knob.style.left=x+"px";
+  fill.style.width=(x+kw)+"px";
+  if(!anim){void knob.offsetWidth;knob.style.transition="";fill.style.transition="";}
+}
+function reset(){track.classList.remove("done");txt.textContent="按住滑块，拖动到最右侧";move(0,true);}
+function pass(){track.classList.add("done");txt.textContent="验证通过 ✓";}
+var auto=null;
+function cycle(){
+  reset();
+  setTimeout(function(){move(1,true);},350);
+  setTimeout(pass,350+state.dur*1000+120);
+}
+auto=setInterval(cycle,3000);
+cycle();
+/* 手动拖动：拖到最右即通过，否则回弹 */
+var dragging=false;
+knob.addEventListener("pointerdown",function(e){dragging=true;clearInterval(auto);knob.setPointerCapture(e.pointerId);});
+track.addEventListener("pointermove",function(e){
+  if(!dragging)return;
+  var rect=track.getBoundingClientRect(),kw=knob.offsetWidth;
+  var p=(e.clientX-rect.left-kw/2)/(rect.width-kw);
+  move(Math.max(0,Math.min(1,p)),false);
+});
+track.addEventListener("pointerup",function(){
+  if(!dragging)return;dragging=false;
+  var rect=track.getBoundingClientRect(),kw=knob.offsetWidth;
+  var p=parseFloat(knob.style.left||"0")/(rect.width-kw);
+  if(p>0.9){move(1,true);pass();}else{reset();}
+  auto=setInterval(cycle,3000);
+});
+apply();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

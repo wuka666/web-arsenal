@@ -8,7 +8,11 @@ body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Micr
 .card.out{opacity:0;transform:translateX(40px);height:0;padding-top:0;padding-bottom:0;margin:0}
 .card .d{width:34px;height:34px;border-radius:9px;background:var(--c1);opacity:.85;flex:0 0 auto}
 .card .x{margin-left:auto;width:28px;height:28px;border:0;border-radius:8px;background:var(--bg);color:var(--c3);cursor:pointer;font-size:16px}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.x{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="list" id="list"></div>
 <script>
 const state={c1:"#007aff",c2:"#ffffff",c3:"#1f2937",bg:"#f2f2f7",bd:"#e5e7eb",rad:12,pad:14,gap:10};

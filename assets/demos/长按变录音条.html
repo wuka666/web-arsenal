@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长按变录音条</title>
+<style>
+:root{--accent:#ff3b30;--barbg:#ffffff;--ink:#222222;--wave:#ff3b30;--radius:28;--dur:0.3;--h:56;--press:350}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f1f3;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.row{display:flex;align-items:center;gap:12px}
+.mic{width:calc(var(--h)*1px);height:calc(var(--h)*1px);border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none;cursor:pointer;touch-action:none;user-select:none}
+.bar{width:calc(var(--h)*1px);height:calc(var(--h)*1px);border-radius:calc(var(--radius)*1px);background:var(--barbg);box-shadow:0 6px 20px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:4px;overflow:hidden;transition:width calc(var(--dur)*1s) cubic-bezier(.34,1.56,.64,1)}
+.bar.open{width:260px;justify-content:flex-start;padding:0 16px}
+.bar i{flex:1;height:60%;background:var(--wave);border-radius:3px;transform-origin:center;animation:wv .8s ease-in-out infinite}
+.bar i:nth-child(2){animation-delay:.1s}.bar i:nth-child(3){animation-delay:.2s}.bar i:nth-child(4){animation-delay:.3s}.bar i:nth-child(5){animation-delay:.15s}.bar i:nth-child(6){animation-delay:.25s}
+@keyframes wv{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.bar .x{display:none;margin-left:auto;font-size:20px;color:var(--ink);cursor:pointer}
+.bar.open .x{display:block}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.mic{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="mic" id="mic">🎤</div>
+  <div class="bar" id="bar"><i></i><i></i><i></i><i></i><i></i><i></i><span class="x" id="x">×</span></div>
+</div>
+<script>
+var state={accent:'#ff3b30',barbg:'#ffffff',ink:'#222222',wave:'#ff3b30',radius:28,dur:0.3,h:56,press:350};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',h:'px',press:''};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var mic=document.getElementById('mic'),bar=document.getElementById('bar'),x=document.getElementById('x'),timer=null;
+mic.addEventListener('pointerdown',function(){timer=setTimeout(function(){bar.classList.add('open');},state.press);});
+function end(){if(timer){clearTimeout(timer);timer=null;}bar.classList.remove('open');}
+window.addEventListener('pointerup',end);
+x.addEventListener('pointerup',function(e){e.stopPropagation();end();});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

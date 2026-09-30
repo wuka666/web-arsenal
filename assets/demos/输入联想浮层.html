@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>输入联想浮层</title>
+<style>
+:root{--accent:#ff6b35;--bg:#ffffff;--ink:#222222;--popbg:#ffffff;--radius:12;--dur:0.22;--fs:15;--maxsug:6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f6f8;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.box{width:340px;background:var(--bg);border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.title{font-size:14px;color:#888;margin-bottom:8px}
+.pos{position:relative}
+.input{width:100%;border:1px solid #e3e5e8;border-radius:var(--radius)px;padding:10px 12px;font-size:var(--fs)px;font-family:inherit;outline:none;color:var(--ink);background:var(--bg)}
+.pop{position:absolute;top:46px;left:0;right:0;background:var(--popbg);border-radius:var(--radius)px;box-shadow:0 10px 30px rgba(0,0,0,.12);overflow:hidden;display:none;z-index:5}
+.pop.show{display:block;animation:pop calc(var(--dur)*1s) ease}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pop div{padding:9px 12px;font-size:var(--fs)px;color:var(--ink);cursor:pointer}
+.pop div:hover{background:#f2f3f5}
+.pop b{color:var(--accent)}
+.body{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;min-height:30px}
+.tag{background:#f2f3f5;color:var(--ink);border-radius:8px;padding:5px 9px;font-size:13px}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.input{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="title">给笔记加话题</div>
+  <div class="pos">
+    <input class="input" id="inp" placeholder="输入“旅”试试">
+    <div class="pop" id="pop"></div>
+  </div>
+  <div class="body" id="body"></div>
+</div>
+<script>
+var state={accent:'#ff6b35',bg:'#ffffff',ink:'#222222',popbg:'#ffffff',radius:12,dur:0.22,fs:15,maxsug:6};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',fs:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var pool=['旅行','旅途','旅行箱','旅拍','酒店','美食','咖啡','摄影','城市','周末','攻略','露营'];
+var inp=document.getElementById('inp'),pop=document.getElementById('pop'),body=document.getElementById('body');
+function render(){
+  var v=inp.value.trim();
+  if(!v){pop.className='pop';return;}
+  var m=pool.filter(function(w){return w.indexOf(v)===0;}).slice(0,state.maxsug);
+  if(!m.length){pop.className='pop';return;}
+  pop.innerHTML=m.map(function(w){return '<div data-w="'+w+'">'+w.replace(v,'<b>'+v+'</b>')+'</div>';}).join('');
+  pop.className='pop show';
+}
+inp.addEventListener('input',render);
+pop.addEventListener('click',function(e){
+  var t=e.target.closest('div[data-w]');if(!t)return;
+  var s=document.createElement('span');s.className='tag';s.textContent=t.getAttribute('data-w');
+  body.appendChild(s);inp.value='';pop.className='pop';
+});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

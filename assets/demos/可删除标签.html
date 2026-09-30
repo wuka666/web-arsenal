@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>可删除标签</title>
+<style>
+:root{--accent:#007aff;--chipbg:#e8f0fe;--ink:#1c1c1e;--bg:#f5f6f8;--radius:16;--dur:0.3;--gap:8;--fs:14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.box{width:340px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.label{font-size:13px;color:#888;margin-bottom:8px}
+.wrap{display:flex;flex-wrap:wrap;gap:var(--gap)px;align-items:center;overflow:hidden;transition:height calc(var(--dur)*1s) ease}
+.chip{display:flex;align-items:center;gap:4px;background:var(--chipbg);color:var(--ink);border-radius:var(--radius)px;padding:6px 10px;font-size:var(--fs)px;white-space:nowrap;transition:all calc(var(--dur)*1s) cubic-bezier(.4,0,.2,1)}
+.chip .x{cursor:pointer;opacity:.55;font-size:15px;line-height:1;color:var(--accent)}
+.chip .x:hover{opacity:1}
+.chip.gone{width:10px;height:10px;padding:0;border-radius:50%;color:transparent;overflow:hidden}
+.inp{flex:1;min-width:90px;border:none;outline:none;font-size:var(--fs)px;font-family:inherit;color:var(--ink);background:transparent}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.inp{min-width:44px;min-height:44px}
+.x{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="label">收件人</div>
+  <div class="wrap" id="wrap">
+    <span class="chip">小林<span class="x">×</span></span>
+    <span class="chip">设计组<span class="x">×</span></span>
+    <span class="chip">王经理<span class="x">×</span></span>
+    <span class="chip">客户A<span class="x">×</span></span>
+    <input class="inp" placeholder="输入后回车添加">
+  </div>
+</div>
+<script>
+var state={accent:'#007aff',chipbg:'#e8f0fe',ink:'#1c1c1e',bg:'#f5f6f8',radius:16,dur:0.3,gap:8,fs:14};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',gap:'px',fs:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var wrap=document.getElementById('wrap');
+function setHeight(){wrap.style.height=wrap.scrollHeight+'px';}
+setTimeout(setHeight,50);
+wrap.querySelectorAll('.x').forEach(function(x){
+  x.addEventListener('click',function(){
+    var chip=x.parentElement;
+    chip.classList.add('gone');
+    setTimeout(function(){
+      if(chip.nextElementSibling&&chip.nextElementSibling.classList.contains('inp')){}
+      chip.remove();
+      setHeight();
+    },300);
+  });
+});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

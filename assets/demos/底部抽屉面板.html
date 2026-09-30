@@ -22,7 +22,7 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 </div></div>
 <script>
 const card=document.getElementById('card'),hd=document.getElementById('hd');
-const state={ac:'#2f6bff',sc:'#ffffff',eh:300,sh:110,sr:16,dur:.35,hw:40,sumc:'#222'};
+const state={ac:'#2f6bff',sc:'#ffffff',eh:300,sh:110,sr:16,dur:.35,hw:40,sumc:"#222222"};
 let drag=false,sy=0,sh0=0;
 function applyStyle(){document.documentElement.style.setProperty('--ac',state.ac);document.documentElement.style.setProperty('--sc',state.sc);document.documentElement.style.setProperty('--eh',state.eh+'px');document.documentElement.style.setProperty('--sh',state.sh+'px');document.documentElement.style.setProperty('--sr',state.sr+'px');document.documentElement.style.setProperty('--hw',state.hw+'px');document.documentElement.style.setProperty('--sumc',state.sumc);card.style.transition='height '+state.dur+'s cubic-bezier(.4,1,.5,1)';}
 hd.addEventListener('pointerdown',e=>{drag=true;sy=e.clientY;sh0=card.offsetHeight;card.style.transition='none';hd.setPointerCapture(e.pointerId);});

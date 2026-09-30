@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>顶图下拉放大</title>
+<style>
+:root{--accent:#ff6b35;--herobg:#ffd9c2;--ink:#222222;--overlay:#000000;--radius:0;--scale:1.3;--dur:0.4;--pull:120}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff}
+.phone{height:100vh;overflow-y:auto;max-width:380px;margin:0 auto;position:relative}
+.hero{height:200px;background:var(--herobg);position:relative;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:22px;font-weight:700;transform-origin:top center;transition:transform calc(var(--dur)*1s) cubic-bezier(.34,1.4,.5,1)}
+.hero .cap{transition:opacity .2s;position:relative;z-index:2;text-shadow:0 2px 8px var(--overlay)}
+.content{padding:16px;color:var(--ink)}
+.content .it{background:#f2f3f5;border-radius:var(--radius)px;padding:14px;margin-bottom:10px;box-shadow:inset 3px 0 0 var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="hero" id="hero"><span class="cap" id="cap">封面标题</span></div>
+  <div class="content" id="content">
+    <div class="it">正文段落一</div><div class="it">正文段落二</div><div class="it">正文段落三</div>
+    <div class="it">正文段落四</div><div class="it">正文段落五</div><div class="it">正文段落六</div>
+  </div>
+</div>
+<script>
+var state={accent:'#ff6b35',herobg:'#ffd9c2',ink:'#222222',overlay:'#000000',radius:0,scale:1.3,dur:0.4,pull:120};
+var root=document.documentElement;
+var UNIT={radius:'px',scale:'',dur:'s',pull:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var phone=document.getElementById('phone'),hero=document.getElementById('hero'),cap=document.getElementById('cap');
+var startY=0,pulling=false;
+phone.addEventListener('touchstart',function(e){if(phone.scrollTop<=0){startY=e.touches[0].clientY;pulling=true;hero.style.transition='none';}});
+phone.addEventListener('touchmove',function(e){if(!pulling)return;var d=e.touches[0].clientY-startY;if(d<0)d=0;if(d>state.pull)d=state.pull;var s=1+d/state.pull*(state.scale-1);hero.style.transform='scale('+s+')';cap.style.opacity=String(1-d/state.pull);});
+phone.addEventListener('touchend',function(){if(!pulling)return;pulling=false;hero.style.transition='transform calc(var(--dur)*1s) cubic-bezier(.34,1.4,.5,1)';hero.style.transform='scale(1)';cap.style.opacity='1';});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

@@ -17,11 +17,15 @@
   --radius:48;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--stage-bg);height:100vh;display:grid;place-items:center;
-  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden}
-/* stage 整组双机，fit() 把它等比缩放进视口，保证两台机器永远完整入框 */
-.stage{display:flex;gap:calc(var(--gap)*1px);align-items:center;justify-content:center;
-  padding:calc(var(--pad)*1px);transform-origin:center}
+body{background:var(--stage-bg);height:100vh;overflow:hidden;
+  font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+/* viewport 占满视口、负责居中；stage 绝对定位脱离文档流，
+   避免 scale 缩放后被 body 的 overflow 裁掉（这是窄屏右机被切的根因） */
+.viewport{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+/* stage 整组双机：绝对居中 + fit() 等比缩放，保证两台机器在任意宽度都完整入框 */
+.stage{position:absolute;left:50%;top:50%;display:flex;gap:calc(var(--gap)*1px);
+  align-items:center;justify-content:center;padding:calc(var(--pad)*1px);
+  transform-origin:center;transform:translate(-50%,-50%) scale(1)}
 .device{width:calc(var(--phone-w)*1px);height:calc(var(--phone-h)*1px);
   background:var(--phone-bg);border-radius:calc(var(--radius)*1px);
   padding:calc(var(--pad)*1px);flex:0 0 auto;box-shadow:0 24px 60px rgba(0,0,0,.25)}
@@ -35,10 +39,11 @@ body{background:var(--stage-bg);height:100vh;display:grid;place-items:center;
 .panel .bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12)}
 .panel .bar.a{width:80%}.panel .bar.b{width:55%}.panel .bar.c{width:65%}
 .note{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
-  font-size:12px;color:#5b5b5b;opacity:.7}
+  font-size:12px;color:#5b5b5b;opacity:.7;z-index:2}
 </style>
 </head>
 <body>
+<div class="viewport">
 <div class="stage" id="stage">
   <div class="device"><div class="panel">
     <span class="chip">左机</span><h2>主标题</h2>
@@ -51,6 +56,7 @@ body{background:var(--stage-bg);height:100vh;display:grid;place-items:center;
     <div class="bar c"></div><div class="bar a"></div><div class="bar b"></div>
   </div></div>
 </div>
+</div>
 <div class="note">拖动窗口大小，两台机器会自动等比缩放完整入框</div>
 <script>
 // 全部参数集中在这里，与上方 :root 一一对应
@@ -60,13 +66,15 @@ function apply(){
   var r=document.documentElement.style;
   for(var k in state){ r.setProperty('--'+k, state[k]); }
 }
-// fit：算出整组双机自然尺寸，再按视口缩放，避免大屏溢出、小屏被裁
+// fit：先复位到 scale(1) 用 getBoundingClientRect 拿真实未缩放尺寸，
+// 再按视口缩放到「正好装下双机」，避免大屏溢出、小屏被裁。
+// stage 现已绝对居中，绝对定位不撑开 body，故不再有布局溢出被裁的问题。
 function fit(){
   var st=document.getElementById('stage');
-  var natW=state.phoneW*2 + state.gap + state.pad*4;
-  var natH=state.phoneH + state.pad*2;
-  var s=Math.min(1,(window.innerWidth-40)/natW,(window.innerHeight-40)/natH);
-  st.style.transform='scale('+s+')';
+  st.style.transform='translate(-50%,-50%) scale(1)';
+  var rect=st.getBoundingClientRect();
+  var s=Math.min(1,(window.innerWidth-40)/rect.width,(window.innerHeight-40)/rect.height);
+  st.style.transform='translate(-50%,-50%) scale('+s+')';
 }
 apply(); fit();
 window.addEventListener('resize', fit);

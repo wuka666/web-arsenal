@@ -106,6 +106,12 @@ body{
 @media (max-width:900px){ :root{--cols:2} .filters .sort{margin-left:0} }
 @media (max-width:560px){ :root{--cols:1} }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+input{min-width:44px;min-height:44px}
+button{min-width:44px;min-height:44px}
+.chip{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="wrap">

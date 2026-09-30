@@ -34,6 +34,13 @@
   .cell.in { background:var(--theme,#2563eb); color:#fff; opacity:.35; }
 
 </style>
+<style>
+  /* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变）。
+     例外：日历 7 列格 .grid（33×36）已满足 WCAG AA 24px 底线，撑到 44px 会令 280px 宽的日历横向溢出 58px，
+     属「布局受限例外」——见 .grid 的 data-touch-exempt。其余目标照常撑 44。 */
+  .head button{min-width:44px;min-height:44px}
+  .trigger{min-height:44px}
+</style>
 </head>
 <body>
   <div class="field" id="field">
@@ -44,7 +51,7 @@
         <span id="title"></span>
         <button id="next">›</button>
       </div>
-      <div class="grid" id="grid"></div>
+      <div class="grid" id="grid" data-touch-exempt="7 列日历格：33×36 已满足 WCAG AA 24px 底线，撑 44px 会导致 280px 日历横向溢出 58px，属布局受限例外"></div>
     </div>
   </div>
 

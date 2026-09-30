@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>波浪矩阵</title>
+<style>
+:root{--bg:#0f172a;--cell:#1e293b;--accent:#38bdf8;--ink:#e2e8f0;--radius:6px;--size:34px;--amp:14px;--speed:1.6s}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(8,calc(var(--size) * 1px));gap:6px}
+.c{width:calc(var(--size) * 1px);height:calc(var(--size) * 1px);background:var(--cell);border-radius:var(--radius);animation:wv calc(var(--speed) * 1s) ease-in-out infinite alternate}
+@keyframes wv{from{transform:translateY(0);background:var(--cell)}to{transform:translateY(calc(var(--amp) * -1px));background:var(--accent)}}
+.cap{font-size:12px;color:var(--ink);opacity:.7;margin-bottom:10px;text-align:center}
+</style>
+</head>
+<body>
+<div><div class="cap">波浪矩阵 · 起伏按行列传播</div><div class="grid" id="gd"></div></div>
+<script>
+var state={bg:"#0f172a",cell:"#1e293b",accent:"#38bdf8",ink:"#e2e8f0",radius:6,size:34,amp:14,speed:1.6};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--cell',state.cell);r.setProperty('--accent',state.accent);r.setProperty('--ink',state.ink);r.setProperty('--radius',state.radius+'px');r.setProperty('--size',state.size+'px');r.setProperty('--amp',state.amp+'px');r.setProperty('--speed',state.speed+'s');}
+apply();
+var gd=document.getElementById("gd");
+function build(){gd.innerHTML="";for(var r=0;r<6;r++){for(var c=0;c<8;c++){var d=document.createElement("div");d.className="c";d.style.animationDelay=((r+c)*0.12)+"s";gd.appendChild(d);}}}
+build();
+
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

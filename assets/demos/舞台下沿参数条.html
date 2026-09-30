@@ -41,6 +41,10 @@
   .sw button i{position:absolute;inset:3px;border-radius:50%;display:block}
   .sw button[aria-pressed="true"]{box-shadow:0 0 0 2px #fff}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+button{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="stage" id="stage">

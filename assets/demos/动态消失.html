@@ -7,7 +7,11 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .red{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:var(--rc,#ef4444);border:2px solid #fff;transition:transform .4s ease,opacity .4s ease}
 .red.gone{transform:scale(0);opacity:0}
 .handle{background:var(--hc,#2f6bff);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.handle{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="row"><span class="bell">🔔<span class="red" id="red"></span></span><span>系统通知</span><button class="handle" id="hd">处理</button></div>
 <script>
 const red=document.getElementById('red'),hd=document.getElementById('hd');

@@ -39,6 +39,10 @@
   .panel select { background: #222; color: #fff; border: 1px solid #ffffff33; border-radius: 6px; padding: 2px 6px; font-size: 12px; }
   .panel
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.panel-toggle{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -69,7 +73,7 @@
   let W, H
 
   const state = {
-    count: 2000, size: 1.5, speed: 0.5, scatter: 0.6, rotate: 0.3,
+    count: 2000, size:2.05, speed: 0.5, scatter:0.041, rotate: 0.3,
     bgRatio: 0.1, palette: 'astra', twinkle: 0.6,
     color1: '#6eb5ff', color2: '#ff8c5a', bg: '#000000'
   }

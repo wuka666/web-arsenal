@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽框选</title>
+<style>
+:root{--bg:#f1f5f9;--item:#cbd5e1;--sel:#0ea5e9;--box:#0ea5e9;--radius:6px;--size:46px;--gap:16px;--cols:6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.pad{position:relative;width:min(94vw,620px);padding:18px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);user-select:none}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),calc(var(--size) * 1px));gap:calc(var(--gap) * 1px)}
+.i{width:calc(var(--size) * 1px);height:calc(var(--size) * 1px);background:var(--item);border-radius:var(--radius)}
+.i.on{background:var(--sel)}
+.mar{position:absolute;border:1px solid var(--box);background:rgba(14,165,233,.14);border-radius:2px;pointer-events:none;display:none}
+.cap{font-size:12px;opacity:.6;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="pad" id="pad"><div class="cap" id="cap">在空白处拖出选框（自动演示中）</div><div class="grid" id="gd"></div><div class="mar" id="mk"></div></div>
+<script>
+var state={bg:"#f1f5f9",item:"#cbd5e1",sel:"#0ea5e9",box:"#0ea5e9",radius:6,size:46,gap:16,cols:6};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--item',state.item);r.setProperty('--sel',state.sel);r.setProperty('--box',state.box);r.setProperty('--radius',state.radius+'px');r.setProperty('--size',state.size+'px');r.setProperty('--gap',state.gap+'px');r.setProperty('--cols',state.cols);}
+apply();
+var pad=document.getElementById("pad"),gd=document.getElementById("gd"),mk=document.getElementById("mk"),cap=document.getElementById("cap");
+function build(){gd.innerHTML="";for(var i=0;i<24;i++){var d=document.createElement("div");d.className="i";gd.appendChild(d);}}
+build();
+var x0=0,y0=0,dr=false;
+function hit(a,b,c,d){return !(a>c||c>b||a>d||d>b);}
+function selectBox(r){var pr=pad.getBoundingClientRect();
+Array.prototype.forEach.call(gd.children,function(el){var b=el.getBoundingClientRect();
+var L=b.left-pr.left,T=b.top-pr.top,R=L+b.width,B=T+b.height;
+var inter=!(r.x2<L||r.x1>R||r.y2<T||r.y1>B);el.classList.toggle("on",inter);});
+var n=gd.querySelectorAll(".i.on").length;cap.textContent="已选中 "+n+" 个";}
+pad.addEventListener("pointerdown",function(e){dr=true;var pr=pad.getBoundingClientRect();x0=e.clientX-pr.left;y0=e.clientY-pr.top;mk.style.display="block";});
+pad.addEventListener("pointermove",function(e){if(!dr)return;var pr=pad.getBoundingClientRect();var x=e.clientX-pr.left,y=e.clientY-pr.top;
+mk.style.left=Math.min(x0,x)+"px";mk.style.top=Math.min(y0,y)+"px";mk.style.width=Math.abs(x-x0)+"px";mk.style.height=Math.abs(y-y0)+"px";
+selectBox({x1:Math.min(x0,x),y1:Math.min(y0,y),x2:Math.max(x0,x),y2:Math.max(y0,y)});});
+function end(){dr=false;mk.style.display="none";}
+pad.addEventListener("pointerup",end);pad.addEventListener("pointerleave",end);
+setTimeout(function(){var pr=pad.getBoundingClientRect();
+mk.style.display="block";mk.style.left="20px";mk.style.top="40px";mk.style.width="190px";mk.style.height="120px";
+selectBox({x1:20,y1:40,x2:210,y2:160});},400);
+setTimeout(function(){mk.style.display="none";},2600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

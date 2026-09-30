@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>几何纹理底纹</title>
+<style>
+:root{
+  --bg:#0f1115;
+  --c1:#7ee7ff;
+  --c2:#1b2330;
+  --scale:22;
+  --lineW:2;
+  --angle:45;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{height:100vh;overflow:hidden;font-family:system-ui,"PingFang SC",sans-serif}
+/* surface 的 background-image 由 JS 按「纹理样式」生成，全部纯 CSS 渐变，零图片零外链 */
+.surface{position:fixed;inset:0;background-color:var(--bg);
+  background-size:calc(var(--scale)*1px) calc(var(--scale)*1px)}
+.panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:rgba(12,14,18,.72);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:18px 22px;color:#e8eefc;backdrop-filter:blur(8px);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);text-align:center}
+.panel b{display:block;font-size:15px;letter-spacing:.04em;margin-bottom:6px}
+.panel span{font-size:12px;opacity:.6}
+</style>
+</head>
+<body>
+<div class="surface" id="surface"></div>
+<div class="panel"><b>几何纹理底纹</b><span>纯 CSS 渐变生成的 5 种底纹 · 密度 / 线宽 / 角度 / 配色可调</span></div>
+<script>
+// 全部参数集中于此，与上方 :root 一一对应（键=CSS 变量名）
+var state={bg:"#0f1115",c1:"#7ee7ff",c2:"#1b2330",scale:22,lineW:2,angle:45,pattern:"斜纹"};
+var surface=document.getElementById('surface');
+function pick(){
+  var c1=state.c1, c2=state.c2;
+  var lw='calc(var(--lineW)*1px)', sc='calc(var(--scale)*1px)';
+  var half='calc(var(--scale)*0.5px)';
+  var a='calc(var(--angle)*1deg)';
+  switch(state.pattern){
+    case '点阵':
+      return {size:sc+' '+sc,
+        img:'radial-gradient(circle,'+c1+' '+lw+',transparent '+lw+')'};
+    case '网格':
+      return {size:sc+' '+sc,
+        img:'linear-gradient('+c1+' '+lw+',transparent '+lw+'),'+
+            'linear-gradient(90deg,'+c1+' '+lw+',transparent '+lw+')'};
+    case '交叉':
+      return {size:sc+' '+sc,
+        img:'linear-gradient('+a+','+c1+' '+lw+',transparent '+lw+'),'+
+            'linear-gradient(calc('+a+' + 90deg),'+c2+' '+lw+',transparent '+lw+')'};
+    case '波纹':
+      return {size:sc+' '+sc,
+        img:'radial-gradient(circle at 50% 100%, transparent '+half+','+c1+' '+half+',transparent calc('+half+' + '+lw+')),'+
+            'radial-gradient(circle at 50% 0%, transparent '+half+','+c1+' '+half+',transparent calc('+half+' + '+lw+'))'};
+    default: // 斜纹
+      return {size:sc+' '+sc,
+        img:'repeating-linear-gradient('+a+','+c1+' 0 '+lw+','+c2+' '+lw+' '+sc+')'};
+  }
+}
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ if(k!=='pattern') r.setProperty('--'+k,state[k]); }
+  var p=pick();
+  surface.style.backgroundImage=p.img;
+  surface.style.backgroundSize=p.size;
+}
+apply();
+// 外部调参契约：只接受 type==='param' 且 key 在 state 内的消息
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

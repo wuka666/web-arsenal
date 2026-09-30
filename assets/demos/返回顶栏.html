@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>返回顶栏</title>
+<style>
+:root{--bg:#ffffff;--fg:#1c1c1e;--accent:#007aff;--h:44px;--fs:16px;--padX:12px;--sideW:56px;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:#f2f2f7;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden}
+.bar{height:var(--h);padding:0 var(--padX);display:flex;align-items:center;background:var(--bg);color:var(--fg);font-size:var(--fs);border-radius:0 0 var(--radius) var(--radius);box-shadow:0 2px 10px rgba(0,0,0,.07);position:relative;z-index:2}
+/* 两侧等宽，标题才能真正居中；否则标题会被左右内容挤偏 */
+.side{width:var(--sideW);display:flex;align-items:center}
+.side.r{justify-content:flex-end}
+.back{font-size:calc(var(--fs) * 1.6);line-height:1;color:var(--accent);font-weight:300;transform:translateY(-1px)}
+.title{flex:1;text-align:center;font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.act{color:var(--accent);font-weight:500}
+.body{padding:16px}
+.rw{height:12px;border-radius:6px;background:#e3e3e8;margin-bottom:12px}
+.rw.w80{width:80%}.rw.w60{width:60%}.rw.w90{width:90%}
+.cd{height:88px;border-radius:12px;background:#fff;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="bar">
+    <div class="side"><span class="back">‹</span></div>
+    <div class="title" id="title">订单详情</div>
+    <div class="side r"><span class="act">编辑</span></div>
+  </div>
+  <div class="body">
+    <div class="rw w80"></div>
+    <div class="rw w60"></div>
+    <div class="rw w90"></div>
+    <div class="cd"></div>
+  </div>
+</div>
+<script>
+var state={bg:"#ffffff",fg:"#1c1c1e",accent:"#007aff",h:44,fs:16,padX:12,sideW:56,radius:14};
+var UNIT={h:"px",fs:"px",padX:"px",sideW:"px",radius:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var title=document.getElementById("title");
+var TITLES=["订单详情","收货地址","账户安全","消息通知"];
+var i=0;
+setInterval(function(){i=(i+1)%TITLES.length;title.textContent=TITLES[i];},1600);
+apply();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

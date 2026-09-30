@@ -12,6 +12,10 @@
   .btn { padding: 9px 20px; border: none; border-radius: 10px; background: #ff7a59; color: #fff; font-size: 14px; cursor: pointer; font-weight: 700; }
 
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <canvas id="c"></canvas>

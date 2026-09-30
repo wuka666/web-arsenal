@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>卡片弹出详情</title>
+<style>
+:root{--accent:#007aff;--cardbg:#ffffff;--ink:#222222;--overlay:#000000;--radius:16;--dur:0.35;--gap:12;--cols:3}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f4f5f7;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:var(--gap)px;max-width:420px;margin:0 auto}
+.c{background:var(--cardbg);border-radius:var(--radius)px;height:96px;box-shadow:0 4px 14px rgba(0,0,0,.08);display:flex;align-items:flex-end;padding:10px;color:var(--ink);font-size:13px;cursor:pointer;transition:transform .15s}
+.ov{position:fixed;inset:0;background:color-mix(in srgb, var(--overlay) 45%, transparent);opacity:0;pointer-events:none;transition:opacity calc(var(--dur)*1s) ease;z-index:10}
+.ov.show{opacity:1;pointer-events:auto}
+.modal{position:fixed;z-index:11;background:var(--cardbg);border-radius:var(--radius)px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:18px;color:var(--ink);display:none;flex-direction:column;gap:6px;max-width:340px}
+.modal h3{font-size:18px}.modal p{font-size:13px;opacity:.6;line-height:1.6}
+.modal .bk{margin-top:8px;background:var(--accent);color:#fff;border:none;padding:9px;border-radius:10px;font-family:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="grid" id="grid">
+  <div class="c">商品 A</div><div class="c">商品 B</div><div class="c">商品 C</div>
+  <div class="c">商品 D</div><div class="c">商品 E</div><div class="c">商品 F</div>
+</div>
+<div class="ov" id="ov"></div>
+<div class="modal" id="modal"><h3 id="mt">详情</h3><p id="mp">这里是该卡片展开后的完整说明与操作入口。</p><button class="bk" id="bk">关闭</button></div>
+<script>
+var state={accent:'#007aff',cardbg:'#ffffff',ink:'#222222',overlay:'#000000',radius:16,dur:0.35,gap:12,cols:3};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',gap:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var grid=document.getElementById('grid'),ov=document.getElementById('ov'),modal=document.getElementById('modal');
+var mt=document.getElementById('mt'),mp=document.getElementById('mp'),bk=document.getElementById('bk');
+var first=null,invert=null;
+grid.querySelectorAll('.c').forEach(function(c){
+  c.addEventListener('click',function(){
+    var r=c.getBoundingClientRect();
+    mt.textContent=c.textContent+' · 详情';
+    modal.style.display='flex';
+    var mr=modal.getBoundingClientRect();
+    var dx=r.left-mr.left,dy=r.top-mr.top,dw=mr.width/r.width,dh=mr.height/r.height;
+    invert='translate('+dx+'px,'+dy+'px) scale('+dw+','+dh+')';
+    modal.style.transformOrigin='top left';
+    modal.style.transition='none';
+    modal.style.transform=invert;
+    requestAnimationFrame(function(){ov.classList.add('show');modal.style.transition='transform calc(var(--dur)*1s) cubic-bezier(.2,.8,.2,1)';modal.style.transform='none';});
+    modal._src=c;
+  });
+});
+function close(){if(!modal.style.display||modal.style.display==='none')return;
+  modal.style.transition='transform calc(var(--dur)*1s) cubic-bezier(.4,0,.2,1)';modal.style.transform=invert;
+  ov.classList.remove('show');
+  setTimeout(function(){modal.style.display='none';},state.dur*1000);
+}
+bk.addEventListener('click',close);ov.addEventListener('click',close);
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

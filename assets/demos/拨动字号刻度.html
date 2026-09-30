@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拨动字号刻度</title>
+<style>
+:root{--accent:#ff6b35;--bg:#f7f8fa;--ink:#222222;--rulerbg:#ffffff;--minfs:14;--maxfs:30;--tick:2;--dur:0.25}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:20px}
+.art{width:340px;background:#fff;border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.art p{font-size:calc(var(--fs,18)*1px);line-height:1.7;color:var(--ink);transition:font-size calc(var(--dur)*1s) ease}
+.art h4{font-size:13px;color:#999;margin-bottom:10px}
+.kb{width:340px;margin-top:14px;background:var(--rulerbg);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.06);position:relative;user-select:none;touch-action:none}
+.scale{position:relative;height:26px;border-bottom:2px solid #e3e5e8}
+.scale i{position:absolute;bottom:0;width:1px;height:8px;background:#c8ccd1}
+.scale i.m{height:14px;background:#9aa0a6}
+.handle{position:absolute;top:0;width:6px;height:34px;border-radius:3px;background:var(--accent);transform:translateX(-50%);cursor:grab;transition:left calc(var(--dur)*1s) cubic-bezier(.3,1.4,.5,1);left:50%}
+.handle:active{cursor:grabbing}
+.val{text-align:center;margin-top:8px;font-size:12px;color:#888}
+</style>
+</head>
+<body>
+<div class="art"><h4>阅读预览</h4><p id="p">把字调大一点，长段落读起来更轻松；松手会自动贴回刻度，保证一致的字号节奏。</p></div>
+<div class="kb" id="kb">
+  <div class="scale" id="scale"></div>
+  <div class="handle" id="hd"></div>
+  <div class="val" id="val">18 px</div>
+</div>
+<script>
+var state={accent:'#ff6b35',bg:'#f7f8fa',ink:'#222222',rulerbg:'#ffffff',minfs:14,maxfs:30,tick:2,dur:0.25};
+var root=document.documentElement;
+var UNIT={minfs:'px',maxfs:'px',dur:'s'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));
+  if(k==='minfs'||k==='maxfs'||k==='tick'){buildScale();}}
+root.style.setProperty('--fs',cur());
+}
+var curV=18;
+function cur(){return curV;}
+function buildScale(){
+  var sc=document.getElementById('scale');if(!sc)return;
+  sc.innerHTML='';var lo=state.minfs,hi=state.maxfs,step=state.tick;
+  for(var f=lo;f<=hi;f+=step){var i=document.createElement('i');i.className=(f%4===0||f===lo||f===hi)?'m':'';i.style.left=((f-lo)/(hi-lo)*100)+'%';sc.appendChild(i);}
+  positionHandle();
+}
+function positionHandle(){var hd=document.getElementById('hd');if(!hd)return;var lo=state.minfs,hi=state.maxfs;hd.style.left=((curV-lo)/(hi-lo)*100)+'%';}
+function setVal(){curV=Math.round(curV/state.tick)*state.tick;if(curV<state.minfs)curV=state.minfs;if(curV>state.maxfs)curV=state.maxfs;
+  root.style.setProperty('--fs',curV);document.getElementById('val').textContent=curV+' px';positionHandle();}
+var kb=document.getElementById('kb'),hd=document.getElementById('hd'),dragging=false;
+function move(x){var r=kb.getBoundingClientRect();var r2=document.getElementById('scale').getBoundingClientRect();
+  var p=(x-r2.left)/r2.width;if(p<0)p=0;if(p>1)p=1;var lo=state.minfs,hi=state.maxfs;
+  curV=Math.round((lo+p*(hi-lo))/state.tick)*state.tick;if(curV<lo)curV=lo;if(curV>hi)curV=hi;
+  root.style.setProperty('--fs',curV);document.getElementById('val').textContent=curV+' px';hd.style.left=(p*100)+'%';}
+kb.addEventListener('pointerdown',function(e){dragging=true;move(e.clientX);});
+window.addEventListener('pointermove',function(e){if(dragging)move(e.clientX);});
+window.addEventListener('pointerup',function(){if(dragging){dragging=false;setVal();}});
+apply();
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

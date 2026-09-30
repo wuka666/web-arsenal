@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>螺旋排布</title>
+<style>
+:root{--bg:#fafaf9;--card:#ffffff;--ink:#1c1917;--accent:#8b5cf6;--radius:10px;--cardW:130px;--turn:42deg;--rise:26px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.scene{width:min(94vw,520px);height:340px;perspective:1000px;display:flex;align-items:center;justify-content:center}
+.sp{position:relative;transform-style:preserve-3d;transform:rotateY(var(--R,0deg))}
+.it{position:absolute;left:50%;top:50%;width:calc(var(--cardW) * 1px);padding:10px 12px;background:var(--card);border-left:4px solid var(--accent);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.1);font-size:12px;font-weight:700;color:var(--ink);transform-style:preserve-3d}
+</style>
+</head>
+<body>
+<div class="scene"><div class="sp" id="sp"></div></div>
+<script>
+var state={bg:"#fafaf9",card:"#ffffff",ink:"#1c1917",accent:"#8b5cf6",radius:10,cardW:130,turn:42,rise:26};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--card',state.card);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--cardW',state.cardW+'px');r.setProperty('--turn',state.turn+'deg');r.setProperty('--rise',state.rise+'px');}
+apply();
+var sp=document.getElementById("sp");
+var labels=["立项","调研","原型","开发","联调","发布"];
+function build(){sp.innerHTML="";for(var i=0;i<labels.length;i++){var d=document.createElement("div");d.className="it";d.textContent=(i+1)+". "+labels[i];
+d.style.transform="translate(-50%,-50%) rotateY("+(parseFloat(state.turn)*i)+"deg) translateZ(90px) translateY("+(-parseFloat(state.rise)*i)+"px)";sp.appendChild(d);}}
+build();
+var r=0;
+window.__spin=function(dr){r+=dr;sp.style.setProperty("--R",r+"deg");};
+setInterval(function(){window.__spin(0.6);},40);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

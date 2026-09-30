@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数字安全键盘</title>
+<style>
+:root{--keyBg:#ffffff;--fg:#1c1c1e;--pressBg:#e5e5ea;--keyH:52px;--keyFs:24px;--valFs:34px;--gap:8px;--radius:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:#f2f2f7;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column;padding:26px 18px 18px}
+.amt{font-size:var(--valFs);font-weight:700;color:var(--fg);text-align:center;letter-spacing:1px;margin:auto 0}
+.amt small{font-size:16px;color:#8e8e93;font-weight:600;margin-right:2px}
+.pad{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.key{height:var(--keyH);background:var(--keyBg);color:var(--fg);font-size:var(--keyFs);font-weight:600;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:background .12s}
+.key.press{background:var(--pressBg)}
+.key.fn{font-size:20px;color:#8e8e93}
+.key.blank{background:transparent;box-shadow:none}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="amt" id="amt"><small>¥</small>0</div>
+  <div class="pad" id="pad"></div>
+</div>
+<script>
+var state={keyBg:"#ffffff",fg:"#1c1c1e",pressBg:"#e5e5ea",keyH:52,keyFs:24,valFs:34,gap:8,radius:10};
+var UNIT={keyH:"px",keyFs:"px",valFs:"px",gap:"px",radius:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var KEYS=["1","2","3","4","5","6","7","8","9","","0","⌫"];
+var pad=document.getElementById("pad");
+pad.innerHTML=KEYS.map(function(k){
+  var cls="key"+(k===""?" blank":"")+(k==="⌫"?" fn":"");
+  return '<div class="'+cls+'" data-k="'+k+'">'+k+'</div>';
+}).join("");
+var keys=[].slice.call(pad.children),amt=document.getElementById("amt");
+var val="";
+function paint(){amt.innerHTML="<small>¥</small>"+(val||"0");}
+function press(k,el){
+  el.classList.add("press");
+  setTimeout(function(){el.classList.remove("press");},200);
+  if(k==="⌫")val=val.slice(0,-1);
+  else if(k!==""&&val.length<7)val+=k;
+  paint();
+}
+pad.addEventListener("click",function(e){var el=e.target.closest(".key");if(el&&el.dataset.k)press(el.dataset.k,el);});
+/* 自动演示：依次按下数字拼出金额、再退格，让静态截图也能看到「按下态」与金额变化 */
+var order=["1","2","8","0","⌫"],i=0;
+setInterval(function(){
+  var k=order[i%order.length];i++;
+  var el=keys.filter(function(e){return e.dataset.k===k;})[0];
+  if(el)press(k,el);
+},620);
+apply();paint();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

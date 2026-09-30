@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数量步进器</title>
+<style>
+:root{
+  --btnSize:36; --btnColor:#007aff; --numColor:#111111; --disabledColor:#c8c8cc;
+  --animSpeed:0.2; --radius:8; --gap:8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f7;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.wrap{display:flex;align-items:center;gap:calc(var(--gap)*1px);background:#fff;padding:14px 18px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.btn{width:calc(var(--btnSize)*1px);height:calc(var(--btnSize)*1px);border:none;border-radius:calc(var(--radius)*1px);background:var(--btnColor);color:#fff;font-size:20px;font-weight:700;cursor:pointer;transition:transform calc(var(--animSpeed)*1s) ease,opacity .15s}
+.btn:active{transform:scale(.9)}
+.btn:disabled{background:var(--disabledColor);cursor:not-allowed}
+.num{min-width:40px;text-align:center;font-size:20px;font-weight:700;color:var(--numColor)}
+.label{font-size:13px;color:#888;margin-right:6px}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="wrap"><span class="label">数量</span><button class="btn" id="minus">−</button><span class="num" id="num">1</span><button class="btn" id="plus">+</button></div>
+<script>
+var state={btnSize:36,btnColor:"#007aff",numColor:"#111111",disabledColor:"#c8c8cc",animSpeed:0.2,radius:8,gap:8};
+var UNIT={btnSize:"px",radius:"px",gap:"px",animSpeed:"s"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+var num=document.getElementById("num"),minus=document.getElementById("minus"),plus=document.getElementById("plus");
+var v=1,MIN=0,MAX=10;
+function render(){num.textContent=v;minus.disabled=v<=MIN;plus.disabled=v>=MAX;}
+minus.onclick=function(){if(v>MIN){v--;render();}};
+plus.onclick=function(){if(v<MAX){v++;render();}};
+render();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

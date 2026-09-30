@@ -23,6 +23,10 @@
   .btn { width: min(420px, 92vw); padding: 11px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
 
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="panel" id="p"></div>
@@ -31,7 +35,7 @@
 <script>
   const state = { steps: 4, dur: 1000, accent: "#3d5fd6", done: "#2bb673", bg: "#fafafa", card: "#ffffff" };
   const p = document.getElementById("p");
-  const plan = ["检索素材", "抽取关键参数", "生成可运行代码", "写入弹药库并校验"];
+  const plan = ["检索素材", "抽取关键参数", "生成可运行代码", "写入书房并校验"];
   let running = false;
   function apply() {
     document.documentElement.style.setProperty("--bg", state.bg);

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽自动吸附</title>
+<style>
+:root{--accent:#007aff;--bg:#ffffff;--ink:#222222;--line:#ff3b30;--radius:10;--snap:12;--dur:0.2;--size:60}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:24px}
+.stage{position:relative;width:340px;height:340px;background:#f4f5f7;border-radius:16px;touch-action:none;overflow:hidden}
+.g{position:absolute;background:var(--line);display:none;z-index:2}
+.gv{width:2px;height:100%;left:50%;top:0}
+.gh{height:2px;width:100%;top:50%;left:0}
+.ghost{margin-left:170px;margin-top:170px}
+.blk{position:absolute;width:calc(var(--size)*1px);height:calc(var(--size)*1px);background:var(--accent);border-radius:var(--radius)px;left:140px;top:140px;cursor:grab;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;z-index:3;touch-action:none}
+.blk:active{cursor:grabbing}
+.tip{color:var(--ink);font-size:12px;margin-top:14px;text-align:center;max-width:340px}
+.tip{color:var(--ink);font-size:12px;margin-top:14px;text-align:center;max-width:340px}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="g gv" id="gv"></div><div class="g gh" id="gh"></div>
+  <div class="blk" id="blk">拖动我</div>
+</div>
+<div class="tip">拖动方块靠近中线，自动吸附并显示红色对齐线</div>
+<script>
+var state={accent:'#007aff',bg:'#ffffff',ink:'#222222',line:'#ff3b30',radius:10,snap:12,dur:0.2,size:60};
+var root=document.documentElement;
+var UNIT={radius:'px',snap:'px',dur:'s',size:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var stage=document.getElementById('stage'),blk=document.getElementById('blk'),gv=document.getElementById('gh'),gh=document.getElementById('gh');
+var gv2=document.getElementById('gv');
+var drag=false,ox=0,oy=0;
+blk.addEventListener('pointerdown',function(e){drag=true;var r=blk.getBoundingClientRect(),sr=stage.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;blk.style.transition='none';e.pointerId&&blk.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',function(e){if(!drag)return;var sr=stage.getBoundingClientRect();var x=e.clientX-sr.left-ox,y=e.clientY-sr.top-oy;
+  var cx=x+state.size/2,cy=y+state.size/2;var snapped=false;
+  if(Math.abs(cx-sr.width/2)<state.snap){x=sr.width/2-state.size/2;gv2.style.display='block';}else gv2.style.display='none';
+  if(Math.abs(cy-sr.height/2)<state.snap){y=sr.height/2-state.size/2;gh.style.display='block';}else gh.style.display='none';
+  blk.style.left=x+'px';blk.style.top=y+'px';});
+window.addEventListener('pointerup',function(){if(!drag)return;drag=false;blk.style.transition='left calc(var(--dur)*1s) ease,top calc(var(--dur)*1s) ease';gv2.style.display='none';gh.style.display='none';});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

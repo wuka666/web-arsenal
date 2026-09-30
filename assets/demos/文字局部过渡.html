@@ -18,6 +18,10 @@
   .mtab { flex: 1; padding: 9px 0; border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); background: transparent; color: #555; border-radius: 10px; font-size: 13px; cursor: pointer; transition: all .2s; }
   .mtab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.mtab{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="card">

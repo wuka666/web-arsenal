@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>结算栏清单</title>
+<style>
+:root{--accent:#ff6b35;--barbg:#ffffff;--ink:#222222;--listbg:#ffffff;--radius:16;--dur:0.32;--rowh:48;--n:4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f4f5f7;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+.phone{position:relative;max-width:380px;margin:0 auto;height:90vh;overflow:hidden}
+.list{position:absolute;bottom:64px;left:12px;right:12px;background:var(--listbg);border-radius:var(--radius)px;box-shadow:0 -4px 20px rgba(0,0,0,.08);overflow:hidden;max-height:0;transition:max-height calc(var(--dur)*1s) ease;z-index:4}
+.list.open{max-height:calc(var(--n)*var(--rowh)*1px + 20px)}
+.list .row{height:calc(var(--rowh)*1px);display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #eee;color:var(--ink);font-size:14px;opacity:0;transform:translateY(10px);transition:all calc(var(--dur)*1s) ease}
+.list.open .row{opacity:1;transform:none}
+.bar{position:absolute;bottom:12px;left:12px;right:12px;height:50px;background:var(--barbg);border-radius:var(--radius)px;box-shadow:0 6px 20px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer;z-index:5}
+.bar .sum{font-weight:700;color:var(--ink)}
+.bar .go{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:12px;font-family:inherit}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.go{min-height:44px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="list" id="list"></div>
+  <div class="bar" id="bar"><span class="sum" id="sum">已选 4 件 · ¥128</span><button class="go">去结算</button></div>
+</div>
+<script>
+var state={accent:'#ff6b35',barbg:'#ffffff',ink:'#222222',listbg:'#ffffff',radius:16,dur:0.32,rowh:48,n:4};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',rowh:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));if(k==='n')build();}}
+apply();
+var names=['机械键盘','人体工学椅','显示器支架','桌面收纳'];
+var list=document.getElementById('list');
+function build(){list.innerHTML='';for(var i=0;i<state.n;i++){var r=document.createElement('div');r.className='row';r.style.transitionDelay=(i*0.05)+'s';r.innerHTML='<span>'+names[i%names.length]+'</span><span>¥'+(32+i*24)+'</span>';list.appendChild(r);}}
+var bar=document.getElementById('bar');
+bar.addEventListener('click',function(){list.classList.toggle('open');});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

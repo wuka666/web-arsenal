@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>动画中途接管</title>
+<style>
+:root{--bg:#f4f4f5;--card:#ffffff;--ink:#18181b;--accent:#f97316;--radius:14px;--w:220px;--dur:2.4s;--dist:120px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.track{width:min(94vw,360px);height:200px;background:var(--card);border-radius:var(--radius);position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.1);touch-action:none}
+.card{position:absolute;top:50%;left:20px;width:calc(var(--w) * 1px);padding:14px;background:var(--accent);color:#fff;border-radius:calc(var(--radius) * 1px);transform:translate(0,-50%);cursor:grab;user-select:none}
+.tip{position:absolute;bottom:8px;left:12px;font-size:12px;opacity:.55}
+</style>
+</head>
+<body>
+<div class="track" id="tk"><div class="card" id="cd">按住我接管</div><div class="tip" id="tp">自动往返中…</div></div>
+<script>
+var state={bg:"#f4f4f5",card:"#ffffff",ink:"#18181b",accent:"#f97316",radius:14,w:220,dur:2.4,dist:120};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--card',state.card);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--w',state.w+'px');r.setProperty('--dur',state.dur+'s');r.setProperty('--dist',state.dist+'px');}
+apply();
+var tk=document.getElementById("tk"),cd=document.getElementById("cd"),tp=document.getElementById("tp");var x=0,taken=false,anim=null,px=0;
+function loop(){if(taken)return;var span=(tk.clientWidth-40)-(parseFloat(state.w));anim=cd.animate([{transform:"translate(0px,-50%)"},{transform:"translate("+span+"px,-50%)"},{transform:"translate(0px,-50%)"}],{duration:parseFloat(state.dur)*1000,iterations:Infinity});}
+loop();
+cd.addEventListener("pointerdown",function(e){taken=true;if(anim)anim.pause();px=e.clientX;cd.setPointerCapture(e.pointerId);cd.style.cursor="grabbing";tp.textContent="已接管：拖动我";});
+cd.addEventListener("pointermove",function(e){if(!taken)return;x+=e.clientX-px;px=e.clientX;var max=(tk.clientWidth-40)-(parseFloat(state.w));x=Math.max(0,Math.min(max,x));cd.style.transform="translate("+x+"px,-50%)";});
+function rel(){if(!taken)return;taken=false;tp.textContent="松手，回到自动动画";if(anim)anim.play();}
+cd.addEventListener("pointerup",rel);cd.addEventListener("pointercancel",rel);
+setTimeout(function(){tp.textContent="自动往返中（截图可见）";},600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

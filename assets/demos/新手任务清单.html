@@ -15,7 +15,11 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .item.ok{color:#9aa3af;text-decoration:line-through}
 .next{font-size:12px;color:var(--pc,#2f6bff);margin-top:6px}
 .done{display:none;color:#16a34a;font-size:13px;font-weight:700;margin-top:8px}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.item{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="box" id="box">
   <div class="ttl">新手入门</div>
   <div class="pbar"><div class="pfill" id="pf"></div></div>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全屏滑动浏览</title>
+<style>
+:root{
+  --imgRadius:0; --dotColor:#007aff; --dotActive:#ffffff; --bg:#111111;
+  --speed:0.35; --arrowColor:#ffffff; --imgGap:0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);overflow:hidden}
+.viewer{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+.track{display:flex;height:100%;transition:transform calc(var(--speed)*1s) ease;will-change:transform}
+.slide{flex:0 0 100%;height:100%;display:flex;align-items:center;justify-content:center;padding:calc(var(--imgGap)*1px)}
+.pic{width:86%;height:70%;border-radius:calc(var(--imgRadius)*1px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.p0{background:linear-gradient(135deg,#ff9a9e,#fad0c4)}
+.p1{background:linear-gradient(135deg,#a18cd1,#fbc2eb)}
+.p2{background:linear-gradient(135deg,#84fab0,#8fd3f4)}
+.p3{background:linear-gradient(135deg,#fccb90,#d57eeb)}
+.dots{position:fixed;bottom:18px;left:0;right:0;display:flex;gap:8px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dotColor);opacity:.5;transition:all .25s}
+.dot.on{opacity:1;background:var(--dotActive);transform:scale(1.3)}
+.arrow{position:fixed;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.35);color:var(--arrowColor);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;user-select:none}
+.arrow.l{left:12px}.arrow.r{right:12px}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.arrow{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="viewer" id="viewer">
+  <div class="track" id="track">
+    <div class="slide"><div class="pic p0"></div></div>
+    <div class="slide"><div class="pic p1"></div></div>
+    <div class="slide"><div class="pic p2"></div></div>
+    <div class="slide"><div class="pic p3"></div></div>
+  </div>
+</div>
+<div class="dots" id="dots"></div>
+<div class="arrow l" id="al">‹</div>
+<div class="arrow r" id="ar">›</div>
+<script>
+var state={imgRadius:0,dotColor:"#007aff",dotActive:"#ffffff",bg:"#111111",speed:0.35,arrowColor:"#ffffff",imgGap:0};
+var UNIT={imgRadius:"px",speed:"s",imgGap:"px"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+var track=document.getElementById("track"),dots=document.getElementById("dots"),viewer=document.getElementById("viewer");
+var N=4,idx=0;
+for(var i=0;i<N;i++){var d=document.createElement("div");d.className="dot"+(i===0?" on":"");dots.appendChild(d);}
+function go(i){idx=(i+N)%N;track.style.transform="translateX("+(-idx*100)+"%)";[].forEach.call(dots.children,function(e,j){e.className="dot"+(j===idx?" on":"");});}
+function next(){go(idx+1);}function prev(){go(idx-1);}
+document.getElementById("ar").onclick=next;document.getElementById("al").onclick=prev;
+var sx=0,dx=0,drag=false;
+viewer.addEventListener("touchstart",function(e){drag=true;sx=e.touches[0].clientX;dx=0;},{passive:true});
+viewer.addEventListener("touchmove",function(e){if(drag)dx=e.touches[0].clientX-sx;},{passive:true});
+viewer.addEventListener("touchend",function(){if(drag){if(dx<-40)next();else if(dx>40)prev();drag=false;}});
+viewer.addEventListener("mousedown",function(e){drag=true;sx=e.clientX;});
+window.addEventListener("mouseup",function(e){if(drag){var d=e.clientX-sx;if(d<-40)next();else if(d>40)prev();drag=false;}});
+setInterval(function(){if(!drag)next();},3200);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

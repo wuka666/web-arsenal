@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>卡片滑动堆叠</title>
+<style>
+:root{--c1:#4f6bff;--c2:#12b886;--c3:#f76707;--cardW:220;--cardH:300;--radius:18;--gap:10;--dur:0.5;--rot:16}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.stage{position:relative;width:calc(var(--cardW) * 1px);height:calc(var(--cardH) * 1px)}
+.card{position:absolute;inset:0;border-radius:calc(var(--radius) * 1px);padding:18px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;font-size:18px;font-weight:700;letter-spacing:.5px;box-shadow:0 12px 30px rgba(0,0,0,.2);transition:transform calc(var(--dur) * 1s) cubic-bezier(.34,1.2,.64,1),opacity calc(var(--dur) * 1s) ease;cursor:pointer}
+.card span{font-size:12px;font-weight:500;opacity:.8;margin-top:4px}
+.card:nth-child(1){background:var(--c1);z-index:3}
+.card:nth-child(2){background:var(--c2);z-index:2;transform:translateY(calc(var(--gap) * 1px)) scale(.96)}
+.card:nth-child(3){background:var(--c3);z-index:1;transform:translateY(calc(var(--gap) * 2px)) scale(.92)}
+.card.out{transform:translateX(165%) rotate(calc(var(--rot) * 1deg));opacity:0}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="card">推荐 · 山间民宿<span>向左滑走 · 点击试试</span></div>
+  <div class="card">推荐 · 城市漫游<span>向左滑走</span></div>
+  <div class="card">推荐 · 海边露营<span>向左滑走</span></div>
+</div>
+<script>
+var state={c1:"#4f6bff",c2:"#12b886",c3:"#f76707",cardW:220,cardH:300,radius:18,gap:10,dur:0.5,rot:16};
+var r=document.documentElement.style;
+/* 尺寸类参数在 CSS 里用 calc(var*1px) 换算，故这里不追加单位 */
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]);}}
+var stage=document.getElementById("stage");
+function swipe(){
+  var c=stage.children[0];
+  if(!c)return;
+  c.classList.add("out");
+  /* 动画结束后把最上面的卡片挪到最底层，形成循环堆叠 */
+  setTimeout(function(){c.classList.remove("out");stage.appendChild(c);},560);
+}
+var timer=setInterval(swipe,1300);
+stage.addEventListener("click",function(){clearInterval(timer);timer=setInterval(swipe,1300);swipe();});
+apply();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

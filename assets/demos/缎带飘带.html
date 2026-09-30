@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>缎带飘带</title>
+<style>
+:root{
+  --bg:#0b0f1a;
+  --hue:200;
+  --count:6;
+  --speed:1;
+  --amp:60;
+  --width:18;
+  --blur:14;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);height:100vh;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+  color:rgba(255,255,255,.55);font:12px/1.4 system-ui,"PingFang SC",sans-serif;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="hint">多条半透明缎带交错流动 · 可调色相 / 条数 / 速度 / 振幅 / 线宽 / 模糊</div>
+<script>
+// 全部参数集中于此，与上方 :root 一一对应（键=CSS 变量名）
+var state={bg:"#0b0f1a",hue:200,count:6,speed:1,amp:60,width:18,blur:14};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k,state[k]); }
+}
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),t=0;
+function resize(){
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=cv.clientWidth*dpr; cv.height=cv.clientHeight*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize(); window.addEventListener('resize',resize);
+// 每条缎带 = 一条正弦叠加曲线，用 lighter 混合叠出「光带交织」感
+function draw(){
+  var W=cv.clientWidth,H=cv.clientHeight;
+  ctx.clearRect(0,0,W,H);
+  var n=Math.max(1,state.count|0);
+  ctx.globalCompositeOperation='lighter';
+  for(var i=0;i<n;i++){
+    var p=n>1?i/(n-1):0;
+    var hue=(+state.hue+p*130)%360;
+    ctx.beginPath();
+    ctx.lineWidth=(+state.width)*(0.55+0.7*p);
+    ctx.strokeStyle='hsl('+hue+' 92% 62% / .42)';
+    ctx.filter='blur('+(+state.blur)+'px)';
+    for(var x=0;x<=W;x+=8){
+      var y=H*0.5
+        + Math.sin((x/W)*Math.PI*2 + t*(1+p) + i)*state.amp*(0.6+0.5*Math.sin(t+i))
+        + Math.cos((x/W)*Math.PI*1.3 + t*0.7 + i*1.7)*state.amp*0.35;
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  ctx.filter='none'; ctx.globalCompositeOperation='source-over';
+}
+var last=performance.now();
+function loop(now){
+  var dt=Math.min(50,now-last)/16.67; last=now;
+  t+=0.016*dt*(+state.speed);
+  draw(); requestAnimationFrame(loop);
+}
+apply(); requestAnimationFrame(loop);
+// 外部调参契约：只接受 type==='param' 且 key 在 state 内的消息
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

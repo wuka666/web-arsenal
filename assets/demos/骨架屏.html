@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>骨架屏</title>
+<style>
+:root{
+  --skColor:#e2e2e7; --shColor:#f5f5f7; --shSpeed:1.2; --radius:10;
+  --barH:14; --gap:12; --textColor:#333333;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff;display:flex;justify-content:center;min-height:100vh;padding:20px}
+.card{width:320px;max-width:100%;border:1px solid #eee;border-radius:calc(var(--radius)*1px);padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+.head{display:flex;gap:12px;align-items:center;margin-bottom:calc(var(--gap)*1px)}
+.avatar{width:46px;height:46px;border-radius:50%;flex:0 0 auto}
+.sk{background:linear-gradient(90deg,var(--skColor) 25%,var(--shColor) 50%,var(--skColor) 75%);background-size:200% 100%;animation:shimmer calc(var(--shSpeed)*1s) infinite linear}
+.avatar.sk{border-radius:50%}
+.line{height:calc(var(--barH)*1px);border-radius:6px;margin-bottom:calc(var(--gap)*1px)}
+.line.w1{width:70%}.line.w2{width:90%}.line.w3{width:55%}
+.content{color:var(--textColor);font-size:14px;line-height:1.7;display:none}
+.content.show{display:block}
+.btn{margin-top:14px;padding:8px 16px;border:none;border-radius:8px;background:#007aff;color:#fff;font-size:13px;cursor:pointer}
+@keyframes shimmer{to{background-position:-200% 0}}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-height:44px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head"><div class="avatar sk"></div><div style="flex:1"><div class="line w1 sk"></div><div class="line w2 sk"></div></div></div>
+  <div class="line w2 sk"></div><div class="line w3 sk"></div><div class="line w2 sk"></div><div class="line w1 sk"></div>
+  <div class="content" id="content">这里是一段已加载完成的正文内容，骨架屏在数据到位后被真实内容替换。骨架屏用于降低等待焦虑，让用户感知页面正在载入而非卡死。</div>
+  <button class="btn" id="btn">加载完成</button>
+</div>
+<script>
+var state={skColor:"#e2e2e7",shColor:"#f5f5f7",shSpeed:1.2,radius:10,barH:14,gap:12,textColor:"#333333"};
+var UNIT={radius:"px",barH:"px",gap:"px",shSpeed:"s"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+document.getElementById("btn").onclick=function(){var c=document.getElementById("content");c.classList.toggle("show");this.textContent=c.classList.contains("show")?"重新加载":"加载完成";};
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

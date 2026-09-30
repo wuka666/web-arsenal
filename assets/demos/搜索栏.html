@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>搜索栏</title>
+<style>
+:root{--bg:#ffffff;--fg:#1c1c1e;--muted:#8e8e93;--fieldBg:#f2f2f7;--accent:#007aff;--h:40;--fs:15;--radius:10}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:var(--bg);border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden}
+.top{height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg)}
+.field{flex:1;height:calc(var(--h) * 1px);background:var(--fieldBg);border-radius:calc(var(--radius) * 1px);display:flex;align-items:center;gap:6px;padding:0 10px}
+.mg{width:15px;height:15px;flex:none;border:1.6px solid var(--muted);border-radius:50%;position:relative}
+.mg::after{content:"";position:absolute;right:-4px;bottom:-3px;width:6px;height:1.6px;background:var(--muted);transform:rotate(45deg)}
+.q{flex:1;font-size:calc(var(--fs) * 1px);color:var(--fg);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-height:1em}
+.q.ph{color:var(--muted)}
+/* 光标只在「正在输入」时出现，呼应真实搜索框的聚焦态 */
+.q.typing::after{content:"";display:inline-block;width:1.5px;height:1em;background:var(--accent);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(2,start) infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.clr{width:16px;height:16px;border-radius:50%;background:#c7c7cc;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.cancel{color:var(--accent);font-size:calc(var(--fs) * 1px);flex:none}
+.body{padding:14px}
+.rw{height:56px;border-radius:12px;background:#f7f7fa;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="top">
+    <div class="field">
+      <span class="mg"></span>
+      <span class="q ph" id="q">搜索商品</span>
+      <span class="clr" id="clr" style="display:none">✕</span>
+    </div>
+    <span class="cancel">取消</span>
+  </div>
+  <div class="body"><div class="rw"></div><div class="rw"></div><div class="rw"></div><div class="rw"></div></div>
+</div>
+<script>
+var state={bg:"#ffffff",fg:"#1c1c1e",muted:"#8e8e93",fieldBg:"#f2f2f7",accent:"#007aff",h:40,fs:15,radius:10};
+var r=document.documentElement.style;
+/* 尺寸类参数在 CSS 里以 calc(var*1px) 换算，apply() 只写原值 */
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]);}}
+var q=document.getElementById("q"),clr=document.getElementById("clr");
+var QS=["无线耳机","纯棉衬衫","咖啡豆","机械键盘"];
+var i=0,j=0;
+/* 自动演示：逐字打出搜索词、停顿、清空，再换下一个；静态截图也能看到输入态 */
+function step(){
+  var s=QS[i%QS.length];
+  j++;
+  if(j>s.length){j=0;i++;setTimeout(step,1400);return;}
+  q.textContent=s.slice(0,j);
+  q.classList.remove("ph");
+  q.classList.add("typing");
+  clr.style.display=j>0?"flex":"none";
+  setTimeout(step,j>=s.length?1:130);
+}
+apply();
+setTimeout(step,300);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

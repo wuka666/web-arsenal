@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>横向滚动展区</title>
+<style>
+:root{--bg:#fafaf9;--card:#ffffff;--ink:#1c1917;--accent:#e11d48;--radius:12px;--cardW:220px;--gap:18px;--h:260px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.pin{width:min(96vw,760px);height:calc(var(--h) * 1px);background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.row{display:flex;gap:calc(var(--gap) * 1px);height:100%;align-items:center;padding:0 24px;transform:translateX(var(--X,0px));will-change:transform}
+.it{flex:0 0 calc(var(--cardW) * 1px);height:72%;background:linear-gradient(160deg,var(--accent),#78716c);border-radius:calc(var(--radius) * 1px);display:flex;align-items:flex-end;padding:12px;color:#fff;font-weight:700;font-size:13px}
+.cap{font-size:12px;opacity:.6;margin-bottom:8px;text-align:center}
+</style>
+</head>
+<body>
+<div><div class="cap" id="cap">纵向滚动 → 内容横向移动</div><div class="pin"><div class="row" id="row"></div></div></div>
+<script>
+var state={bg:"#fafaf9",card:"#ffffff",ink:"#1c1917",accent:"#e11d48",radius:12,cardW:220,gap:18,h:260};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--card',state.card);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--cardW',state.cardW+'px');r.setProperty('--gap',state.gap+'px');r.setProperty('--h',state.h+'px');}
+apply();
+var row=document.getElementById("row"),cap=document.getElementById("cap");
+for(var i=1;i<=6;i++){var d=document.createElement("div");d.className="it";d.textContent="作品 "+i;row.appendChild(d);}
+function upd(p){var max=row.scrollWidth-row.parentElement.clientWidth+48;var x=-max*p;row.style.setProperty("--X",x+"px");cap.textContent="横向进度 "+(p*100).toFixed(0)+"%";}
+window.__setP=function(v){upd(Math.max(0,Math.min(1,v)));};
+var t=0;
+setInterval(function(){t+=0.01;window.__setP((Math.sin(t*Math.PI*2-Math.PI/2)+1)/2);},40);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

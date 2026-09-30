@@ -9,7 +9,12 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .tip{position:absolute;left:0;top:46px;background:#fff;border:1px solid #fecaca;color:#b91c1c;font-size:12px;padding:7px 10px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.12);opacity:0;transform:translateY(-4px);transition:.25s;pointer-events:none;z-index:3}
 .tip.on{opacity:1;transform:none}
 .sub{background:var(--hl,#2f6bff);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;cursor:pointer}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.inp{min-width:44px;min-height:44px}
+.sub{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="field"><input class="inp" id="inp" placeholder="请输入昵称"><div class="tip" id="tip">昵称不能为空</div></div>
 <button class="sub" id="sub">保存</button>
 <script>

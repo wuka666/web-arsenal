@@ -21,5 +21,12 @@ body{background:#dfe4e8;display:flex;justify-content:center;align-items:center;m
 <path class="route" d="M20 130 C 80 130, 70 50, 130 60 S 210 120, 280 30"/>
 <circle class="node" cx="20" cy="130" r="7"/><circle class="node" cx="280" cy="30" r="7"/></svg>
 <div class="cap"><span>起点</span><span>终点</span></div></div>
+<script>
+const state={mapbg:"#eef1f4",route:"#d98a3d",node:"#2e7d4f",ink:"#1c1c1c",radius:16,dur:3,pad:14};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--mapbg',state.mapbg);r.setProperty('--route',state.route);r.setProperty('--node',state.node);r.setProperty('--ink',state.ink);r.setProperty('--radius',state.radius);r.setProperty('--dur',state.dur);r.setProperty('--pad',state.pad);}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script>
 </body>
 </html>

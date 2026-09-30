@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拖拽上传</title>
+<style>
+:root{--bg:#f8fafc;--zone:#ffffff;--active:#e0f2fe;--accent:#0ea5e9;--radius:12px;--w:320px;--dash:8px;--h:180px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.z{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px);background:var(--zone);border:2px dashed var(--accent);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#475569;transition:background .2s,transform .2s}
+.z.on{background:var(--active);transform:scale(1.02)}
+.z.done{background:#dcfce7;border-color:#22c55e}
+.ic{font-size:30px}
+.t1{font-size:14px;font-weight:700}
+.t2{font-size:12px;opacity:.65}
+</style>
+</head>
+<body>
+<div class="z" id="z"><div class="ic">⬆</div><div class="t1" id="t1">把文件拖到这里</div><div class="t2">松手即可上传</div></div>
+<script>
+var state={bg:"#f8fafc",zone:"#ffffff",active:"#e0f2fe",accent:"#0ea5e9",radius:12,w:320,dash:8,h:180};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--zone',state.zone);r.setProperty('--active',state.active);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--w',state.w+'px');r.setProperty('--dash',state.dash+'px');r.setProperty('--h',state.h+'px');}
+apply();
+var z=document.getElementById("z"),t1=document.getElementById("t1");
+["dragenter","dragover"].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.add("on");t1.textContent="松手即可上传";});});
+z.addEventListener("dragleave",function(){z.classList.remove("on");t1.textContent="把文件拖到这里";});
+z.addEventListener("drop",function(e){e.preventDefault();z.classList.remove("on");z.classList.add("done");t1.textContent="上传完成 ✓";});
+setTimeout(function(){z.classList.add("on");t1.textContent="松手即可上传";},400);
+setTimeout(function(){z.classList.remove("on");z.classList.add("done");t1.textContent="上传完成 ✓";},2200);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

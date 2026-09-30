@@ -30,6 +30,10 @@ body[data-glow="1"] .coral{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhucai)
 /* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
 .block{box-shadow:0 calc(var(--yinying)*.22px) calc(var(--yinying)*.55px) rgba(0,0,0,.34)}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.cta{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="topbar"><span class="logo">云枢</span><span class="menu"><a>总览</a><a>主机</a><a>告警</a><a>报表</a></span></div>

@@ -39,6 +39,11 @@
   canvas{width:100%;max-height:56vh;display:block}
   @media (max-width:860px){.layer{grid-template-columns:1fr;overflow:auto;align-items:start;padding-top:9vh}}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.open{min-width:44px;min-height:44px}
+.back{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="hero">

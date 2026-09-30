@@ -37,6 +37,12 @@
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.main{min-width:44px;min-height:44px}
+.arrow{min-width:44px;min-height:44px}
+.mi{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
   <div class="wrap">

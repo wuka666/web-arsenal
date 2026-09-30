@@ -15,6 +15,10 @@
   .btn { padding: 9px 20px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13px; cursor: pointer; font-family: system-ui; }
 
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="panel" id="log"></div>
@@ -24,7 +28,7 @@
   const state = { calls: 4, dur: 700, accent: "#5ad1ff", bg: "#fafafa", radius: 14, accent2: "#ffd27a" };
   const log = document.getElementById("log");
   const calls = [
-    ['搜索', '{query:"Web 灵感弹药库"}', "命中 12 条素材"],
+    ['搜索', '{query:"Web 灵感书房"}', "命中 12 条素材"],
     ['读取页面', '{url:"index.html"}', "解析 67 条条目"],
     ['计算', '{a:8848,b:1.06}', "结果 9379.88"],
     ['写文件', '{path:"data/素材.js"}', "已写入 22 条"]

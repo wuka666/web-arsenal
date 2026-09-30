@@ -16,7 +16,11 @@
 
   .lab{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;color:var(--labc,#666);white-space:nowrap;display:var(--showlab,none);}
 
-</style></head>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.dot{min-width:44px;min-height:44px}
+</style>
+</head>
 <body>
   <nav class="nav" id="nav"><div id="line"></div></nav>
 

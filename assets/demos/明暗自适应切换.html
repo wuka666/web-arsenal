@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>明暗自适应切换</title>
+<style>
+:root{--accent:#007aff;--bg:#ffffff;--ink:#222222;--floatbg:#000000;--radius:16;--dur:0.3;--sens:0.5;--fs:14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg)}
+.phone{height:100vh;overflow-y:auto;max-width:380px;margin:0 auto;position:relative}
+.band{height:33.33%;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:18px}
+.band.a{background:#f2f3f5}.band.b{background:#1c1c1e;color:#eee}.band.c{background:#f2f3f5}
+.fab{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);width:150px;height:46px;border-radius:var(--radius)px;display:flex;align-items:center;justify-content:center;font-size:var(--fs)px;font-weight:600;transition:background calc(var(--dur)*1s) ease,color calc(var(--dur)*1s) ease;border:2px solid var(--accent);z-index:5}
+.fab.dark{background:var(--floatbg);color:#fff}
+.fab.light{background:#fff;color:#111;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="band a">浅色区域</div>
+  <div class="band b">深色区域</div>
+  <div class="band c">浅色区域</div>
+</div>
+<div class="fab" id="fab">自适应浮标</div>
+<script>
+var state={accent:'#007aff',bg:'#ffffff',ink:'#222222',floatbg:'#000000',radius:16,dur:0.3,sens:0.5,fs:14};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',sens:'',fs:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var phone=document.getElementById('phone'),fab=document.getElementById('fab');
+function update(){var r=fab.getBoundingClientRect();var cy=r.top+r.height/2;
+  var darkBand=phone.querySelector('.band.b');if(!darkBand)return;
+  var br=darkBand.getBoundingClientRect();
+  var overDark=cy>=br.top+br.height*state.sens&&cy<=br.bottom;
+  fab.className='fab '+(overDark?'light':'dark');
+}
+phone.addEventListener('scroll',update);window.addEventListener('resize',update);update();
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

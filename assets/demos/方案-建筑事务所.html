@@ -19,9 +19,13 @@ html,body{height:100%}
 body{background:var(--di);color:var(--mo);min-height:100vh;display:flex;flex-direction:column;
   font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif}
 nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);padding:calc(var(--jianju)*1) calc(var(--jianju)*1.6);
-  border-bottom:1px solid rgba(38,36,31,.16);font-size:calc(var(--zihao)*.8)}
+  border-bottom:1px solid rgba(38,36,31,.16);font-size:calc(var(--zihao)*.8);
+  flex-wrap:wrap;row-gap:8px}   /* 窄屏允许换行：否则链接会被挤成 15px 宽的竖排 */
 nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.15);letter-spacing:.14em;font-weight:400}
-nav a{color:var(--hui);text-decoration:none}nav a:hover{color:var(--zhuan)}
+nav a{color:var(--hui);text-decoration:none;
+  /* 合规补齐：宪法附录B B1 —— 命中区 ≥44；nowrap 防窄屏被 flex 挤成竖排（实测挤到 15px 宽） */
+  white-space:nowrap;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+nav a:hover{color:var(--zhuan)}
 nav .cta{color:var(--zhuan);border:1px solid color-mix(in srgb,var(--zhuan) 55%,transparent);
   border-radius:99px;padding:7px 15px}
 main{flex:1;display:grid;grid-template-columns:1.15fr .85fr;min-height:0}

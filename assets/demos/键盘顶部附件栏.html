@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>键盘顶部附件栏</title>
+<style>
+:root{--bg:#f7f7f9;--fg:#1c1c1e;--accent:#007aff;--h:44px;--fs:14px;--dur:0.32;--padX:14px;--kbH:216px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:300px;height:540px;background:#fff;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden}
+.form{padding:26px 18px;display:flex;flex-direction:column;gap:14px}
+.fld{border:1px solid #dcdce1;border-radius:10px;padding:11px 12px;font-size:14px;color:#3a3a3c;background:#fff;cursor:pointer}
+.fld.on{border-color:var(--accent);color:var(--fg);box-shadow:0 0 0 3px rgba(0,122,255,.12)}
+.kb{position:absolute;left:0;right:0;bottom:0;height:var(--kbH);background:#d1d3d9;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;transform:translateY(100%);transition:transform calc(var(--dur)*1s) ease;z-index:3}
+.kb i{display:block;height:38px;background:#fff;border-radius:6px}
+.bar{position:absolute;left:0;right:0;bottom:var(--kbH);height:var(--h);padding:0 var(--padX);display:flex;align-items:center;justify-content:space-between;background:var(--bg);color:var(--fg);font-size:var(--fs);border-top:1px solid rgba(0,0,0,.08);transform:translateY(100%);transition:transform calc(var(--dur)*1s) ease;z-index:4}
+.open .kb,.open .bar{transform:translateY(0)}
+.bar .step{opacity:.5}
+.bar .prev{opacity:.75}
+.bar .done{font-weight:600;color:var(--accent)}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.fld{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="form">
+    <div class="fld" id="f1">收货人姓名</div>
+    <div class="fld" id="f2">手机号码</div>
+    <div class="fld" id="f3">详细地址</div>
+  </div>
+  <div class="bar">
+    <span class="step" id="step">第 1 / 3 项</span>
+    <span class="prev">上一步</span>
+    <span class="done">完成</span>
+  </div>
+  <div class="kb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+<script>
+var state={bg:"#f7f7f9",fg:"#1c1c1e",accent:"#007aff",h:44,fs:14,dur:0.32,padX:14,kbH:216};
+var UNIT={h:"px",fs:"px",padX:"px",kbH:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var phone=document.getElementById("phone"),step=document.getElementById("step");
+var flds=[document.getElementById("f1"),document.getElementById("f2"),document.getElementById("f3")];
+var cur=0;
+function go(i){
+  cur=(i%3+3)%3;
+  flds.forEach(function(f,ix){f.classList.toggle("on",ix===cur);});
+  step.textContent="第 "+(cur+1)+" / 3 项";
+}
+function open_(on){phone.classList.toggle("open",on);}
+apply();
+go(0);open_(true);
+var auto=setInterval(function(){
+  if(cur<2){go(cur+1);open_(true);}
+  else{open_(false);}
+},1500);
+/* 手动点选后停掉自动轮播，否则用户刚点开就被切走 */
+flds.forEach(function(f,ix){
+  f.addEventListener("click",function(){clearInterval(auto);go(ix);open_(true);});
+});
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

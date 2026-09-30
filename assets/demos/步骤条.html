@@ -19,6 +19,10 @@
   .btn { padding: 10px 22px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
 
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="wrap">

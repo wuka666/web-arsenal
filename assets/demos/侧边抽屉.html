@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>侧边抽屉</title>
+<style>
+:root{--accent:#007aff;--panelbg:#ffffff;--ink:#222222;--mainbg:#f2f3f5;--drawerw:78;--radius:0;--dur:0.35;--dim:0.35}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#333;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden}
+.phone{position:relative;width:100%;height:100vh;overflow:hidden}
+.main{position:absolute;inset:0;background:var(--mainbg);transition:transform calc(var(--dur)*1s) cubic-bezier(.4,0,.2,1);transform-origin:right center;padding:18px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.menu{width:40px;height:40px;border-radius:10px;background:var(--accent);color:#fff;border:none;font-size:18px;cursor:pointer;font-family:inherit}
+.main h3{font-size:18px;color:var(--ink)}
+.card{background:#fff;border-radius:12px;height:90px;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.ov{position:absolute;inset:0;background:rgba(0,0,0,var(--dim));opacity:0;pointer-events:none;transition:opacity calc(var(--dur)*1s) ease;z-index:5}
+.ov.show{opacity:1;pointer-events:auto}
+.drawer{position:absolute;top:0;left:0;bottom:0;width:calc(var(--drawerw)*1%);background:var(--panelbg);z-index:6;transform:translateX(-100%);transition:transform calc(var(--dur)*1s) cubic-bezier(.4,0,.2,1);padding:20px;color:var(--ink);border-radius:var(--radius)px}
+.drawer h4{margin:10px 0;font-size:16px}
+.drawer.open{transform:none}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.menu{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="main" id="main">
+    <div class="bar"><button class="menu" id="menu">☰</button><h3>首页</h3></div>
+    <div class="card"></div><div class="card"></div><div class="card"></div>
+  </div>
+  <div class="ov" id="ov"></div>
+  <div class="drawer" id="drawer"><h4>导航</h4><h4>我的</h4><h4>设置</h4><h4>关于</h4></div>
+</div>
+<script>
+var state={accent:'#007aff',panelbg:'#ffffff',ink:'#222222',mainbg:'#f2f3f5',drawerw:78,radius:0,dur:0.35,dim:0.35};
+var root=document.documentElement;
+var UNIT={drawerw:'%',radius:'px',dur:'s',dim:''};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var menu=document.getElementById('menu'),ov=document.getElementById('ov'),drawer=document.getElementById('drawer'),main=document.getElementById('main');
+function open(){drawer.classList.add('open');ov.classList.add('show');main.style.transform='translateX('+state.drawerw+'%) scale(0.92)';}
+function close(){drawer.classList.remove('open');ov.classList.remove('show');main.style.transform='';}
+menu.addEventListener('click',open);ov.addEventListener('click',close);
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

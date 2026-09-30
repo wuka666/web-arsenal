@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>气泡提示</title>
+<style>
+:root{--accent:#007aff;--bubblebg:#222222;--ink:#ffffff;--arrow:#222222;--radius:12;--dur:0.25;--stay:2.5;--fs:14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f6f8;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.wrap{position:relative;display:inline-block;margin-top:80px}
+.btn{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:20px;cursor:pointer;font-family:inherit}
+.bub{position:absolute;bottom:54px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--bubblebg);color:var(--ink);font-size:var(--fs)px;padding:9px 13px;border-radius:var(--radius)px;white-space:nowrap;opacity:0;pointer-events:none;transition:all calc(var(--dur)*1s) ease}
+.bub.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.bub::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--arrow)}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bub" id="bub">这是新功能，点一下试试</div>
+  <button class="btn" id="btn">i</button>
+</div>
+<script>
+var state={accent:'#007aff',bubblebg:'#222222',ink:'#ffffff',arrow:'#222222',radius:12,dur:0.25,stay:2.5,fs:14};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',fs:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var btn=document.getElementById('btn'),bub=document.getElementById('bub'),t=null;
+function show(){bub.classList.add('show');if(t)clearTimeout(t);t=setTimeout(function(){bub.classList.remove('show');},state.stay*1000);}
+btn.addEventListener('click',show);
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>验证码输入</title>
+<style>
+:root{--boxBg:#ffffff;--fg:#1c1c1e;--accent:#007aff;--boxW:44px;--boxH:52px;--fs:22px;--gap:10px;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:#fff;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden;padding:34px 18px}
+.tt{font-size:20px;font-weight:700;color:#1c1c1e;margin-bottom:6px}
+.sub{font-size:12px;color:#8e8e93;margin-bottom:26px}
+.boxes{display:flex;gap:var(--gap);justify-content:center}
+.box{width:var(--boxW);height:var(--boxH);border:1.5px solid #dcdce1;border-radius:var(--radius);background:var(--boxBg);color:var(--fg);font-size:var(--fs);font-weight:600;display:flex;align-items:center;justify-content:center;transition:border-color .22s,box-shadow .22s}
+.box.on{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,122,255,.14)}
+/* 光标只在当前格显示：用 ::after 画竖线，避免额外 DOM 节点 */
+.box.on::after{content:"";width:2px;height:calc(var(--boxH) * 0.42);background:var(--accent);animation:blink 1.05s steps(2,start) infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.resend{margin-top:22px;text-align:center;font-size:12px;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="tt">输入验证码</div>
+  <div class="sub">验证码已发送至 138****8888</div>
+  <div class="boxes" id="boxes"></div>
+  <div class="resend">重新发送（59s）</div>
+</div>
+<script>
+var state={boxBg:"#ffffff",fg:"#1c1c1e",accent:"#007aff",boxW:44,boxH:52,fs:22,gap:10,radius:12};
+var UNIT={boxW:"px",boxH:"px",fs:"px",gap:"px",radius:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var boxes=document.getElementById("boxes");
+var N=6,SEQ=[4,8,2,1,9,6];
+boxes.innerHTML="";
+for(var i=0;i<N;i++){var d=document.createElement("div");d.className="box";boxes.appendChild(d);}
+var els=[].slice.call(boxes.children);
+function paint(){
+  var m=Math.min(Math.min(k,SEQ.length),N);
+  els.forEach(function(el,i){el.textContent=i<m?SEQ[i]:"";el.classList.toggle("on",i===m&&m<N);});
+}
+var k=0;
+/* 多留 2 拍停在「填满」状态，方便截图看到完成态 */
+setInterval(function(){k=(k+1)%(SEQ.length+2);paint();},420);
+apply();paint();
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

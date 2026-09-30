@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>弧线换列动画</title>
+<style>
+:root{--accent:#ff6b35;--bg:#ffffff;--ink:#222222;--cellbg:#f2f3f5;--radius:10;--cols:4;--dur:0.5;--gap:10}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:16px}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:var(--ink)}
+.b{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:inherit}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:var(--gap)px;transition:grid-template-columns calc(var(--dur)*1s) ease}
+.cell{background:var(--cellbg);border-radius:var(--radius)px;height:70px;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.b{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="head"><b>专辑</b><button class="b" id="b">换列</button></div>
+<div class="grid" id="grid"></div>
+<script>
+var state={accent:'#ff6b35',bg:'#ffffff',ink:'#222222',cellbg:'#f2f3f5',radius:10,cols:4,dur:0.5,gap:10};
+var root=document.documentElement;
+var UNIT={radius:'px',cols:'',dur:'s',gap:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+var grid=document.getElementById('grid');
+for(var i=1;i<=12;i++){var c=document.createElement('div');c.className='cell';c.textContent='项'+i;grid.appendChild(c);}
+function flip(toCols){var cells=[].slice.call(grid.children);var firsts=cells.map(function(c){return c.getBoundingClientRect();});
+  state.cols=toCols;apply();grid.style.gridTemplateColumns='repeat('+toCols+',1fr)';
+  var lasts=cells.map(function(c){return c.getBoundingClientRect();});
+  cells.forEach(function(c,idx){var f=firsts[idx],l=lasts[idx];var dx=f.left-l.left,dy=f.top-l.top;
+    if(Math.abs(dx)<2&&Math.abs(dy)<2)return;
+    var arc=Math.min(60,Math.abs(dx)*0.4);
+    c.style.transition='none';c.style.transform='translate('+dx+'px,'+(dy-arc)+'px)';
+    requestAnimationFrame(function(){c.style.transition='transform calc(var(--dur)*1s) cubic-bezier(.34,1.2,.5,1) '+(idx*0.03)+'s';c.style.transform='translate(0,0)';});});
+}
+document.getElementById('b').addEventListener('click',function(){flip(state.cols===4?6:4);});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

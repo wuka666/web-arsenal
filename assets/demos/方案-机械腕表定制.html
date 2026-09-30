@@ -59,6 +59,12 @@ header .no{font-family:Consolas,monospace;font-size:11.5px;color:var(--ci);lette
 .detail button{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--ci);cursor:pointer;font-size:15px}
 @media (max-width:820px){.detail{left:calc(var(--jianju)*1.4);width:auto}.dock{padding-bottom:calc(var(--jianju)*1.4)}}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.hot{min-width:44px;min-height:44px}
+button{min-width:44px;min-height:44px}
+.sys{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <header>

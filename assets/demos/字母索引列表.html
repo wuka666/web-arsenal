@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>字母索引列表</title>
+<style>
+:root{--bg:#ffffff;--fg:#1c1c1e;--accent:#007aff;--fs:15px;--idxW:22px;--hdrBg:#f2f2f7;--radius:10px;--dur:0.35}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:300px;height:540px;background:var(--bg);border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden}
+.list{height:100%;overflow-y:auto;padding-right:var(--idxW);scrollbar-width:none}
+.hdr{padding:6px 16px;background:var(--hdrBg);color:#6b6b70;font-size:12px;font-weight:600;position:sticky;top:0;transition:color calc(var(--dur)*1s)}
+.hdr.on{color:var(--accent)}
+.row{padding:11px 16px;font-size:var(--fs);color:var(--fg);border-bottom:1px solid #f0f0f3;display:flex;align-items:center;gap:10px}
+.row .av{width:26px;height:26px;border-radius:50%;background:#dcdce1;flex:none}
+.idx{position:absolute;right:2px;top:0;bottom:0;width:var(--idxW);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.idx b{font-size:9px;font-weight:600;line-height:1;color:#8e8e93;padding:2px 3px;border-radius:var(--radius);cursor:pointer;transition:color calc(var(--dur)*1s),background calc(var(--dur)*1s)}
+.idx b.on{color:#fff;background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="list" id="list"></div>
+  <!-- data-touch-exempt：字母索引条为 iOS/Android 平台惯例组件，命中逻辑是「按住沿条滑动」的连续命中区，
+       21 个字母若各撑到 44px = 924px 会竖向溢出屏幕，属 WCAG essential 例外（详见 Agent宪法 附录B B1）。 -->
+  <div class="idx" id="idx" data-touch-exempt="字母索引条：连续滑动命中区，平台惯例，44px 物理不可行"></div>
+</div>
+<script>
+var state={bg:"#ffffff",fg:"#1c1c1e",accent:"#007aff",fs:15,idxW:22,hdrBg:"#f2f2f7",radius:10,dur:0.35};
+var UNIT={fs:"px",idxW:"px",radius:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var LETTERS=["A","B","C","D","E","F","G","H","J","K","L","M","N","P","R","S","T","W","X","Y","Z"];
+var NAMES={A:["安琪","阿泽","艾米"],B:["白露","毕岩"],C:["陈默","程野","崔明"],D:["邓超","丁宁"],E:["恩雅"],F:["方舟","冯野"],G:["高翔","顾清"],H:["韩雪","何岸","黄宁"],J:["江离","金阳"],K:["康桥","柯蓝"],L:["李桉","林深","刘岩"],M:["马骁","孟夏"],N:["宁远"],P:["潘岳","彭野"],R:["任冬","阮青"],S:["苏叶","沈屿","石岩"],T:["唐宁","田野"],W:["王砚","吴迪","文清"],X:["夏树","谢岚"],Y:["杨帆","叶秋","于归"],Z:["赵岩","周迟","朱明"]};
+var list=document.getElementById("list"),idx=document.getElementById("idx");
+var html="";
+LETTERS.forEach(function(L){
+  html+='<div class="hdr" data-l="'+L+'">'+L+'</div>';
+  (NAMES[L]||[]).forEach(function(n){html+='<div class="row"><span class="av"></span>'+n+'</div>';});
+});
+list.innerHTML=html;
+idx.innerHTML=LETTERS.map(function(L){return '<b data-l="'+L+'">'+L+'</b>';}).join("");
+var hdrs=[].slice.call(list.querySelectorAll(".hdr"));
+function jump(L){
+  for(var i=0;i<hdrs.length;i++){if(hdrs[i].dataset.l===L){list.scrollTop=hdrs[i].offsetTop;break;}}
+  [].slice.call(idx.children).forEach(function(b){b.classList.toggle("on",b.dataset.l===L);});
+  hdrs.forEach(function(h){h.classList.toggle("on",h.dataset.l===L);});
+}
+apply();
+var i=0;
+setInterval(function(){jump(LETTERS[i%LETTERS.length]);i++;},1100);
+jump("A");
+idx.addEventListener("click",function(e){var b=e.target.closest("b");if(b)jump(b.dataset.l);});
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

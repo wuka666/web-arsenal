@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分类标签展开</title>
+<style>
+:root{--accent:#ff6b35;--bg:#f4f5f7;--ink:#222222;--selbg:#ffffff;--radius:12;--dur:0.3;--cols:4;--gap:8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f6f8;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.box{width:340px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.row{display:flex;flex-wrap:wrap;gap:var(--gap)px;transition:all calc(var(--dur)*1s) ease}
+.row.expand{display:grid;grid-template-columns:repeat(var(--cols),1fr)}
+.t{background:var(--bg);color:var(--ink);border-radius:var(--radius)px;padding:8px 12px;font-size:14px;cursor:pointer;border:none;font-family:inherit;text-align:center;transition:all calc(var(--dur)*1s) ease;white-space:nowrap}
+.t.on{background:var(--selbg);color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.t.more{background:transparent;color:var(--accent);font-weight:600}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.t{min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="row" id="row">
+    <button class="t on">推荐</button>
+    <button class="t">数码</button>
+    <button class="t">家居</button>
+    <button class="t">服饰</button>
+    <button class="t">美妆</button>
+    <button class="t">食品</button>
+    <button class="t">运动</button>
+    <button class="t">图书</button>
+    <button class="t more" id="more">展开 ▾</button>
+  </div>
+</div>
+<script>
+var state={accent:'#ff6b35',bg:'#f4f5f7',ink:'#222222',selbg:'#ffffff',radius:12,dur:0.3,cols:4,gap:8};
+var root=document.documentElement;
+var UNIT={radius:'px',dur:'s',cols:'',gap:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var row=document.getElementById('row'),more=document.getElementById('more'),tags=row.querySelectorAll('.t:not(.more)');
+row.addEventListener('click',function(e){
+  var t=e.target.closest('.t');if(!t)return;
+  if(t.id==='more'){row.classList.toggle('expand');more.textContent=row.classList.contains('expand')?'收起 ▴':'展开 ▾';return;}
+  tags.forEach(function(x){x.classList.remove('on');x.style.order='';});
+  t.classList.add('on');t.style.order='-1';
+  if(row.classList.contains('expand')){row.classList.remove('expand');more.textContent='展开 ▾';}
+});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

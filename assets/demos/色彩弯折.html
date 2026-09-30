@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>色彩弯折</title>
+<style>
+:root{
+  --bg:#05060a;
+  --hue:220;
+  --span:140;
+  --colors:4;
+  --speed:1;
+  --blur:58;
+  --sat:1.35;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);height:100vh;overflow:hidden}
+/* bend 整体旋转 + 模糊 + 饱和度，做出「色彩被拧弯」的柔光流动 */
+.bend{position:fixed;inset:-28%;display:block;
+  filter:blur(calc(var(--blur)*1px)) saturate(var(--sat));
+  animation:spin calc(30s / var(--speed)) linear infinite}
+.bend i{position:absolute;inset:0;display:block;mix-blend-mode:screen;border-radius:50%}
+.bend i:nth-child(odd){animation:spin calc(22s / var(--speed)) linear infinite reverse}
+.bend i:nth-child(even){animation:spin calc(34s / var(--speed)) linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+  color:rgba(255,255,255,.5);font:12px/1.4 system-ui,"PingFang SC",sans-serif;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="bend" id="bend"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="hint">多层锥形渐变交叠旋转 · 色彩呈流体弯折（色相 / 跨度 / 层数 / 速度 / 模糊 / 饱和可调）</div>
+<script>
+// 全部参数集中于此，与上方 :root 一一对应（键=CSS 变量名）
+var state={bg:"#05060a",hue:220,span:140,colors:4,speed:1,blur:58,sat:1.35};
+var bend=document.getElementById('bend');
+var MAX=6, layers=[].slice.call(bend.children);
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k,state[k]); }
+  var use=Math.max(1,Math.min(MAX,state.colors|0));
+  var span=+state.span, base=+state.hue;
+  layers.forEach(function(el,i){
+    if(i>=use){ el.style.display='none'; return; }
+    el.style.display='block';
+    var h=(base + i*(use>1?span/(use-1):0))%360;
+    var h2=(h+38)%360, h3=(h+74)%360;
+    var ang=i*46, pct=(38+((i*17)%30))+'%';
+    el.style.background='conic-gradient(from '+ang+'deg at '+pct+' 60%,'+
+      ' hsl('+h+' 92% 62%), hsl('+h2+' 92% 54%), hsl('+h3+' 92% 62%), hsl('+h+' 92% 62%))';
+  });
+}
+apply();
+// 外部调参契约：只接受 type==='param' 且 key 在 state 内的消息
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

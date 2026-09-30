@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>卡牌全息光效</title>
+<style>
+:root{
+  --bg:#141018;
+  --cardBg:#1d1522;
+  --accent:#e8c06a;
+  --w:220;
+  --h:308;
+  --radius:16;
+  --gloss:0.75;
+  --glossSize:62;
+  --rainbow:1;
+  --mx:50;
+  --my:50;
+  --ang:0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);height:100vh;display:grid;place-items:center;overflow:hidden;
+  font-family:system-ui,"PingFang SC",sans-serif}
+.card{position:relative;width:calc(var(--w)*1px);height:calc(var(--h)*1px);
+  border-radius:calc(var(--radius)*1px);background:var(--cardBg);
+  border:1px solid rgba(255,255,255,.14);overflow:hidden;cursor:pointer;
+  box-shadow:0 26px 60px rgba(0,0,0,.55);transition:transform .2s ease}
+.card:hover{transform:translateY(-6px)}
+/* 全息彩虹层：conic 彩虹随 --ang 转，颜色随鼠标位置偏移，用 color-dodge 叠出「金属反光」 */
+.card::before{content:"";position:absolute;inset:-45%;pointer-events:none;
+  background:conic-gradient(from calc(var(--ang)*1deg),
+    #ff5f6d,#ffc371,#e9ff70,#47e6b1,#59c3ff,#c86dd7,#ff5f6d);
+  mix-blend-mode:color-dodge;opacity:var(--gloss);
+  filter:blur(6px);
+  transform:translate(calc((var(--mx) - 50)*0.5px),calc((var(--my) - 50)*0.5px));
+  transition:opacity .25s ease}
+/* 鼠标高光：radial 光斑跟着指针走 */
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle calc(var(--glossSize)*1%) at calc(var(--mx)*1%) calc(var(--my)*1%),
+    rgba(255,255,255,.5),rgba(255,255,255,0) 68%);
+  mix-blend-mode:soft-light}
+.face{position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:space-between;padding:16px;color:var(--accent);z-index:2}
+.face .corner{font-size:22px;font-weight:800;line-height:1}
+.face .corner.bottom{align-self:flex-end;transform:rotate(180deg)}
+.face .pip{position:absolute;inset:0;display:grid;place-items:center;font-size:74px;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))}
+.hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+  color:rgba(255,255,255,.45);font:12px/1.4 system-ui,"PingFang SC",sans-serif;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="face">
+    <span class="corner">A</span>
+    <span class="pip">♠</span>
+    <span class="corner bottom">A</span>
+  </div>
+</div>
+<div class="hint">移动鼠标 / 手指划过卡面 · 全息彩虹反光跟随（色相 / 强度 / 光斑 / 速度可调）</div>
+<script>
+// 全部参数集中于此，与上方 :root 一一对应（键=CSS 变量名）
+var state={bg:"#141018",cardBg:"#1d1522",accent:"#e8c06a",w:220,h:308,radius:16,
+  gloss:0.75,glossSize:62,rainbow:1};
+function apply(){
+  var r=document.documentElement.style;
+  for(var k in state){ r.setProperty('--'+k,state[k]); }
+}
+var card=document.getElementById('card'),raf=0;
+function setMX(x,y){ // 折算成 0–100 的百分比，写回 CSS 变量
+  var b=card.getBoundingClientRect();
+  var px=b.width?Math.max(0,Math.min(100,(x-b.left)/b.width*100)):50;
+  var py=b.height?Math.max(0,Math.min(100,(y-b.top)/b.height*100)):50;
+  var R=document.documentElement.style;
+  R.setProperty('--mx',px.toFixed(1)); R.setProperty('--my',py.toFixed(1));
+}
+card.addEventListener('mousemove',function(e){ setMX(e.clientX,e.clientY); });
+card.addEventListener('touchmove',function(e){
+  if(e.touches[0]) setMX(e.touches[0].clientX,e.touches[0].clientY);
+},{passive:true});
+// 自动演示：无指针时彩虹缓缓旋转，方便截图也能看到光泽
+var t=0,last=performance.now();
+function loop(now){
+  var dt=Math.min(50,now-last)/16.67; last=now;
+  t+=0.35*dt*(+state.rainbow);
+  document.documentElement.style.setProperty('--ang',(t%360).toFixed(1));
+  requestAnimationFrame(loop);
+}
+apply(); requestAnimationFrame(loop);
+// 外部调参契约：只接受 type==='param' 且 key 在 state 内的消息
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value; apply();
+});
+</script>
+</body>
+</html>

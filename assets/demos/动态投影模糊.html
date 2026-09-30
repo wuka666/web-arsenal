@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>动态投影模糊</title>
+<style>
+:root{--accent:#007aff;--bg:#ffffff;--ink:#222222;--rowbg:#f2f3f5;--radius:10;--maxblur:8;--dur:0.2;--fs:14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+.phone{height:100vh;overflow-y:auto;max-width:380px;margin:0 auto;padding:12px}
+.list{will-change:filter,transform;transition:filter calc(var(--dur)*1s) ease,transform calc(var(--dur)*1s) ease}
+.it{background:var(--rowbg);border-radius:var(--radius)px;color:var(--ink);padding:14px;margin-bottom:10px;font-size:var(--fs)px;box-shadow:inset 3px 0 0 var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone" id="phone"><div class="list" id="list"></div></div>
+<script>
+var state={accent:'#007aff',bg:'#ffffff',ink:'#222222',rowbg:'#f2f3f5',radius:10,maxblur:8,dur:0.2,fs:14};
+var root=document.documentElement;
+var UNIT={radius:'px',maxblur:'px',dur:'s',fs:'px'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var list=document.getElementById('list'),phone=document.getElementById('phone');
+var items='';for(var i=1;i<=24;i++){items+='<div class="it">列表项 '+i+' · 滚动看看动态模糊</div>';}
+list.innerHTML=items;
+var last=0,blur=0,dir=0,raf=null;
+phone.addEventListener('scroll',function(){var y=phone.scrollTop;var v=y-last;last=y;blur=Math.min(state.maxblur,Math.abs(v)*0.6);dir=v<0?-1:1;
+  list.style.filter='blur('+blur+'px)';list.style.transform='translateY('+(dir*blur*0.4)+'px)';
+  if(raf)cancelAnimationFrame(raf);decay();});
+function decay(){raf=requestAnimationFrame(function(){blur*=0.82;if(blur<0.3)blur=0;list.style.filter='blur('+blur+'px)';list.style.transform='translateY('+(dir*blur*0.4)+'px)';if(blur>0.3)decay();});}
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

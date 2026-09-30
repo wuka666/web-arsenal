@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>按压倾斜卡片</title>
+<style>
+:root{--accent:#ff6b35;--cardbg:#ffffff;--ink:#222222;--spot:#ffd9c2;--radius:20;--tiltmax:10;--scale:0.94;--dur:0.5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f1f3;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;perspective:900px;padding:24px}
+.stage{position:relative}
+.spot{position:absolute;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--spot),transparent 70%);filter:blur(6px);left:50%;top:50%;transform:translate(-50%,-50%);transition:left calc(var(--dur)*1s) ease,top calc(var(--dur)*1s) ease,opacity .3s;opacity:.0}
+.card{position:relative;width:240px;height:300px;background:var(--cardbg);border-radius:var(--radius)px;box-shadow:0 18px 40px rgba(0,0,0,.12);display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:var(--ink);transform-style:preserve-3d;transition:transform calc(var(--dur)*1s) cubic-bezier(.34,1.56,.64,1);touch-action:none;cursor:pointer}
+.card h3{font-size:20px;margin-bottom:6px}
+.card p{font-size:13px;opacity:.6}
+.card .tag{position:absolute;top:16px;left:16px;background:var(--accent);color:#fff;font-size:12px;padding:4px 9px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="spot" id="spot"></div>
+  <div class="card" id="card"><span class="tag">限时</span><h3>北欧极简椅</h3><p>按压感受一下回弹手感</p></div>
+</div>
+<script>
+var state={accent:'#ff6b35',cardbg:'#ffffff',ink:'#222222',spot:'#ffd9c2',radius:20,tiltmax:10,scale:0.94,dur:0.5};
+var root=document.documentElement;
+var UNIT={radius:'px',tiltmax:'',scale:'',dur:'s'};
+function apply(){for(var k in state){root.style.setProperty('--'+k,state[k]+(UNIT[k]||''));}}
+apply();
+var card=document.getElementById('card'),spot=document.getElementById('spot'),down=false;
+card.addEventListener('pointerdown',function(e){down=true;var r=card.getBoundingClientRect();
+  var px=(e.clientX-r.left)/r.width-0.5,py=(e.clientY-r.top)/r.height-0.5;
+  var rx=(-py*state.tiltmax*2).toFixed(1),ry=(px*state.tiltmax*2).toFixed(1);
+  card.style.transition='none';
+  card.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg) scale('+state.scale+')';
+  spot.style.left=(50+px*60)+'%';spot.style.top=(50+py*60)+'%';spot.style.opacity='.9';
+});
+window.addEventListener('pointerup',function(){if(!down)return;down=false;
+  card.style.transition='transform calc(var(--dur)*1s) cubic-bezier(.34,1.56,.64,1)';
+  card.style.transform='';spot.style.opacity='0';spot.style.left='50%';spot.style.top='50%';});
+
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || d.type !== 'param') return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

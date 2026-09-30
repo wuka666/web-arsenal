@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>调整大小</title>
+<style>
+:root{--bg:#f1f5f9;--panel:#ffffff;--ink:#0f172a;--accent:#0ea5e9;--radius:10px;--minW:160px;--minH:120px;--handle:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.box{position:relative;width:280px;height:190px;background:var(--panel);border:1px solid #e2e8f0;border-radius:var(--radius);padding:14px;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.cap{font-size:12px;opacity:.6}
+.h{position:absolute;right:0;bottom:0;width:calc(var(--handle) * 1px);height:calc(var(--handle) * 1px);background:var(--accent);border-radius:0 0 var(--radius) 0;cursor:nwse-resize;clip-path:polygon(100% 0,100% 100%,0 100%)}
+</style>
+</head>
+<body>
+<div class="box" id="bx"><div class="cap" id="cap">拖右下角把手调整大小</div><div style="margin-top:8px;font-size:13px;opacity:.8">面板内容随尺寸自适应</div><div class="h" id="hh"></div></div>
+<script>
+var state={bg:"#f1f5f9",panel:"#ffffff",ink:"#0f172a",accent:"#0ea5e9",radius:10,minW:160,minH:120,handle:16};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--panel',state.panel);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--minW',state.minW+'px');r.setProperty('--minH',state.minH+'px');r.setProperty('--handle',state.handle+'px');}
+apply();
+var bx=document.getElementById("bx"),hh=document.getElementById("hh"),cap=document.getElementById("cap");
+var sw=0,sh=0,sx=0,sy=0,dr=false;
+hh.addEventListener("pointerdown",function(e){dr=true;sw=bx.offsetWidth;sh=bx.offsetHeight;sx=e.clientX;sy=e.clientY;hh.setPointerCapture(e.pointerId);e.stopPropagation();});
+hh.addEventListener("pointermove",function(e){if(!dr)return;var w=Math.max(parseFloat(state.minW),sw+e.clientX-sx);var h=Math.max(parseFloat(state.minH),sh+e.clientY-sy);
+bx.style.width=w+"px";bx.style.height=h+"px";cap.textContent="当前 "+Math.round(w)+" × "+Math.round(h);});
+function end(){dr=false;}
+hh.addEventListener("pointerup",end);hh.addEventListener("pointercancel",end);
+setTimeout(function(){bx.style.width="340px";bx.style.height="230px";cap.textContent="当前 340 × 230（自动演示）";},500);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

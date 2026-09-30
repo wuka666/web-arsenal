@@ -1,4 +1,4 @@
-// Web 灵感弹药库 · 方案库（v4，2026-09-07 丰富化 + 并入 4 套）
+// Web 灵感书房 · 方案库（v4，2026-09-07 丰富化 + 并入 4 套）
 // 编目轴：重色落点 / 第一屏内容 / 删减元素（与作者「西瓜同学🍉」Skill 三问一致）。
 // 每套 代码 为完整多区块页（导航+首屏+功能卡×3+数据墙×3+页脚），打开即感受氛围。
 // 配色守 60-30-10；参数键↔CSS 变量一致；demo 支持 postMessage({type:'param',key,value}) 调参。
@@ -65,6 +65,10 @@ body[data-glow="1"] .coral{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhucai)
 
 /* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
 .block{box-shadow:0 calc(var(--yinying)*.22px) calc(var(--yinying)*.55px) rgba(0,0,0,.34)}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.cta{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
@@ -346,7 +350,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     id: "S03",
     风格名: "玻璃拟态风",
     适配端: "PC 端",
-    风格: "玻璃拟态",
+    风格: "其他·特色风格",
     场景: "官网·品牌站",
     骨架: "毛玻璃浮层",
     配色: {
@@ -997,7 +1001,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     id: "S08",
     风格名: "强对比视觉风",
     适配端: "PC 端",
-    风格: "粗野·新粗野",
+    风格: "其他·特色风格",
     场景: "落地页·发布页",
     骨架: "瑞士分屏海报",
     配色: {
@@ -1322,7 +1326,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     风格名: "自然有机风",
     适配端: "通用",
     风格: "有机自然",
-    场景: "工具·SaaS",
+    场景: "其他·场景",
     骨架: "有机侧栏+主卡",
     配色: {
       "米白底": "75%",
@@ -1368,6 +1372,10 @@ body[data-banbo="0"] .blob{border-radius:var(--yuanjiao);}
 
 /* 参数落地：以下参数此前只定义未消费（旋钮无效），在此接上 */
 .btn{box-shadow:0 calc(var(--yinying)*.2px) calc(var(--yinying)*.5px) rgba(0,0,0,.18),0 0 calc(var(--faguang)*.6px) var(--zhucai)}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.btn{min-width:44px;min-height:44px}
 </style>
 </head>
 <body data-banbo="1">
@@ -1479,7 +1487,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     id: "S11",
     风格名: "复古胶片风",
     适配端: "PC 端",
-    风格: "复古怀旧",
+    风格: "其他·特色风格",
     场景: "作品集·叙事",
     骨架: "胶片横滚长廊",
     配色: {
@@ -1634,7 +1642,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     id: "S12",
     风格名: "中式水墨风",
     适配端: "PC 端",
-    风格: "国风水墨",
+    风格: "其他·特色风格",
     场景: "作品集·叙事",
     骨架: "水墨非对称",
     配色: {
@@ -2093,9 +2101,13 @@ html,body{height:100%}
 body{background:var(--di);color:var(--mo);min-height:100vh;display:flex;flex-direction:column;
   font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif}
 nav{display:flex;align-items:center;gap:calc(var(--jianju)*1.2);padding:calc(var(--jianju)*1) calc(var(--jianju)*1.6);
-  border-bottom:1px solid rgba(38,36,31,.16);font-size:calc(var(--zihao)*.8)}
+  border-bottom:1px solid rgba(38,36,31,.16);font-size:calc(var(--zihao)*.8);
+  flex-wrap:wrap;row-gap:8px}   /* 窄屏允许换行：否则链接会被挤成 15px 宽的竖排 */
 nav b{margin-right:auto;font-family:Georgia,serif;font-size:calc(var(--zihao)*1.15);letter-spacing:.14em;font-weight:400}
-nav a{color:var(--hui);text-decoration:none}nav a:hover{color:var(--zhuan)}
+nav a{color:var(--hui);text-decoration:none;
+  /* 合规补齐：宪法附录B B1 —— 命中区 ≥44；nowrap 防窄屏被 flex 挤成竖排（实测挤到 15px 宽） */
+  white-space:nowrap;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+nav a:hover{color:var(--zhuan)}
 nav .cta{color:var(--zhuan);border:1px solid color-mix(in srgb,var(--zhuan) 55%,transparent);
   border-radius:99px;padding:7px 15px}
 main{flex:1;display:grid;grid-template-columns:1.15fr .85fr;min-height:0}
@@ -2728,6 +2740,12 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
   .notice a { color: #ffffff90; pointer-events: auto; }
   #modeText { color: #ffffff80; }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+button{min-width:44px;min-height:44px}
+.tuner-toggle{min-width:44px;min-height:44px}
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="stage"><canvas id="starCanvas"></canvas></div>
@@ -3277,8 +3295,8 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.6;}
     id: "S22",
     风格名: "黑胶唱片店",
     适配端: "PC 端",
-    风格: "复古怀旧",
-    场景: "电商·预订",
+    风格: "其他·特色风格",
+    场景: "其他·场景",
     骨架: "顶部导航 + 标题与本周精选徽章 + 唱片陈列网格（封面用径向渐变绘制）",
     配色: {"浅底(页面)":"60%","灰阶文本与分隔线":"30%","强调橙(徽章/CTA)":"10%"},
     布局骨架: "导航一条；标题区左右分置（左大标题 / 右徽章与说明）；主体为陈列网格，列数由参数控制，每张含封面、品名、厂牌年份与评分",
@@ -3808,6 +3826,10 @@ h1 small{display:block;margin-top:10px;font-size:calc(var(--zihao)*.8);font-weig
   .depth,.panel{display:none}
 }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+button{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="depth">
@@ -4158,6 +4180,10 @@ body{
   .v,.label h1,.label p{animation-duration:.01ms;animation-delay:0s}
 }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.on{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="stage">
@@ -4315,7 +4341,7 @@ h1{font-size:calc(98*var(--u));font-weight:360;letter-spacing:-.035em;line-heigh
     风格名: "机械腕表定制",
     适配端: "通用",
     风格: "科技未来",
-    场景: "电商·预订",
+    场景: "其他·场景",
     骨架: "顶部品牌与编号 + 中央影棚渲染（canvas）+ 系统切换坞 + 详情浮层",
     配色: {
       "影棚灰蓝(画布)": "60%",
@@ -4431,6 +4457,12 @@ header .no{font-family:Consolas,monospace;font-size:11.5px;color:var(--ci);lette
 .detail dd{font-family:Consolas,monospace;color:var(--ke)}
 .detail button{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--ci);cursor:pointer;font-size:15px}
 @media (max-width:820px){.detail{left:calc(var(--jianju)*1.4);width:auto}.dock{padding-bottom:calc(var(--jianju)*1.4)}}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.hot{min-width:44px;min-height:44px}
+button{min-width:44px;min-height:44px}
+.sys{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
@@ -4621,7 +4653,7 @@ requestAnimationFrame(render);
     风格名: "独立书店",
     适配端: "PC 端",
     风格: "编辑杂志",
-    场景: "电商·预订",
+    场景: "其他·场景",
     骨架: "页头说明 + 整排书脊（跟随光标）+ 订阅页脚",
     配色: {
       "深紫黑(页脚底)": "60%",
@@ -4875,8 +4907,8 @@ requestAnimationFrame(track);
     id: "S28",
     风格名: "香氛实验室",
     适配端: "通用",
-    风格: "品牌海报",
-    场景: "电商·预订",
+    风格: "其他·特色风格",
+    场景: "其他·场景",
     骨架: "左栏配方卡（前中后调）+ 右侧香雾舞台与标题 + 底部预约表单",
     配色: {
       "深墨绿(纸底)": "62%",
@@ -4984,6 +5016,11 @@ button{background:var(--wu);color:#1A1620;border:none;border-radius:var(--yuanji
   body{grid-template-columns:1fr;grid-template-areas:"mist" "card" "book"}
   .card{border-right:none;border-top:1px solid rgba(201,166,232,.14)}
 }
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+input{min-width:44px;min-height:44px}
+button{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
@@ -5118,7 +5155,7 @@ if(!reduce) requestAnimationFrame(loop);
   {
     id: "S29",
     风格名: "夜跑城市地图",
-    适配端: "通用",
+    适配端: "PC 端",
     风格: "科技未来",
     场景: "落地页·发布页",
     骨架: "全屏路网 canvas + 左下路线卡 + 右上配速数据 + 底部大标题",
@@ -5997,7 +6034,7 @@ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ draw(0); } el
     id: "S34",
     风格名: "沉浸氛围",
     适配端: "通用",
-    风格: "玻璃拟态",
+    风格: "其他·特色风格",
     场景: "落地页·发布页",
     骨架: "整屏氛围层 + 浮起小玻璃卡",
     配色: {"深色调渐变底":"86%","玻璃卡":"8%","单一光源/强调":"6%"},
@@ -6579,6 +6616,11 @@ a:focus-visible{outline:2px solid #9fe0ff; outline-offset:3px; border-radius:4px
   *{animation:none!important; transition:none!important}
 }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.brand{min-width:44px;min-height:44px}
+.burger{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="art"><canvas id="fiber"></canvas></div>
@@ -6769,7 +6811,7 @@ a:focus-visible{outline:2px solid #9fe0ff; outline-offset:3px; border-radius:4px
   {
     id: "S37",
     风格名: "茶道风味测评",
-    适配端: "通用",
+    适配端: "PC 端",
     风格: "有机自然",
     场景: "官网·品牌站",
     骨架: "手机框内单屏测评：顶栏玻璃徽章 + 标题区 + 四选一卡片网格 + 语音按钮 + 滑动确认",
@@ -6975,7 +7017,7 @@ document.querySelectorAll('.card').forEach(function(c){
   {
     id: "S38",
     风格名: "登山者英雄页",
-    适配端: "通用",
+    适配端: "移动端",
     风格: "暗色",
     场景: "落地页·发布页",
     骨架: "三手机视差阵列并陈，每屏独立叙事（英雄 / 数据 / 队伍）+ 橙黑菜单覆盖",
@@ -7098,6 +7140,10 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
 .overlay a:hover{color:var(--accent)}
 @keyframes si{to{opacity:1;transform:translateX(0)}}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.nav .menu{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="row">
@@ -7172,7 +7218,7 @@ document.querySelectorAll('.num[data-to]').forEach(function(el){
     风格名: "墨痕写作社区注册页",
     适配端: "通用",
     风格: "暗色",
-    场景: "工具·SaaS",
+    场景: "其他·场景",
     骨架: "两栏注册：左栏氛围叙事（渐变替代视频）+ 右栏表单操作",
     配色: {
       "黑底(底)": "80%",
@@ -7287,6 +7333,10 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
   .heading{font-size:24px}.steps{display:none}
 }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.eye{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -7341,7 +7391,7 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
   {
     id: "S40",
     风格名: "书香共读会APP三屏",
-    适配端: "通用",
+    适配端: "移动端",
     风格: "编辑杂志",
     场景: "内容·阅读",
     骨架: "三手机屏展示（证言 / 英雄书单 / 活动），各屏独立叙事 + 菜单覆盖",
@@ -7451,6 +7501,11 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
 @keyframes sl{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
 .overlay .x{position:absolute;top:40px;right:40px;font-size:28px;cursor:pointer}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变）。
+   .burger 原 22×16 且 space-between，撑 44 会让两条线被拉散 → 同步改居中紧凑，保持「汉堡」观感。 */
+.burger{min-width:44px;min-height:44px;justify-content:center;gap:5px}
+</style>
 </head>
 <body>
 <div class="row">
@@ -7519,7 +7574,7 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
   {
     id: "S41",
     风格名: "山货直送物流落地页",
-    适配端: "通用",
+    适配端: "移动端",
     风格: "有机自然",
     场景: "落地页·发布页",
     骨架: "居中 iPhone 落地页：英雄 + 地图路线卡 + 统计 + 步骤 + 联系表单，内部单列滚动",
@@ -7621,6 +7676,10 @@ body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"
 .cta{width:100%;background:var(--accent);color:var(--bg);border:0;border-radius:14px;padding:13px;font-size:15px;font-weight:700;cursor:pointer}
 .foot{padding:10px 18px 22px;color:var(--cream);opacity:.6;font-size:11px;text-align:center}
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.field input,.field textarea{min-height:44px}
+</style>
 </head>
 <body>
 <div class="phone"><div class="screen"><div class="scroll">
@@ -7685,7 +7744,7 @@ body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"
     风格名: "标准件检索库",
     适配端: "通用",
     风格: "极简瑞士",
-    场景: "工具·SaaS",
+    场景: "其他·场景",
     骨架: "顶部大搜索条(焦点层) + 分类层层递进 + 筛选条 + 密集方形规格卡网格 + 分页（结构层加法）",
     配色: {
       "暖灰白底(页面)": "60%",
@@ -7837,6 +7896,12 @@ body{
 
 @media (max-width:900px){ :root{--cols:2} .filters .sort{margin-left:0} }
 @media (max-width:560px){ :root{--cols:1} }
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+input{min-width:44px;min-height:44px}
+button{min-width:44px;min-height:44px}
+.chip{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
@@ -8497,7 +8562,7 @@ body:not(.intro-ready) .header,.intro-ready .planet-list,.intro-ready .planet-co
   {
     id: "S44",
     风格名: "山涧廊桥志",
-    适配端: "通用",
+    适配端: "PC 端",
     风格: "有机自然",
     场景: "官网·品牌站",
     骨架: "sticky 电影舞台(3700px 滚动行程) + 顶部网格导航 + 主视觉巨标题 + 分层场景(天空/远山/廊桥/分屏/桥二/古村) + 古村引文 + 分屏 choreography + 无限滑块(5 张 sight-card 克隆循环) + 滚动驱动数据面板",
@@ -8676,6 +8741,10 @@ bg / paper / ink / accent / titleSize / parallax / blurMax / cardRadius / heroSi
   .sight-pin{top:24px;right:24px;width:57.6px;height:57.6px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene-img,.back-stack,.hero-title,.intro-copy,.story-panel,.sights-track,.sights-slider{transition:none}}
+</style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.language-switcher{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
@@ -8880,7 +8949,7 @@ if(location.search.includes('autoshot')){
 {
   id: "S45",
   风格名: "星野笔记",
-  适配端: "通用",
+  适配端: "PC 端",
   风格: "暗色",
   场景: "落地页·发布页",
   骨架: "双 iPhone 并列陈列 + 自动缩放舞台 + 动态岛 + 视频就绪入场动画",

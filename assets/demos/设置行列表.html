@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设置行列表</title>
+<style>
+:root{--bg:#ffffff;--fg:#1c1c1e;--accent:#007aff;--rowH:48px;--fs:15px;--iconW:29px;--padX:14px;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{width:300px;height:540px;background:#f2f2f7;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden;padding-top:16px}
+.grp{margin:0 var(--padX) 18px;background:var(--bg);border-radius:var(--radius);overflow:hidden}
+.row{height:var(--rowH);padding:0 var(--padX);display:flex;align-items:center;gap:12px;font-size:var(--fs);color:var(--fg);border-bottom:1px solid #f0f0f3}
+.row:last-child{border-bottom:none}
+.ic{width:var(--iconW);height:var(--iconW);border-radius:7px;background:var(--accent);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.lb{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.val{color:#8e8e93;font-size:13px}
+.chev{color:#c7c7cc;font-weight:700;font-size:16px}
+.sw{width:51px;height:31px;border-radius:16px;background:#e5e5ea;position:relative;flex:none;transition:background .25s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.2);transition:transform .25s}
+.sw.on{background:#34c759}
+.sw.on::after{transform:translateX(20px)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="grp">
+    <div class="row"><span class="ic">✈︎</span><span class="lb">飞行模式</span><span class="sw" id="sw1"></span></div>
+    <div class="row"><span class="ic">📶</span><span class="lb">无线局域网</span><span class="val">Home_5G</span><span class="chev">›</span></div>
+    <div class="row"><span class="ic">🔵</span><span class="lb">蓝牙</span><span class="val">打开</span><span class="chev">›</span></div>
+  </div>
+  <div class="grp">
+    <div class="row"><span class="ic">🔔</span><span class="lb">通知</span><span class="chev">›</span></div>
+    <div class="row"><span class="ic">🔊</span><span class="lb">声音与触感</span><span class="chev">›</span></div>
+    <div class="row"><span class="ic">🌙</span><span class="lb">勿扰模式</span><span class="sw" id="sw2"></span></div>
+  </div>
+  <div class="grp">
+    <div class="row"><span class="ic">⚙︎</span><span class="lb">通用</span><span class="chev">›</span></div>
+    <div class="row"><span class="ic">🔒</span><span class="lb">隐私与安全性</span><span class="chev">›</span></div>
+  </div>
+</div>
+<script>
+var state={bg:"#ffffff",fg:"#1c1c1e",accent:"#007aff",rowH:48,fs:15,iconW:29,padX:14,radius:12};
+var UNIT={rowH:"px",fs:"px",iconW:"px",padX:"px",radius:"px"};
+var r=document.documentElement.style;
+function apply(){for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+var sw1=document.getElementById("sw1"),sw2=document.getElementById("sw2");
+sw2.classList.add("on");
+/* 自动轮播两个开关的状态，静止截图也能看出这是可交互的开关而不是贴图 */
+setInterval(function(){sw1.classList.toggle("on");},1400);
+setInterval(function(){sw2.classList.toggle("on");},2100);
+apply();
+sw1.addEventListener("click",function(){sw1.classList.toggle("on");});
+sw2.addEventListener("click",function(){sw2.classList.toggle("on");});
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

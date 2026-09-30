@@ -8,7 +8,11 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .page{transition:transform .4s ease;padding:30px;color:#444;font-size:14px;line-height:1.8}
 .controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
 button{background:var(--cc,#2f6bff);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+button{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="status">状态栏</div>
 <div class="banner" id="bn">新版本已发布，点击查看更新内容</div>
 <div class="page" id="pg">新版本已经发布，带来了更快的加载速度、更稳定的同步能力，以及全新的主题外观。<br>我们会持续打磨细节，让每一次使用都更顺手。感谢你的支持。</div>

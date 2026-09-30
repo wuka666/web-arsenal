@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>手势转场</title>
+<style>
+:root{--bg:#111827;--panel:#1f2937;--ink:#f9fafb;--accent:#38bdf8;--radius:18px;--w:300px;--dur:0.35s;--thr:0.4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.stage{width:min(94vw,360px);height:300px;position:relative;overflow:hidden;border-radius:var(--radius);background:#0b1220;touch-action:none}
+.p{position:absolute;inset:0;padding:18px;background:var(--panel);border-radius:var(--radius);color:var(--ink);display:flex;flex-direction:column;justify-content:center;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.p.next{background:#0f172a;transform:translateX(100%)}
+.t{font-size:18px;font-weight:800}
+.s{font-size:12px;opacity:.7}
+.pb{margin-top:6px;font-size:12px;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="stage" id="sg"><div class="p" id="p1"><div class="t">当前页</div><div class="s">从右往左拖动页面</div><div class="pb" id="pb">进度 0%</div></div><div class="p next" id="p2"><div class="t">下一页</div><div class="s">松手超过阈值即完成转场</div></div></div>
+<script>
+var state={bg:"#111827",panel:"#1f2937",ink:"#f9fafb",accent:"#38bdf8",radius:18,w:300,dur:0.35,thr:0.4};
+var r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--panel',state.panel);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--radius',state.radius+'px');r.setProperty('--w',state.w+'px');r.setProperty('--dur',state.dur+'s');r.setProperty('--thr',state.thr);}
+apply();
+var sg=document.getElementById("sg"),p1=document.getElementById("p1"),p2=document.getElementById("p2"),pb=document.getElementById("pb");
+var x0=0,dr=false,prog=0;
+sg.addEventListener("pointerdown",function(e){dr=true;x0=e.clientX;sg.setPointerCapture(e.pointerId);});
+sg.addEventListener("pointermove",function(e){if(!dr)return;var dx=Math.max(0,x0-e.clientX);prog=Math.min(1,dx/sg.clientWidth);
+p1.style.transition="none";p2.style.transition="none";
+p1.style.transform="translateX("+(-prog*100)+"%)";p2.style.transform="translateX("+((1-prog)*100)+"%)";
+pb.textContent="进度 "+Math.round(prog*100)+"%";});
+function end(){if(!dr)return;dr=false;p1.style.transition="transform calc(var(--dur) * 1s) ease";p2.style.transition="transform calc(var(--dur) * 1s) ease";
+if(prog>=parseFloat(state.thr)){p1.style.transform="translateX(-100%)";p2.style.transform="translateX(0)";pb.textContent="转场完成";}
+else{p1.style.transform="translateX(0)";p2.style.transform="translateX(100%)";pb.textContent="未达阈值，已回弹";}}
+sg.addEventListener("pointerup",end);sg.addEventListener("pointercancel",end);
+setTimeout(function(){p1.style.transition="transform .6s ease";p2.style.transition="transform .6s ease";
+p1.style.transform="translateX(-45%)";p2.style.transform="translateX(55%)";pb.textContent="进度 45%（自动演示）";},500);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

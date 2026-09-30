@@ -14,6 +14,10 @@
   .hero { position: fixed; z-index: 6; background: linear-gradient(135deg, var(--c1), var(--c2)); border-radius: var(--radius); transition: all var(--dur) cubic-bezier(.4,0,.2,1); will-change: transform, width, height, top, left, border-radius; }
   .close { position: fixed; z-index: 7; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--accent); color: #fff; font-size: 18px; cursor: pointer; opacity: 0; transition: opacity var(--dur) ease; }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.close{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="grid" id="grid">

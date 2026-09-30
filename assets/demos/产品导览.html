@@ -14,7 +14,11 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .step{font-size:11px;color:#888}
 .nx{background:var(--hl,#2f6bff);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
 .fin{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.nx{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="hd">示例应用</div>
 <div class="app" id="app">
   <div class="feat" data-i="0">数据看板</div>

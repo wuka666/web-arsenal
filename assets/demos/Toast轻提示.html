@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toast 轻提示</title>
+<style>
+:root{--bg:#1c1c1e;--fg:#ffffff;--radius:22px;--gap:34px;--fs:14px;--dur:2;--maxW:280px;--pos:0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#e9e9ee;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:300px;height:540px;background:#fff;border-radius:30px;box-shadow:0 14px 44px rgba(0,0,0,.16);overflow:hidden}
+.bar{height:64px;background:#f7f7f9;border-bottom:1px solid #ececf0}
+.rows{padding:16px}
+.row{height:12px;border-radius:6px;background:#efeff3;margin-bottom:14px}
+.row.w70{width:70%}.row.w90{width:90%}.row.w50{width:50%}
+.card{height:96px;border-radius:14px;background:#f2f2f6;margin-top:6px}
+.toast{position:absolute;left:50%;max-width:var(--maxW);padding:10px 16px;background:var(--bg);color:var(--fg);font-size:var(--fs);line-height:1.45;text-align:center;border-radius:var(--radius);opacity:0;transform:translate(-50%,14px) scale(.94);transition:opacity .28s ease,transform .34s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.toast.bottom{bottom:var(--gap)}
+.toast.top{top:var(--gap)}
+.toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="bar"></div>
+  <div class="rows">
+    <div class="row w70"></div>
+    <div class="row w90"></div>
+    <div class="row w50"></div>
+    <div class="card"></div>
+  </div>
+  <div class="toast bottom" id="toast">已保存到相册</div>
+</div>
+<script>
+var state={bg:"#1c1c1e",fg:"#ffffff",radius:22,gap:34,fs:14,dur:2,maxW:280,pos:0};
+var UNIT={radius:"px",gap:"px",fs:"px",maxW:"px"};
+var r=document.documentElement.style;
+function apply(){
+  for(var k in state){r.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  var t=document.getElementById("toast");
+  /* 位置只有上/下两态，用阈值切换，避免为二值再开一个字段 */
+  var top=state.pos>=0.5;
+  t.classList.toggle("top",top);
+  t.classList.toggle("bottom",!top);
+}
+var msgs=["已保存到相册","上传成功 · 2 张照片","网络似乎不太稳","已复制到剪贴板","删除成功"];
+var idx=0,timer=null;
+function show(){
+  var t=document.getElementById("toast");
+  t.textContent=msgs[idx%msgs.length];idx++;
+  t.classList.add("show");
+  if(timer)clearTimeout(timer);
+  timer=setTimeout(function(){t.classList.remove("show");},state.dur*1000);
+}
+apply();
+setTimeout(show,120);
+setInterval(show,2400);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

@@ -10,7 +10,11 @@ body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#fff;min-heig
 .go{background:var(--pc,#2f6bff);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer}
 .pulse{animation:p .4s ease}
 @keyframes p{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
-</style></head><body>
+</style><style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+.go{min-width:44px;min-height:44px}
+</style>
+</head><body>
 <div class="top">总未读：<span id="total">0</span></div>
 <div class="grp" id="g0"><div class="ghead"><span>评论</span><span class="gc" id="c0">0</span></div><div id="l0"></div></div>
 <div class="grp" id="g1"><div class="ghead"><span>私信</span><span class="gc" id="c1">0</span></div><div id="l1"></div></div>

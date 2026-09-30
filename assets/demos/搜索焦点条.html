@@ -76,5 +76,12 @@ body{
     <div class="row"><span class="sq"></span><span class="ln w1"></span><span class="ln w2"></span></div>
   </div>
 </div>
+<script>
+const state={bg:"#F5F3EF",ink:"#1E1B18",accent:"#A8452B",line:"#DDD7CE",radius:6,barH:64,gap:16};
+const r=document.documentElement.style;
+function apply(){r.setProperty('--bg',state.bg);r.setProperty('--ink',state.ink);r.setProperty('--accent',state.accent);r.setProperty('--line',state.line);r.setProperty('--radius',state.radius+'px');r.setProperty('--barH',state.barH+'px');r.setProperty('--gap',state.gap+'px');}
+apply();
+addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key in state){state[d.key]=d.value;apply();}});
+</script>
 </body>
 </html>

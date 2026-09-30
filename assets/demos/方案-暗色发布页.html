@@ -80,6 +80,12 @@
   .notice a { color: #ffffff90; pointer-events: auto; }
   #modeText { color: #ffffff80; }
 </style>
+<style>
+/* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
+button{min-width:44px;min-height:44px}
+.tuner-toggle{min-width:44px;min-height:44px}
+.btn{min-width:44px;min-height:44px}
+</style>
 </head>
 <body>
 <div class="stage"><canvas id="starCanvas"></canvas></div>
