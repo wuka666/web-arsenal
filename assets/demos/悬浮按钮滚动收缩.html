@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>悬浮按钮滚动收缩</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+  }
+  .scroller{
+    position:absolute;inset:0;overflow-y:auto;padding:0 0 140px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .scroller h2{padding:28px var(--pad) 0;font-size:15px;font-weight:500}
+  .scroller .tip{padding:8px var(--pad) 0;color:var(--muted);font-size:12px;line-height:1.7}
+  .card{
+    margin:14px var(--pad) 0;height:var(--cardH);border-radius:var(--radius);background:var(--card);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;
+  }
+  .fab{
+    position:absolute;right:var(--gapEdge);bottom:var(--gapEdge);z-index:6;
+    height:var(--fabH);width:var(--fabW);
+    border:none;border-radius:calc(var(--fabH) / 2);background:var(--accent);color:var(--onAccent);
+    display:flex;align-items:center;gap:0;overflow:hidden;cursor:pointer;
+    padding:0 var(--fabPad);
+    transition:width var(--dur) var(--ease),border-radius var(--dur) var(--ease);
+  }
+  /* 收拢态：只剩一个圆形图标；展开态：横向伸出显示文字 */
+  .fab.shrink{width:var(--fabH);padding:0}
+  .fab .ico{flex:none;width:var(--fabH);height:var(--fabH);display:grid;place-items:center;font-size:18px}
+  .fab .lb{font-size:13px;font-weight:500;white-space:nowrap;opacity:0;transition:opacity var(--dur) var(--ease)}
+  .fab:not(.shrink) .lb{opacity:1}
+  .dir{
+    position:absolute;left:var(--gapEdge);bottom:var(--gapEdge);z-index:6;
+    font-size:11px;color:var(--muted);background:var(--card);border-radius:8px;padding:5px 9px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="scroller" id="scroller">
+    <h2>悬浮按钮滚动收缩</h2>
+    <p class="tip">向下滚动时按钮收回成圆形纯图标（让路给内容），向上滚动时伸出文字标签（提示可点）。在下方区域滚动即可看到。</p>
+  </div>
+  <button class="fab" id="fab"><span class="ico">＋</span><span class="lb">新建订单</span></button>
+  <span class="dir" id="dir">向下 ↓</span>
+</div>
+<script>
+var state={
+  page:"#f2f2f5",ink:"#1c1c1e",muted:"#6b7280",card:"#ffffff",
+  accent:"#2f6bff",onAccent:"#ffffff",
+  radius:14,cardH:120,pad:16,gapEdge:18,fabH:56,fabW:160,fabPad:18,dur:.32,thresh:6
+};
+var UNIT={radius:"px",cardH:"px",pad:"px",gapEdge:"px",fabH:"px",fabW:"px",fabPad:"px",dur:"s",thresh:"px"};
+var root=document.documentElement;
+var EASE="cubic-bezier(.22,.61,.36,1)";
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ease",EASE);
+}
+var scroller=document.getElementById("scroller"),fab=document.getElementById("fab"),dir=document.getElementById("dir");
+for(var i=0;i<9;i++){
+  var c=document.createElement("div");
+  c.className="card";c.textContent="内容块 "+(i+1);
+  scroller.appendChild(c);
+}
+var last=0;
+/* 阈值存在的理由：手指滚动会有 1–3px 的抖动，不设阈值按钮会在两种状态间来回抽搐 */
+scroller.addEventListener("scroll",function(){
+  var y=scroller.scrollTop,d=y-last;
+  if(Math.abs(d)<state.thresh)return;
+  last=y;
+  var down=d>0;
+  fab.classList.toggle("shrink",down);
+  dir.textContent=down?"向下 ↓":"向上 ↑";
+},{passive:true});
+fab.addEventListener("click",function(){fab.classList.remove("shrink");});
+apply();
+setTimeout(function(){fab.classList.add("shrink");},1200);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

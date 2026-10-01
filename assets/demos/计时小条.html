@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>计时小条</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+  }
+  /* 演示舞台只做留白，主角是底部那条 */
+  .stage{padding:28px var(--pad)}
+  .stage h2{font-size:15px;font-weight:500;letter-spacing:-.01em}
+  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}
+  .trigger{
+    margin-top:18px;min-height:44px;padding:0 18px;border:none;border-radius:var(--radius);
+    background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;
+  }
+  .snack{
+    position:absolute;left:var(--gapEdge);right:var(--gapEdge);bottom:var(--gapEdge);
+    z-index:6;background:var(--bg);border-radius:var(--radius);overflow:hidden;
+    /* 收起时高度只到主行；展开时撑到卡片高度，两种身份共用一块容器 */
+    height:var(--h);
+    transform:translateY(var(--rise));opacity:0;
+    transition:height var(--trans) var(--ease),transform var(--trans) var(--ease),opacity var(--trans) var(--ease);
+  }
+  .snack.show{transform:translateY(0);opacity:1}
+  .snack.open{height:var(--cardH)}
+  .row{
+    height:var(--h);display:flex;align-items:center;gap:var(--gap);
+    padding:0 var(--pad);position:relative;z-index:2;
+  }
+  .row .ico{
+    flex:none;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:11px;display:grid;place-items:center;
+  }
+  .row .txt{flex:1;min-width:0;color:var(--fg);font-size:var(--fs);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .sec{flex:none;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .row .act{
+    flex:none;min-height:44px;padding:0 10px;border:none;background:transparent;
+    color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;
+  }
+  .card{
+    padding:0 var(--pad) calc(var(--pad) - 2px);color:var(--fg);
+    opacity:0;transform:translateY(-6px);
+    transition:opacity var(--trans) var(--ease),transform var(--trans) var(--ease);
+  }
+  .snack.open .card{opacity:1;transform:translateY(0)}
+  .card p{font-size:11px;line-height:1.6;color:var(--muted)}
+  .card .bts{display:flex;gap:8px;margin-top:10px}
+  .card .bts button{
+    flex:1;min-height:44px;border:none;border-radius:calc(var(--radius) - 4px);
+    font-size:12px;font-weight:500;cursor:pointer;
+  }
+  .card .b1{background:var(--accent);color:#fff}
+  .card .b2{background:var(--ghost);color:var(--fg)}
+  /* 剩余时间：横向铺满再退回去，比数字更能让人「看见」还剩多久 */
+  .fill{
+    position:absolute;left:0;bottom:0;height:var(--barH);width:100%;
+    background:var(--accent);transform-origin:left;transform:scaleX(var(--left));
+    transition:transform linear;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <h2>会话已归档</h2>
+    <p>底部小条会自己走完倒计时再收；点一下展开操作卡片，鼠标移开或走完计时自动收回。</p>
+    <button class="trigger" id="trigger">再演示一次</button>
+  </div>
+  <div class="snack" id="snack">
+    <div class="row">
+      <span class="ico">✓</span>
+      <span class="txt">已归档「草稿 · 0927」</span>
+      <span class="sec" id="sec">6s</span>
+      <button class="act" id="act">撤销</button>
+    </div>
+    <div class="card">
+      <p>7 天内可在「回收站」找回，超时自动清理。</p>
+      <div class="bts"><button class="b1">恢复</button><button class="b2">查看回收站</button></div>
+    </div>
+    <i class="fill" id="fill"></i>
+  </div>
+</div>
+<script>
+var state={
+  page:"#f2f2f5",ink:"#1c1c1e",muted:"#6b7280",bg:"#1c1c22",fg:"#ffffff",
+  ghost:"rgba(255,255,255,.12)",accent:"#ff9f0a",
+  radius:14,h:52,pad:16,fs:13,gap:10,barH:3,dur:6,cardH:132,rise:28,gapEdge:16,trans:.34
+};
+var UNIT={radius:"px",h:"px",pad:"px",fs:"px",gap:"px",barH:"px",dur:"s",cardH:"px",rise:"px",gapEdge:"px",trans:"s"};
+var root=document.documentElement;
+var EASE="cubic-bezier(.22,.61,.36,1)";
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ease",EASE);
+  root.style.setProperty("--left",left);
+}
+var left=1;                       // 剩余比例 1→0
+var snack=document.getElementById("snack"),fill=document.getElementById("fill"),sec=document.getElementById("sec");
+var opened=false,timer=0,raf=0,t0=null;
+
+/* 倒计时用 rAF 逐帧推进：setInterval 会与 CSS 过渡不同步，进度条与秒数会打架 */
+function tick(t){
+  if(!t0)t0=t;
+  var p=Math.min(1,(t-t0)/(state.dur*1000));
+  left=1-p;
+  root.style.setProperty("--left",left);
+  sec.textContent=Math.ceil(state.dur*(1-p))+"s";
+  if(p<1){raf=requestAnimationFrame(tick);}else{close();}
+}
+function open(){
+  cancelAnimationFrame(raf);clearTimeout(timer);
+  t0=null;left=1;
+  root.style.setProperty("--left",1);
+  snack.classList.add("show");
+  fill.style.transition="none";
+  raf=requestAnimationFrame(tick);
+}
+function close(){
+  cancelAnimationFrame(raf);
+  snack.classList.remove("open","show");opened=false;left=1;
+  root.style.setProperty("--left",1);
+}
+function toggleOpen(){
+  opened=!opened;
+  snack.classList.toggle("open",opened);
+  /* 打开卡片时暂停计时：正在读操作说明却被收走，是这个组件最招人烦的失败模式 */
+  if(opened){cancelAnimationFrame(raf);}else{t0=null;raf=requestAnimationFrame(tick);}
+}
+document.getElementById("act").addEventListener("click",function(e){e.stopPropagation();close();});
+snack.addEventListener("click",function(){if(!opened)toggleOpen();});
+document.getElementById("trigger").addEventListener("click",open);
+apply();
+open();
+setInterval(open,9000);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

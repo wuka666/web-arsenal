@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底部导航展开</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+  }
+  .stage{padding:28px var(--pad)}
+  .stage h2{font-size:15px;font-weight:500}
+  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}
+  .nav{
+    position:absolute;left:var(--gapEdge);right:var(--gapEdge);bottom:var(--gapEdge);
+    height:var(--barH);display:flex;align-items:center;gap:var(--gap);
+    padding:0 var(--pad);background:var(--bar);border-radius:var(--radius);
+  }
+  .nav .pill{
+    position:absolute;top:var(--inset);bottom:var(--inset);left:0;
+    background:var(--accent);border-radius:calc(var(--radius) - 4px);
+    width:var(--pillW);transform:translateX(var(--pillX));
+    transition:width var(--dur) var(--ease),transform var(--dur) var(--ease);
+  }
+  .nav button{
+    position:relative;z-index:2;height:var(--barH);border:none;background:transparent;
+    display:flex;align-items:center;gap:0;cursor:pointer;
+    min-height:44px;padding:0 var(--hit);
+    /* 选中项横向撑开露出文字，其余项收回到只剩图标——宽度变化本身就是状态说明 */
+    width:var(--icoW);
+    transition:width var(--dur) var(--ease);
+  }
+  .nav button.on{width:var(--openW)}
+  .nav button .ico{
+    flex:none;width:var(--icoW);height:var(--barH);display:grid;place-items:center;
+    color:var(--dim);font-size:15px;transition:color var(--dur) var(--ease);
+  }
+  .nav button.on .ico{color:var(--onAccent)}
+  .nav button .lb{
+    font-size:12px;font-weight:500;color:var(--onAccent);white-space:nowrap;
+    opacity:0;transition:opacity var(--dur) var(--ease);
+  }
+  .nav button.on .lb{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <h2>底部导航展开</h2>
+    <p>选中项横向撑开露出文字标签，背景块滑到选中位置，其余项收回成纯图标。点一下切换。</p>
+  </div>
+  <div class="nav" id="nav">
+    <i class="pill" id="pill"></i>
+  </div>
+</div>
+<script>
+var state={
+  page:"#f2f2f5",ink:"#1c1c1e",dim:"#9a9ca6",bar:"#ffffff",
+  accent:"#1c1c22",onAccent:"#ffffff",
+  radius:22,barH:56,pad:10,gap:6,gapEdge:16,icoW:44,hit:6,openW:104,dur:.34,inset:6
+};
+var UNIT={radius:"px",barH:"px",pad:"px",gap:"px",gapEdge:"px",icoW:"px",hit:"px",openW:"px",dur:"s",inset:"px"};
+var root=document.documentElement;
+var EASE="cubic-bezier(.22,.61,.36,1)";
+var cur=0;
+var ITEMS=[["◧","首页"],["◍","发现"],["◈","订单"],["◉","我的"]];
+var nav=document.getElementById("nav"),pill=document.getElementById("pill");
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ease",EASE);
+  place();
+}
+/* pill 的位置与宽度都得实测 DOM 算：选中项宽度是变的，写死偏移量会在切项时错位 */
+function place(){
+  var btns=nav.querySelectorAll("button");
+  if(!btns.length)return;
+  var b=btns[cur];
+  root.style.setProperty("--pillX",(b.offsetLeft)+"px");
+  root.style.setProperty("--pillW",b.offsetWidth+"px");
+}
+ITEMS.forEach(function(it,n){
+  var b=document.createElement("button");
+  b.innerHTML='<span class="ico">'+it[0]+'</span><span class="lb">'+it[1]+'</span>';
+  b.addEventListener("click",function(){
+    cur=n;
+    [].forEach.call(nav.querySelectorAll("button"),function(e,j){e.className=j===cur?"on":"";});
+    place();
+  });
+  nav.appendChild(b);
+});
+function pick(n){
+  cur=n%ITEMS.length;
+  [].forEach.call(nav.querySelectorAll("button"),function(e,j){e.className=j===cur?"on":"";});
+  place();
+}
+apply();
+pick(0);
+setInterval(function(){pick(cur+1);},2400);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

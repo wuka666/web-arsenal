@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>输入错误提示</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+  }
+  .stage{padding:28px var(--pad)}
+  .stage h2{font-size:15px;font-weight:500}
+  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}
+  .field{margin:16px var(--pad) 0}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .box{
+    position:relative;display:flex;align-items:center;min-height:48px;
+    border:1px solid var(--edge);border-radius:var(--radius);background:var(--card);
+    padding:0 12px;overflow:hidden;
+    transition:border-color var(--dur) var(--ease);
+  }
+  .box input{
+    flex:1;min-width:0;border:none;outline:none;background:transparent;
+    font:inherit;font-size:14px;color:var(--ink);height:46px;
+  }
+  /* 三件事一起发生：横向轻晃 + 边框转红 + 提示文字滑入。只做其中一个，反馈强度不够 */
+  .box.bad{border-color:var(--danger);animation:shake var(--shake) var(--ease)}
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(calc(var(--amp) * -1))}
+    45%{transform:translateX(var(--amp))}
+    70%{transform:translateX(calc(var(--amp) * -0.5))}
+  }
+  .msg{
+    overflow:hidden;height:0;color:var(--danger);font-size:11px;
+    transition:height var(--dur) var(--ease),opacity var(--dur) var(--ease);
+    opacity:0;
+  }
+  .msg.show{height:var(--msgH);opacity:1;padding-top:6px}
+  .go{
+    margin:18px var(--pad) 0;min-height:44px;padding:0 18px;border:none;
+    border-radius:var(--radius);background:var(--accent);color:#fff;
+    font-size:13px;font-weight:500;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <h2>输入错误提示</h2>
+    <p>提交不合规内容时：输入框横向轻晃、边框转红、错误说明从下方滑入；改对了提示自动收起，不用等人来关。</p>
+  </div>
+  <div class="field">
+    <label>手机号</label>
+    <div class="box" id="box"><input id="inp" value="138" placeholder="请输入 11 位手机号" inputmode="numeric"></div>
+    <div class="msg" id="msg">手机号应为 11 位数字</div>
+  </div>
+  <button class="go" id="go">提交</button>
+</div>
+<script>
+var state={
+  page:"#f2f2f5",ink:"#1c1c1e",muted:"#6b7280",card:"#ffffff",edge:"#e4e4ea",
+  danger:"#e5484d",accent:"#2f6bff",
+  radius:12,pad:16,dur:.26,shake:.42,amp:7,msgH:22
+};
+var UNIT={radius:"px",pad:"px",dur:"s",shake:"s",amp:"px",msgH:"px"};
+var root=document.documentElement;
+var EASE="cubic-bezier(.22,.61,.36,1)";
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ease",EASE);
+}
+var box=document.getElementById("box"),inp=document.getElementById("inp");
+var msg=document.getElementById("msg"),go=document.getElementById("go");
+var ok=function(v){return /^\d{11}$/.test(v);};
+function judge(){
+  var good=ok(inp.value.trim());
+  /* 改对了就自动收：错误提示赖着不走，会把一次性的提醒变成常驻的噪音 */
+  msg.classList.toggle("show",!good);
+  if(!good){
+    box.classList.remove("bad");
+    void box.offsetWidth;        // 强制重排，让同一元素能连续触发第二次 shake
+    box.classList.add("bad");
+  }else{
+    box.classList.remove("bad");
+  }
+}
+go.addEventListener("click",judge);
+inp.addEventListener("input",function(){if(ok(inp.value.trim())){msg.classList.remove("show");box.classList.remove("bad");}});
+apply();
+setTimeout(judge,700);
+setInterval(judge,3000);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

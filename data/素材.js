@@ -18394,5 +18394,856 @@ window.WEB_ARSENAL = [
  "用法": "DATA 数组换成真实数值（0–1 归一化）即可；条高 = bh*(0.34+v*0.66)，要支持超 1 的比例改这个式子；整卡可点重播，若要看 hover 态需给 .bars 自己加 transition。",
  "提示词": "零依赖单文件 HTML（移动端）：白色数据卡片，顶部标签 + 大数字（从 0 倒数到峰值）+ 副标题，下方 9 根离散竖条按数据起伏分布、逐条从底部生长（错峰 55ms、时长 0.62s），末根高亮为主色 #4a8cff；卡片圆角 16px、阴影极淡；点击卡片重播、每 2.8s 自动重播；可用参数：页面底 #eef0f4、卡片白、条色 #d8dce5、条区高 46px、条基准高 26px、条间距 5px。全内联无外链。",
  "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>卡片内迷你走势条</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    width:100%;height:100vh;display:flex;align-items:center;justify-content:center;\\n    background:var(--page);padding:16px;\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--fg);\\n  }\\n  .card{\\n    width:100%;max-width:340px;min-height:44px;\\n    background:var(--cardBg);border-radius:var(--radius);\\n    padding:14px 14px 12px;box-shadow:var(--shadow);cursor:pointer;\\n  }\\n  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}\\n  .top .lab{font-size:12px;color:var(--dim)}\\n  .top .val{font-size:22px;font-weight:500;letter-spacing:-.02em}\\n  .top .val em{font-style:normal;font-size:12px;color:var(--dim);margin-left:4px}\\n  /* 离散小条：用逐条 scaleY 生长代替 SVG path 折线，尺寸小到只占卡片一行的高度 */\\n  .bars{display:flex;align-items:flex-end;gap:var(--gap);height:var(--h)}\\n  .bars i{\\n    flex:1;border-radius:var(--barR);\\n    background:var(--bar);\\n    height:var(--bh);\\n    transform-origin:bottom;\\n    transform:scaleY(var(--grow));\\n    transition:transform var(--dur) var(--ease);\\n    transition-delay:calc(var(--i) * var(--stagger) / 1000);\\n  }\\n  .bars i.hi{background:var(--barHi)}\\n  .sub{display:flex;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--dim)}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"card\\\" id=\\\"card\\\">\\n    <div class=\\\"top\\\"><span class=\\\"lab\\\">近 9 周活跃</span><span class=\\\"val\\\" id=\\\"val\\\">0<em>次</em></span></div>\\n    <div class=\\\"bars\\\" id=\\\"bars\\\"></div>\\n    <div class=\\\"sub\\\"><span>03/09</span><span id=\\\"peak\\\">峰值 —</span></div>\\n  </div>\\n</div>\\n<script>\\nvar state={page:\\\"#eef0f4\\\",cardBg:\\\"#ffffff\\\",fg:\\\"#1c1c1e\\\",dim:\\\"#9b9ba4\\\",bar:\\\"#d8dce5\\\",barHi:\\\"#4a8cff\\\",radius:16,gap:5,h:46,bh:26,barR:3,dur:0.62,stagger:55,shadow:\\\"0 2px 8px rgba(20,24,40,.06)\\\"};\\nvar UNIT={radius:\\\"px\\\",gap:\\\"px\\\",h:\\\"px\\\",bh:\\\"px\\\",barR:\\\"px\\\",dur:\\\"s\\\",stagger:\\\"ms\\\"};\\nvar root=document.documentElement;\\nvar DATA=[.42,.58,.36,.72,.5,.88,.66,.94,.61];\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--grow\\\",grown?1:0);\\n}\\nvar grown=false,card=document.getElementById(\\\"card\\\");\\nvar bars=document.getElementById(\\\"bars\\\");\\nDATA.forEach(function(v,i){\\n  var b=document.createElement(\\\"i\\\");\\n  b.style.height=(state.bh*(0.34+v*0.66)).toFixed(1)+\\\"px\\\";\\n  b.style.setProperty(\\\"--i\\\",i);\\n  if(i===DATA.length-1)b.className=\\\"hi\\\";\\n  bars.appendChild(b);\\n});\\nvar val=document.getElementById(\\\"val\\\"),peak=document.getElementById(\\\"peak\\\");\\nvar mx=Math.round(Math.max.apply(null,DATA)*1380);\\nvar raf=0;\\nfunction toggle(){\\n  growNow();\\n  grown=!grown;apply();\\n  var t0=null;\\n  var step=function(t){\\n    if(!t0)t0=t;\\n    var p=Math.min(1,(t-t0)/700);\\n    val.innerHTML=Math.round(mx*p)+\\\"<em>次</em>\\\";\\n    if(p<1)raf=requestAnimationFrame(step);\\n  };\\n  cancelAnimationFrame(raf);\\n  raf=requestAnimationFrame(step);\\n}\\nfunction growNow(){val.innerHTML=\\\"0<em>次</em>\\\";}\\ncard.addEventListener(\\\"click\\\",toggle);\\npeak.textContent=\\\"峰值 \\\"+mx;\\n/* 初始即展开态：缩略图与 headless 截图直接看到长完的样子，不必等点击 */\\ntoggle();\\nsetInterval(toggle,2800);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
+},
+{
+ "id": "M338",
+ "标题": "计时小条",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "工具·SaaS",
+ "元素": "反馈",
+ "搭配": [],
+ "标签": [
+  "计时条",
+  "撤销条",
+  "Toast",
+  "倒计时",
+  "自动收回",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/计时小条.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>计时小条</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  /* 演示舞台只做留白，主角是底部那条 */\\n  .stage{padding:28px var(--pad)}\\n  .stage h2{font-size:15px;font-weight:500;letter-spacing:-.01em}\\n  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}\\n  .trigger{\\n    margin-top:18px;min-height:44px;padding:0 18px;border:none;border-radius:var(--radius);\\n    background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n  .snack{\\n    position:absolute;left:var(--gapEdge);right:var(--gapEdge);bottom:var(--gapEdge);\\n    z-index:6;background:var(--bg);border-radius:var(--radius);overflow:hidden;\\n    /* 收起时高度只到主行；展开时撑到卡片高度，两种身份共用一块容器 */\\n    height:var(--h);\\n    transform:translateY(var(--rise));opacity:0;\\n    transition:height var(--trans) var(--ease),transform var(--trans) var(--ease),opacity var(--trans) var(--ease);\\n  }\\n  .snack.show{transform:translateY(0);opacity:1}\\n  .snack.open{height:var(--cardH)}\\n  .row{\\n    height:var(--h);display:flex;align-items:center;gap:var(--gap);\\n    padding:0 var(--pad);position:relative;z-index:2;\\n  }\\n  .row .ico{\\n    flex:none;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;\\n    font-size:11px;display:grid;place-items:center;\\n  }\\n  .row .txt{flex:1;min-width:0;color:var(--fg);font-size:var(--fs);\\n    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\\n  .row .sec{flex:none;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}\\n  .row .act{\\n    flex:none;min-height:44px;padding:0 10px;border:none;background:transparent;\\n    color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n  .card{\\n    padding:0 var(--pad) calc(var(--pad) - 2px);color:var(--fg);\\n    opacity:0;transform:translateY(-6px);\\n    transition:opacity var(--trans) var(--ease),transform var(--trans) var(--ease);\\n  }\\n  .snack.open .card{opacity:1;transform:translateY(0)}\\n  .card p{font-size:11px;line-height:1.6;color:var(--muted)}\\n  .card .bts{display:flex;gap:8px;margin-top:10px}\\n  .card .bts button{\\n    flex:1;min-height:44px;border:none;border-radius:calc(var(--radius) - 4px);\\n    font-size:12px;font-weight:500;cursor:pointer;\\n  }\\n  .card .b1{background:var(--accent);color:#fff}\\n  .card .b2{background:var(--ghost);color:var(--fg)}\\n  /* 剩余时间：横向铺满再退回去，比数字更能让人「看见」还剩多久 */\\n  .fill{\\n    position:absolute;left:0;bottom:0;height:var(--barH);width:100%;\\n    background:var(--accent);transform-origin:left;transform:scaleX(var(--left));\\n    transition:transform linear;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"stage\\\">\\n    <h2>会话已归档</h2>\\n    <p>底部小条会自己走完倒计时再收；点一下展开操作卡片，鼠标移开或走完计时自动收回。</p>\\n    <button class=\\\"trigger\\\" id=\\\"trigger\\\">再演示一次</button>\\n  </div>\\n  <div class=\\\"snack\\\" id=\\\"snack\\\">\\n    <div class=\\\"row\\\">\\n      <span class=\\\"ico\\\">✓</span>\\n      <span class=\\\"txt\\\">已归档「草稿 · 0927」</span>\\n      <span class=\\\"sec\\\" id=\\\"sec\\\">6s</span>\\n      <button class=\\\"act\\\" id=\\\"act\\\">撤销</button>\\n    </div>\\n    <div class=\\\"card\\\">\\n      <p>7 天内可在「回收站」找回，超时自动清理。</p>\\n      <div class=\\\"bts\\\"><button class=\\\"b1\\\">恢复</button><button class=\\\"b2\\\">查看回收站</button></div>\\n    </div>\\n    <i class=\\\"fill\\\" id=\\\"fill\\\"></i>\\n  </div>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",muted:\\\"#6b7280\\\",bg:\\\"#1c1c22\\\",fg:\\\"#ffffff\\\",\\n  ghost:\\\"rgba(255,255,255,.12)\\\",accent:\\\"#ff9f0a\\\",\\n  radius:14,h:52,pad:16,fs:13,gap:10,barH:3,dur:6,cardH:132,rise:28,gapEdge:16,trans:.34\\n};\\nvar UNIT={radius:\\\"px\\\",h:\\\"px\\\",pad:\\\"px\\\",fs:\\\"px\\\",gap:\\\"px\\\",barH:\\\"px\\\",dur:\\\"s\\\",cardH:\\\"px\\\",rise:\\\"px\\\",gapEdge:\\\"px\\\",trans:\\\"s\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n  root.style.setProperty(\\\"--left\\\",left);\\n}\\nvar left=1;                       // 剩余比例 1→0\\nvar snack=document.getElementById(\\\"snack\\\"),fill=document.getElementById(\\\"fill\\\"),sec=document.getElementById(\\\"sec\\\");\\nvar opened=false,timer=0,raf=0,t0=null;\\n\\n/* 倒计时用 rAF 逐帧推进：setInterval 会与 CSS 过渡不同步，进度条与秒数会打架 */\\nfunction tick(t){\\n  if(!t0)t0=t;\\n  var p=Math.min(1,(t-t0)/(state.dur*1000));\\n  left=1-p;\\n  root.style.setProperty(\\\"--left\\\",left);\\n  sec.textContent=Math.ceil(state.dur*(1-p))+\\\"s\\\";\\n  if(p<1){raf=requestAnimationFrame(tick);}else{close();}\\n}\\nfunction open(){\\n  cancelAnimationFrame(raf);clearTimeout(timer);\\n  t0=null;left=1;\\n  root.style.setProperty(\\\"--left\\\",1);\\n  snack.classList.add(\\\"show\\\");\\n  fill.style.transition=\\\"none\\\";\\n  raf=requestAnimationFrame(tick);\\n}\\nfunction close(){\\n  cancelAnimationFrame(raf);\\n  snack.classList.remove(\\\"open\\\",\\\"show\\\");opened=false;left=1;\\n  root.style.setProperty(\\\"--left\\\",1);\\n}\\nfunction toggleOpen(){\\n  opened=!opened;\\n  snack.classList.toggle(\\\"open\\\",opened);\\n  /* 打开卡片时暂停计时：正在读操作说明却被收走，是这个组件最招人烦的失败模式 */\\n  if(opened){cancelAnimationFrame(raf);}else{t0=null;raf=requestAnimationFrame(tick);}\\n}\\ndocument.getElementById(\\\"act\\\").addEventListener(\\\"click\\\",function(e){e.stopPropagation();close();});\\nsnack.addEventListener(\\\"click\\\",function(){if(!opened)toggleOpen();});\\ndocument.getElementById(\\\"trigger\\\").addEventListener(\\\"click\\\",open);\\napply();\\nopen();\\nsetInterval(open,9000);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "底部浮出一条深色小条，底边有一条横向铺满再退回的进度线，把「还剩多久」直接画出来；点一下小条，它就地撑高成操作卡片（恢复 / 查看回收站），读的时候计时暂停，不会被硬收走。\n好在一次反馈同时给了三个信息：发生了什么、还剩多久能反悔、反悔的入口在哪。比纯文字 Toast 能操作，比常驻提示条不占地方；dur 调短适合「已复制」这类轻反馈，调长适合可逆的删除归档。",
+ "用法": "dur 是倒计时秒数（3–15s），可逆操作给 6–10s、纯告知给 2–3s；cardH 必须 ≥ 主行高 h + 卡片内容高度，否则展开会被裁。\n计时用 rAF 推进而不是 setInterval：后者与 CSS 过渡不同步，进度线和秒数会打架。",
+ "提示词": "零依赖单文件 HTML（移动端）：底部浮出一条深色胶囊小条，左侧 20px 圆形对勾图标，中间是「已归档「草稿 · 0927」」单行省略文本，右侧橙色「撤销」文字按钮；小条底边有一条 3px 的橙色进度线，宽度从 100% 线性缩到 0 表示剩余时间，右侧同步显示剩余秒数；点击小条，它就地撑高到 132px 展开操作卡片（一行灰色说明 + 「恢复」「查看回收站」两个等宽按钮），展开时暂停计时；计时走完或未交互则整条下滑淡出。参数：底色 #1c1c22、文字 #ffffff、强调 #ff9f0a、圆角 14px、主行高 52px、左右内边距 16px、字号 13px、进度线高 3px、倒计时 6s、展开高度 132px、浮出位移 28px、距边 16px、过渡 0.34s。缓动用 cubic-bezier(.22,.61,.36,1)，所有资源内联，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "页面文字色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "muted",
+   "名": "说明文字色",
+   "类型": "color",
+   "默认": "#6b7280"
+  },
+  {
+   "键": "bg",
+   "名": "小条底色",
+   "类型": "color",
+   "默认": "#1c1c22"
+  },
+  {
+   "键": "fg",
+   "名": "小条文字色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "ghost",
+   "名": "次按钮底色",
+   "类型": "color",
+   "默认": "rgba(255,255,255,.12)"
+  },
+  {
+   "键": "accent",
+   "名": "强调色",
+   "类型": "color",
+   "默认": "#ff9f0a"
+  },
+  {
+   "键": "radius",
+   "名": "圆角(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 6,
+   "最大": 26,
+   "步长": 1
+  },
+  {
+   "键": "h",
+   "名": "主行高(px)",
+   "类型": "slider",
+   "默认": 52,
+   "最小": 44,
+   "最大": 72,
+   "步长": 2
+  },
+  {
+   "键": "pad",
+   "名": "左右内边距(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 28,
+   "步长": 1
+  },
+  {
+   "键": "fs",
+   "名": "字号(px)",
+   "类型": "slider",
+   "默认": 13,
+   "最小": 11,
+   "最大": 17,
+   "步长": 1
+  },
+  {
+   "键": "gap",
+   "名": "元素间距(px)",
+   "类型": "slider",
+   "默认": 10,
+   "最小": 4,
+   "最大": 20,
+   "步长": 1
+  },
+  {
+   "键": "barH",
+   "名": "进度线高(px)",
+   "类型": "slider",
+   "默认": 3,
+   "最小": 1,
+   "最大": 8,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "倒计时(s)",
+   "类型": "slider",
+   "默认": 6,
+   "最小": 2,
+   "最大": 15,
+   "步长": 1
+  },
+  {
+   "键": "cardH",
+   "名": "展开高度(px)",
+   "类型": "slider",
+   "默认": 132,
+   "最小": 96,
+   "最大": 200,
+   "步长": 4
+  },
+  {
+   "键": "rise",
+   "名": "浮出位移(px)",
+   "类型": "slider",
+   "默认": 28,
+   "最小": 8,
+   "最大": 60,
+   "步长": 2
+  },
+  {
+   "键": "gapEdge",
+   "名": "距边(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 32,
+   "步长": 2
+  },
+  {
+   "键": "trans",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.34,
+   "最小": 0.15,
+   "最大": 0.7,
+   "步长": 0.02
+  }
+ ]
+},
+{
+ "id": "M339",
+ "标题": "分步弹窗",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "工具·SaaS",
+ "元素": "容器布局",
+ "搭配": [],
+ "标签": [
+  "分步",
+  "弹窗",
+  "底部弹层",
+  "横向滑动",
+  "高度过渡",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/分步弹窗.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>分步弹窗</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  .hint{padding:28px var(--pad)}\\n  .hint h2{font-size:15px;font-weight:500}\\n  .hint p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}\\n  .scrim{\\n    position:absolute;inset:0;background:var(--scrim);z-index:4;\\n    opacity:0;transition:opacity var(--dur) var(--ease);pointer-events:none;\\n  }\\n  .wrap.on .scrim{opacity:1;pointer-events:auto}\\n  .sheet{\\n    position:absolute;left:var(--gapEdge);right:var(--gapEdge);bottom:var(--gapEdge);\\n    z-index:5;background:var(--card);border-radius:var(--radius);overflow:hidden;\\n    height:0;opacity:0;transform:translateY(var(--rise));\\n    transition:height var(--dur) var(--ease),opacity var(--dur) var(--ease),transform var(--dur) var(--ease);\\n  }\\n  .wrap.on .sheet{opacity:1;transform:translateY(0)}\\n  .sheet .head{\\n    display:flex;align-items:center;gap:10px;padding:0 var(--pad);height:var(--headH);\\n    border-bottom:1px solid var(--edge);\\n  }\\n  .sheet .head b{flex:1;font-size:14px;font-weight:500}\\n  .sheet .head .x{\\n    width:44px;height:44px;border:none;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;\\n  }\\n  .steps{display:flex;gap:5px;padding:0 var(--pad)}\\n  .steps i{flex:1;height:3px;border-radius:2px;background:var(--edge)}\\n  .steps i.on{background:var(--accent)}\\n  /* 轨道按 100%×步数铺开，靠 translateX 换页：内容横向滑动而不是淡入淡出 */\\n  .track{\\n    display:flex;width:calc(100% * var(--n));\\n    transform:translateX(calc(var(--i) * -100% / var(--n)));\\n    transition:transform var(--dur) var(--ease);\\n  }\\n  .page{\\n    flex:0 0 calc(100% / var(--n));padding:var(--pad);\\n  }\\n  .page h3{font-size:var(--fs);font-weight:500;letter-spacing:-.01em}\\n  .page p{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.6}\\n  .field{\\n    margin-top:12px;display:flex;align-items:center;min-height:48px;padding:0 12px;\\n    border:1px solid var(--edge);border-radius:calc(var(--radius) - 4px);background:var(--field);\\n  }\\n  .field span{font-size:13px;color:var(--ink)}\\n  .foot{\\n    display:flex;gap:10px;padding:0 var(--pad) var(--pad);\\n  }\\n  .foot button{\\n    flex:1;min-height:44px;border:none;border-radius:calc(var(--radius) - 4px);\\n    font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n  .foot .back{background:transparent;border:1px solid var(--edge);color:var(--ink);flex:0 0 var(--backW)}\\n  .foot .next{background:var(--accent);color:#fff}\\n  .open{\\n    position:absolute;left:var(--pad);top:calc(28px + 120px);\\n    min-height:44px;padding:0 18px;border:none;border-radius:var(--radius);\\n    background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\" id=\\\"wrap\\\">\\n  <div class=\\\"hint\\\">\\n    <h2>分步弹窗</h2>\\n    <p>切步骤时内容横向滑动，弹窗高度跟着当前步的内容平滑过渡——不是每步一个固定高度。</p>\\n  </div>\\n  <button class=\\\"open\\\" id=\\\"open\\\">打开弹窗</button>\\n  <div class=\\\"scrim\\\" id=\\\"scrim\\\"></div>\\n  <div class=\\\"sheet\\\" id=\\\"sheet\\\">\\n    <div class=\\\"head\\\"><b id=\\\"ttl\\\">选择套餐</b><button class=\\\"x\\\" id=\\\"x\\\" aria-label=\\\"关闭\\\">×</button></div>\\n    <div class=\\\"steps\\\" id=\\\"steps\\\"></div>\\n    <div class=\\\"track\\\" id=\\\"track\\\"></div>\\n    <div class=\\\"foot\\\"><button class=\\\"back\\\" id=\\\"back\\\">上一步</button><button class=\\\"next\\\" id=\\\"next\\\">下一步</button></div>\\n  </div>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",muted:\\\"#6b7280\\\",card:\\\"#ffffff\\\",field:\\\"#f7f7f9\\\",edge:\\\"#e4e4ea\\\",\\n  scrim:\\\"rgba(20,22,28,.38)\\\",accent:\\\"#2f6bff\\\",\\n  radius:16,pad:16,gapEdge:14,headH:54,fs:16,dur:.38,rise:24,backW:96,extra:0\\n};\\nvar UNIT={radius:\\\"px\\\",pad:\\\"px\\\",gapEdge:\\\"px\\\",headH:\\\"px\\\",fs:\\\"px\\\",dur:\\\"s\\\",rise:\\\"px\\\",backW:\\\"px\\\",extra:\\\"px\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nvar i=0;\\nvar DATA=[\\n  [\\\"选择套餐\\\",\\\"三档里挑一档，随时可升可降。\\\",\\\"月度 · ¥39\\\"],\\n  [\\\"填写信息\\\",\\\"只留必要的一栏，其余系统补齐。\\\",\\\"手机号\\\"],\\n  [\\\"确认支付\\\",\\\"确认后即时生效，发票可在订单里开。\\\",\\\"微信支付\\\"]\\n];\\nvar wrap=document.getElementById(\\\"wrap\\\"),sheet=document.getElementById(\\\"sheet\\\");\\nvar track=document.getElementById(\\\"track\\\"),steps=document.getElementById(\\\"steps\\\");\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n  root.style.setProperty(\\\"--n\\\",DATA.length);\\n  root.style.setProperty(\\\"--i\\\",i);\\n  fit();\\n}\\nDATA.forEach(function(d,n){\\n  var p=document.createElement(\\\"div\\\");\\n  p.className=\\\"page\\\";\\n  p.innerHTML='<h3>'+d[0]+'</h3><p>'+d[1]+'</p><div class=\\\"field\\\"><span>'+d[2]+'</span></div>';\\n  track.appendChild(p);\\n  var s=document.createElement(\\\"i\\\");steps.appendChild(s);\\n});\\n/* 高度跟着「当前这一页」走：先量出该页实际高度再写回 sheet，\\n   固定高度会让短步骤下面留一大块空白、长步骤被裁掉 */\\nfunction fit(){\\n  var pages=track.children;\\n  if(!pages.length)return;\\n  sheet.style.height=\\\"auto\\\";\\n  var h=pages[i].offsetHeight;\\n  sheet.style.height=(state.headH+3+8+h+44+state.pad+state.extra)+\\\"px\\\";\\n}\\nfunction go(n){\\n  i=Math.max(0,Math.min(DATA.length-1,n));\\n  apply();\\n  document.getElementById(\\\"ttl\\\").textContent=DATA[i][0];\\n  document.getElementById(\\\"next\\\").textContent=i===DATA.length-1?\\\"完成\\\":\\\"下一步\\\";\\n  [].forEach.call(steps.children,function(e,j){e.className=j<=i?\\\"on\\\":\\\"\\\";});\\n}\\nfunction show(v){wrap.classList.toggle(\\\"on\\\",v);if(v)setTimeout(fit,20);}\\ndocument.getElementById(\\\"next\\\").addEventListener(\\\"click\\\",function(){go(i===DATA.length-1?0:i+1);});\\ndocument.getElementById(\\\"back\\\").addEventListener(\\\"click\\\",function(){go(i-1);});\\ndocument.getElementById(\\\"x\\\").addEventListener(\\\"click\\\",function(){show(false);});\\ndocument.getElementById(\\\"scrim\\\").addEventListener(\\\"click\\\",function(){show(false);});\\ndocument.getElementById(\\\"open\\\").addEventListener(\\\"click\\\",function(){go(0);show(true);});\\napply();\\ngo(0);\\nshow(true);\\nsetInterval(function(){go(i>=DATA.length-1?0:i+1);},3200);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "底部弹层里放多步流程：切步骤时内容整体横向滑动过去，弹窗高度跟着「当前这一步」的实际内容平滑过渡，不是每步一个固定高度。\n好在不跳、不闪、不裁：短的那步不会留一大块空白，长的那步也不会被切掉。三步走完高度变了三次，视线却一直是连续的——横向滑动给了方向感，高度过渡给了「容器在配合我」的安心感。",
+ "用法": "高度必须实测再写回：先把 sheet 置 auto，量当前页 offsetHeight，再加头尾固定高度——写死高度必然某一步裁切。\n轨道宽度用 calc(100% * 步数)、位移用 translateX(-100%/步数 * 当前步)，改步数不用改 CSS。",
+ "提示词": "零依赖单文件 HTML（移动端）：底部弹出式分步弹窗，半透明遮罩 rgba(20,22,28,.38)；弹层白底、圆角 16px、距边 14px；顶部 54px 标题行（左侧当前步骤标题 + 右侧 44×44 关闭按钮）下接 1px 分隔线，再接 3 段步骤指示条（当前及已完成段为主题蓝）；内容区是一条 flex 轨道（宽度 = 100% × 步数），切步时整条 translateX 横向滑动，每页含一个 16px 标题、一行灰色说明、一个 48px 高的输入框；底部是「上一步」（96px 描边）与「下一步」（主题蓝填充）两个 44px 高按钮。切换时弹层高度用 JS 实测当前页内容高度后平滑过渡（0.38s），不写死。参数：页面底 #f2f2f5、卡片 #ffffff、输入框底 #f7f7f9、描边 #e4e4ea、强调 #2f6bff、圆角 16px、内边距 16px、标题 16px、过渡 0.38s、浮出位移 24px。缓动 cubic-bezier(.22,.61,.36,1)，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "正文色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "muted",
+   "名": "次要文字色",
+   "类型": "color",
+   "默认": "#6b7280"
+  },
+  {
+   "键": "card",
+   "名": "弹层底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "field",
+   "名": "输入框底色",
+   "类型": "color",
+   "默认": "#f7f7f9"
+  },
+  {
+   "键": "edge",
+   "名": "描边色",
+   "类型": "color",
+   "默认": "#e4e4ea"
+  },
+  {
+   "键": "scrim",
+   "名": "遮罩色",
+   "类型": "color",
+   "默认": "rgba(20,22,28,.38)"
+  },
+  {
+   "键": "accent",
+   "名": "强调色",
+   "类型": "color",
+   "默认": "#2f6bff"
+  },
+  {
+   "键": "radius",
+   "名": "圆角(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 28,
+   "步长": 1
+  },
+  {
+   "键": "pad",
+   "名": "内边距(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 10,
+   "最大": 26,
+   "步长": 1
+  },
+  {
+   "键": "gapEdge",
+   "名": "距边(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 6,
+   "最大": 28,
+   "步长": 2
+  },
+  {
+   "键": "headH",
+   "名": "标题行高(px)",
+   "类型": "slider",
+   "默认": 54,
+   "最小": 44,
+   "最大": 68,
+   "步长": 2
+  },
+  {
+   "键": "fs",
+   "名": "标题字号(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 13,
+   "最大": 22,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.38,
+   "最小": 0.15,
+   "最大": 0.8,
+   "步长": 0.02
+  },
+  {
+   "键": "rise",
+   "名": "浮出位移(px)",
+   "类型": "slider",
+   "默认": 24,
+   "最小": 8,
+   "最大": 56,
+   "步长": 2
+  },
+  {
+   "键": "backW",
+   "名": "上一步宽度(px)",
+   "类型": "slider",
+   "默认": 96,
+   "最小": 72,
+   "最大": 140,
+   "步长": 4
+  },
+  {
+   "键": "extra",
+   "名": "高度补偿(px)",
+   "类型": "slider",
+   "默认": 0,
+   "最小": -20,
+   "最大": 40,
+   "步长": 2
+  }
+ ]
+},
+{
+ "id": "M340",
+ "标题": "底部导航展开",
+ "适配端": "移动端",
+ "风格": "iOS 原生",
+ "场景": "工具·SaaS",
+ "元素": "导航",
+ "搭配": [],
+ "标签": [
+  "底部导航",
+  "展开标签",
+  "背景块",
+  "胶囊导航",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/底部导航展开.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>底部导航展开</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  .stage{padding:28px var(--pad)}\\n  .stage h2{font-size:15px;font-weight:500}\\n  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}\\n  .nav{\\n    position:absolute;left:var(--gapEdge);right:var(--gapEdge);bottom:var(--gapEdge);\\n    height:var(--barH);display:flex;align-items:center;gap:var(--gap);\\n    padding:0 var(--pad);background:var(--bar);border-radius:var(--radius);\\n  }\\n  .nav .pill{\\n    position:absolute;top:var(--inset);bottom:var(--inset);left:0;\\n    background:var(--accent);border-radius:calc(var(--radius) - 4px);\\n    width:var(--pillW);transform:translateX(var(--pillX));\\n    transition:width var(--dur) var(--ease),transform var(--dur) var(--ease);\\n  }\\n  .nav button{\\n    position:relative;z-index:2;height:var(--barH);border:none;background:transparent;\\n    display:flex;align-items:center;gap:0;cursor:pointer;\\n    min-height:44px;padding:0 var(--hit);\\n    /* 选中项横向撑开露出文字，其余项收回到只剩图标——宽度变化本身就是状态说明 */\\n    width:var(--icoW);\\n    transition:width var(--dur) var(--ease);\\n  }\\n  .nav button.on{width:var(--openW)}\\n  .nav button .ico{\\n    flex:none;width:var(--icoW);height:var(--barH);display:grid;place-items:center;\\n    color:var(--dim);font-size:15px;transition:color var(--dur) var(--ease);\\n  }\\n  .nav button.on .ico{color:var(--onAccent)}\\n  .nav button .lb{\\n    font-size:12px;font-weight:500;color:var(--onAccent);white-space:nowrap;\\n    opacity:0;transition:opacity var(--dur) var(--ease);\\n  }\\n  .nav button.on .lb{opacity:1}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"stage\\\">\\n    <h2>底部导航展开</h2>\\n    <p>选中项横向撑开露出文字标签，背景块滑到选中位置，其余项收回成纯图标。点一下切换。</p>\\n  </div>\\n  <div class=\\\"nav\\\" id=\\\"nav\\\">\\n    <i class=\\\"pill\\\" id=\\\"pill\\\"></i>\\n  </div>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",dim:\\\"#9a9ca6\\\",bar:\\\"#ffffff\\\",\\n  accent:\\\"#1c1c22\\\",onAccent:\\\"#ffffff\\\",\\n  radius:22,barH:56,pad:10,gap:6,gapEdge:16,icoW:44,hit:6,openW:104,dur:.34,inset:6\\n};\\nvar UNIT={radius:\\\"px\\\",barH:\\\"px\\\",pad:\\\"px\\\",gap:\\\"px\\\",gapEdge:\\\"px\\\",icoW:\\\"px\\\",hit:\\\"px\\\",openW:\\\"px\\\",dur:\\\"s\\\",inset:\\\"px\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nvar cur=0;\\nvar ITEMS=[[\\\"◧\\\",\\\"首页\\\"],[\\\"◍\\\",\\\"发现\\\"],[\\\"◈\\\",\\\"订单\\\"],[\\\"◉\\\",\\\"我的\\\"]];\\nvar nav=document.getElementById(\\\"nav\\\"),pill=document.getElementById(\\\"pill\\\");\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n  place();\\n}\\n/* pill 的位置与宽度都得实测 DOM 算：选中项宽度是变的，写死偏移量会在切项时错位 */\\nfunction place(){\\n  var btns=nav.querySelectorAll(\\\"button\\\");\\n  if(!btns.length)return;\\n  var b=btns[cur];\\n  root.style.setProperty(\\\"--pillX\\\",(b.offsetLeft)+\\\"px\\\");\\n  root.style.setProperty(\\\"--pillW\\\",b.offsetWidth+\\\"px\\\");\\n}\\nITEMS.forEach(function(it,n){\\n  var b=document.createElement(\\\"button\\\");\\n  b.innerHTML='<span class=\\\"ico\\\">'+it[0]+'</span><span class=\\\"lb\\\">'+it[1]+'</span>';\\n  b.addEventListener(\\\"click\\\",function(){\\n    cur=n;\\n    [].forEach.call(nav.querySelectorAll(\\\"button\\\"),function(e,j){e.className=j===cur?\\\"on\\\":\\\"\\\";});\\n    place();\\n  });\\n  nav.appendChild(b);\\n});\\nfunction pick(n){\\n  cur=n%ITEMS.length;\\n  [].forEach.call(nav.querySelectorAll(\\\"button\\\"),function(e,j){e.className=j===cur?\\\"on\\\":\\\"\\\";});\\n  place();\\n}\\napply();\\npick(0);\\nsetInterval(function(){pick(cur+1);},2400);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "底部四个入口，选中的那一项横向撑开露出文字标签，深色胶囊背景块滑到选中位置；其余三项收回成纯图标，只留轮廓。\n好在状态不用猜：宽度变化本身就说明了「哪个是当前」，比只换个颜色更直接，也把宝贵的底部空间让给了内容。和 M315 液态 Tab 的区别是——那条是背景块液滴形变、每一项宽度不变，这条是选中项自身展开、宽度在变。",
+ "用法": "背景块的位置与宽度必须实测 DOM（offsetLeft / offsetWidth）再写回：选中项宽度是变的，写死偏移量切项就会错位。\nopenW 要按最长标签文字算（4 字约 104px）；icoW 保持 ≥44px 保证未选中项也点得中。",
+ "提示词": "零依赖单文件 HTML（移动端）：底部一条白底胶囊导航栏（圆角 22px、高 56px、距边 16px），内含 4 个入口（首页 / 发现 / 订单 / 我的）；每个入口默认只显示 44px 宽的图标（灰色 #9a9ca6），选中的那一项宽度撑开到 104px、露出 12px 白色文字标签并把图标转为白色；一个深色胶囊背景块（#1c1c22，上下内缩 6px）平滑滑到选中项位置，宽度与选中项实时一致（0.34s）；未选中项保持纯图标。参数：页面底 #f2f2f5、导航底 #ffffff、胶囊 #1c1c22、胶囊内文字 #ffffff、图标灰 #9a9ca6、圆角 22px、条高 56px、左右内边距 10px、项间距 6px、图标宽 44px、展开宽 104px、内缩 6px、过渡 0.34s。缓动 cubic-bezier(.22,.61,.36,1)，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "正文色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "dim",
+   "名": "未选中图标色",
+   "类型": "color",
+   "默认": "#9a9ca6"
+  },
+  {
+   "键": "bar",
+   "名": "导航条底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "accent",
+   "名": "选中背景块色",
+   "类型": "color",
+   "默认": "#1c1c22"
+  },
+  {
+   "键": "onAccent",
+   "名": "选中文字色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "radius",
+   "名": "圆角(px)",
+   "类型": "slider",
+   "默认": 22,
+   "最小": 10,
+   "最大": 32,
+   "步长": 1
+  },
+  {
+   "键": "barH",
+   "名": "条高(px)",
+   "类型": "slider",
+   "默认": 56,
+   "最小": 48,
+   "最大": 72,
+   "步长": 2
+  },
+  {
+   "键": "pad",
+   "名": "左右内边距(px)",
+   "类型": "slider",
+   "默认": 10,
+   "最小": 6,
+   "最大": 20,
+   "步长": 1
+  },
+  {
+   "键": "gap",
+   "名": "项间距(px)",
+   "类型": "slider",
+   "默认": 6,
+   "最小": 0,
+   "最大": 16,
+   "步长": 1
+  },
+  {
+   "键": "gapEdge",
+   "名": "距边(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 30,
+   "步长": 2
+  },
+  {
+   "键": "icoW",
+   "名": "图标宽(px)",
+   "类型": "slider",
+   "默认": 44,
+   "最小": 36,
+   "最大": 56,
+   "步长": 2
+  },
+  {
+   "键": "hit",
+   "名": "命中区补白(px)",
+   "类型": "slider",
+   "默认": 6,
+   "最小": 0,
+   "最大": 16,
+   "步长": 1
+  },
+  {
+   "键": "openW",
+   "名": "展开宽度(px)",
+   "类型": "slider",
+   "默认": 104,
+   "最小": 72,
+   "最大": 160,
+   "步长": 4
+  },
+  {
+   "键": "dur",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.34,
+   "最小": 0.15,
+   "最大": 0.7,
+   "步长": 0.02
+  },
+  {
+   "键": "inset",
+   "名": "背景块内缩(px)",
+   "类型": "slider",
+   "默认": 6,
+   "最小": 0,
+   "最大": 14,
+   "步长": 1
+  }
+ ]
+},
+{
+ "id": "M341",
+ "标题": "悬浮按钮滚动收缩",
+ "适配端": "移动端",
+ "风格": "iOS 原生",
+ "场景": "工具·SaaS",
+ "元素": "动效",
+ "搭配": [],
+ "标签": [
+  "悬浮按钮",
+  "FAB",
+  "滚动收缩",
+  "展开文字",
+  "滚动方向",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/悬浮按钮滚动收缩.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>悬浮按钮滚动收缩</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  .scroller{\\n    position:absolute;inset:0;overflow-y:auto;padding:0 0 140px;\\n    -webkit-overflow-scrolling:touch;\\n  }\\n  .scroller h2{padding:28px var(--pad) 0;font-size:15px;font-weight:500}\\n  .scroller .tip{padding:8px var(--pad) 0;color:var(--muted);font-size:12px;line-height:1.7}\\n  .card{\\n    margin:14px var(--pad) 0;height:var(--cardH);border-radius:var(--radius);background:var(--card);\\n    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;\\n  }\\n  .fab{\\n    position:absolute;right:var(--gapEdge);bottom:var(--gapEdge);z-index:6;\\n    height:var(--fabH);width:var(--fabW);\\n    border:none;border-radius:calc(var(--fabH) / 2);background:var(--accent);color:var(--onAccent);\\n    display:flex;align-items:center;gap:0;overflow:hidden;cursor:pointer;\\n    padding:0 var(--fabPad);\\n    transition:width var(--dur) var(--ease),border-radius var(--dur) var(--ease);\\n  }\\n  /* 收拢态：只剩一个圆形图标；展开态：横向伸出显示文字 */\\n  .fab.shrink{width:var(--fabH);padding:0}\\n  .fab .ico{flex:none;width:var(--fabH);height:var(--fabH);display:grid;place-items:center;font-size:18px}\\n  .fab .lb{font-size:13px;font-weight:500;white-space:nowrap;opacity:0;transition:opacity var(--dur) var(--ease)}\\n  .fab:not(.shrink) .lb{opacity:1}\\n  .dir{\\n    position:absolute;left:var(--gapEdge);bottom:var(--gapEdge);z-index:6;\\n    font-size:11px;color:var(--muted);background:var(--card);border-radius:8px;padding:5px 9px;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"scroller\\\" id=\\\"scroller\\\">\\n    <h2>悬浮按钮滚动收缩</h2>\\n    <p class=\\\"tip\\\">向下滚动时按钮收回成圆形纯图标（让路给内容），向上滚动时伸出文字标签（提示可点）。在下方区域滚动即可看到。</p>\\n  </div>\\n  <button class=\\\"fab\\\" id=\\\"fab\\\"><span class=\\\"ico\\\">＋</span><span class=\\\"lb\\\">新建订单</span></button>\\n  <span class=\\\"dir\\\" id=\\\"dir\\\">向下 ↓</span>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",muted:\\\"#6b7280\\\",card:\\\"#ffffff\\\",\\n  accent:\\\"#2f6bff\\\",onAccent:\\\"#ffffff\\\",\\n  radius:14,cardH:120,pad:16,gapEdge:18,fabH:56,fabW:160,fabPad:18,dur:.32,thresh:6\\n};\\nvar UNIT={radius:\\\"px\\\",cardH:\\\"px\\\",pad:\\\"px\\\",gapEdge:\\\"px\\\",fabH:\\\"px\\\",fabW:\\\"px\\\",fabPad:\\\"px\\\",dur:\\\"s\\\",thresh:\\\"px\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n}\\nvar scroller=document.getElementById(\\\"scroller\\\"),fab=document.getElementById(\\\"fab\\\"),dir=document.getElementById(\\\"dir\\\");\\nfor(var i=0;i<9;i++){\\n  var c=document.createElement(\\\"div\\\");\\n  c.className=\\\"card\\\";c.textContent=\\\"内容块 \\\"+(i+1);\\n  scroller.appendChild(c);\\n}\\nvar last=0;\\n/* 阈值存在的理由：手指滚动会有 1–3px 的抖动，不设阈值按钮会在两种状态间来回抽搐 */\\nscroller.addEventListener(\\\"scroll\\\",function(){\\n  var y=scroller.scrollTop,d=y-last;\\n  if(Math.abs(d)<state.thresh)return;\\n  last=y;\\n  var down=d>0;\\n  fab.classList.toggle(\\\"shrink\\\",down);\\n  dir.textContent=down?\\\"向下 ↓\\\":\\\"向上 ↑\\\";\\n},{passive:true});\\nfab.addEventListener(\\\"click\\\",function(){fab.classList.remove(\\\"shrink\\\");});\\napply();\\nsetTimeout(function(){fab.classList.add(\\\"shrink\\\");},1200);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "右下角悬浮按钮跟着滚动方向变形：向下滚（正在读内容）时收拢成一个纯图标的圆，把空间让给正文；向上滚（可能要操作）时横向伸出显示「新建订单」文字。\n好在按钮学会了让路——读的时候不挡字、想操作的时候有明确入口。与 M333 悬浮按钮容器变换的区别：那条是点击后径向推出子按钮（点击驱动），这条是滚动方向驱动、只做自身的伸缩与文字显隐。",
+ "用法": "滚动判定必须带阈值（thresh 默认 6px）：手指滚动有 1–3px 抖动，不设阈值按钮会在两态之间抽搐。\nfabW 按最长文字算（4 字 + 图标约 160px）；收拢态宽度直接等于 fabH，圆角取 fabH/2 保证是正圆。",
+ "提示词": "零依赖单文件 HTML（移动端）：可竖向滚动的长列表内容区；右下角一个蓝色胶囊悬浮按钮（高 56px、宽 160px、距边 18px、圆角 = 半高），左侧 56px 方形区放「＋」图标，右侧是 13px 白色文字「新建订单」；向下滚动时按钮宽度收拢到 56px 变成纯图标正圆（文字淡出），向上滚动时重新伸出到 160px 显示文字，宽度与圆角都用 0.32s 过渡；滚动方向判定带 6px 阈值防抖；左下角有一个小标签实时显示当前滚动方向。参数：页面底 #f2f2f5、卡片白 #ffffff、强调 #2f6bff、按钮文字 #ffffff、圆角 14px、内容卡高 120px、内边距 16px、距边 18px、按钮高 56px、按钮展开宽 160px、按钮左右补白 18px、过渡 0.32s、抖动阈值 6px。缓动 cubic-bezier(.22,.61,.36,1)，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "正文色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "muted",
+   "名": "次要文字色",
+   "类型": "color",
+   "默认": "#6b7280"
+  },
+  {
+   "键": "card",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "accent",
+   "名": "按钮底色",
+   "类型": "color",
+   "默认": "#2f6bff"
+  },
+  {
+   "键": "onAccent",
+   "名": "按钮文字色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "radius",
+   "名": "卡片圆角(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 6,
+   "最大": 26,
+   "步长": 1
+  },
+  {
+   "键": "cardH",
+   "名": "内容卡高(px)",
+   "类型": "slider",
+   "默认": 120,
+   "最小": 72,
+   "最大": 200,
+   "步长": 4
+  },
+  {
+   "键": "pad",
+   "名": "左右留白(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 28,
+   "步长": 1
+  },
+  {
+   "键": "gapEdge",
+   "名": "距边(px)",
+   "类型": "slider",
+   "默认": 18,
+   "最小": 8,
+   "最大": 34,
+   "步长": 2
+  },
+  {
+   "键": "fabH",
+   "名": "按钮高(px)",
+   "类型": "slider",
+   "默认": 56,
+   "最小": 44,
+   "最大": 72,
+   "步长": 2
+  },
+  {
+   "键": "fabW",
+   "名": "按钮展开宽(px)",
+   "类型": "slider",
+   "默认": 160,
+   "最小": 110,
+   "最大": 220,
+   "步长": 5
+  },
+  {
+   "键": "fabPad",
+   "名": "按钮补白(px)",
+   "类型": "slider",
+   "默认": 18,
+   "最小": 8,
+   "最大": 30,
+   "步长": 2
+  },
+  {
+   "键": "dur",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.32,
+   "最小": 0.15,
+   "最大": 0.7,
+   "步长": 0.02
+  },
+  {
+   "键": "thresh",
+   "名": "滚动阈值(px)",
+   "类型": "slider",
+   "默认": 6,
+   "最小": 1,
+   "最大": 20,
+   "步长": 1
+  }
+ ]
+},
+{
+ "id": "M342",
+ "标题": "复制按钮反馈",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "工具·SaaS",
+ "元素": "反馈",
+ "搭配": [],
+ "标签": [
+  "复制",
+  "已复制",
+  "按钮反馈",
+  "气泡提示",
+  "自动复原",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/复制按钮反馈.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>复制按钮反馈</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  .stage{padding:28px var(--pad)}\\n  .stage h2{font-size:15px;font-weight:500}\\n  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}\\n  .code{\\n    margin:14px var(--pad) 0;padding:12px 14px;border-radius:var(--radius);background:var(--card);\\n    border:1px solid var(--edge);font-family:Consolas,monospace;font-size:12px;color:var(--ink);\\n    word-break:break-all;\\n  }\\n  .copy{\\n    margin:14px var(--pad) 0;min-height:44px;padding:0 18px;border:1px solid var(--edge);\\n    border-radius:var(--radius);background:var(--card);color:var(--ink);\\n    font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;\\n    transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease);\\n  }\\n  .copy.done{background:var(--accent);color:var(--onAccent);border-color:transparent}\\n  .copy .ico{font-size:13px;width:14px;text-align:center}\\n  /* 提示气泡挂在按钮上方并自带指向箭头：反馈要能一眼定位到是哪个操作生效了 */\\n  .tip{\\n    position:absolute;z-index:6;background:var(--tipBg);color:var(--tipFg);\\n    font-size:11px;padding:5px 10px;border-radius:8px;white-space:nowrap;\\n    transform:translate(-50%,calc(-100% - var(--tipGap)));\\n    opacity:0;transition:opacity var(--dur) var(--ease);\\n  }\\n  .tip::after{\\n    content:\\\"\\\";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;\\n    background:var(--tipBg);transform:translateX(-50%) rotate(45deg);\\n  }\\n  .tip.show{opacity:1}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"stage\\\">\\n    <h2>复制按钮反馈</h2>\\n    <p>按下后图标换成对勾、上方弹出「已复制」，一秒后自动复原——反馈来了就走，不占版面也不等人点掉。</p>\\n  </div>\\n  <div class=\\\"code\\\">git clone git@example.com:org/repo.git</div>\\n  <button class=\\\"copy\\\" id=\\\"copy\\\"><span class=\\\"ico\\\" id=\\\"ico\\\">⧉</span><span id=\\\"lb\\\">复制</span></button>\\n  <div class=\\\"tip\\\" id=\\\"tip\\\">已复制</div>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",card:\\\"#ffffff\\\",edge:\\\"#e4e4ea\\\",\\n  accent:\\\"#16a34a\\\",onAccent:\\\"#ffffff\\\",tipBg:\\\"#1c1c22\\\",tipFg:\\\"#ffffff\\\",\\n  radius:12,pad:16,dur:.22,tipGap:10,hold:1000\\n};\\nvar UNIT={radius:\\\"px\\\",pad:\\\"px\\\",dur:\\\"s\\\",tipGap:\\\"px\\\",hold:\\\"ms\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n}\\nvar copy=document.getElementById(\\\"copy\\\"),ico=document.getElementById(\\\"ico\\\");\\nvar lb=document.getElementById(\\\"lb\\\"),tip=document.getElementById(\\\"tip\\\");\\nvar timer=0;\\nfunction placeTip(){\\n  var r=copy.getBoundingClientRect();\\n  tip.style.left=(r.left+r.width/2)+\\\"px\\\";\\n  tip.style.top=r.top+\\\"px\\\";\\n}\\nfunction fire(){\\n  /* 连点必须先清掉上一次的复原定时器，否则第一次的 1s 会把第二次的反馈提前掐掉 */\\n  clearTimeout(timer);\\n  copy.classList.add(\\\"done\\\");\\n  ico.textContent=\\\"✓\\\";lb.textContent=\\\"已复制\\\";\\n  placeTip();tip.classList.add(\\\"show\\\");\\n  timer=setTimeout(restore,state.hold);\\n}\\nfunction restore(){\\n  copy.classList.remove(\\\"done\\\");\\n  ico.textContent=\\\"⧉\\\";lb.textContent=\\\"复制\\\";\\n  tip.classList.remove(\\\"show\\\");\\n}\\ncopy.addEventListener(\\\"click\\\",fire);\\napply();\\nplaceTip();\\nsetTimeout(fire,600);\\nsetInterval(fire,2600);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();placeTip();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "点「复制」后按钮整块转成绿色、图标换成对勾、文字变「已复制」，同时按钮正上方弹出一个带指向箭头的深色小气泡写「已复制」，一秒后全部自动复原。\n好在反馈来了就走：确认感给足了，却既不占版面也不等人去点掉。与 M032 状态收尾的区别是——那条是按钮原位变形后停在提示态（终态），这条是瞬时反馈后自动回到可再次点击的原态（过程态）。",
+ "用法": "连点必须先 clearTimeout 再重新计时：否则第一次的 1s 会把第二次的反馈提前掐掉，看起来像「点了没反应」。\n气泡位置要在每次触发时重算（按钮可能被键盘顶上去或页面滚动过），写死坐标会飘。",
+ "提示词": "零依赖单文件 HTML（移动端）：一行等宽字体代码块（白底、1px 描边、12px、圆角 12px），下方一个「⧉ 复制」描边按钮（44px 高、圆角 12px、白底）；点击后按钮整块转绿色 #16a34a、文字与图标转白、图标换成对勾、文案变「已复制」，同时按钮正上方 10px 处弹出一个深色小气泡（#1c1c22 底、白字、11px、圆角 8px、底部带 8px 旋转 45° 的指向箭头）写「已复制」；1 秒后按钮与气泡一起复原。参数：页面底 #f2f2f5、正文 #1c1c1e、卡片白 #ffffff、描边 #e4e4ea、成功绿 #16a34a、按钮文字 #ffffff、气泡底 #1c1c22、气泡字 #ffffff、圆角 12px、左右留白 16px、过渡 0.22s、气泡间距 10px、停留 1000ms。缓动 cubic-bezier(.22,.61,.36,1)，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "正文色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "card",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "edge",
+   "名": "描边色",
+   "类型": "color",
+   "默认": "#e4e4ea"
+  },
+  {
+   "键": "accent",
+   "名": "成功色",
+   "类型": "color",
+   "默认": "#16a34a"
+  },
+  {
+   "键": "onAccent",
+   "名": "成功态文字色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "tipBg",
+   "名": "气泡底色",
+   "类型": "color",
+   "默认": "#1c1c22"
+  },
+  {
+   "键": "tipFg",
+   "名": "气泡文字色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "radius",
+   "名": "圆角(px)",
+   "类型": "slider",
+   "默认": 12,
+   "最小": 6,
+   "最大": 22,
+   "步长": 1
+  },
+  {
+   "键": "pad",
+   "名": "左右留白(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 28,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.22,
+   "最小": 0.1,
+   "最大": 0.6,
+   "步长": 0.02
+  },
+  {
+   "键": "tipGap",
+   "名": "气泡间距(px)",
+   "类型": "slider",
+   "默认": 10,
+   "最小": 4,
+   "最大": 24,
+   "步长": 1
+  },
+  {
+   "键": "hold",
+   "名": "停留时长(ms)",
+   "类型": "slider",
+   "默认": 1000,
+   "最小": 400,
+   "最大": 3000,
+   "步长": 100
+  }
+ ]
+},
+{
+ "id": "M343",
+ "标题": "输入错误提示",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "工具·SaaS",
+ "元素": "输入",
+ "搭配": [],
+ "标签": [
+  "表单校验",
+  "错误提示",
+  "抖动",
+  "shake",
+  "自动收起",
+  "移动端"
+ ],
+ "来源": "来自于抖音",
+ "效果演示": "assets/demos/输入错误提示.html",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>输入错误提示</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--ink);\\n  }\\n  .stage{padding:28px var(--pad)}\\n  .stage h2{font-size:15px;font-weight:500}\\n  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}\\n  .field{margin:16px var(--pad) 0}\\n  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}\\n  .box{\\n    position:relative;display:flex;align-items:center;min-height:48px;\\n    border:1px solid var(--edge);border-radius:var(--radius);background:var(--card);\\n    padding:0 12px;overflow:hidden;\\n    transition:border-color var(--dur) var(--ease);\\n  }\\n  .box input{\\n    flex:1;min-width:0;border:none;outline:none;background:transparent;\\n    font:inherit;font-size:14px;color:var(--ink);height:46px;\\n  }\\n  /* 三件事一起发生：横向轻晃 + 边框转红 + 提示文字滑入。只做其中一个，反馈强度不够 */\\n  .box.bad{border-color:var(--danger);animation:shake var(--shake) var(--ease)}\\n  @keyframes shake{\\n    0%,100%{transform:translateX(0)}\\n    20%{transform:translateX(calc(var(--amp) * -1))}\\n    45%{transform:translateX(var(--amp))}\\n    70%{transform:translateX(calc(var(--amp) * -0.5))}\\n  }\\n  .msg{\\n    overflow:hidden;height:0;color:var(--danger);font-size:11px;\\n    transition:height var(--dur) var(--ease),opacity var(--dur) var(--ease);\\n    opacity:0;\\n  }\\n  .msg.show{height:var(--msgH);opacity:1;padding-top:6px}\\n  .go{\\n    margin:18px var(--pad) 0;min-height:44px;padding:0 18px;border:none;\\n    border-radius:var(--radius);background:var(--accent);color:#fff;\\n    font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"stage\\\">\\n    <h2>输入错误提示</h2>\\n    <p>提交不合规内容时：输入框横向轻晃、边框转红、错误说明从下方滑入；改对了提示自动收起，不用等人来关。</p>\\n  </div>\\n  <div class=\\\"field\\\">\\n    <label>手机号</label>\\n    <div class=\\\"box\\\" id=\\\"box\\\"><input id=\\\"inp\\\" value=\\\"138\\\" placeholder=\\\"请输入 11 位手机号\\\" inputmode=\\\"numeric\\\"></div>\\n    <div class=\\\"msg\\\" id=\\\"msg\\\">手机号应为 11 位数字</div>\\n  </div>\\n  <button class=\\\"go\\\" id=\\\"go\\\">提交</button>\\n</div>\\n<script>\\nvar state={\\n  page:\\\"#f2f2f5\\\",ink:\\\"#1c1c1e\\\",muted:\\\"#6b7280\\\",card:\\\"#ffffff\\\",edge:\\\"#e4e4ea\\\",\\n  danger:\\\"#e5484d\\\",accent:\\\"#2f6bff\\\",\\n  radius:12,pad:16,dur:.26,shake:.42,amp:7,msgH:22\\n};\\nvar UNIT={radius:\\\"px\\\",pad:\\\"px\\\",dur:\\\"s\\\",shake:\\\"s\\\",amp:\\\"px\\\",msgH:\\\"px\\\"};\\nvar root=document.documentElement;\\nvar EASE=\\\"cubic-bezier(.22,.61,.36,1)\\\";\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--ease\\\",EASE);\\n}\\nvar box=document.getElementById(\\\"box\\\"),inp=document.getElementById(\\\"inp\\\");\\nvar msg=document.getElementById(\\\"msg\\\"),go=document.getElementById(\\\"go\\\");\\nvar ok=function(v){return /^\\\\d{11}$/.test(v);};\\nfunction judge(){\\n  var good=ok(inp.value.trim());\\n  /* 改对了就自动收：错误提示赖着不走，会把一次性的提醒变成常驻的噪音 */\\n  msg.classList.toggle(\\\"show\\\",!good);\\n  if(!good){\\n    box.classList.remove(\\\"bad\\\");\\n    void box.offsetWidth;        // 强制重排，让同一元素能连续触发第二次 shake\\n    box.classList.add(\\\"bad\\\");\\n  }else{\\n    box.classList.remove(\\\"bad\\\");\\n  }\\n}\\ngo.addEventListener(\\\"click\\\",judge);\\ninp.addEventListener(\\\"input\\\",function(){if(ok(inp.value.trim())){msg.classList.remove(\\\"show\\\");box.classList.remove(\\\"bad\\\");}});\\napply();\\nsetTimeout(judge,700);\\nsetInterval(judge,3000);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\"",
+ "效果说明": "提交不合规内容时三件事同时发生：输入框横向轻晃一下、边框转成红色、错误说明从输入框下方滑入占位；用户改对的那一刻，提示自己收起、边框回灰。\n好在错误是「被演出来」的而不是「被写出来」的——晃动负责抓注意力，红框负责定位，文字负责说清怎么改；改完即收，把一个常驻的警告变成一次性的提醒，不会变成赖着不走的噪音。",
+ "用法": "连续两次报错要先 remove class 再 void offsetWidth 强制重排，否则第二次 shake 不会触发（同一个动画不重播）。\namp 别超过 8px：幅度越大越像页面在抖，7px 是「提醒」和「抽搐」的分界。",
+ "提示词": "零依赖单文件 HTML（移动端）：一个「手机号」输入框（48px 高、白底、1px 灰描边、圆角 12px、14px 字号），下方一个「提交」主题蓝按钮；点提交且内容不是 11 位数字时，输入框横向轻晃一记（±7px、0.42s、四次折返的 keyframes），边框转红 #e5484d，同时错误说明「手机号应为 11 位数字」（11px 红色）从输入框下方展开占位（0.26s 高度过渡）；用户把内容改成合规的那一刻，提示自动收起、边框回灰。参数：页面底 #f2f2f5、正文 #1c1c1e、次要 #6b7280、卡片白 #ffffff、描边 #e4e4ea、错误红 #e5484d、按钮蓝 #2f6bff、圆角 12px、左右留白 16px、过渡 0.26s、晃动时长 0.42s、晃动幅度 7px、提示行高 22px。缓动 cubic-bezier(.22,.61,.36,1)，无外链。",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f5"
+  },
+  {
+   "键": "ink",
+   "名": "正文色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "muted",
+   "名": "标签文字色",
+   "类型": "color",
+   "默认": "#6b7280"
+  },
+  {
+   "键": "card",
+   "名": "输入框底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "edge",
+   "名": "描边色",
+   "类型": "color",
+   "默认": "#e4e4ea"
+  },
+  {
+   "键": "danger",
+   "名": "错误色",
+   "类型": "color",
+   "默认": "#e5484d"
+  },
+  {
+   "键": "accent",
+   "名": "按钮色",
+   "类型": "color",
+   "默认": "#2f6bff"
+  },
+  {
+   "键": "radius",
+   "名": "圆角(px)",
+   "类型": "slider",
+   "默认": 12,
+   "最小": 6,
+   "最大": 22,
+   "步长": 1
+  },
+  {
+   "键": "pad",
+   "名": "左右留白(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 8,
+   "最大": 28,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "过渡时长(s)",
+   "类型": "slider",
+   "默认": 0.26,
+   "最小": 0.1,
+   "最大": 0.6,
+   "步长": 0.02
+  },
+  {
+   "键": "shake",
+   "名": "晃动时长(s)",
+   "类型": "slider",
+   "默认": 0.42,
+   "最小": 0.2,
+   "最大": 0.9,
+   "步长": 0.02
+  },
+  {
+   "键": "amp",
+   "名": "晃动幅度(px)",
+   "类型": "slider",
+   "默认": 7,
+   "最小": 2,
+   "最大": 14,
+   "步长": 1
+  },
+  {
+   "键": "msgH",
+   "名": "提示行高(px)",
+   "类型": "slider",
+   "默认": 22,
+   "最小": 16,
+   "最大": 40,
+   "步长": 2
+  }
+ ]
 }
 ];

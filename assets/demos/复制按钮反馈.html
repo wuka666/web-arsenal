@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>复制按钮反馈</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+  }
+  .stage{padding:28px var(--pad)}
+  .stage h2{font-size:15px;font-weight:500}
+  .stage p{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}
+  .code{
+    margin:14px var(--pad) 0;padding:12px 14px;border-radius:var(--radius);background:var(--card);
+    border:1px solid var(--edge);font-family:Consolas,monospace;font-size:12px;color:var(--ink);
+    word-break:break-all;
+  }
+  .copy{
+    margin:14px var(--pad) 0;min-height:44px;padding:0 18px;border:1px solid var(--edge);
+    border-radius:var(--radius);background:var(--card);color:var(--ink);
+    font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease);
+  }
+  .copy.done{background:var(--accent);color:var(--onAccent);border-color:transparent}
+  .copy .ico{font-size:13px;width:14px;text-align:center}
+  /* 提示气泡挂在按钮上方并自带指向箭头：反馈要能一眼定位到是哪个操作生效了 */
+  .tip{
+    position:absolute;z-index:6;background:var(--tipBg);color:var(--tipFg);
+    font-size:11px;padding:5px 10px;border-radius:8px;white-space:nowrap;
+    transform:translate(-50%,calc(-100% - var(--tipGap)));
+    opacity:0;transition:opacity var(--dur) var(--ease);
+  }
+  .tip::after{
+    content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;
+    background:var(--tipBg);transform:translateX(-50%) rotate(45deg);
+  }
+  .tip.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <h2>复制按钮反馈</h2>
+    <p>按下后图标换成对勾、上方弹出「已复制」，一秒后自动复原——反馈来了就走，不占版面也不等人点掉。</p>
+  </div>
+  <div class="code">git clone git@example.com:org/repo.git</div>
+  <button class="copy" id="copy"><span class="ico" id="ico">⧉</span><span id="lb">复制</span></button>
+  <div class="tip" id="tip">已复制</div>
+</div>
+<script>
+var state={
+  page:"#f2f2f5",ink:"#1c1c1e",card:"#ffffff",edge:"#e4e4ea",
+  accent:"#16a34a",onAccent:"#ffffff",tipBg:"#1c1c22",tipFg:"#ffffff",
+  radius:12,pad:16,dur:.22,tipGap:10,hold:1000
+};
+var UNIT={radius:"px",pad:"px",dur:"s",tipGap:"px",hold:"ms"};
+var root=document.documentElement;
+var EASE="cubic-bezier(.22,.61,.36,1)";
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ease",EASE);
+}
+var copy=document.getElementById("copy"),ico=document.getElementById("ico");
+var lb=document.getElementById("lb"),tip=document.getElementById("tip");
+var timer=0;
+function placeTip(){
+  var r=copy.getBoundingClientRect();
+  tip.style.left=(r.left+r.width/2)+"px";
+  tip.style.top=r.top+"px";
+}
+function fire(){
+  /* 连点必须先清掉上一次的复原定时器，否则第一次的 1s 会把第二次的反馈提前掐掉 */
+  clearTimeout(timer);
+  copy.classList.add("done");
+  ico.textContent="✓";lb.textContent="已复制";
+  placeTip();tip.classList.add("show");
+  timer=setTimeout(restore,state.hold);
+}
+function restore(){
+  copy.classList.remove("done");
+  ico.textContent="⧉";lb.textContent="复制";
+  tip.classList.remove("show");
+}
+copy.addEventListener("click",fire);
+apply();
+placeTip();
+setTimeout(fire,600);
+setInterval(fire,2600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();placeTip();});
+</script>
+</body>
+</html>
