@@ -69,18 +69,21 @@ function probe(absDemo, keys) {
   </body></html>`;
   const tmpPath = path.join(root, "assets/demos", TMP_NAME);
   fs.writeFileSync(tmpPath, wrap, "utf8");
+  // profile 用后即删：一个 demo 一个，不删的话全量跑一轮就在 TEMP 里堆几百个
+  const prof = path.join(os.tmpdir(), "varf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7));
   try {
     const url = "file:///" + tmpPath.split(path.sep).join("/");
     const out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox",
       "--disable-background-networking", "--disable-component-update", "--no-first-run",
       "--hide-scrollbars", "--allow-file-access-from-files",
       "--window-size=900,900", "--virtual-time-budget=4000",
-      "--user-data-dir=" + path.join(os.tmpdir(), "varf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7)),
+      "--user-data-dir=" + prof,
       "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
     const mm = out.match(/VARRESULT (\{[\s\S]*?\})</);
     return mm ? JSON.parse(mm[1]) : null;
   } finally {
     try { fs.unlinkSync(tmpPath); } catch (e) { }
+    try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
   }
 }
 

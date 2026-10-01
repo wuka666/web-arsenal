@@ -101,18 +101,21 @@ function probe(absDemo) {
   </body></html>`;
   const tmpPath = path.join(root, "assets/demos", TMP_NAME);
   fs.writeFileSync(tmpPath, wrap, "utf8");
+  // profile 用后即删（同 check_adapt / check_vars）：不然全量跑一轮 TEMP 里多几百个目录
+  const prof = path.join(os.tmpdir(), "ttf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7));
   try {
     const url = "file:///" + tmpPath.split(path.sep).join("/");
     const out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox",
       "--disable-background-networking", "--disable-component-update", "--no-first-run",
       "--hide-scrollbars", "--allow-file-access-from-files",
       "--window-size=1900,950", "--virtual-time-budget=6000",
-      "--user-data-dir=" + path.join(os.tmpdir(), "ttf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7)),
+      "--user-data-dir=" + prof,
       "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
     const m = out.match(/TTOUT (\{[\s\S]*?\})</);
     return m ? JSON.parse(m[1]) : null;
   } finally {
     try { fs.unlinkSync(tmpPath); } catch (e) { }
+    try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
   }
 }
 

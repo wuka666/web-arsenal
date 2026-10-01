@@ -53,18 +53,22 @@ function probe(absDemo) {
   </body></html>`;
   const tmpPath = path.join(root, "assets/demos", TMP_NAME);
   fs.writeFileSync(tmpPath, wrap, "utf8");
+  // profile 目录必须每次用完就删：一个 demo 一个，全量跑一轮就留几百个，
+  // 2026-10-01 实测累积到 566 个才被发现（TEMP 里一堆 adf-*）。
+  const prof = path.join(os.tmpdir(), "adf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7));
   try {
     const url = "file:///" + tmpPath.split(path.sep).join("/");
     const out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox",
       "--disable-background-networking", "--disable-component-update", "--no-first-run",
       "--hide-scrollbars", "--allow-file-access-from-files",
       "--window-size=900,900", "--virtual-time-budget=5000",
-      "--user-data-dir=" + path.join(os.tmpdir(), "adf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7)),
+      "--user-data-dir=" + prof,
       "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
     const m = out.match(/ADAPTRESULT (\{[\s\S]*?\})</);
     return m ? JSON.parse(m[1]) : null;
   } finally {
     try { fs.unlinkSync(tmpPath); } catch (e) { }
+    try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
   }
 }
 

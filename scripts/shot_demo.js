@@ -23,4 +23,6 @@ files.forEach(f => {
     console.log((sz > 3000 ? "✓" : "✗ 疑似空白") + "  " + String(sz).padStart(7) + "B  " + png);
   } catch (e) { console.log("✗ 失败 " + f + " :: " + String(e.message).slice(0, 90)); }
 });
+// profile 用完即删：截图产物要留（outDir），但它只是 Chrome 的临时目录，留着就是垃圾
+try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
 console.log("输出目录：" + outDir);
