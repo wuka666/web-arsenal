@@ -45,9 +45,11 @@ const PROBE = `(function(){
 
 function stateKeys(file) {
   const s = fs.readFileSync(file, "utf8");
-  const m = s.match(/var\s+state\s*=\s*\{([\s\S]*?)\}\s*;/);
+  // 三种声明都要认：M183+ 那批老条目写 const state={...}，新条目写 var state={...}
+  const m = s.match(/(?:var|let|const)\s+state\s*=\s*\{([\s\S]*?)\}\s*;/);
   if (!m) return [];
-  return (m[1].match(/(?:^|[,{\s])([A-Za-z_$][\w$]*)\s*:/g) || [])
+  // 键可能带引号（老条目是 JSON 风格 {"bg":...}），两种都要取
+  return (m[1].match(/(?:^|[,{\s])["']?([A-Za-z_$][\w$]*)["']?\s*:/g) || [])
     .map(x => x.replace(/[^A-Za-z0-9_$]/g, ""));
 }
 

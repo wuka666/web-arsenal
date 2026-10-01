@@ -6,12 +6,18 @@
 <title>透视显露内部</title>
 <style>
 *{box-sizing:border-box;margin:0}
-body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0b1020);font-family:system-ui,"Segoe UI",Arial,sans-serif}
-:root{--bg:#0b1020;--shell:#2b6cb0;--inner:#ffce5a;--mina:0.15;--glow:#ff9d5a;--dur:6;--radius:10}
+body{position:relative;height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--bg,#0b1020);font-family:system-ui,"Segoe UI",Arial,sans-serif}
+:root{--bg:#0b1020;--shell:#2b6cb0;--inner:#ffce5a;--mina:0.15;--glow:#ff9d5a;--dur:6;--radius:10;--meterW:180}
 .scene{width:200px;height:200px;transform-style:preserve-3d;transform:perspective(900px) rotateX(-16deg) rotateY(-24deg)}
 .box{position:absolute;inset:0;transform-style:preserve-3d}
 .face{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:calc(var(--radius)*1px);background:var(--shell,#2b6cb0);border:1px solid rgba(255,255,255,.3)}
 .core{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:10px;background:var(--inner,#ffce5a);box-shadow:0 0 30px var(--glow,#ff9d5a)}
+/* 不透明度对照条：透视动画的唯一变量就是外壳 opacity，给实时读数才谈得上「可校准」 */
+.meter{position:absolute;left:50%;transform:translateX(-50%);bottom:30px;width:calc(var(--meterW)*1px);height:30px}
+.meter .val{position:absolute;top:0;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.10em;color:rgba(255,255,255,.72);font-variant-numeric:tabular-nums}
+.meter .track{position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.14)}
+.meter .fill{position:absolute;bottom:0;left:0;height:4px;border-radius:2px;background:var(--inner);width:0}
+.meter .cap{position:absolute;bottom:10px;left:0;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -24,11 +30,17 @@ body{height:100vh;display:grid;place-items:center;overflow:hidden;background:var
 <div class="face" style="transform:rotateX(-90deg) translateZ(60px)"></div>
 <div class="core" id="core"></div>
 </div></div>
+<div class="meter" id="meter">
+  <span class="cap">外壳不透明度</span>
+  <span class="val" id="val">100%</span>
+  <i class="track"></i><i class="fill" id="fill"></i>
+</div>
 <script>
-const state={"bg":"#0b1020","shell":"#2b6cb0","inner":"#ffce5a","mina":0.15,"glow":"#ff9d5a","dur":6,"radius":10};
-function apply(){const r=document.documentElement.style;r.setProperty("--bg",state.bg);r.setProperty("--shell",state.shell);r.setProperty("--inner",state.inner);r.setProperty("--mina",state.mina);r.setProperty("--glow",state.glow);r.setProperty("--dur",state.dur);r.setProperty("--radius",state.radius);}
+const state={"bg":"#0b1020","shell":"#2b6cb0","inner":"#ffce5a","mina":0.15,"glow":"#ff9d5a","dur":6,"radius":10,"meterW":180};
+function apply(){const r=document.documentElement.style;for(const k in state){r.setProperty("--"+k,state[k]);}}
 const faces=[].slice.call(document.querySelectorAll(".face")),core=document.getElementById("core");
-function draw(t){const o=t<0.4?t/0.4:t<0.7?1:1-(t-0.7)/0.3;const op=1-(1-state.mina)*o;faces.forEach(function(f){f.style.opacity=op;});core.style.transform="scale("+(0.8+0.2*o)+")";}
+const fill=document.getElementById("fill"),val=document.getElementById("val");
+function draw(t){const o=t<0.4?t/0.4:t<0.7?1:1-(t-0.7)/0.3;const op=1-(1-state.mina)*o;faces.forEach(function(f){f.style.opacity=op;});core.style.transform="scale("+(0.8+0.2*o)+")";fill.style.width=(op*100)+"%";val.textContent=Math.round(op*100)+"%";}
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 function frame(now){const t=(now/1000/state.dur)%1;draw(t);if(!reduce)requestAnimationFrame(frame);}
 apply();if(reduce)draw(0.5);else requestAnimationFrame(frame);
