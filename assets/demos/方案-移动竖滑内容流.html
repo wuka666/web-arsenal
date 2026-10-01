@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>移动竖滑内容流</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg);
+    font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg)}
+  .nav{position:absolute;left:0;top:0;z-index:6;width:100%;height:var(--navH);display:flex;align-items:center;
+    gap:8px;padding:0 var(--pad);background:linear-gradient(180deg,var(--bg) 30%,transparent)}
+  .nav .brand{font-size:var(--fs1);letter-spacing:-.02em}
+  .nav .steps{display:flex;gap:4px;margin-left:auto}
+  .nav .steps i{width:var(--dotW);height:2px;border-radius:2px;background:var(--line);display:block}
+  .nav .steps i.on{background:var(--accent)}
+  .scenes{position:absolute;inset:0;transform:translateY(var(--ty));transition:transform var(--dur) cubic-bezier(.22,.61,.36,1)}
+  /* 底部留白含 dockH：否则每屏的大标题会被常驻操作条压住 */
+  .scene{position:relative;width:100%;height:100vh;padding:var(--pad) var(--pad) calc(var(--dockH) + var(--pad));
+    display:flex;flex-direction:column;justify-content:flex-end}
+  .scene .plate{position:absolute;inset:var(--pad) var(--pad) auto;top:22%;height:44%;border-radius:var(--radius);
+    background:var(--plate);transform:scale(var(--plateZ))}
+  .scene h1{font-size:var(--fs1);line-height:1.18;letter-spacing:-.03em;font-weight:500;position:relative;z-index:2}
+  .scene p{margin-top:10px;color:var(--muted);font-size:var(--fs2);position:relative;z-index:2}
+  .kicker{position:absolute;left:var(--pad);top:calc(var(--navH) + 10px);z-index:3;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+  .dock{position:absolute;left:0;right:0;bottom:0;z-index:6;height:var(--dockH);padding:0 var(--pad);
+    background:#ffffff;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px}
+  .dock .t{flex:1;min-width:0}
+  .dock .t b{display:block;font-weight:500;font-size:var(--fs2)}
+  .dock .t span{font-size:11px;color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .primary{min-width:104px;min-height:44px;border:none;border-radius:var(--radius);background:var(--accent);
+    color:var(--onAccent);font-size:14px;font-weight:500;cursor:pointer}
+  .rail-v{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:7;display:flex;flex-direction:column;gap:8px}
+  .rail-v i{width:6px;height:var(--dotH);border-radius:3px;background:var(--line);transition:background var(--dur)}
+  .rail-v i.on{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="nav"><span class="brand">拾阶</span><span class="steps" id="steps"></span></div>
+  <div class="kicker" id="kicker">Chapter 01</div>
+  <div class="scenes" id="scenes"></div>
+  <div class="rail-v" id="railv"></div>
+  <div class="dock">
+    <div class="t"><b>江畔夜行</b><span>图文 · 12 张</span></div>
+    <button class="primary">开始阅读</button>
+  </div>
+</div>
+<script>
+var state={bg:"#f4f4f6",fg:"#0f1115",muted:"#6b7280",line:"#dcdce2",accent:"#e2543a",onAccent:"#ffffff",
+  plate:"#0f1115",plateZ:1.06,navH:52,dockH:66,pad:18,dur:.5,dotW:18,dotH:16,fs1:26,fs2:13,radius:14};
+var UNIT={navH:"px",dockH:"px",pad:"px",dur:"s",dotW:"px",dotH:"px",fs1:"px",fs2:"px",radius:"px"};
+var root=document.documentElement;
+var i=0;
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ty",(-i*100)+"%");
+  root.style.setProperty("--plateZ",(i%2?1.06:1));
+}
+var DATA=[["Chapter 01","江畔夜行","夜里沿江走一段，风把灯柱拉得很长。"],
+  ["Chapter 02","旧渡口","铁链上还挂着上一班船的号牌。"],
+  ["Chapter 03","苔与石","石阶阴处长了薄薄一层绿。"],
+  ["Chapter 04","回到窗前","灯亮着，屋里有人在等。"]];
+var scenes=document.getElementById("scenes"),steps=document.getElementById("steps"),railv=document.getElementById("railv");
+DATA.forEach(function(d,n){
+  var s=document.createElement("div");
+  s.className="scene";
+  s.innerHTML='<div class="plate"></div><h1>'+d[1]+'</h1><p>'+d[2]+'</p>';
+  scenes.appendChild(s);
+  var a=document.createElement("i");steps.appendChild(a);
+  var b=document.createElement("i");railv.appendChild(b);
+});
+function go(n){i=(n+DATA.length)%DATA.length;apply();
+  [].forEach.call(steps.children,function(e,j){e.className=j===i?"on":"";});
+  [].forEach.call(railv.children,function(e,j){e.className=j===i?"on":"";});
+  document.getElementById("kicker").textContent=DATA[i][0];
+}
+go(0);
+document.getElementById("shell").addEventListener("click",function(){go(i+1);});
+setInterval(function(){go(i+1);},4600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

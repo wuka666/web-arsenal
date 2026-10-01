@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>悬浮按钮容器变换</title>
+<style>
+  :root{
+    --fg:#1c1c1e;--dim:#8e8e93;--line:#e5e5ea;--line2:#d9d9de;--chip:#e9e9ee;
+    --ease:cubic-bezier(.34,1.56,.64,1);
+    --open:0;--spin:0deg;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    position:relative;width:100%;height:100vh;overflow:hidden;
+    background:var(--bg);
+    font:500 14px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--fg);
+    -webkit-user-select:none;user-select:none;
+  }
+  .page{padding:22px 18px 150px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}
+  .row b{font-weight:500}
+  .row span{color:var(--dim);font-size:12px;letter-spacing:.04em}
+  .block{margin-top:16px;height:56px;border-radius:14px;background:var(--chip)}
+  .scrim{position:absolute;inset:0;background:#000;opacity:calc(var(--scrim) * (1 - var(--open)));pointer-events:none}
+  .dock{position:absolute;right:18px;bottom:calc(var(--size) / 2 + 26px);width:0;height:0;z-index:2}
+  /* 主按钮一次 transition 完成三件事：位移到圆心位置、整体转 45° 把「+」拧成「×」、缩收压住子按钮 */
+  .main{
+    position:absolute;left:calc(var(--size) / -2);top:calc(var(--size) / -2);
+    width:var(--size);height:var(--size);
+    border-radius:50%;background:var(--fab);border:none;
+    display:grid;place-items:center;cursor:pointer;z-index:3;
+    transition:transform var(--dur) var(--ease),background-color var(--dur) ease;
+    transform:rotate(calc(var(--spin) * var(--open))) scale(calc(1 - var(--open) * .12));
+  }
+  .main i{position:absolute;width:20px;height:2px;border-radius:2px;background:var(--icon)}
+  .main i:first-child{transform:rotate(calc(var(--spin) * var(--open)))}
+  .main i:last-child{transform:rotate(calc((var(--spin) + 90) * var(--open)))}
+  .item{
+    position:absolute;left:calc(var(--item) / -2);top:calc(var(--item) / -2);
+    width:var(--item);height:var(--item);border-radius:50%;
+    background:var(--itemBg);border:1px solid var(--line2);
+    display:grid;place-items:center;cursor:pointer;
+    transition:transform var(--dur) var(--ease),opacity var(--dur) ease;
+    transition-delay:calc(var(--i) * var(--stagger) / 1000 * var(--open));
+    opacity:calc(1 - var(--open));
+  }
+  .item em{width:14px;height:14px;border-radius:5px;background:var(--icon)}
+  .label{
+    position:absolute;right:0;top:calc(var(--item) / -2);
+    height:var(--item);display:flex;align-items:center;white-space:nowrap;
+    font-size:12px;color:var(--labelFg);background:var(--labelBg);
+    padding:0 9px;border-radius:6px;pointer-events:none;
+    opacity:calc(1 - var(--open));
+    transition:opacity var(--dur) ease;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="page">
+    <div class="row"><b>本周概览</b><span>04 / 12</span></div>
+    <div class="row"><b>进行中的项目</b><span>7</span></div>
+    <div class="row"><b>待处理提醒</b><span>23</span></div>
+    <div class="block"></div>
+    <div class="row"><b>草稿箱</b><span>4</span></div>
+    <div class="block"></div>
+    <div class="row"><b>最近同步</b><span>刚刚</span></div>
+  </div>
+  <div class="scrim"></div>
+  <div class="dock" id="dock"></div>
+  <button class="main" id="main" aria-label="展开操作"><i></i><i></i></button>
+</div>
+<script>
+var state={bg:"#f2f2f7",fab:"#0a84ff",icon:"#ffffff",itemBg:"#ffffff",labelBg:"#1c1c1e",labelFg:"#ffffff",radius:112,size:56,item:48,dur:0.36,stagger:45,spin:45,scrim:0.28};
+var UNIT={radius:"px",size:"px",item:"px",dur:"s",stagger:"ms",spin:"deg"};
+var root=document.documentElement;
+var open=false;
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--open",open?1:0);
+  root.style.setProperty("--spin",state.spin);
+}
+function setOpen(v){open=v;apply();}
+var dock=document.getElementById("dock");
+var NAMES=["新建","扫一扫","上传","邀请"];
+var RAD=[-180,-135,-90,-45];
+RAD.forEach(function(deg,i){
+  var a=deg*Math.PI/180, r=state.radius;
+  var el=document.createElement("div");
+  el.className="item";
+  el.style.transform="translate("+(Math.cos(a)*r)+"px,"+(Math.sin(a)*r)+"px)";
+  el.style.setProperty("--i",i);
+  el.innerHTML='<em></em><span class="label" style="transform:translateX('+(r+24)+'px)">'+NAMES[i]+'</span>';
+  dock.appendChild(el);
+  var lb=el.querySelector(".label");
+  lb.style.right=(r+30)+"px";
+});
+var main=document.getElementById("main");
+main.addEventListener("click",function(e){e.stopPropagation();setOpen(!open);});
+document.getElementById("wrap").addEventListener("click",function(){setOpen(false);});
+/* 初始即展开态：画廊缩略图与 headless 截图不看鼠标也能看到容器变换的结果 */
+setOpen(true);
+setInterval(function(){setOpen(!open);},3200);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

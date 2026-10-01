@@ -9695,5 +9695,578 @@ window.addEventListener('message',e=>{
       默认: "12"
     }],
   来源: "机制参考自 motionsites.ai（arceage-stats，2026-09-23 分析）：双栏统计区 + 打字机逐字揭示 + 滚动触发数字计数 + SVG logo 遮罩视频；已换题重推为「极光监测站」数据品牌站，字体/视频全部系统栈/canvas 离线化，配色/文案/主题重做，非复刻"
+},
+{
+ id: "S47",
+ 风格名: "拾阶·竖滑内容流",
+ 适配端: "移动端",
+ 风格: "极简瑞士",
+ 场景: "内容·阅读",
+ 骨架: "竖向翻页：顶部 52px 导航（品牌 + 分段进度）→ 满屏章节（图版 + 大标题 + 一句导语）→ 底部 66px 常驻信息条。",
+ 配色: "纸白 #f4f4f6 为底，墨 #0f1115 为主文字，砖红 #e2543a 只用在当前章节进度与行动按钮。",
+ 布局骨架: "8pt 栅格、左右 18px 留白；章节图版占上 44% 高度、文字落最下三分之一；底部信息条固定不滚。",
+ 重色落点: "砖红只出现在「当前章节进度条 + 唯一主按钮」两处，其余全部灰阶。",
+ 第一屏内容: "章节序号（小字大字距）+ 单句标题 + 两句导语 + 满幅图版。",
+ 删减元素: "去卡片阴影、去圆角装饰、去第三层文字层级；同一屏只留一个重点色。",
+ 适用: "图文故事、长内容阅读、需要把用户压在拇指区反复下滑的场合。",
+ 禁忌: "不要横向轮播与横向滚动混进来；不要给每一屏都配不同颜色，会失去节奏。",
+ 参考站: ["自建（2026-10-01）"],
+ 我的说明: "三套移动端方案里唯一走「竖向翻页」骨架的一套，与 S48 的分步表单、S49 的竖向叙事在 DOM 层级上完全不同。",
+ Agent提示词: "1 视觉主题与氛围：纸白底、墨色字的瑞士式克制，章节式竖滑阅读，气质安静、密度低、每屏只说一件事。\n2 色彩板与角色：纸白 #f4f4f6 页面底；墨 #0f1115 主文字；砖红 #e2543a 仅用于当前章节进度与主按钮；灰 #6b7280 次要文字；分隔 #dcdce2。\n3 字体规则：-apple-system / PingFang SC；标题 26px/1.18/-0.03em 500；正文 13px/1.6 400；注释 11px/0.18em 字距。\n4 组件规范：主按钮 104×44 圆角 14 砖红；导航 52px 高、分段进度 18×2px 灰底砖红当前段；信息条 66px 高白底上边线。\n5 布局法：8pt 栅格、左右 18px 留白、章节图版占 44% 高、文字贴最下三分之一。\n6 深度与层级：只有「页面 / 卡片 / 描边」三层，用 1px 描边代替阴影。\n7 该做 / 不该做：该做——每屏一个重点、进度随章节推进；不该做——多余配色、横向滚动、装饰性投影。\n8 响应式行为：320–480 小手机单栏；触控目标 ≥44px；折叠策略＝整屏竖滑。\n9 Agent 提示词指南：把内容套进上述 token 输出完整 HTML，主按钮文案唯一、色值只留砖红一处强调。",
+ 演示页: "assets/demos/方案-移动竖滑内容流.html",
+ 代码: `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>移动竖滑内容流</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg);
+    font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg)}
+  .nav{position:absolute;left:0;top:0;z-index:6;width:100%;height:var(--navH);display:flex;align-items:center;
+    gap:8px;padding:0 var(--pad);background:linear-gradient(180deg,var(--bg) 30%,transparent)}
+  .nav .brand{font-size:var(--fs1);letter-spacing:-.02em}
+  .nav .steps{display:flex;gap:4px;margin-left:auto}
+  .nav .steps i{width:var(--dotW);height:2px;border-radius:2px;background:var(--line);display:block}
+  .nav .steps i.on{background:var(--accent)}
+  .scenes{position:absolute;inset:0;transform:translateY(var(--ty));transition:transform var(--dur) cubic-bezier(.22,.61,.36,1)}
+  /* 底部留白含 dockH：否则每屏的大标题会被常驻操作条压住 */
+  .scene{position:relative;width:100%;height:100vh;padding:var(--pad) var(--pad) calc(var(--dockH) + var(--pad));
+    display:flex;flex-direction:column;justify-content:flex-end}
+  .scene .plate{position:absolute;inset:var(--pad) var(--pad) auto;top:22%;height:44%;border-radius:var(--radius);
+    background:var(--plate);transform:scale(var(--plateZ))}
+  .scene h1{font-size:var(--fs1);line-height:1.18;letter-spacing:-.03em;font-weight:500;position:relative;z-index:2}
+  .scene p{margin-top:10px;color:var(--muted);font-size:var(--fs2);position:relative;z-index:2}
+  .kicker{position:absolute;left:var(--pad);top:calc(var(--navH) + 10px);z-index:3;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+  .dock{position:absolute;left:0;right:0;bottom:0;z-index:6;height:var(--dockH);padding:0 var(--pad);
+    background:#ffffff;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px}
+  .dock .t{flex:1;min-width:0}
+  .dock .t b{display:block;font-weight:500;font-size:var(--fs2)}
+  .dock .t span{font-size:11px;color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .primary{min-width:104px;min-height:44px;border:none;border-radius:var(--radius);background:var(--accent);
+    color:var(--onAccent);font-size:14px;font-weight:500;cursor:pointer}
+  .rail-v{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:7;display:flex;flex-direction:column;gap:8px}
+  .rail-v i{width:6px;height:var(--dotH);border-radius:3px;background:var(--line);transition:background var(--dur)}
+  .rail-v i.on{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="nav"><span class="brand">拾阶</span><span class="steps" id="steps"></span></div>
+  <div class="kicker" id="kicker">Chapter 01</div>
+  <div class="scenes" id="scenes"></div>
+  <div class="rail-v" id="railv"></div>
+  <div class="dock">
+    <div class="t"><b>江畔夜行</b><span>图文 · 12 张</span></div>
+    <button class="primary">开始阅读</button>
+  </div>
+</div>
+<script>
+var state={bg:"#f4f4f6",fg:"#0f1115",muted:"#6b7280",line:"#dcdce2",accent:"#e2543a",onAccent:"#ffffff",
+  plate:"#0f1115",plateZ:1.06,navH:52,dockH:66,pad:18,dur:.5,dotW:18,dotH:16,fs1:26,fs2:13,radius:14};
+var UNIT={navH:"px",dockH:"px",pad:"px",dur:"s",dotW:"px",dotH:"px",fs1:"px",fs2:"px",radius:"px"};
+var root=document.documentElement;
+var i=0;
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--ty",(-i*100)+"%");
+  root.style.setProperty("--plateZ",(i%2?1.06:1));
+}
+var DATA=[["Chapter 01","江畔夜行","夜里沿江走一段，风把灯柱拉得很长。"],
+  ["Chapter 02","旧渡口","铁链上还挂着上一班船的号牌。"],
+  ["Chapter 03","苔与石","石阶阴处长了薄薄一层绿。"],
+  ["Chapter 04","回到窗前","灯亮着，屋里有人在等。"]];
+var scenes=document.getElementById("scenes"),steps=document.getElementById("steps"),railv=document.getElementById("railv");
+DATA.forEach(function(d,n){
+  var s=document.createElement("div");
+  s.className="scene";
+  s.innerHTML='<div class="plate"></div><h1>'+d[1]+'</h1><p>'+d[2]+'</p>';
+  scenes.appendChild(s);
+  var a=document.createElement("i");steps.appendChild(a);
+  var b=document.createElement("i");railv.appendChild(b);
+});
+function go(n){i=(n+DATA.length)%DATA.length;apply();
+  [].forEach.call(steps.children,function(e,j){e.className=j===i?"on":"";});
+  [].forEach.call(railv.children,function(e,j){e.className=j===i?"on":"";});
+  document.getElementById("kicker").textContent=DATA[i][0];
+}
+go(0);
+document.getElementById("shell").addEventListener("click",function(){go(i+1);});
+setInterval(function(){go(i+1);},4600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+<\/script>
+</body>
+</html>
+`,
+ 片段: "",
+ 参数: [
+  {
+   键: "bg",
+   名: "页面底色",
+   类型: "color",
+   默认: "#f4f4f6"
+  },
+  {
+   键: "fg",
+   名: "文字色",
+   类型: "color",
+   默认: "#0f1115"
+  },
+  {
+   键: "accent",
+   名: "强调色",
+   类型: "color",
+   默认: "#e2543a"
+  },
+  {
+   键: "plate",
+   名: "图版底色",
+   类型: "color",
+   默认: "#0f1115"
+  },
+  {
+   键: "radius",
+   名: "圆角(px)",
+   类型: "slider",
+   默认: 14,
+   最小: 4,
+   最大: 22,
+   步长: 1
+  },
+  {
+   键: "fs1",
+   名: "标题字号(px)",
+   类型: "slider",
+   默认: 26,
+   最小: 18,
+   最大: 36,
+   步长: 1
+  },
+  {
+   键: "navH",
+   名: "导航高(px)",
+   类型: "slider",
+   默认: 52,
+   最小: 44,
+   最大: 64,
+   步长: 2
+  },
+  {
+   键: "dur",
+   名: "换屏时长(s)",
+   类型: "slider",
+   默认: 0.5,
+   最小: 0.2,
+   最大: 1,
+   步长: 0.05
+  },
+  {
+   键: "pad",
+   名: "左右留白(px)",
+   类型: "slider",
+   默认: 18,
+   最小: 12,
+   最大: 28,
+   步长: 1
+  }
+ ],
+ 来源: "自研（零依赖单文件 demo，未临摹特定站点）"
+},
+{
+ id: "S48",
+ 风格名: "拾阶·分步表单",
+ 适配端: "移动端",
+ 风格: "科技未来",
+ 场景: "落地页·发布页",
+ 骨架: "顶部 56px 表单条（关闭 + 居中标题 + 步骤分段）→ 中间单页表单（问题 + 副标题 + 输入框组）→ 底部 62px 固定操作区（上一步 / 下一步）。",
+ 配色: "浅灰页面底 #f7f7f9，白表单条，蓝 #2f6bff 作唯一强调（进度、选中、主按钮），其余中性灰。",
+ 布局骨架: "页面转场用横向位移（左进右出，40px 偏移、0.34s），每页只问一组问题，输入框 48px 高。",
+ 重色落点: "蓝色只落在「顶部当前进度段 + 已选中项圆点 + 主按钮」三处。",
+ 第一屏内容: "第一步问题 + 一句副标题 + 三个可选项 + 底部「下一步」。",
+ 删减元素: "不要侧边校验提示、不要页脚链接、不要第二排按钮；每页只保留一条主线。",
+ 适用: "预约、下单、注册这类需要降低填表焦虑的移动端流程。",
+ 禁忌: "不要一次铺三页内容在某屏；不要让「上一步」在首步也亮着。",
+ 参考站: ["自建（2026-10-01）"],
+ 我的说明: "唯一走「分步 + 底部固定 CTA」骨架的一套，横向转场与顶部三段进度是它的识别点。",
+ Agent提示词: "1 视觉主题与氛围：冷静、可信、效率优先的预约表单，蓝白科技感，密度中低，情绪是「不打扰我把事办完」。\n2 色彩板与角色：页面底 #f7f7f9；表单条 #ffffff；主文字 #16181d；次要 #8a8a93；描边 #e4e4ea；强调蓝 #2f6bff（仅用于进度、选中圆点、主按钮）；主按钮字 #ffffff。\n3 字体规则：-apple-system / PingFang SC；问题 19px/1.5/500；副标题 12px/1.5 次要色；输入框 13px；按钮 14px/500。\n4 组件规范：输入框 48px 高、12px 圆角、浅灰填充；已选态＝描边变蓝；主按钮 44px 高圆角 12 蓝底白字；次按钮 72×44 描边透明底。\n5 布局法：左右 16px 留白，单列垂直推进，项间距 10px，问题与副标题成组。\n6 深度与层级：填充色区分层级（页面灰 / 卡片白 / 字段更浅灰），不用投影。\n7 该做 / 不该做：该做——一页一组、进度可见、主按钮常驻；不该做——页内长滚动、多列并排、页脚社交链接。\n8 响应式行为：320–480 单栏；触控目标 ≥44px；折叠策略＝整页横向转场。\n9 Agent 提示词指南：把表单内容套进上述 token 输出完整 HTML，三页结构、蓝色只留三处强调。",
+ 演示页: "assets/demos/方案-移动分步表单.html",
+ 代码: `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>移动分步表单</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);
+    font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+  .bar{height:var(--barH);display:flex;align-items:center;padding:0 var(--pad);background:var(--barBg);
+    border-bottom:1px solid var(--edge);position:relative}
+  .bar .x{width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:var(--ink);font-size:18px;cursor:pointer}
+  .bar .ttl{position:absolute;left:0;right:0;text-align:center;font-size:var(--fs);letter-spacing:-.01em;pointer-events:none}
+  .bar .step{position:absolute;left:0;right:0;bottom:-9px;display:flex;gap:5px;padding:0 var(--pad)}
+  .bar .step i{flex:1;height:3px;border-radius:2px;background:var(--edge)}
+  .bar .step i.on{background:var(--accent)}
+  .body{height:calc(100% - var(--barH) - var(--ctaH));overflow:hidden;position:relative}
+  /* 横向转场：新页从 --dir×--shift 的偏移滑到 0；--dir 归零后即为静止态（不留位移） */
+  .page2{position:absolute;inset:0;padding:calc(var(--pad) + 12px) var(--pad) 0;
+    transform:translateX(calc(var(--dir) * var(--shift)));
+    transition:transform var(--dur) cubic-bezier(.34,1.1,.5,1)}
+  .q{font-size:var(--fs);letter-spacing:-.02em;margin:2px 0 4px}
+  .sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+  .field{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border-radius:var(--radius);
+    background:var(--field);border:1px solid var(--edge);margin-bottom:10px;cursor:text}
+  .field b{font-weight:500;font-size:13px;flex:1}
+  .field i{width:var(--tick);height:var(--tick);border-radius:50%;background:var(--accent);display:block}
+  .picked{border-color:var(--accent)}
+  .hint{font-size:11px;color:var(--muted);padding-left:2px}
+  .cta{position:absolute;left:0;right:0;bottom:0;height:var(--ctaH);display:flex;align-items:center;gap:10px;
+    padding:0 var(--pad);background:var(--barBg);border-top:1px solid var(--edge);z-index:4}
+  .cta .back{min-width:72px;min-height:44px;border-radius:var(--radius);border:1px solid var(--edge);
+    background:transparent;color:var(--ink);font-size:13px;cursor:pointer;flex:none}
+  .cta .go{flex:1;min-height:44px;border:none;border-radius:var(--radius);background:var(--accent);
+    color:var(--onAccent);font-size:14px;font-weight:500;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="bar">
+    <button class="x" id="x" aria-label="关闭">×</button>
+    <div class="ttl" id="ttl">预约试听</div>
+    <div class="step" id="step"></div>
+  </div>
+  <div class="body" id="body"></div>
+  <div class="cta">
+    <button class="back" id="back">上一步</button>
+    <button class="go" id="go">下一步</button>
+  </div>
+</div>
+
+<script>
+var state={page:"#f7f7f9",barBg:"#ffffff",ink:"#16181d",muted:"#8a8a93",edge:"#e4e4ea",field:"#f2f2f5",
+  accent:"#2f6bff",onAccent:"#ffffff",radius:12,barH:56,ctaH:62,pad:16,fs:19,dur:.34,tick:8,shift:40};
+var UNIT={radius:"px",barH:"px",ctaH:"px",pad:"px",fs:"px",dur:"s",tick:"px",shift:"px"};
+var root=document.documentElement;
+var step=0,S=3,dir=0;
+function apply(){
+  for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+}
+/* --dir 只表示「本次转场的起始偏移方向」：先置 ±1 让新页落在偏移位，再归零滑回正位 */
+function setDir(v){root.style.setProperty("--dir",v);}
+function slide(v){setDir(v);requestAnimationFrame(function(){requestAnimationFrame(function(){setDir(0);});});}
+var PAGES=[
+  ["选择课程","三节课里挑一节，到点自动提醒。",["声音基础","图像基础","交互基础"]],
+  ["填写信息","只留三栏，其余交给系统补齐。",["姓名","手机号","备注"]],
+  ["确认预约","确认后可在「我的」里随时改期。",["时间","地点","人数"]]
+];
+var body=document.getElementById("body"),stepDom=document.getElementById("step");
+for(var i=0;i<S;i++){var e=document.createElement("i");stepDom.appendChild(e);}
+function render(){
+  body.innerHTML="";
+  var d=PAGES[step];
+  var p=document.createElement("div");
+  p.className="page2";
+  p.innerHTML='<div class="q">'+d[0]+'</div><div class="sub">'+d[1]+'</div>';
+  d[2].forEach(function(t,j){
+    p.innerHTML+='<div class="field'+(j===0?" picked":"")+'" data-k="'+j+'"><b>'+t+'</b><i></i></div>';
+  });
+  p.innerHTML+='<div class="hint">本页 3 项 · 已选 1 项</div>';
+  body.appendChild(p);
+  [].forEach.call(stepDom.children,function(e,j){e.className=j<=step?"on":"";});
+  document.getElementById("ttl").textContent=d[0];
+  document.getElementById("go").textContent=step===S-1?"提交预约":"下一步";
+}
+body.addEventListener("click",function(e){
+  var f=e.target.closest?e.target.closest(".field"):null;
+  if(!f)return;
+  [].forEach.call(f.parentNode.querySelectorAll(".field"),function(x){x.classList.remove("picked");});
+  f.classList.add("picked");
+});
+function go(n){dir=n>step?1:-1;step=Math.max(0,Math.min(S-1,n));apply();setDir(dir);render();slide(dir);}
+document.getElementById("go").addEventListener("click",function(){go(step===S-1?0:step+1);});
+document.getElementById("back").addEventListener("click",function(){go(step-1);});
+document.getElementById("x").addEventListener("click",function(){go(0);});
+apply();
+setDir(0);
+render();
+setInterval(function(){go(step===S-1?0:step+1);},5200);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+<\/script>
+</body>
+</html>
+`,
+ 片段: "",
+ 参数: [
+  {
+   键: "page",
+   名: "页面底色",
+   类型: "color",
+   默认: "#f7f7f9"
+  },
+  {
+   键: "barBg",
+   名: "表单条底色",
+   类型: "color",
+   默认: "#ffffff"
+  },
+  {
+   键: "ink",
+   名: "文字色",
+   类型: "color",
+   默认: "#16181d"
+  },
+  {
+   键: "accent",
+   名: "强调色",
+   类型: "color",
+   默认: "#2f6bff"
+  },
+  {
+   键: "field",
+   名: "输入框填充",
+   类型: "color",
+   默认: "#f2f2f5"
+  },
+  {
+   键: "radius",
+   名: "圆角(px)",
+   类型: "slider",
+   默认: 12,
+   最小: 4,
+   最大: 20,
+   步长: 1
+  },
+  {
+   键: "fs",
+   名: "问题字号(px)",
+   类型: "slider",
+   默认: 19,
+   最小: 15,
+   最大: 26,
+   步长: 1
+  },
+  {
+   键: "barH",
+   名: "顶部条高(px)",
+   类型: "slider",
+   默认: 56,
+   最小: 48,
+   最大: 68,
+   步长: 2
+  },
+  {
+   键: "ctaH",
+   名: "底部操作区高(px)",
+   类型: "slider",
+   默认: 62,
+   最小: 54,
+   最大: 76,
+   步长: 2
+  },
+  {
+   键: "dur",
+   名: "转场时长(s)",
+   类型: "slider",
+   默认: 0.34,
+   最小: 0.15,
+   最大: 0.7,
+   步长: 0.02
+  }
+ ],
+ 来源: "自研（零依赖单文件 demo，未临摹特定站点）"
+},
+{
+ id: "S49",
+ 风格名: "拾阶·竖向作品集",
+ 适配端: "移动端",
+ 风格: "暗色",
+ 场景: "作品集·叙事",
+ 骨架: "顶部大标题区（眉标 + 双行大标题 + 一句导语）→ 满幅封面图版 → 条目列表（左缩略图 + 右标题元信息）→ 底部标签行 + 右侧点状导航。",
+ 配色: "墨绿黑 #12130f 为底，纸白 #f2f0e8 为主文字，铁锈 #c8552f 只用在标题里一个词与点导航当前点，苔绿 #3f4a3a 作图版光晕。",
+ 布局骨架: "单栏、左右 18px 留白；封面高 168px；条目行高 = 缩略图 56px + 上下 14px 呼吸；行与行之间 1px 描边。",
+ 重色落点: "铁锈只出现在「标题里的一个词 + 右侧当前点」两处。",
+ 第一屏内容: "眉标 Selected Work + 双行大标题（第二行一个词染铁锈）+ 一句导语。",
+ 删减元素: "不要导航栏、不要卡片阴影、不要第三种强调色；列表只用 1px 描边分隔。",
+ 适用: "摄影 / 插画 / 设计个人作品集，需要把视线从上往下慢慢带走的场合。",
+ 禁忌: "不要做成瀑布流（会丢掉叙事顺序）；不要给每个条目都换色。",
+ 参考站: ["自建（2026-10-01）"],
+ 我的说明: "唯一走「大标题 + 封面 + 条目列表 + 点状导航」骨架的一套，暗色纸感与 S47 的纸白形成对位。",
+ Agent提示词: "1 视觉主题与氛围：暗色纸感作品集，像一本摊开的影集，墨绿黑底配纸白字，气质沉静、留白大、节奏慢。\n2 色彩板与角色：墨绿黑 #12130f 全页底；纸白 #f2f0e8 主文字；苔绿 #3f4a3a 封面光晕；铁锈 #c8552f 仅用于标题里一个词与当前点；灰 #9a9c92 次要文字；描边 #2b2c25。\n3 字体规则：-apple-system / PingFang SC；大标题 30px/1.1/-0.04em 500（可换行）；正文 13px/1.6；眉标 11px/0.24em  Uppercase；条目标题 13px。\n4 组件规范：封面 168px 高、12px 圆角、苔绿径向光晕；条目缩略图 56×56 圆角 10；下一条箭头 30×30 描边圆；底部标签 11px 描边胶囊，选中态铁锈底白字。\n5 布局法：8pt 呼吸、左右 18px、条目行 = 缩略图 56 + 上下 14px、行间 1px 描边。\n6 深度与层级：暗底 + 1px 描边，不用投影、不用深浅分层。\n7 该做 / 不该做：该做——顺序叙事、大留白、单色强调；不该做——瀑布流、多色强调、卡片投影。\n8 响应式行为：320–480 单栏；触控目标 ≥44px；折叠策略＝整页纵向滚动 + 点导航跟随。\n9 Agent 提示词指南：把作品内容套进上述 token 输出完整 HTML，大标题允许换行、第二行染铁锈、点导航按当前条目高亮。",
+ 演示页: "assets/demos/方案-移动竖向作品集.html",
+ 代码: `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>移动竖向作品集</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg);
+    font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg)}
+  .head{padding:calc(var(--topP)) var(--pad) 0;position:relative}
+  .head .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+  .head h1{font-size:var(--fs1);line-height:1.1;letter-spacing:-.04em;font-weight:500;margin:10px 0 8px}
+  .head h1 em{font-style:normal;color:var(--accent)}
+  .head p{color:var(--muted);font-size:var(--fs2);max-width:var(--measure)}
+  .panel{margin:calc(var(--topP) + 6px) var(--pad) 0;height:var(--panelH);border-radius:var(--radius);
+    background:var(--panel);position:relative;overflow:hidden}
+  .panel .g{position:absolute;inset:0;background:radial-gradient(100% 70% at 70% 15%,var(--accent2) 0%,transparent 58%)}
+  .panel .cap{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--onPanel);opacity:.8}
+  .works{margin-top:calc(var(--topP) + 4px);padding:0 var(--pad)}
+  .work{display:flex;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--edge);cursor:pointer}
+  .work .thumb{flex:none;width:var(--thumb);height:var(--thumb);border-radius:var(--thumbR);background:var(--panel2)}
+  .work .m{flex:1;min-width:0}
+  .work .m b{display:block;font-weight:500;font-size:var(--fs2);letter-spacing:-.01em}
+  .work .m span{font-size:11px;color:var(--muted)}
+  .work .go{width:30px;height:30px;border-radius:50%;border:1px solid var(--edge);display:grid;place-items:center;
+    color:var(--muted);font-size:13px;flex:none}
+  .work:active .thumb{transform:scale(.97)}
+  /* 侧点导航：竖向叙事的中轴锚点，与竖滑内容流、分步表单的骨架都不是同一套 */
+  .rail-dot{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+  .rail-dot i{width:var(--dot);height:var(--dot);border-radius:50%;background:var(--edge);transition:background var(--dur),transform var(--dur)}
+  .rail-dot i.on{background:var(--accent);transform:scale(var(--dotScale))}
+  .foot{position:absolute;left:0;right:0;bottom:0;padding:0 var(--pad) 14px;display:flex;gap:8px;align-items:center;
+    background:linear-gradient(180deg,transparent,var(--bg) 45%)}
+  .tag{border:1px solid var(--edge);border-radius:8px;padding:5px 9px;font-size:11px;color:var(--muted)}
+  .tag.hi{background:var(--accent);color:var(--onAccent);border-color:transparent}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="head">
+    <div class="eyebrow">Selected Work</div>
+    <h1>八个<em>下午</em>，<br>和它们的光</h1>
+    <p>一本关于城市角落的影像笔记。点开任一条目，看当天的光线是怎么落下来的。</p>
+  </div>
+  <div class="panel"><div class="g"></div><div class="cap">封面 · 江畔 2026</div></div>
+  <div class="works" id="works"></div>
+  <div class="rail-dot" id="railDot"></div>
+  <div class="foot"><span class="tag hi">影像</span><span class="tag">城市</span><span class="tag">长曝光</span></div>
+</div>
+<script>
+var state={bg:"#12130f",fg:"#f2f0e8",muted:"#9a9c92",edge:"#2b2c25",panel:"#1c1d17",panel2:"#2a2b22",
+  accent:"#c8552f",accent2:"#3f4a3a",onPanel:"#f2f0e8",onAccent:"#ffffff",
+  fs1:30,fs2:13,topP:26,pad:18,radius:12,panelH:168,thumb:56,thumbR:10,dot:7,dotScale:1.5,dur:.3,measure:"24em"};
+var UNIT={fs1:"px",fs2:"px",topP:"px",pad:"px",radius:"px",panelH:"px",thumb:"px",thumbR:"px",dot:"px",dotScale:"",dur:"s"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+var ITEMS=[["渡口 4:40","胶片 · 35mm"],["天台 18:12","手机 · 长曝"],["苔阶 09:30","静物"],
+  ["旧招牌 11:20","街拍"],["雨夜 21:05","夜景"]];
+var works=document.getElementById("works"),railDot=document.getElementById("railDot");
+ITEMS.forEach(function(it,i){
+  var w=document.createElement("div");
+  w.className="work";
+  w.innerHTML='<div class="thumb"></div><div class="m"><b>'+it[0]+'</b><span>'+it[1]+'</span></div><div class="go">›</div>';
+  works.appendChild(w);
+  var d=document.createElement("i");railDot.appendChild(d);
+});
+var cur=-1;
+var all=[].slice.call(document.querySelectorAll(".work"));
+function focus(n){
+  cur=Math.max(-1,Math.min(n,all.length-1));
+  all.forEach(function(e,j){e.style.background=j<=cur?"rgba(255,255,255,.04)":"transparent";});
+  [].forEach.call(railDot.children,function(e,j){e.className=j<=cur?"on":"";});
+}
+works.addEventListener("click",function(e){var w=e.target.closest?e.target.closest(".work"):null;if(w)focus(all.indexOf(w));});
+setInterval(function(){focus(cur>=all.length-1?0:cur+1);},3600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+<\/script>
+</body>
+</html>
+`,
+ 片段: "",
+ 参数: [
+  {
+   键: "bg",
+   名: "页面底色",
+   类型: "color",
+   默认: "#12130f"
+  },
+  {
+   键: "fg",
+   名: "文字色",
+   类型: "color",
+   默认: "#f2f0e8"
+  },
+  {
+   键: "muted",
+   名: "次要文字色",
+   类型: "color",
+   默认: "#9a9c92"
+  },
+  {
+   键: "panel",
+   名: "封面底色",
+   类型: "color",
+   默认: "#1c1d17"
+  },
+  {
+   键: "accent",
+   名: "强调色",
+   类型: "color",
+   默认: "#c8552f"
+  },
+  {
+   键: "accent2",
+   名: "光晕色",
+   类型: "color",
+   默认: "#3f4a3a"
+  },
+  {
+   键: "onPanel",
+   名: "封面字色",
+   类型: "color",
+   默认: "#f2f0e8"
+  },
+  {
+   键: "fs1",
+   名: "大标题字号(px)",
+   类型: "slider",
+   默认: 30,
+   最小: 22,
+   最大: 42,
+   步长: 1
+  },
+  {
+   键: "panelH",
+   名: "封面高(px)",
+   类型: "slider",
+   默认: 168,
+   最小: 120,
+   最大: 240,
+   步长: 8
+  },
+  {
+   键: "radius",
+   名: "圆角(px)",
+   类型: "slider",
+   默认: 12,
+   最小: 4,
+   最大: 22,
+   步长: 1
+  },
+  {
+   键: "thumb",
+   名: "缩略图边长(px)",
+   类型: "slider",
+   默认: 56,
+   最小: 44,
+   最大: 80,
+   步长: 2
+  },
+  {
+   键: "pad",
+   名: "左右留白(px)",
+   类型: "slider",
+   默认: 18,
+   最小: 12,
+   最大: 28,
+   步长: 1
+  }
+ ],
+ 来源: "自研（零依赖单文件 demo，未临摹特定站点）"
 }
 ];

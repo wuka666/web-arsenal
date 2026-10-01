@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>移动竖向作品集</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg);
+    font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg)}
+  .head{padding:calc(var(--topP)) var(--pad) 0;position:relative}
+  .head .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+  .head h1{font-size:var(--fs1);line-height:1.1;letter-spacing:-.04em;font-weight:500;margin:10px 0 8px}
+  .head h1 em{font-style:normal;color:var(--accent)}
+  .head p{color:var(--muted);font-size:var(--fs2);max-width:var(--measure)}
+  .panel{margin:calc(var(--topP) + 6px) var(--pad) 0;height:var(--panelH);border-radius:var(--radius);
+    background:var(--panel);position:relative;overflow:hidden}
+  .panel .g{position:absolute;inset:0;background:radial-gradient(100% 70% at 70% 15%,var(--accent2) 0%,transparent 58%)}
+  .panel .cap{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--onPanel);opacity:.8}
+  .works{margin-top:calc(var(--topP) + 4px);padding:0 var(--pad)}
+  .work{display:flex;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--edge);cursor:pointer}
+  .work .thumb{flex:none;width:var(--thumb);height:var(--thumb);border-radius:var(--thumbR);background:var(--panel2)}
+  .work .m{flex:1;min-width:0}
+  .work .m b{display:block;font-weight:500;font-size:var(--fs2);letter-spacing:-.01em}
+  .work .m span{font-size:11px;color:var(--muted)}
+  .work .go{width:30px;height:30px;border-radius:50%;border:1px solid var(--edge);display:grid;place-items:center;
+    color:var(--muted);font-size:13px;flex:none}
+  .work:active .thumb{transform:scale(.97)}
+  /* 侧点导航：竖向叙事的中轴锚点，与竖滑内容流、分步表单的骨架都不是同一套 */
+  .rail-dot{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+  .rail-dot i{width:var(--dot);height:var(--dot);border-radius:50%;background:var(--edge);transition:background var(--dur),transform var(--dur)}
+  .rail-dot i.on{background:var(--accent);transform:scale(var(--dotScale))}
+  .foot{position:absolute;left:0;right:0;bottom:0;padding:0 var(--pad) 14px;display:flex;gap:8px;align-items:center;
+    background:linear-gradient(180deg,transparent,var(--bg) 45%)}
+  .tag{border:1px solid var(--edge);border-radius:8px;padding:5px 9px;font-size:11px;color:var(--muted)}
+  .tag.hi{background:var(--accent);color:var(--onAccent);border-color:transparent}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="head">
+    <div class="eyebrow">Selected Work</div>
+    <h1>八个<em>下午</em>，<br>和它们的光</h1>
+    <p>一本关于城市角落的影像笔记。点开任一条目，看当天的光线是怎么落下来的。</p>
+  </div>
+  <div class="panel"><div class="g"></div><div class="cap">封面 · 江畔 2026</div></div>
+  <div class="works" id="works"></div>
+  <div class="rail-dot" id="railDot"></div>
+  <div class="foot"><span class="tag hi">影像</span><span class="tag">城市</span><span class="tag">长曝光</span></div>
+</div>
+<script>
+var state={bg:"#12130f",fg:"#f2f0e8",muted:"#9a9c92",edge:"#2b2c25",panel:"#1c1d17",panel2:"#2a2b22",
+  accent:"#c8552f",accent2:"#3f4a3a",onPanel:"#f2f0e8",onAccent:"#ffffff",
+  fs1:30,fs2:13,topP:26,pad:18,radius:12,panelH:168,thumb:56,thumbR:10,dot:7,dotScale:1.5,dur:.3,measure:"24em"};
+var UNIT={fs1:"px",fs2:"px",topP:"px",pad:"px",radius:"px",panelH:"px",thumb:"px",thumbR:"px",dot:"px",dotScale:"",dur:"s"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+apply();
+var ITEMS=[["渡口 4:40","胶片 · 35mm"],["天台 18:12","手机 · 长曝"],["苔阶 09:30","静物"],
+  ["旧招牌 11:20","街拍"],["雨夜 21:05","夜景"]];
+var works=document.getElementById("works"),railDot=document.getElementById("railDot");
+ITEMS.forEach(function(it,i){
+  var w=document.createElement("div");
+  w.className="work";
+  w.innerHTML='<div class="thumb"></div><div class="m"><b>'+it[0]+'</b><span>'+it[1]+'</span></div><div class="go">›</div>';
+  works.appendChild(w);
+  var d=document.createElement("i");railDot.appendChild(d);
+});
+var cur=-1;
+var all=[].slice.call(document.querySelectorAll(".work"));
+function focus(n){
+  cur=Math.max(-1,Math.min(n,all.length-1));
+  all.forEach(function(e,j){e.style.background=j<=cur?"rgba(255,255,255,.04)":"transparent";});
+  [].forEach.call(railDot.children,function(e,j){e.className=j<=cur?"on":"";});
+}
+works.addEventListener("click",function(e){var w=e.target.closest?e.target.closest(".work"):null;if(w)focus(all.indexOf(w));});
+setInterval(function(){focus(cur>=all.length-1?0:cur+1);},3600);
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>

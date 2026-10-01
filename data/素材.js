@@ -17838,5 +17838,561 @@ window.WEB_ARSENAL = [
   "用法": "向下滚动页面即可逐帧推进（滚动距离越长、帧推进越多）；不滚动时自动演示。调「场景」换日出 / 星轨 / 海浪；「主色相」整体换色调；「自动演示速度」控制闲置时的播放节奏。",
   "提示词": "做一组「滚动驱动逐帧切景」的网页动效：用户向下滚动时，画面像电影分镜一样按帧连续推进切换（自带 3 个程序化场景：日出 / 星轨 / 海浪，纯 canvas 生成，零图片）。要求：零依赖单文件 HTML；所有可调项用 CSS 变量驱动（背景色 / 文字色 / 强调色 / 主色相 / 场景 / 自动演示速度）并支持 postMessage type='param' 调参；无人滚动时自动来回播放避免黑屏预览。",
   "代码": "<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>滚动帧序列切景</title>\n<style>\n:root{\n  --bg:#0b0e14;\n  --fg:#e8eefc;\n  --accent:#7ee7ff;\n  --hue:200;\n  --scene:0;\n  --speed:1;\n}\n*{box-sizing:border-box;margin:0;padding:0}\nhtml,body{margin:0}\nbody{background:var(--bg);color:var(--fg);font-family:system-ui,\"PingFang SC\",sans-serif;overflow-x:hidden}\n.stage{position:sticky;top:0;height:100vh;width:100vw;overflow:hidden}\ncanvas{display:block;width:100%;height:100%}\n.hud{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);\n  background:rgba(10,12,18,.7);border:1px solid rgba(255,255,255,.14);\n  border-radius:12px;padding:9px 16px;font-size:13px;letter-spacing:.02em;\n  backdrop-filter:blur(8px);white-space:nowrap}\n.hud b{color:var(--accent)}\n.tip{position:fixed;left:50%;top:22px;transform:translateX(-50%);\n  font-size:12px;opacity:.55;text-align:center}\n.scroller{height:600vh}\n</style>\n</head>\n<body>\n<div class=\"stage\">\n  <canvas id=\"cv\"></canvas>\n  <div class=\"tip\">向下滚动＝逐帧推进场景（滚动驱动帧序列）</div>\n  <div class=\"hud\">场景 <b id=\"sName\">日出</b> · 帧 <b id=\"fNo\">0</b>/<b id=\"fTot\">60</b></div>\n</div>\n<div class=\"scroller\"></div>\n<script>\n// 全部参数集中于此，与上方 :root 一一对应（键=CSS 变量名）\nvar state={bg:'#0b0e14',fg:'#e8eefc',accent:'#7ee7ff',hue:200,scene:'日出',speed:1};\nvar FRAMES=60;\nvar cv=document.getElementById('cv'), ctx=cv.getContext('2d');\nvar sName=document.getElementById('sName'), fNo=document.getElementById('fNo'), fTot=document.getElementById('fTot');\nfTot.textContent=FRAMES;\nfunction resize(){\n  var dpr=Math.min(window.devicePixelRatio||1,2);\n  cv.width=innerWidth*dpr; cv.height=innerHeight*dpr;\n  ctx.setTransform(dpr,0,0,dpr,0,0);\n}\naddEventListener('resize',resize); resize();\nfunction hsl(h,s,l,a){return 'hsla('+h+','+s+'%,'+l+'%,'+(a==null?1:a)+')';}\n// 按滚动进度 t(0~1) 绘制当前帧对应的场景；场景随帧连续变化，形成\"电影分镜式\"逐帧切景\nfunction drawScene(t){\n  var W=innerWidth,H=innerHeight;\n  ctx.clearRect(0,0,W,H);\n  var sc=state.scene;\n  if(sc==='日出'){\n    var top=hsl(state.hue,40,Math.round(8+34*t));      // 夜→昼 天顶渐亮\n    var bot=hsl((state.hue+30)%360,55,Math.round(20+30*t));\n    var g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,top); g.addColorStop(1,bot);\n    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);\n    var sy=H*(1-0.08-t*0.84), r=Math.max(40,W*0.07);   // 太阳从地平线升到顶\n    ctx.fillStyle=state.accent; ctx.globalAlpha=0.9;\n    ctx.beginPath(); ctx.arc(W/2,sy,r,0,7); ctx.fill(); ctx.globalAlpha=1;\n    ctx.fillStyle=hsl(state.hue,30,Math.round(6+10*t)); ctx.fillRect(0,H*0.82,W,H*0.18);\n  } else if(sc==='星轨'){\n    ctx.fillStyle=state.bg; ctx.fillRect(0,0,W,H);\n    var cx=W/2,cy=H/2, ang=t*Math.PI*2;\n    for(var i=0;i<120;i++){\n      var rr=(i/120)*(Math.min(W,H)*0.45), a0=i*0.7;\n      ctx.strokeStyle=hsl(state.hue,70,60,0.5); ctx.lineWidth=1.2;\n      ctx.beginPath(); ctx.arc(cx,cy,rr,a0,a0+ang); ctx.stroke();\n    }\n    ctx.fillStyle=state.accent; ctx.beginPath(); ctx.arc(cx,cy,6,0,7); ctx.fill();\n  } else { // 海浪\n    var g2=ctx.createLinearGradient(0,0,0,H);\n    g2.addColorStop(0,hsl(state.hue,40,12)); g2.addColorStop(1,hsl(state.hue,45,22));\n    ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);\n    for(var k=0;k<4;k++){\n      ctx.beginPath(); ctx.moveTo(0,H);\n      for(var x=0;x<=W;x+=8){\n        var y=H*0.55+k*18+Math.sin(x*0.02+t*Math.PI*2+k)*18*(1-k*0.12);\n        ctx.lineTo(x,y);\n      }\n      ctx.lineTo(W,H); ctx.closePath();\n      ctx.fillStyle=hsl(state.hue+k*10,60,40+k*8,0.25+k*0.12); ctx.fill();\n    }\n  }\n}\nvar auto=true, vp=0, dir=1, lastScroll=0;\nfunction apply(){\n  var t;\n  if(auto){ t=vp; }\n  else {\n    var max=document.body.scrollHeight-innerHeight;\n    t=max>0?Math.min(1,Math.max(0,scrollY/max)):0;\n  }\n  var frame=Math.floor(t*FRAMES);\n  drawScene(t);\n  fNo.textContent=frame; sName.textContent=state.scene;\n}\naddEventListener('scroll',function(){\n  if(performance.now()-lastScroll>400){ auto=false; }   // 真人滚动后切到滚动驱动\n  lastScroll=performance.now(); apply();\n},{passive:true});\nfunction loop(){\n  if(auto){ vp+=0.004*state.speed*dir; if(vp>=1){vp=1;dir=-1;} if(vp<=0){vp=0;dir=1;} apply(); }\n  requestAnimationFrame(loop);\n}\nloop();\n// 外部调参契约：只接受 type==='param' 且 key 在 state 内的消息\nwindow.addEventListener('message',function(e){\n  var d=e.data;\n  if(!d||d.type!=='param')return;\n  if(!(d.key in state))return;\n  state[d.key]=d.value; apply();\n});\napply();\n<\/script>\n</body>\n</html>\n"
+},
+{
+ "id": "M333",
+ "标题": "悬浮按钮容器变换",
+ "适配端": "移动端",
+ "风格": "iOS 原生",
+ "场景": "工具·SaaS",
+ "元素": "动效",
+ "搭配": [],
+ "标签": [
+  "悬浮按钮",
+  "FAB",
+  "径向菜单",
+  "容器变换",
+  "错峰",
+  "移动端"
+ ],
+ "来源": "自研（零依赖单文件 demo，未临摹特定站点）",
+ "效果演示": "assets/demos/悬浮按钮容器变换.html",
+ "参数": [
+  {
+   "键": "bg",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f2f2f7"
+  },
+  {
+   "键": "fab",
+   "名": "主按钮底色",
+   "类型": "color",
+   "默认": "#0a84ff"
+  },
+  {
+   "键": "icon",
+   "名": "图标色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "itemBg",
+   "名": "子按钮底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "labelBg",
+   "名": "文字标签底",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "labelFg",
+   "名": "文字标签色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "radius",
+   "名": "展开半径(px)",
+   "类型": "slider",
+   "默认": 112,
+   "最小": 56,
+   "最大": 150,
+   "步长": 2
+  },
+  {
+   "键": "size",
+   "名": "主按钮直径(px)",
+   "类型": "slider",
+   "默认": 56,
+   "最小": 48,
+   "最大": 76,
+   "步长": 2
+  },
+  {
+   "键": "item",
+   "名": "子按钮直径(px)",
+   "类型": "slider",
+   "默认": 48,
+   "最小": 40,
+   "最大": 64,
+   "步长": 2
+  },
+  {
+   "键": "dur",
+   "名": "变换时长(s)",
+   "类型": "slider",
+   "默认": 0.36,
+   "最小": 0.15,
+   "最大": 0.8,
+   "步长": 0.05
+  },
+  {
+   "键": "stagger",
+   "名": "子项错峰(ms)",
+   "类型": "slider",
+   "默认": 45,
+   "最小": 0,
+   "最大": 140,
+   "步长": 5
+  },
+  {
+   "键": "spin",
+   "名": "展开旋转角(deg)",
+   "类型": "slider",
+   "默认": 45,
+   "最小": 0,
+   "最大": 180,
+   "步长": 15
+  },
+  {
+   "键": "scrim",
+   "名": "遮罩浓度",
+   "类型": "slider",
+   "默认": 0.28,
+   "最小": 0,
+   "最大": 0.6,
+   "步长": 0.04
+  }
+ ],
+ "效果说明": "点下主按钮，它同时完成位移、整体旋转与缩收，把「+」拧成「×」；四个子按钮沿不同角度错峰推出，标签左置跟出。\n好在一个控件承担了「展开 / 收起」两种身份，拇指全程留在屏幕右下角不用换位置；把 spin 设成 0 就退回纯展开，设 135 会变成扇形翻页。",
+ "用法": "把 .main 与 .item 换成自己的图标与层级；子按钮务必保持 ≥44px 命中区（本例 48px）；radius 超过 140px 后窄屏容易顶到内容，要么调小展开半径，要么把角度范围收到 -160°~-20°。",
+ "提示词": "零依赖单文件 HTML（移动端）：右下角悬浮主按钮，点击后从圆心向四个方向推出 4 个圆形子按钮（错峰 45ms，缓动 cubic-bezier(.34,1.56,.64,1)），主按钮同时旋转 45 度把加号变叉并缩收到 0.92，遮罩浓度 0.28 渐隐；子按钮文字标签左置，再点遮罩或主按钮收起；可用参数：展开半径 112px、主按钮 56px、子按钮 48px、时长 0.36s、展开旋转角 45 度。所有资源内联，无外链。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>悬浮按钮容器变换</title>\\n<style>\\n  :root{\\n    --fg:#1c1c1e;--dim:#8e8e93;--line:#e5e5ea;--line2:#d9d9de;--chip:#e9e9ee;\\n    --ease:cubic-bezier(.34,1.56,.64,1);\\n    --open:0;--spin:0deg;\\n  }\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;\\n    background:var(--bg);\\n    font:500 14px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;\\n    color:var(--fg);\\n    -webkit-user-select:none;user-select:none;\\n  }\\n  .page{padding:22px 18px 150px}\\n  .row{display:flex;justify-content:space-between;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}\\n  .row b{font-weight:500}\\n  .row span{color:var(--dim);font-size:12px;letter-spacing:.04em}\\n  .block{margin-top:16px;height:56px;border-radius:14px;background:var(--chip)}\\n  .scrim{position:absolute;inset:0;background:#000;opacity:calc(var(--scrim) * (1 - var(--open)));pointer-events:none}\\n  .dock{position:absolute;right:18px;bottom:calc(var(--size) / 2 + 26px);width:0;height:0;z-index:2}\\n  /* 主按钮一次 transition 完成三件事：位移到圆心位置、整体转 45° 把「+」拧成「×」、缩收压住子按钮 */\\n  .main{\\n    position:absolute;left:calc(var(--size) / -2);top:calc(var(--size) / -2);\\n    width:var(--size);height:var(--size);\\n    border-radius:50%;background:var(--fab);border:none;\\n    display:grid;place-items:center;cursor:pointer;z-index:3;\\n    transition:transform var(--dur) var(--ease),background-color var(--dur) ease;\\n    transform:rotate(calc(var(--spin) * var(--open))) scale(calc(1 - var(--open) * .12));\\n  }\\n  .main i{position:absolute;width:20px;height:2px;border-radius:2px;background:var(--icon)}\\n  .main i:first-child{transform:rotate(calc(var(--spin) * var(--open)))}\\n  .main i:last-child{transform:rotate(calc((var(--spin) + 90) * var(--open)))}\\n  .item{\\n    position:absolute;left:calc(var(--item) / -2);top:calc(var(--item) / -2);\\n    width:var(--item);height:var(--item);border-radius:50%;\\n    background:var(--itemBg);border:1px solid var(--line2);\\n    display:grid;place-items:center;cursor:pointer;\\n    transition:transform var(--dur) var(--ease),opacity var(--dur) ease;\\n    transition-delay:calc(var(--i) * var(--stagger) / 1000 * var(--open));\\n    opacity:calc(1 - var(--open));\\n  }\\n  .item em{width:14px;height:14px;border-radius:5px;background:var(--icon)}\\n  .label{\\n    position:absolute;right:0;top:calc(var(--item) / -2);\\n    height:var(--item);display:flex;align-items:center;white-space:nowrap;\\n    font-size:12px;color:var(--labelFg);background:var(--labelBg);\\n    padding:0 9px;border-radius:6px;pointer-events:none;\\n    opacity:calc(1 - var(--open));\\n    transition:opacity var(--dur) ease;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\" id=\\\"wrap\\\">\\n  <div class=\\\"page\\\">\\n    <div class=\\\"row\\\"><b>本周概览</b><span>04 / 12</span></div>\\n    <div class=\\\"row\\\"><b>进行中的项目</b><span>7</span></div>\\n    <div class=\\\"row\\\"><b>待处理提醒</b><span>23</span></div>\\n    <div class=\\\"block\\\"></div>\\n    <div class=\\\"row\\\"><b>草稿箱</b><span>4</span></div>\\n    <div class=\\\"block\\\"></div>\\n    <div class=\\\"row\\\"><b>最近同步</b><span>刚刚</span></div>\\n  </div>\\n  <div class=\\\"scrim\\\"></div>\\n  <div class=\\\"dock\\\" id=\\\"dock\\\"></div>\\n  <button class=\\\"main\\\" id=\\\"main\\\" aria-label=\\\"展开操作\\\"><i></i><i></i></button>\\n</div>\\n<script>\\nvar state={bg:\\\"#f2f2f7\\\",fab:\\\"#0a84ff\\\",icon:\\\"#ffffff\\\",itemBg:\\\"#ffffff\\\",labelBg:\\\"#1c1c1e\\\",labelFg:\\\"#ffffff\\\",radius:112,size:56,item:48,dur:0.36,stagger:45,spin:45,scrim:0.28};\\nvar UNIT={radius:\\\"px\\\",size:\\\"px\\\",item:\\\"px\\\",dur:\\\"s\\\",stagger:\\\"ms\\\",spin:\\\"deg\\\"};\\nvar root=document.documentElement;\\nvar open=false;\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--open\\\",open?1:0);\\n  root.style.setProperty(\\\"--spin\\\",state.spin);\\n}\\nfunction setOpen(v){open=v;apply();}\\nvar dock=document.getElementById(\\\"dock\\\");\\nvar NAMES=[\\\"新建\\\",\\\"扫一扫\\\",\\\"上传\\\",\\\"邀请\\\"];\\nvar RAD=[-180,-135,-90,-45];\\nRAD.forEach(function(deg,i){\\n  var a=deg*Math.PI/180, r=state.radius;\\n  var el=document.createElement(\\\"div\\\");\\n  el.className=\\\"item\\\";\\n  el.style.transform=\\\"translate(\\\"+(Math.cos(a)*r)+\\\"px,\\\"+(Math.sin(a)*r)+\\\"px)\\\";\\n  el.style.setProperty(\\\"--i\\\",i);\\n  el.innerHTML='<em></em><span class=\\\"label\\\" style=\\\"transform:translateX('+(r+24)+'px)\\\">'+NAMES[i]+'</span>';\\n  dock.appendChild(el);\\n  var lb=el.querySelector(\\\".label\\\");\\n  lb.style.right=(r+30)+\\\"px\\\";\\n});\\nvar main=document.getElementById(\\\"main\\\");\\nmain.addEventListener(\\\"click\\\",function(e){e.stopPropagation();setOpen(!open);});\\ndocument.getElementById(\\\"wrap\\\").addEventListener(\\\"click\\\",function(){setOpen(false);});\\n/* 初始即展开态：画廊缩略图与 headless 截图不看鼠标也能看到容器变换的结果 */\\nsetOpen(true);\\nsetInterval(function(){setOpen(!open);},3200);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
+},
+{
+ "id": "M334",
+ "标题": "竖向整屏视频流",
+ "适配端": "移动端",
+ "风格": "暗色",
+ "场景": "内容·阅读",
+ "元素": "媒体",
+ "搭配": [],
+ "标签": [
+  "竖滑",
+  "视频流",
+  "整屏",
+  "全屏",
+  "吸附",
+  "移动端"
+ ],
+ "来源": "自研（零依赖单文件 demo，未临摹特定站点）",
+ "效果演示": "assets/demos/竖向整屏视频流.html",
+ "参数": [
+  {
+   "键": "bg",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#05050a"
+  },
+  {
+   "键": "accent",
+   "名": "主色",
+   "类型": "color",
+   "默认": "#ff375f"
+  },
+  {
+   "键": "metaFg",
+   "名": "元信息色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "metaBg",
+   "名": "底部条底色",
+   "类型": "color",
+   "默认": "rgba(12,12,16,.72)"
+  },
+  {
+   "键": "dot",
+   "名": "进度点色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "dotBg",
+   "名": "翻页钮底色",
+   "类型": "color",
+   "默认": "rgba(255,255,255,.16)"
+  },
+  {
+   "键": "zoom",
+   "名": "未入屏缩放",
+   "类型": "slider",
+   "默认": 1.22,
+   "最小": 1,
+   "最大": 1.6,
+   "步长": 0.02
+  },
+  {
+   "键": "dur",
+   "名": "切换时长(s)",
+   "类型": "slider",
+   "默认": 0.46,
+   "最小": 0.2,
+   "最大": 0.9,
+   "步长": 0.02
+  },
+  {
+   "键": "gap",
+   "名": "进度点间距(px)",
+   "类型": "slider",
+   "默认": 8,
+   "最小": 4,
+   "最大": 16,
+   "步长": 1
+  },
+  {
+   "键": "tabH",
+   "名": "底部条高度(px)",
+   "类型": "slider",
+   "默认": 64,
+   "最小": 52,
+   "最大": 84,
+   "步长": 2
+  },
+  {
+   "键": "dotW",
+   "名": "进度点宽(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 10,
+   "最大": 26,
+   "步长": 1
+  }
+ ],
+ "效果说明": "一屏一项的竖向轨道：拖拽跟手，松手按 60px 阈值吸附到相邻项；右下角竖向分段进度随位置推进，底部信息条常驻。\n与轮播的区别在「整屏 + 一屏一项 + 竖向」——左右不出现任何横向控件，控件全落在拇指区；把 gap 调大能拉开进度点间距，dur 调慢会让吸附更黏。",
+ "用法": "轨道用 translateY 整屏位移；接真实视频时把 .art 换成 <video autoplay muted loop playsinline>；不要同时挂横向轮播手势，两种手势会互相抢。",
+ "提示词": "零依赖单文件 HTML（移动端暗色）：竖向整屏视频流共 4 屏，每屏一屏一项，translateY 整屏切换并带 0.46s 缓动；touch 拖拽跟手、松手位移超 60px 吸附相邻项；右下角竖向分段进度条随当前项推进，底部 64px 固定信息条（头像、标题、赞数、主按钮）；自动轮播间隔 4.2s；可用参数：主色 #ff375f、未入屏缩放 1.22、切换时长 0.46s、进度点宽 14px。资源全部内联，不引外链。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>竖向整屏视频流</title>\\n<style>\\n  :root{--open:1}\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  body{overflow:hidden}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:#fff;\\n    -webkit-user-select:none;user-select:none;\\n  }\\n  /* 竖向轨道：一屏一项，靠 translateY 走位；--open 是「是否已滑到该页」的连续量，供进度条插值 */\\n  .track{\\n    position:absolute;left:0;top:0;width:100%;\\n    will-change:transform;\\n    transition:transform var(--dur) var(--ease);\\n  }\\n  .slide{\\n    position:relative;width:100%;height:100vh;overflow:hidden;\\n    display:flex;flex-direction:column;justify-content:flex-end;\\n    padding:0 16px 0;\\n  }\\n  .art{\\n    position:absolute;inset:0;\\n    background:\\n      radial-gradient(120% 80% at 20% 10%,var(--accent) 0%,transparent 55%),\\n      linear-gradient(160deg,#1b1b22 0%,#05050a 100%);\\n    transform:scale(var(--zoom));\\n    transition:transform 1.2s var(--ease);\\n  }\\n  .slide.on .art{transform:scale(1)}\\n  .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.72) 100%)}\\n  .meta{position:relative;z-index:2;padding-bottom:calc(var(--tabH) + 26px);opacity:calc(1 - var(--open) * .0);transition:opacity .3s}\\n  .meta h3{font-size:17px;font-weight:500;letter-spacing:.01em;margin-bottom:6px}\\n  .meta p{color:var(--metaFg);font-size:12px;opacity:.72}\\n  .bar{position:relative;z-index:2;height:calc(var(--tabH));display:flex;align-items:center;gap:14px;margin:0 -16px;padding:0 16px;background:var(--metaBg)}\\n  .av{width:34px;height:34px;border-radius:50%;background:var(--accent);flex:none}\\n  .bar .t{flex:1}\\n  .bar .t b{display:block;font-weight:500;font-size:12px}\\n  .bar .t span{font-size:11px;color:var(--metaFg);opacity:.7}\\n  .nav{\\n    position:absolute;right:12px;top:50%;transform:translateY(-50%);\\n    width:44px;height:44px;border-radius:50%;border:none;\\n    background:var(--dotBg);color:var(--dot);font-size:16px;cursor:pointer;z-index:5;\\n  }\\n  .dots{position:absolute;right:16px;top:calc(50% + 40px);z-index:5;display:flex;flex-direction:column;gap:var(--gap)}\\n  .dots i{width:var(--dotW);height:3px;border-radius:2px;background:var(--dot);opacity:.32;transition:opacity .3s,width .3s}\\n  .dots i.on{opacity:1;width:calc(var(--dotW) + 6px)}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\" id=\\\"wrap\\\">\\n  <div class=\\\"track\\\" id=\\\"track\\\"></div>\\n  <div class=\\\"dots\\\" id=\\\"dots\\\"></div>\\n  <button class=\\\"nav\\\" id=\\\"nav\\\" aria-label=\\\"下一项\\\">›</button>\\n</div>\\n<script>\\nvar state={bg:\\\"#05050a\\\",accent:\\\"#ff375f\\\",dur:0.46,gap:8,zoom:1.22,tabH:64,metaFg:\\\"#ffffff\\\",metaBg:\\\"rgba(12,12,16,.72)\\\",dot:\\\"#ffffff\\\",dotBg:\\\"rgba(255,255,255,.16)\\\",dotW:14};\\nvar UNIT={dur:\\\"s\\\",gap:\\\"px\\\",zoom:\\\"\\\",tabH:\\\"px\\\",dotW:\\\"px\\\"};\\nvar root=document.documentElement;\\nvar idx=0,N=4;\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--open\\\",0);\\n}\\nvar track=document.getElementById(\\\"track\\\"),dots=document.getElementById(\\\"dots\\\");\\nvar DATA=[\\n  {h:\\\"深夜厨房·一锅到底\\\",p:\\\"跟着做 3 道下饭菜 · 22:10\\\"},\\n  {h:\\\"骑行 40 公里看江\\\",p:\\\"第一视角 · 全程无剪辑\\\"},\\n  {h:\\\"旧书店的午后\\\",p:\\\"在城市里慢下来 · 治愈向\\\"},\\n  {h:\\\"手冲咖啡的三分钟\\\",p:\\\"器具与手法 · 新手向\\\"}\\n];\\nDATA.forEach(function(d,i){\\n  var s=document.createElement(\\\"div\\\");\\n  s.className=\\\"slide\\\";\\n  s.innerHTML='<div class=\\\"art\\\"></div><div class=\\\"veil\\\"></div>'+\\n    '<div class=\\\"meta\\\"><h3>'+d.h+'</h3><p>'+d.p+'</p></div>'+\\n    '<div class=\\\"bar\\\"><div class=\\\"av\\\"></div><div class=\\\"t\\\"><b>账号 '+i+'</b><span>3.2 万 赞</span></div></div>';\\n  track.appendChild(s);\\n  var dot=document.createElement(\\\"i\\\");dots.appendChild(dot);\\n});\\nfunction go(i){\\n  idx=(i+N)%N;\\n  track.style.transform=\\\"translateY(\\\"+(-idx*100)+\\\"%)\\\";\\n  [].forEach.call(track.children,function(e,j){e.className=\\\"slide\\\"+(j===idx?\\\" on\\\":\\\"\\\");});\\n  [].forEach.call(dots.children,function(e,j){e.className=j===idx?\\\"on\\\":\\\"\\\";});\\n}\\napply();\\ngo(0);\\nfunction next(){go(idx+1);}\\ndocument.getElementById(\\\"nav\\\").addEventListener(\\\"click\\\",next);\\ndots.addEventListener(\\\"click\\\",function(e){if(e.target.tagName===\\\"I\\\")go([].indexOf.call(dots.children,e));});\\n/* 拖动跟随：竖向拖拽实时跟手，松手按位移阈值吸附到相邻项 */\\nvar sy=0,dy=0,drag=false;\\nvar wrap=document.getElementById(\\\"wrap\\\");\\nwrap.addEventListener(\\\"touchstart\\\",function(e){drag=true;sy=e.touches[0].clientY;dy=0;},{passive:true});\\nwrap.addEventListener(\\\"touchmove\\\",function(e){if(drag)dy=e.touches[0].clientY-sy;},{passive:true});\\nwrap.addEventListener(\\\"touchend\\\",function(){if(drag){if(dy<-60)go(idx+1);else if(dy>60)go(idx-1);drag=false;}});\\nwrap.addEventListener(\\\"mousedown\\\",function(e){drag=true;sy=e.clientY;dy=0;});\\nwindow.addEventListener(\\\"mouseup\\\",function(e){if(drag){var d=e.clientY-sy;if(d<-60)go(idx+1);else if(d>60)go(idx-1);drag=false;}});\\nsetInterval(next,4200);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
+},
+{
+ "id": "M335",
+ "标题": "双列交错瀑布流",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "内容·阅读",
+ "元素": "媒体",
+ "搭配": [],
+ "标签": [
+  "瀑布流",
+  "双列",
+  "错落",
+  "交错",
+  "卡片墙",
+  "移动端"
+ ],
+ "来源": "自研（零依赖单文件 demo，未临摹特定站点）",
+ "效果演示": "assets/demos/双列交错瀑布流.html",
+ "参数": [
+  {
+   "键": "pageBg",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#f6f6f8"
+  },
+  {
+   "键": "cardBg",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "accent",
+   "名": "主按钮色",
+   "类型": "color",
+   "默认": "#ff7a45"
+  },
+  {
+   "键": "fg",
+   "名": "文字色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "dim",
+   "名": "次要文字色",
+   "类型": "color",
+   "默认": "#9a9aa2"
+  },
+  {
+   "键": "gap",
+   "名": "列间距(px)",
+   "类型": "slider",
+   "默认": 10,
+   "最小": 6,
+   "最大": 20,
+   "步长": 1
+  },
+  {
+   "键": "radius",
+   "名": "卡片圆角(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 6,
+   "最大": 24,
+   "步长": 1
+  },
+  {
+   "键": "h1",
+   "名": "占位块基准高(px)",
+   "类型": "slider",
+   "默认": 120,
+   "最小": 70,
+   "最大": 200,
+   "步长": 5
+  },
+  {
+   "键": "barH",
+   "名": "底部条高度(px)",
+   "类型": "slider",
+   "默认": 58,
+   "最小": 48,
+   "最大": 76,
+   "步长": 2
+  },
+  {
+   "键": "stagger",
+   "名": "入场错峰(ms)",
+   "类型": "slider",
+   "默认": 45,
+   "最小": 0,
+   "最大": 160,
+   "步长": 5
+  },
+  {
+   "键": "shadow",
+   "名": "卡片阴影",
+   "类型": "string",
+   "默认": "0 1px 2px rgba(20,20,30,.05)"
+  }
+ ],
+ "效果说明": "两列不等高卡片流：每次新增都插进当前较短的那一列，形成天然错落，卡片再按序号错峰浮入。\n与等比网格的差别就在「不等高 + 按列最短插入」；想更碎就把 h1 调小、gap 拉大，想更整就把 JS 里高度抖动的幅度收窄。",
+ "用法": ".cols 是两条 flex 列，卡片高度由 JS 按序号抖动生成；接真实数据时把高度换成图片原始比例；底部固定条是常驻 CTA，别让它压住最后一列（padBottom 可调）。",
+ "提示词": "零依赖单文件 HTML（移动端）：双列交错瀑布流，占位色块代替图片，卡片白底圆角 14px、列间距 10px，每次新增插入当前较短列（最短列逻辑），卡片入场按序号 45ms 错峰上浮；底部 58px 固定信息条 + 主按钮「进入店铺」；可用参数：页面底色 #f6f6f8、卡片白、主色 #ff7a45、基准高 120px、错峰 45ms。全内联无外链。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>双列交错瀑布流</title>\\n<style>\\n  :root{}\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  body{background:var(--pageBg)}\\n  .wrap{\\n    width:100%;min-height:100vh;background:var(--pageBg);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--fg);\\n    padding:14px 12px calc(var(--padBottom));\\n    -webkit-user-select:none;user-select:none;\\n  }\\n  .cols{display:flex;gap:var(--gap);align-items:flex-start}\\n  .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}\\n  .card{\\n    border-radius:var(--radius);overflow:hidden;background:var(--cardBg);\\n    box-shadow:var(--shadow);\\n    opacity:calc(var(--reveal) * 1);transform:translateY(calc((1 - var(--reveal)) * 14px));\\n    transition:opacity .42s ease,transform .42s var(--ease);transition-delay:calc(var(--i) * var(--stagger) / 1000);\\n  }\\n  .art{width:100%;background:var(--a1);height:var(--h1)}\\n  .art.b{background:var(--a2)}\\n  .art.c{background:var(--a3)}\\n  .body{padding:9px 10px 11px}\\n  .body b{display:block;font-weight:500;font-size:12.5px;margin-bottom:3px}\\n  .body span{font-size:11px;color:var(--dim)}\\n  .foot{\\n    position:fixed;left:0;right:0;bottom:0;z-index:5;\\n    display:flex;align-items:center;gap:10px;\\n    height:var(--barH);padding:0 14px;\\n    background:var(--barBg);border-top:1px solid var(--line);\\n  }\\n  .foot .t{flex:1;font-size:12px}\\n  .foot .t b{display:block;font-weight:500}\\n  .foot .t span{font-size:11px;color:var(--dim)}\\n  .cta{\\n    min-width:88px;min-height:40px;border:none;border-radius:var(--radius);\\n    background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"cols\\\" id=\\\"cols\\\"><div class=\\\"col\\\" id=\\\"c0\\\"></div><div class=\\\"col\\\" id=\\\"c1\\\"></div></div>\\n</div>\\n<div class=\\\"foot\\\"><div class=\\\"t\\\"><b>拾光集</b><span>共 12 条</span></div><button class=\\\"cta\\\">进入店铺</button></div>\\n<script>\\nvar state={pageBg:\\\"#f6f6f8\\\",cardBg:\\\"#ffffff\\\",fg:\\\"#1c1c1e\\\",dim:\\\"#9a9aa2\\\",line:\\\"#ececf0\\\",accent:\\\"#ff7a45\\\",a1:\\\"#dfe7f2\\\",a2:\\\"#f2e3dc\\\",a3:\\\"#e2efe4\\\",gap:10,radius:14,h1:120,barH:58,padBottom:18,stagger:45,shadow:\\\"0 1px 2px rgba(20,20,30,.05)\\\"};\\nvar UNIT={gap:\\\"px\\\",radius:\\\"px\\\",h1:\\\"px\\\",barH:\\\"px\\\",padBottom:\\\"px\\\",stagger:\\\"ms\\\"};\\nvar root=document.documentElement;\\nfunction apply(){for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--reveal\\\",1);}\\napply();\\nvar TITLES=[\\\"江边旧渡口\\\",\\\"玻璃幕墙的午后\\\",\\\"苔与石\\\",\\\"午后的窗\\\",\\\"天台的风\\\",\\\"青石阶\\\",\\\"旧招牌\\\",\\\"晨雾散去\\\",\\\"铁艺栏杆\\\",\\\"晒台上的猫\\\",\\\"巷口的光\\\",\\\"雨后的柏油\\\"];\\nvar c0=document.getElementById(\\\"c0\\\"),c1=document.getElementById(\\\"c1\\\");\\nvar n=0,seq=0;\\nfunction shortest(){return c0.offsetHeight<=c1.offsetHeight?c0:c1;}\\nfunction add(){\\n  if(n>=TITLES.length)return;\\n  var t=TITLES[n++],cl=shortest();\\n  var d=document.createElement(\\\"div\\\");\\n  d.className=\\\"card\\\";\\n  var artCls=[\\\"art\\\",\\\"art b\\\",\\\"art c\\\"][n%3];\\n  /* 高度按序号错落，制造不等高的交错节奏——这是瀑布流与等比网格的唯一区别 */\\n  d.innerHTML='<div class=\\\"'+artCls+'\\\" style=\\\"height:'+(state.h1+((n*23)%90-45))+'px\\\"></div>'+\\n    '<div class=\\\"body\\\"><b>'+t+'</b><span>拍照笔记 · '+((n*7)%29+1)+' 分钟前</span></div>';\\n  d.style.setProperty(\\\"--i\\\",seq++);\\n  cl.appendChild(d);\\n}\\nfor(var i=0;i<8;i++)add();\\ndocument.querySelector(\\\".foot\\\").addEventListener(\\\"click\\\",function(){for(var j=0;j<4;j++)add();});\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
+},
+{
+ "id": "M336",
+ "标题": "横滑故事卡组",
+ "适配端": "移动端",
+ "风格": "品牌海报",
+ "场景": "内容·阅读",
+ "元素": "媒体",
+ "搭配": [],
+ "标签": [
+  "横滑",
+  "故事卡",
+  "分段进度",
+  "长按暂停",
+  "移动端"
+ ],
+ "来源": "自研（零依赖单文件 demo，未临摹特定站点）",
+ "效果演示": "assets/demos/横滑故事卡组.html",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#101014"
+  },
+  {
+   "键": "cardBg",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#1c1c22"
+  },
+  {
+   "键": "accent",
+   "名": "光晕主色",
+   "类型": "color",
+   "默认": "#5ac8fa"
+  },
+  {
+   "键": "segOn",
+   "名": "进度条激活色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "segBg",
+   "名": "进度条底色",
+   "类型": "color",
+   "默认": "rgba(255,255,255,.28)"
+  },
+  {
+   "键": "ring",
+   "名": "头像环色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "w",
+   "名": "卡片宽(px)",
+   "类型": "slider",
+   "默认": 196,
+   "最小": 150,
+   "最大": 260,
+   "步长": 4
+  },
+  {
+   "键": "h",
+   "名": "卡图高(px)",
+   "类型": "slider",
+   "默认": 250,
+   "最小": 180,
+   "最大": 320,
+   "步长": 6
+  },
+  {
+   "键": "radius",
+   "名": "卡片圆角(px)",
+   "类型": "slider",
+   "默认": 14,
+   "最小": 6,
+   "最大": 24,
+   "步长": 1
+  },
+  {
+   "键": "gap",
+   "名": "卡间距(px)",
+   "类型": "slider",
+   "默认": 12,
+   "最小": 6,
+   "最大": 20,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "切换时长(s)",
+   "类型": "slider",
+   "默认": 0.4,
+   "最小": 0.2,
+   "最大": 0.8,
+   "步长": 0.02
+  }
+ ],
+ "效果说明": "横向故事卡组：卡片固定宽、轨道横向位移，顶部按张数分段、当前段持续推进，长按即暂停推进。\n核心不在滑动本身，而在「分段进度 + 长按暂停」这两个 stories 类容器的标志；改 dotW 调分段宽度，stagger 类参数可换节奏。",
+ "用法": "卡片固定宽 + 轨道 translateX；接真实多图时把 .art 换成横向图片轨道；长按暂停靠 touchstart / touchend 的 paused 标志，桌面端也要补一份 mousedown 分支，否则鼠标点不动。",
+ "提示词": "零依赖单文件 HTML（移动端暗色）：横向滑动故事卡组，6 张固定宽 196px 卡片、间距 12px，轨道 translateX 切换并带 0.4s 缓动；顶部 6 段进度条，当前段按 4%/260ms 推进、长按手势暂停推进；左下头像环 + 右下滑点提示；可用参数：底色 #101014、卡片 #1c1c22、主色 #5ac8fa、卡宽 196px、卡图高 250px、圆角 14px。全内联无外链。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>横滑故事卡组</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page);\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:#fff;\\n    -webkit-user-select:none;user-select:none;\\n  }\\n  .seg{\\n    position:absolute;left:0;top:calc(var(--topY));width:100%;display:flex;gap:3px;padding:0 var(--pad);\\n    z-index:4;\\n  }\\n  .seg i{flex:1;height:2.5px;border-radius:2px;background:var(--segBg);overflow:hidden}\\n  .seg i b{display:block;height:100%;width:var(--p);background:var(--segOn);border-radius:2px}\\n  .rail{\\n    position:absolute;top:0;left:0;height:100%;width:100%;\\n    display:flex;align-items:center;gap:var(--gap);\\n    padding:0 var(--pad);will-change:transform;\\n    transition:transform var(--dur) var(--ease);\\n  }\\n  .card{\\n    flex:none;width:var(--w);border-radius:var(--radius);overflow:hidden;\\n    background:var(--cardBg);box-shadow:0 2px 10px rgba(10,10,20,.16);\\n    transition:transform var(--dur) var(--ease);\\n  }\\n  .art{width:100%;height:var(--h);background:var(--a1);position:relative;overflow:hidden}\\n  .art .g{position:absolute;inset:0;background:radial-gradient(90% 70% at 30% 20%,var(--accent) 0%,transparent 60%)}\\n  .body{padding:9px 11px 11px}\\n  .body b{display:block;font-weight:500;font-size:13px;margin-bottom:2px}\\n  .body span{font-size:11px;opacity:.62}\\n  .dot{\\n    position:absolute;left:var(--pad);bottom:calc(var(--topY) + 14px);\\n    width:44px;height:44px;border-radius:50%;border:2px solid var(--ring);z-index:4;\\n    background:var(--a2);\\n  }\\n  .hint{\\n    position:absolute;right:var(--pad);bottom:calc(var(--topY) + 18px);z-index:4;\\n    font-size:11px;opacity:.55;\\n  }\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\" id=\\\"wrap\\\">\\n  <div class=\\\"seg\\\" id=\\\"seg\\\"></div>\\n  <div class=\\\"dot\\\"></div>\\n  <div class=\\\"hint\\\">左滑</div>\\n  <div class=\\\"rail\\\" id=\\\"rail\\\"></div>\\n</div>\\n<script>\\nvar state={page:\\\"#101014\\\",cardBg:\\\"#1c1c22\\\",accent:\\\"#5ac8fa\\\",segOn:\\\"#ffffff\\\",segBg:\\\"rgba(255,255,255,.28)\\\",ring:\\\"#ffffff\\\",a1:\\\"#2a2a34\\\",a2:\\\"#3a3a48\\\",fg:\\\"#ffffff\\\",w:196,h:250,gap:12,pad:16,topY:16,radius:14,dur:0.4,stagger:0,p:0};\\nvar UNIT={w:\\\"px\\\",h:\\\"px\\\",gap:\\\"px\\\",pad:\\\"px\\\",topY:\\\"px\\\",radius:\\\"px\\\",dur:\\\"s\\\",p:\\\"%\\\"};\\nvar root=document.documentElement;\\nfunction apply(){for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}}\\napply();\\nvar NAMES=[\\\"海边两日\\\",\\\"城市切片\\\",\\\"苔庭\\\",\\\"旧巷\\\",\\\"夜行\\\",\\\"晒台\\\"];\\nvar rail=document.getElementById(\\\"rail\\\"),seg=document.getElementById(\\\"seg\\\");\\nvar k=0;\\nNAMES.forEach(function(n,i){\\n  var d=document.createElement(\\\"div\\\");\\n  d.className=\\\"card\\\";\\n  d.innerHTML='<div class=\\\"art\\\"><div class=\\\"g\\\"></div></div><div class=\\\"body\\\"><b>'+n+'</b><span>第 '+(i+1)+' / '+NAMES.length+' 组</span></div>';\\n  rail.appendChild(d);\\n  var s=document.createElement(\\\"i\\\");\\n  s.innerHTML=\\\"<b></b>\\\";seg.appendChild(s);\\n});\\nvar cur=0;\\nfunction go(i){\\n  cur=Math.max(0,Math.min(i,NAMES.length-1));\\n  var total=namesLen();\\n  rail.style.transform=\\\"translateX(\\\"+(-cur*(state.w+state.gap))+\\\"px)\\\";\\n  [].forEach.call(seg.children,function(e,j){\\n    e.firstChild.style.width=(j<cur?100:(j===cur?state.p:0))+\\\"%\\\";\\n  });\\n}\\nfunction namesLen(){return document.querySelectorAll(\\\".card\\\").length;}\\nrail.addEventListener(\\\"click\\\",function(e){if(e.target.closest(\\\".card\\\"))go(cur+1);});\\nvar sx=0,dx=0,drag=false,wrap=document.getElementById(\\\"wrap\\\");\\nwrap.addEventListener(\\\"touchstart\\\",function(e){drag=true;sx=e.touches[0].clientX;dx=0;},{passive:true});\\nwrap.addEventListener(\\\"touchmove\\\",function(e){if(drag)dx=e.touches[0].clientX-sx;},{passive:true});\\nwrap.addEventListener(\\\"touchend\\\",function(){if(drag){var t=-(dx-8);go(cur+Math.round(t/(state.w+state.gap)));drag=false;}});\\nwrap.addEventListener(\\\"mousedown\\\",function(e){drag=true;sx=e.clientX;dx=0;});\\nwindow.addEventListener(\\\"mouseup\\\",function(e){if(drag){var t=-(e.clientX-sx-8);go(cur+Math.round(t/(state.w+state.gap)));drag=false;}});\\n/* 长按暂停：把「播放中」的推进停住，是 stories 类容器的标志性手势反馈 */\\nvar paused=false;\\nwrap.addEventListener(\\\"touchstart\\\",function(){paused=true;},{passive:true});\\nwrap.addEventListener(\\\"touchend\\\",function(){paused=false;});\\nsetInterval(function(){if(paused)return;state.p=state.p>92?4:state.p+4;apply();seg.children[cur].firstChild.style.width=state.p+\\\"%\\\";},260);\\ngo(0);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
+},
+{
+ "id": "M337",
+ "标题": "卡片内迷你走势条",
+ "适配端": "移动端",
+ "风格": "极简瑞士",
+ "场景": "工具·SaaS",
+ "元素": "数据",
+ "搭配": [],
+ "标签": [
+  "迷你图",
+  "走势条",
+  "数据卡",
+  "生长动画",
+  "卡片",
+  "移动端"
+ ],
+ "来源": "自研（零依赖单文件 demo，未临摹特定站点）",
+ "效果演示": "assets/demos/卡片内迷你走势条.html",
+ "参数": [
+  {
+   "键": "page",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#eef0f4"
+  },
+  {
+   "键": "cardBg",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#ffffff"
+  },
+  {
+   "键": "fg",
+   "名": "文字色",
+   "类型": "color",
+   "默认": "#1c1c1e"
+  },
+  {
+   "键": "dim",
+   "名": "次要文字色",
+   "类型": "color",
+   "默认": "#9b9ba4"
+  },
+  {
+   "键": "bar",
+   "名": "条底色",
+   "类型": "color",
+   "默认": "#d8dce5"
+  },
+  {
+   "键": "barHi",
+   "名": "末根高亮色",
+   "类型": "color",
+   "默认": "#4a8cff"
+  },
+  {
+   "键": "radius",
+   "名": "卡片圆角(px)",
+   "类型": "slider",
+   "默认": 16,
+   "最小": 6,
+   "最大": 26,
+   "步长": 1
+  },
+  {
+   "键": "h",
+   "名": "条形区高(px)",
+   "类型": "slider",
+   "默认": 46,
+   "最小": 28,
+   "最大": 90,
+   "步长": 2
+  },
+  {
+   "键": "bh",
+   "名": "条基准高(px)",
+   "类型": "slider",
+   "默认": 26,
+   "最小": 14,
+   "最大": 40,
+   "步长": 1
+  },
+  {
+   "键": "gap",
+   "名": "条间距(px)",
+   "类型": "slider",
+   "默认": 5,
+   "最小": 2,
+   "最大": 12,
+   "步长": 1
+  },
+  {
+   "键": "dur",
+   "名": "生长时长(s)",
+   "类型": "slider",
+   "默认": 0.62,
+   "最小": 0.2,
+   "最大": 1.2,
+   "步长": 0.02
+  },
+  {
+   "键": "stagger",
+   "名": "逐条错峰(ms)",
+   "类型": "slider",
+   "默认": 55,
+   "最小": 0,
+   "最大": 160,
+   "步长": 5
+  }
+ ],
+ "效果说明": "一张卡片里放 9 根离散小条：高度按数据起伏，首屏逐条从底部长起来，末根高亮成主色，上方大数字同步倒数到峰值。\n刻意不画折线——这类卡片最常见的失败就是塞一条 SVG 折线进去，340px 宽里折线只剩噪音；离散条既读出节奏又几乎不占高度。换 barHi 就是换主色，stagger 调生长节奏。",
+ "用法": "DATA 数组换成真实数值（0–1 归一化）即可；条高 = bh*(0.34+v*0.66)，要支持超 1 的比例改这个式子；整卡可点重播，若要看 hover 态需给 .bars 自己加 transition。",
+ "提示词": "零依赖单文件 HTML（移动端）：白色数据卡片，顶部标签 + 大数字（从 0 倒数到峰值）+ 副标题，下方 9 根离散竖条按数据起伏分布、逐条从底部生长（错峰 55ms、时长 0.62s），末根高亮为主色 #4a8cff；卡片圆角 16px、阴影极淡；点击卡片重播、每 2.8s 自动重播；可用参数：页面底 #eef0f4、卡片白、条色 #d8dce5、条区高 46px、条基准高 26px、条间距 5px。全内联无外链。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh-CN\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>卡片内迷你走势条</title>\\n<style>\\n  *{box-sizing:border-box;margin:0;padding:0}\\n  .wrap{\\n    width:100%;height:100vh;display:flex;align-items:center;justify-content:center;\\n    background:var(--page);padding:16px;\\n    font:500 13px/1.5 -apple-system,\\\"PingFang SC\\\",\\\"Microsoft YaHei\\\",sans-serif;color:var(--fg);\\n  }\\n  .card{\\n    width:100%;max-width:340px;min-height:44px;\\n    background:var(--cardBg);border-radius:var(--radius);\\n    padding:14px 14px 12px;box-shadow:var(--shadow);cursor:pointer;\\n  }\\n  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}\\n  .top .lab{font-size:12px;color:var(--dim)}\\n  .top .val{font-size:22px;font-weight:500;letter-spacing:-.02em}\\n  .top .val em{font-style:normal;font-size:12px;color:var(--dim);margin-left:4px}\\n  /* 离散小条：用逐条 scaleY 生长代替 SVG path 折线，尺寸小到只占卡片一行的高度 */\\n  .bars{display:flex;align-items:flex-end;gap:var(--gap);height:var(--h)}\\n  .bars i{\\n    flex:1;border-radius:var(--barR);\\n    background:var(--bar);\\n    height:var(--bh);\\n    transform-origin:bottom;\\n    transform:scaleY(var(--grow));\\n    transition:transform var(--dur) var(--ease);\\n    transition-delay:calc(var(--i) * var(--stagger) / 1000);\\n  }\\n  .bars i.hi{background:var(--barHi)}\\n  .sub{display:flex;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--dim)}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"wrap\\\">\\n  <div class=\\\"card\\\" id=\\\"card\\\">\\n    <div class=\\\"top\\\"><span class=\\\"lab\\\">近 9 周活跃</span><span class=\\\"val\\\" id=\\\"val\\\">0<em>次</em></span></div>\\n    <div class=\\\"bars\\\" id=\\\"bars\\\"></div>\\n    <div class=\\\"sub\\\"><span>03/09</span><span id=\\\"peak\\\">峰值 —</span></div>\\n  </div>\\n</div>\\n<script>\\nvar state={page:\\\"#eef0f4\\\",cardBg:\\\"#ffffff\\\",fg:\\\"#1c1c1e\\\",dim:\\\"#9b9ba4\\\",bar:\\\"#d8dce5\\\",barHi:\\\"#4a8cff\\\",radius:16,gap:5,h:46,bh:26,barR:3,dur:0.62,stagger:55,shadow:\\\"0 2px 8px rgba(20,24,40,.06)\\\"};\\nvar UNIT={radius:\\\"px\\\",gap:\\\"px\\\",h:\\\"px\\\",bh:\\\"px\\\",barR:\\\"px\\\",dur:\\\"s\\\",stagger:\\\"ms\\\"};\\nvar root=document.documentElement;\\nvar DATA=[.42,.58,.36,.72,.5,.88,.66,.94,.61];\\nfunction apply(){\\n  for(var k in state){root.style.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}\\n  root.style.setProperty(\\\"--grow\\\",grown?1:0);\\n}\\nvar grown=false,card=document.getElementById(\\\"card\\\");\\nvar bars=document.getElementById(\\\"bars\\\");\\nDATA.forEach(function(v,i){\\n  var b=document.createElement(\\\"i\\\");\\n  b.style.height=(state.bh*(0.34+v*0.66)).toFixed(1)+\\\"px\\\";\\n  b.style.setProperty(\\\"--i\\\",i);\\n  if(i===DATA.length-1)b.className=\\\"hi\\\";\\n  bars.appendChild(b);\\n});\\nvar val=document.getElementById(\\\"val\\\"),peak=document.getElementById(\\\"peak\\\");\\nvar mx=Math.round(Math.max.apply(null,DATA)*1380);\\nvar raf=0;\\nfunction toggle(){\\n  growNow();\\n  grown=!grown;apply();\\n  var t0=null;\\n  var step=function(t){\\n    if(!t0)t0=t;\\n    var p=Math.min(1,(t-t0)/700);\\n    val.innerHTML=Math.round(mx*p)+\\\"<em>次</em>\\\";\\n    if(p<1)raf=requestAnimationFrame(step);\\n  };\\n  cancelAnimationFrame(raf);\\n  raf=requestAnimationFrame(step);\\n}\\nfunction growNow(){val.innerHTML=\\\"0<em>次</em>\\\";}\\ncard.addEventListener(\\\"click\\\",toggle);\\npeak.textContent=\\\"峰值 \\\"+mx;\\n/* 初始即展开态：缩略图与 headless 截图直接看到长完的样子，不必等点击 */\\ntoggle();\\nsetInterval(toggle,2800);\\nwindow.addEventListener(\\\"message\\\",function(e){var d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
 }
 ];

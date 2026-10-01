@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双列交错瀑布流</title>
+<style>
+  :root{}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--pageBg)}
+  .wrap{
+    width:100%;min-height:100vh;background:var(--pageBg);
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg);
+    padding:14px 12px calc(var(--padBottom));
+    -webkit-user-select:none;user-select:none;
+  }
+  .cols{display:flex;gap:var(--gap);align-items:flex-start}
+  .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}
+  .card{
+    border-radius:var(--radius);overflow:hidden;background:var(--cardBg);
+    box-shadow:var(--shadow);
+    opacity:calc(var(--reveal) * 1);transform:translateY(calc((1 - var(--reveal)) * 14px));
+    transition:opacity .42s ease,transform .42s var(--ease);transition-delay:calc(var(--i) * var(--stagger) / 1000);
+  }
+  .art{width:100%;background:var(--a1);height:var(--h1)}
+  .art.b{background:var(--a2)}
+  .art.c{background:var(--a3)}
+  .body{padding:9px 10px 11px}
+  .body b{display:block;font-weight:500;font-size:12.5px;margin-bottom:3px}
+  .body span{font-size:11px;color:var(--dim)}
+  .foot{
+    position:fixed;left:0;right:0;bottom:0;z-index:5;
+    display:flex;align-items:center;gap:10px;
+    height:var(--barH);padding:0 14px;
+    background:var(--barBg);border-top:1px solid var(--line);
+  }
+  .foot .t{flex:1;font-size:12px}
+  .foot .t b{display:block;font-weight:500}
+  .foot .t span{font-size:11px;color:var(--dim)}
+  .cta{
+    min-width:88px;min-height:40px;border:none;border-radius:var(--radius);
+    background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="cols" id="cols"><div class="col" id="c0"></div><div class="col" id="c1"></div></div>
+</div>
+<div class="foot"><div class="t"><b>拾光集</b><span>共 12 条</span></div><button class="cta">进入店铺</button></div>
+<script>
+var state={pageBg:"#f6f6f8",cardBg:"#ffffff",fg:"#1c1c1e",dim:"#9a9aa2",line:"#ececf0",accent:"#ff7a45",a1:"#dfe7f2",a2:"#f2e3dc",a3:"#e2efe4",gap:10,radius:14,h1:120,barH:58,padBottom:18,stagger:45,shadow:"0 1px 2px rgba(20,20,30,.05)"};
+var UNIT={gap:"px",radius:"px",h1:"px",barH:"px",padBottom:"px",stagger:"ms"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}
+  root.style.setProperty("--reveal",1);}
+apply();
+var TITLES=["江边旧渡口","玻璃幕墙的午后","苔与石","午后的窗","天台的风","青石阶","旧招牌","晨雾散去","铁艺栏杆","晒台上的猫","巷口的光","雨后的柏油"];
+var c0=document.getElementById("c0"),c1=document.getElementById("c1");
+var n=0,seq=0;
+function shortest(){return c0.offsetHeight<=c1.offsetHeight?c0:c1;}
+function add(){
+  if(n>=TITLES.length)return;
+  var t=TITLES[n++],cl=shortest();
+  var d=document.createElement("div");
+  d.className="card";
+  var artCls=["art","art b","art c"][n%3];
+  /* 高度按序号错落，制造不等高的交错节奏——这是瀑布流与等比网格的唯一区别 */
+  d.innerHTML='<div class="'+artCls+'" style="height:'+(state.h1+((n*23)%90-45))+'px"></div>'+
+    '<div class="body"><b>'+t+'</b><span>拍照笔记 · '+((n*7)%29+1)+' 分钟前</span></div>';
+  d.style.setProperty("--i",seq++);
+  cl.appendChild(d);
+}
+for(var i=0;i<8;i++)add();
+document.querySelector(".foot").addEventListener("click",function(){for(var j=0;j<4;j++)add();});
+window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});
+</script>
+</body>
+</html>
