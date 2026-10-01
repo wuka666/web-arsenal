@@ -28,6 +28,16 @@
     background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
     padding: 9px 22px; border-radius: 8px;
   }
+  /* 过冲量标尺：过冲是这条与普通环形进度的唯一区别，把那个「冲过头多少」画出来才看得懂差别 */
+  .os { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280; }
+  .os-track {
+    position: relative; display: block; width: 120px; height: 4px; border-radius: 2px; background: var(--track, #eee);
+  }
+  .os-knob {
+    position: absolute; top: -3px; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--color, #1a1a1a); left: 0; transition: left .2s ease;
+  }
+  .os-val { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color, #1a1a1a); }
 </style>
 <style>
 /* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
@@ -41,6 +51,11 @@
     <circle class="ring" id="ring" cx="70" cy="70" r="58"></circle>
   </svg>
   <div class="ring-pct" id="pct">0%</div>
+</div>
+<div class="os">
+  <span class="os-cap">过冲</span>
+  <i class="os-track"><i class="os-knob" id="osKnob"></i></i>
+  <span class="os-val" id="osVal">+10%</span>
 </div>
 <button class="btn" id="btn">重新转</button>
 
@@ -65,6 +80,13 @@
   const pct = document.getElementById("pct");
   const wrap = document.getElementById("wrap");
   const svg = document.getElementById("svg");
+  const osKnob = document.getElementById("osKnob");
+  const osVal = document.getElementById("osVal");
+  function paintOvershoot() {
+    const v = Math.max(state.overshoot, 0);
+    osKnob.style.left = Math.min(v / 30, 1) * 100 + "%";
+    osVal.textContent = "+" + v + "%";
+  }
 
   function ease(t) {
     if (state.easing === "linear") return t;
@@ -93,6 +115,7 @@
     circ = 2 * Math.PI * r;
     ring.style.strokeDasharray = circ;
     ring.style.strokeDashoffset = circ;
+    paintOvershoot();
     pct.textContent = "0%";
   }
   let circ = 2 * Math.PI * 58;

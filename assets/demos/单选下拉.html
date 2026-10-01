@@ -30,6 +30,12 @@
   .opt { padding:10px 14px; font-size:var(--fs,15px); color:var(--text,#1f2937); cursor:pointer; }
   .opt:hover { background:var(--hover,#eff6ff); }
   .opt.sel { color:var(--theme,#2563eb); font-weight:700; }
+  /* 键盘提示条：下拉的无障碍刚需——不写出来，用户不会知道支持 ↑↓ / Enter */
+  .keybar { display:flex; align-items:center; gap:6px; margin-top:9px; font-size:12px; color:var(--arrow,#6b7280); }
+  .keycap {
+    display:inline-grid; place-items:center; min-width:22px; height:20px; padding:0 5px;
+    border:1px solid var(--border,#d1d5db); border-radius:5px; background:#fff; font-size:11px; font-family:inherit;
+  }
 
 </style>
 <style>
@@ -45,6 +51,7 @@
       <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="menu" id="menu"></div>
+    <div class="keybar"><kbd class="keycap">↑↓</kbd>选择<kbd class="keycap">Enter</kbd>确认<kbd class="keycap">Esc</kbd>关闭</div>
   </div>
 
 <script>

@@ -49,8 +49,12 @@ function stateKeys(file) {
   const m = s.match(/(?:var|let|const)\s+state\s*=\s*\{([\s\S]*?)\}\s*;/);
   if (!m) return [];
   // 键可能带引号（老条目是 JSON 风格 {"bg":...}），两种都要取
-  return (m[1].match(/(?:^|[,{\s])["']?([A-Za-z_$][\w$]*)["']?\s*:/g) || [])
+  const all = (m[1].match(/(?:^|[,{\s])["']?([A-Za-z_$][\w$]*)["']?\s*:/g) || [])
     .map(x => x.replace(/[^A-Za-z0-9_$]/g, ""));
+  // ⚠️ 只查「真正当 CSS 变量用」的键：老条目（M035/M109 那批）的 state 里混着
+  //    纯 JS 逻辑参数（dur / easing / overshoot / showPct），它们从不出现在 var() 里，
+  //    不排除就会整片误报成「空变量」。判据＝该键在 CSS 里被 var(--k) 消费过。
+  return all.filter(k => new RegExp("var\\(\\s*--" + k + "\\b").test(s));
 }
 
 function probe(absDemo, keys) {

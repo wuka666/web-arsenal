@@ -33,6 +33,9 @@
     background: #1a1a1a; color: #fff; font-size: 14px; font-weight: 700;
     padding: 10px 24px; border-radius: 8px;
   }
+  /* 四档刻度：环读到一半时数字会说话、刻度让你一眼看出「到第几档」，不用读百分比 */
+  .ring-tick { stroke: var(--track, #eee); stroke-width: 2; stroke-linecap: round; transition: stroke .2s; }
+  .ring-tick.pass { stroke: var(--color, #1a1a1a); }
 </style>
 <style>
 /* 合规补齐：宪法附录B B1 —— 移动端可点元素命中区须 ≥44（WCAG 判命中区不判视觉尺寸，故用 min 尺寸撑开，视觉不变） */
@@ -44,6 +47,7 @@
   <svg viewBox="0 0 120 120" id="svg">
     <circle class="ring-track" id="ringTrack" cx="60" cy="60" r="52"></circle>
     <circle class="ring" id="ring" cx="60" cy="60" r="52"></circle>
+    <g id="ticks"></g>
   </svg>
   <div class="ring-pct" id="pct">0%</div>
 </div>
@@ -70,6 +74,29 @@
   const pct = document.getElementById("pct");
   const wrap = document.getElementById("wrap");
   const svg = document.getElementById("svg");
+  const ticksG = document.getElementById("ticks");
+  const NS = "http://www.w3.org/2000/svg";
+  // 25/50/75/100 四档，按 12→3→6→9 点方向排（与 --rot 起点对齐）
+  const TICK_ANGLES = [0, 90, 180, 270];
+  const tickEls = TICK_ANGLES.map(() => {
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("class", "ring-tick");
+    ticksG.appendChild(l);
+    return l;
+  });
+  function layoutTicks(r, circ) {
+    tickEls.forEach((l, i) => {
+      const a = (TICK_ANGLES[i] - 90) * Math.PI / 180;
+      const r1 = r + 4, r2 = r + 9;
+      l.setAttribute("x1", 60 + r1 * Math.cos(a));
+      l.setAttribute("y1", 60 + r1 * Math.sin(a));
+      l.setAttribute("x2", 60 + r2 * Math.cos(a));
+      l.setAttribute("y2", 60 + r2 * Math.sin(a));
+    });
+  }
+  function markTicks(p) {
+    tickEls.forEach((l, i) => l.classList.toggle("pass", p >= (i + 1) * 25));
+  }
 
   function ease(t) {
     if (state.easing === "linear") return t;
@@ -99,6 +126,8 @@
     const circ = 2 * Math.PI * r;
     ring.style.strokeDasharray = circ;
     ring.style.strokeDashoffset = circ;
+    layoutTicks(r);
+    markTicks(0);
     pct.textContent = "0%";
   }
 
@@ -108,6 +137,7 @@
     const r = 52 - Math.min(state.thick / 2, 8);
     const circ = 2 * Math.PI * r;
     ring.style.strokeDashoffset = circ;
+    markTicks(0);
     pct.textContent = "0%";
     const start = performance.now();
     const dur = state.dur * 1000;
@@ -116,6 +146,7 @@
       const t = Math.min((now - start) / dur, 1);
       const p = Math.round(100 * ease(t));
       ring.style.strokeDashoffset = circ * (1 - p / 100);
+      markTicks(p);
       pct.textContent = p + "%";
       if (t < 1) raf = requestAnimationFrame(tick);
     }

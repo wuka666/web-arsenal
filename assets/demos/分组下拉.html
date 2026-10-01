@@ -31,6 +31,12 @@
   .opt:hover { background:var(--hover,#f3f4f6); }
   .opt.sel { color:var(--theme,#2563eb); font-weight:700; }
   .grp + .grp { margin-top:var(--ggap,6px); }
+  /* 组内计数：分组的价值就是「同类聚合」，不标出每组多少条，用户仍要自己数 */
+  .ghead .gcount {
+    display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; margin-left:6px;
+    border-radius:9px; background:var(--hover,#f3f4f6); color:var(--gt,#9ca3af);
+    font-size:10px; font-weight:400; letter-spacing:0; vertical-align:middle;
+  }
 
 </style>
 <style>
@@ -66,7 +72,8 @@
     menu.innerHTML="";
     GROUPS.forEach(g=>{
       const wrap=document.createElement("div"); wrap.className="grp";
-      const h=document.createElement("div"); h.className="ghead"; h.textContent=g.name; wrap.appendChild(h);
+      const h=document.createElement("div"); h.className="ghead";
+      h.innerHTML=g.name+'<i class="gcount">'+g.items.length+'</i>'; wrap.appendChild(h);
       g.items.forEach(o=>{
         const d=document.createElement("div");
         d.className="opt"+(o===selected?" sel":""); d.textContent=o;
