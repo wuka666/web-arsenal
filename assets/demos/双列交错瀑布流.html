@@ -38,7 +38,8 @@
   .foot .t b{display:block;font-weight:500}
   .foot .t span{font-size:11px;color:var(--dim)}
   .cta{
-    min-width:88px;min-height:40px;border:none;border-radius:var(--radius);
+    /* 命中区 ≥44（宪法附录B B1）：visual 仍是 88×44 的小胶囊，不靠 padding 撑 */
+    min-width:88px;min-height:44px;border:none;border-radius:var(--radius);
     background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;
   }
 </style>

@@ -9904,7 +9904,8 @@ window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="para
     font:500 14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
   .bar{height:var(--barH);display:flex;align-items:center;padding:0 var(--pad);background:var(--barBg);
     border-bottom:1px solid var(--edge);position:relative}
-  .bar .x{width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:var(--ink);font-size:18px;cursor:pointer}
+  /* 命中区 ≥44（宪法附录B B1）：关闭按钮视觉仍是小圆，靠 44×44 的按钮盒撑 */
+  .bar .x{width:44px;height:44px;border-radius:50%;border:none;background:transparent;color:var(--ink);font-size:18px;cursor:pointer}
   .bar .ttl{position:absolute;left:0;right:0;text-align:center;font-size:var(--fs);letter-spacing:-.01em;pointer-events:none}
   .bar .step{position:absolute;left:0;right:0;bottom:-9px;display:flex;gap:5px;padding:0 var(--pad)}
   .bar .step i{flex:1;height:3px;border-radius:2px;background:var(--edge)}
