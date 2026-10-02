@@ -29,6 +29,7 @@
 | `data/方案.js` | 方案数据源（49 条，`window.WEB_SCHEMES`） |
 | `scripts/` | 入库与体检工具（都要在根目录运行）：`check_all.js` 一条命令跑全库基线；`check_skeleton.js` **跨条目骨架雷同比对**（规矩 21 第 4 项，`check_all.js` 查不出这层）；`check_adapt.js` 适配端实测（`--materials` 扫素材库；375×812 真机视口量横向溢出与并排多栏）；`rebuild_tags.js` 按四维词表全量重组标签（`--dry` 可干跑）；`test_filters.js` 分级筛选回归测试（无头浏览器注入点击）；`sync_code.js` / `sync_scheme_code.js` 代码↔demo 同步；`verify_entry.js` 条目校验（清单在同目录 `new_entries.js`）；`check_palette.js` 配色对齐；`check_links.js` 零外链；`check_param_types.js` 参数类型/用法冲突；`check_vars.js` **悬空 CSS 变量体检**（真实渲染逐键读 `--x` 计算值，专抓「定义了 `state` 却忘了在加载时调 `apply()`」→ 整页变量落空）；`shot_demo.js` headless 截图；`check_touch_targets.js` 触控目标尺寸核查（移动≥44 / PC≥24，无头双视口，内置 WCAG 2.5.8 inline 例外与 `data-touch-exempt` 豁免机制）；`fix_touch_targets.js` 按核查清单**批量补命中区**（幂等、改前自动备份）；`add_entries.js` 批量追加新条目到 `data/素材.js`（幂等） |
 | `mcp/server.js` | 可选 MCP 服务器，AI 客户端可直接检索素材 |
+| `Agent宪法.md` | **AI 行为规则（最高准则，31 条规矩 + 附录 A 踩坑 + 附录 B UI 基线）**，与仓库根 `AGENTS.md` 冲突时本文件优先 |
 | `01-素材条目模板.md` | 新增素材的填写模板 |
 | `LICENSE` | 许可 |
 | `ROADMAP.md` | 路线与里程碑 |
@@ -77,12 +78,20 @@ node server.js        # 在 MCP 客户端里配成 stdio 服务器
 
 ## 维护与体检（改完必跑）
 
+**入库 / 改 demo 后的完整校验链（顺序固定，缺一项不算完成 → 宪法规矩 31③）**
+
 ```bash
-node scripts/check_all.js        # 一条命令跑全库基线：语法 / id / 参数 / 死参数 / 来源 / 代码=demo / 配色 / 零外链
-node scripts/check_skeleton.js   # 跨条目骨架雷同比对（规矩 21 第 4 项）—— check_all.js 查不出这层
-node scripts/shot_demo.js "assets/demos/xxx.html"   # headless 截图，确认渲染非空白（改过 demo 时）
+node scripts/verify_entry.js                        # 1 条目自检（待校验 id 写在 scripts/new_entries.js）
+node scripts/check_all.js                           # 2 全库基线：语法 / id / 参数 / 死参数 / 来源 / 代码=demo / 配色 / 零外链 / 桶容量
+node scripts/check_skeleton.js                      # 3 骨架雷同（扫素材库要加 --materials --threshold 0.75+）
+node scripts/check_vars.js                          # 4 悬空 CSS 变量（真实渲染逐键读计算值，专抓 demo 漏调 apply() → 整页变透明）
+node scripts/check_adapt.js                         # 5 适配端 375px 实测（--materials 扫素材库）
+node scripts/check_touch_targets.js                 # 6 触控命中区（移动≥44 / PC≥24）
+node scripts/shot_demo.js "assets/demos/xxx.html"   # 7 headless 截图，确认渲染非空白（改过 demo 时）
 ```
 
-`check_all.js` 与 `check_skeleton.js` 不合格均退出码非 0，可直接挂 CI。改动 demo 后记得跑 `sync_code.js`（素材）/ `sync_scheme_code.js`（方案），保证「代码 = demo 逐字节」。
+> ⚠️ **无头核查很慢**（每个 demo 起一次 Chrome，全量 >15 分钟会被前台超时转后台）：**别接 `| grep` 管道**；别想 kill 全量任务（子 node 会变孤儿继续跑，本机也枚举不到）。日常用「指定 demo 路径」定向核查，全量一周一次即可。
 
-> ⚠️ **两条命令都过 ≠ 入库合格**：它们查的分别是「单条自身」与「方案之间的骨架」。**「新条目的原站是否已被现有条目覆盖」（同源重复）仍需人工确认** —— 先 `grep` 一下 `data/*.js` 的 `来源` / `参考站` 里有没有同一个域名。
+`check_all.js` 与 `check_skeleton.js` 不合格均退出码非 0，可直接挂 CI。改动 demo 后记得跑 `sync_code.js`（素材）/ `sync_scheme_code.js`（方案），保证「代码 = demo 逐字节」。方案新条目同步完还要**手动把 `</script>` 转义成 `<\/script>`**（素材的同步器会自动处理，方案的不）。
+
+> ⚠️ **两条命令都过 ≠ 入库合格**：它们查的分别是「单条自身」与「方案之间的骨架」。**「新条目的机制是否已被现有条目覆盖」（同源重复）仍需人工确认** —— 先 `grep` 一下 `data/*.js` 的 `来源` / `参考站` 里有没有同一个域名，再**读候选条目的「效果说明」比机制指纹**（关键词命中 60% 是误命中）。详细 10 条入库铁律见 `Agent宪法.md` 规矩 31 + 附录 A5。
