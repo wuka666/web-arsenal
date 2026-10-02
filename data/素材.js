@@ -19245,5 +19245,105 @@ window.WEB_ARSENAL = [
    "步长": 2
   }
  ]
+},
+{
+ "id": "M344",
+ "标题": "卡片组悬停编舞",
+ "适配端": "PC 端",
+ "风格": "科技未来",
+ "场景": "官网·品牌站",
+ "元素": "动效",
+ "搭配": [
+  "悬浮边框",
+  "产品卡悬停",
+  "辉光悬停"
+ ],
+ "标签": [
+  "卡片组",
+  "悬停编舞",
+  "分层反馈",
+  "渐变发光",
+  "下划线生长"
+ ],
+ "来源": "④ 来自于抖音（2026-10 初入库：功能卡组悬停的分层编舞——背景发光 / 图标旋转 / 标题上移 / 下划线生长四层错峰联动）；本库零依赖原生 CSS 重实现（非搬运源码、无外链、无框架）；机制指纹（同一张卡内多元素按层级错峰响应）在库内 0 命中——已有悬停类 M005 / M007 / M009 / M250 都是「单个元素整体响应」，本条是「组内分层编舞」的新机制，故入素材库",
+ "效果演示": "assets/demos/卡片组悬停编舞.html",
+ "参数": [
+  {
+   "键": "bg",
+   "名": "页面底色",
+   "类型": "color",
+   "默认": "#0d1220"
+  },
+  {
+   "键": "card",
+   "名": "卡片底色",
+   "类型": "color",
+   "默认": "#151d31"
+  },
+  {
+   "键": "accent",
+   "名": "强调色",
+   "类型": "color",
+   "默认": "#5b8cff"
+  },
+  {
+   "键": "glow",
+   "名": "发光强度(%)",
+   "类型": "slider",
+   "最小": 0,
+   "最大": 100,
+   "步长": 1,
+   "默认": 65
+  },
+  {
+   "键": "rot",
+   "名": "图标旋转(°)",
+   "类型": "slider",
+   "最小": 0,
+   "最大": 24,
+   "步长": 1,
+   "默认": 9
+  },
+  {
+   "键": "lift",
+   "名": "标题上移(px)",
+   "类型": "slider",
+   "最小": 0,
+   "最大": 10,
+   "步长": 1,
+   "默认": 4
+  },
+  {
+   "键": "gap",
+   "名": "卡片间距(px)",
+   "类型": "slider",
+   "最小": 8,
+   "最大": 36,
+   "步长": 1,
+   "默认": 18
+  },
+  {
+   "键": "dur",
+   "名": "单层时长(s)",
+   "类型": "slider",
+   "最小": 0.15,
+   "最大": 0.8,
+   "步长": 0.01,
+   "默认": 0.42
+  },
+  {
+   "键": "stagger",
+   "名": "错峰间隔(ms)",
+   "类型": "slider",
+   "最小": 0,
+   "最大": 240,
+   "步长": 10,
+   "默认": 90
+  }
+ ],
+ "效果说明": "一张功能卡被悬停时，卡内四层按顺序各自动作：背景先漫出同色柔光、图标跟着旋转放大、标题再上移、最后由下划线从左长出收尾——每层错开一点延迟，整张卡像被「编舞」，而不是整体变个色。\n它和库内已有的悬停类是两种做法：M005 / M007 / M009 / M250 都是「整块卡片做一个动作」，本条是「同一张卡内四层元素各有各的动作与延迟」——层级感来自时间差，而不是阴影或描边。\n无指针时每 2.2 秒轮转点亮一张，缩略图与挂机预览不会是静止图。\n核心交互依赖 hover，触摸端不可达，故判 PC 端（demo 内置 .on 类可作触摸替代，但呈现主体仍是悬停编舞）。",
+ "用法": "stagger 是这条的灵魂：设为 0 四层同时动，会立刻退化成普通 hover；60–120ms 是最舒服的错峰区间（下划线排最后，延迟是 stagger 的两倍）。glow 调背景柔光强度（0 = 不发光，只留图标 / 标题 / 下划线三个动作）；rot 调图标旋转角度、lift 调标题上移距离；dur 是单层时长（0.3–0.5 最稳）；gap 调卡片间距；bg / card / accent 改配色。\n⚠️ 触屏没有 hover：真机落地时改成点击切换卡片上的 .on 类（demo 已内置该类与对应样式）。",
+ "提示词": "做一个「卡片组悬停编舞」：2×2 功能卡组（图标 + 标题 + 一行说明 + 底部短线）。悬停某张卡时，卡内四层元素按延迟依次响应——① 背景从图标一侧漫出同色柔光（radial-gradient 层 opacity 0→1）② 图标 rotate + scale 放大 ③ 标题上移 4px ④ 底部下划线从左 scaleX 0→1 收尾；四层用同一个 duration，但 transition-delay 递增（错峰 90ms 左右，下划线放最后）。要求：零依赖单文件 HTML；卡片整体同时轻微上浮、边框转为强调色；窄屏 ≤540px 堆成单栏；所有可调项用 CSS 变量驱动（页面底色 / 卡片底色 / 强调色 / 发光强度 / 图标旋转角 / 标题上移 / 间距 / 时长 / 错峰间隔）并支持 postMessage type='param' 调参；触屏改为点击切换 .on 类；无指针时自动轮转点亮一张，便于截图与挂机预览。",
+ "代码": "\"<!doctype html>\\n<html lang=\\\"zh\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\">\\n<title>卡片组悬停编舞</title>\\n<style>\\n*{box-sizing:border-box;margin:0}\\nbody{min-height:100vh;display:grid;place-items:center;padding:36px 22px;background:var(--bg);font-family:system-ui,\\\"Segoe UI\\\",Arial,sans-serif}\\n/* 参数值一律「带单位」写进 CSS 变量（apply 里走 UNIT 映射），所以这里直接用 var()——\\n   再套 calc(var(--x)*1px) 会变成 px² 而整条声明失效（同 A5-F2 的镜像坑） */\\n:root{--bg:#0d1220;--card:#151d31;--accent:#5b8cff;--glow:65;--rot:9deg;--lift:4px;--gap:18px;--dur:.42s;--stagger:90ms}\\n.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap);width:min(640px,100%)}\\n/* 窄屏两列会把标题挤成竖条，堆成单栏 */\\n@media (max-width:540px){.grid{grid-template-columns:1fr}}\\n.card{position:relative;overflow:hidden;padding:22px 20px 26px;border-radius:14px;background:var(--card);border:1px solid rgba(255,255,255,.07);\\n  transition:transform var(--dur) cubic-bezier(.22,.61,.36,1),border-color var(--dur)}\\n/* 发光只从图标那一侧漫出：比整块变亮有方向感，也不至于糊掉文字 */\\n.card .halo{position:absolute;left:-20%;right:-20%;top:-40%;height:150%;pointer-events:none;\\n  background:radial-gradient(58% 76% at 26% 12%,var(--accent),transparent 70%);\\n  opacity:0;transition:opacity var(--dur)}\\n.card .ico{position:relative;width:36px;height:36px;color:var(--accent);\\n  transition:transform var(--dur) cubic-bezier(.34,1.4,.64,1)}\\n.card h3{position:relative;margin-top:13px;font-size:15px;font-weight:600;color:#fff;\\n  transition:transform var(--dur) cubic-bezier(.22,.61,.36,1) var(--stagger)}\\n.card p{position:relative;margin-top:7px;font-size:12.5px;line-height:1.62;color:rgba(255,255,255,.55)}\\n/* 下划线收尾：它是「这张被选中了」的结论，排在其他动作之后 */\\n.card .line{position:absolute;left:20px;bottom:15px;width:32px;height:2px;border-radius:2px;background:var(--accent);\\n  transform:scaleX(0);transform-origin:0 50%;\\n  transition:transform calc(var(--dur)*1.4) cubic-bezier(.22,.61,.36,1) calc(var(--stagger)*2)}\\n.card:hover,.card.on{transform:translateY(calc(var(--lift)*-1));border-color:color-mix(in srgb,var(--accent) 46%,transparent)}\\n.card:hover .halo,.card.on .halo{opacity:calc(var(--glow)/100)}\\n.card:hover .ico,.card.on .ico{transform:rotate(var(--rot)) scale(1.14)}\\n.card:hover h3,.card.on h3{transform:translateY(calc(var(--lift)*-1))}\\n.card:hover .line,.card.on .line{transform:scaleX(1)}\\n</style>\\n</head>\\n<body>\\n<div class=\\\"grid\\\" id=\\\"grid\\\">\\n  <div class=\\\"card\\\">\\n    <span class=\\\"halo\\\"></span>\\n    <svg class=\\\"ico\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"currentColor\\\" stroke-width=\\\"1.7\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\"><path d=\\\"M12 3v18M3 12h18\\\"/><circle cx=\\\"12\\\" cy=\\\"12\\\" r=\\\"9\\\"/></svg>\\n    <h3>实时协作</h3>\\n    <p>多人同时编辑，光标位置与选区即时同步。</p>\\n    <i class=\\\"line\\\"></i>\\n  </div>\\n  <div class=\\\"card\\\">\\n    <span class=\\\"halo\\\"></span>\\n    <svg class=\\\"ico\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"currentColor\\\" stroke-width=\\\"1.7\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\"><path d=\\\"M4 17V7l8-4 8 4v10l-8 4-8-4z\\\"/><path d=\\\"M4 7l8 4 8-4M12 11v10\\\"/></svg>\\n    <h3>版本快照</h3>\\n    <p>每次保存自动留档，可随时回滚到任意节点。</p>\\n    <i class=\\\"line\\\"></i>\\n  </div>\\n  <div class=\\\"card\\\">\\n    <span class=\\\"halo\\\"></span>\\n    <svg class=\\\"ico\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"currentColor\\\" stroke-width=\\\"1.7\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\"><path d=\\\"M13 2L4.5 13H11l-1 9 8.5-11H12l1-9z\\\"/></svg>\\n    <h3>边缘加速</h3>\\n    <p>静态资源就近分发，首屏加载稳定在毫秒级。</p>\\n    <i class=\\\"line\\\"></i>\\n  </div>\\n  <div class=\\\"card\\\">\\n    <span class=\\\"halo\\\"></span>\\n    <svg class=\\\"ico\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"currentColor\\\" stroke-width=\\\"1.7\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\"><path d=\\\"M12 3l7 4v5c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V7l7-4z\\\"/><path d=\\\"M9 12l2 2 4-4\\\"/></svg>\\n    <h3>权限可控</h3>\\n    <p>按成员粒度分配读写范围，操作全量留痕。</p>\\n    <i class=\\\"line\\\"></i>\\n  </div>\\n</div>\\n<script>\\nconst state={\\\"bg\\\":\\\"#0d1220\\\",\\\"card\\\":\\\"#151d31\\\",\\\"accent\\\":\\\"#5b8cff\\\",\\\"glow\\\":65,\\\"rot\\\":9,\\\"lift\\\":4,\\\"gap\\\":18,\\\"dur\\\":0.42,\\\"stagger\\\":90};\\nconst UNIT={gap:\\\"px\\\",rot:\\\"deg\\\",lift:\\\"px\\\",dur:\\\"s\\\",stagger:\\\"ms\\\"};\\nfunction apply(){const r=document.documentElement.style;for(const k in state){r.setProperty(\\\"--\\\"+k,state[k]+(UNIT[k]||\\\"\\\"));}}\\n\\nconst grid=document.getElementById(\\\"grid\\\");\\nconst cards=[].slice.call(grid.children);\\n// hover 类效果没人动时就只是张静止图（挂机预览与缩略截图同理），所以没真实指针时轮转点亮一张\\nlet idx=0,userIn=false;\\ncards.forEach(function(c){c.addEventListener(\\\"pointerenter\\\",function(){userIn=true;cards.forEach(function(x){x.classList.remove(\\\"on\\\");});});});\\nsetInterval(function(){\\n  if(userIn)return;\\n  cards.forEach(function(c,i){c.classList.toggle(\\\"on\\\",i===idx%cards.length);});\\n  idx++;\\n},2200);\\n\\napply();\\naddEventListener(\\\"message\\\",e=>{const d=e.data;if(!d||d.type!==\\\"param\\\")return;if(!(d.key in state))return;state[d.key]=d.value;apply();});\\n<\\/script>\\n</body>\\n</html>\\n\""
 }
 ];
