@@ -1249,8 +1249,22 @@
     }
     return p;
   }
+  // 「代码」字段有两种存储形态（2026-10-02 实测：335 条里 58 条值直接是 HTML，277 条是 JSON 字符串字面量，
+  //   后者是 sync_code.js 的双层序列化写法）。渲染层两种都必须认 —— 否则复制出去的是带首尾引号、
+  //   字面 \n 和 \" 的坏文本，用户拿到根本跑不起来。判据：值以引号开头就试着解析，解析不出就原样返回。
+  function normCode(c) {
+    if (typeof c !== "string" || !c) return c || "";
+    let v = c, guard = 0;
+    while (typeof v === "string" && (v.charAt(0) === '"' || v.charAt(0) === "`") && guard++ < 3) {
+      let n = null, ok = false;
+      try { n = JSON.parse(v); ok = true; } catch (e) { try { n = new Function("return " + v)(); ok = true; } catch (e2) { } }
+      if (!ok || typeof n !== "string" || n === v) break;
+      v = n;
+    }
+    return typeof v === "string" ? v : (c || "");
+  }
   function buildCode(it, current) {
-    let code = it.代码 || "";
+    let code = normCode(it.代码);
     if (code.includes("const state")) {
       code = code.replace(/const state = \{[\s\S]*?\};/, "const state = " + stateLiteral(current) + ";");
     }
@@ -1472,8 +1486,8 @@
       sec.appendChild(refs);
       info.appendChild(sec);
     }
-    info.appendChild(codeBlock("完整模板代码（可直接拷贝用）", s.代码));
-    info.appendChild(codeBlock("可复用片段（拷进自己项目）", s.片段));
+    info.appendChild(codeBlock("完整模板代码（可直接拷贝用）", normCode(s.代码)));
+    info.appendChild(codeBlock("可复用片段（拷进自己项目）", normCode(s.片段)));
     info.appendChild(textSection("我的说明（三把尺子）", s.我的说明 || ""));
     const meta = el("div", "meta");
     const srcP = el("p"); srcP.append(el("b", null, "来源："), s.来源 || "未标注");

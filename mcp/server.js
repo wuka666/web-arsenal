@@ -19,6 +19,22 @@ const ARSENAL = loadData(DATA_PATH, 'WEB_ARSENAL');
 
 const SCHEMES = loadData(SCHEME_PATH, 'WEB_SCHEMES');
 
+// 「代码」字段有两种存储形态（2026-10-02 实测：335 条里 58 条值直接是 HTML，
+//   277 条是 JSON 字符串字面量，后者由 sync_code.js 的双层序列化写出）。
+//   MCP 的输出同样必须过这一层，否则 get_code / get_material / get_scheme 吐给 AI 的是
+//   带首尾引号、字面 \n 和 \" 的坏代码。判据与 index.html 的 normCode 保持一字不差。
+function normCode(c) {
+  if (typeof c !== 'string' || !c) return c || '';
+  let v = c, guard = 0;
+  while (typeof v === 'string' && (v.charAt(0) === '"' || v.charAt(0) === '`') && guard++ < 3) {
+    let n = null, ok = false;
+    try { n = JSON.parse(v); ok = true; } catch (e) { try { n = new Function('return ' + v)(); ok = true; } catch (e2) { } }
+    if (!ok || typeof n !== 'string' || n === v) break;
+    v = n;
+  }
+  return typeof v === 'string' ? v : (c || '');
+}
+
 const server = new McpServer({
   name: 'web-arsenal',
   version: '1.0.0',
@@ -77,7 +93,7 @@ server.tool(
       `\n## 用法\n${it.用法 || ''}`,
       `\n## 可调参数（${it.参数 ? it.参数.length : 0} 个）\n${params || '无'}`,
       `\n## 提示词（复制给 AI 即可复刻）\n${it.提示词 || ''}`,
-      `\n## 代码（完整可运行 HTML）\n\`\`\`html\n${(it.代码 || '').replace(/<\\\//g, '</')}\n\`\`\``,
+      `\n## 代码（完整可运行 HTML）\n\`\`\`html\n${normCode(it.代码).replace(/<\\\//g, '</')}\n\`\`\``,
     ].join('\n');
     return { content: [{ type: 'text', text }] };
   }
@@ -101,7 +117,7 @@ server.tool(
   ({ id }) => {
     const it = ARSENAL.find(x => x.id === id);
     if (!it) return { content: [{ type: 'text', text: `找不到 id=${id} 的素材。` }] };
-    const code = (it.代码 || '').replace(/<\\\//g, '</');
+    const code = normCode(it.代码).replace(/<\\\//g, '</');
     return { content: [{ type: 'text', text: code || '该素材暂无代码。' }] };
   }
 );
@@ -174,8 +190,8 @@ server.tool(
       `\n## 参考站\n${(s.参考站 || []).join('、') || '无'}`,
       `\n## 可调参数（${(s.参数 || []).length} 个）\n${params || '无'}`,
       s.Agent提示词 ? `\n## Agent 提示词（可直接喂给 AI）\n${s.Agent提示词}` : '\n## Agent 提示词\n（该方案暂无）',
-      `\n## 完整模板代码（可直接拷贝用）\n\`\`\`html\n${s.代码 || ''}\n\`\`\``,
-      `\n## 可复用片段\n\`\`\`html\n${s.片段 || ''}\n\`\`\``,
+      `\n## 完整模板代码（可直接拷贝用）\n\`\`\`html\n${normCode(s.代码)}\n\`\`\``,
+      `\n## 可复用片段\n\`\`\`html\n${normCode(s.片段)}\n\`\`\``,
     ].join('\n');
     return { content: [{ type: 'text', text }] };
   }
