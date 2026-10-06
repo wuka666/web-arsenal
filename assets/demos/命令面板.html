@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命令面板</title>
+<style>
+:root{
+  --bg:#0e1117;--panel:#171c26;--ink:#e6e9ef;--dim:#8b93a7;--accent:#5b8cff;
+  --radius:14;--blur:10;--w:560;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);overflow:hidden;
+  font:15px/1.55 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+.hint{color:var(--dim);font-size:13px;text-align:center}
+.kbd{
+  display:inline-block;padding:2px 7px;border:1px solid var(--dim);border-radius:6px;
+  font:12px ui-monospace,Consolas,monospace;
+}
+.btn{
+  padding:12px 20px;border-radius:calc(var(--radius) * 1px);border:1px solid var(--dim);
+  background:transparent;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9;
+  backdrop-filter:blur(calc(var(--blur) * 1px));
+  display:none;align-items:flex-start;justify-content:center;padding-top:13vh;
+}
+.scrim.on{display:flex}
+.panel{
+  width:min(calc(var(--w) * 1px),92vw);background:var(--panel);
+  border-radius:calc(var(--radius) * 1px);overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+  transform:translateY(-12px);opacity:0;transition:.22s cubic-bezier(.2,.8,.3,1);
+}
+.scrim.on .panel{transform:none;opacity:1}
+.field{display:flex;align-items:center;gap:10px;padding:5px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.field .ico{flex:0 0 auto;color:var(--dim);font-size:15px}
+input{
+  flex:1;min-width:0;min-height:44px;background:transparent;border:0;outline:none;
+  color:var(--ink);font:16px inherit;font-family:inherit;
+}
+input::placeholder{color:var(--dim)}
+.list{max-height:44vh;overflow:auto;padding:6px}
+.row{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
+  cursor:pointer;min-height:44px;font-size:14px;
+}
+.row .em{flex:0 0 auto;width:18px;color:var(--dim);font-size:13px}
+.row .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .k{margin-left:auto;flex:0 0 auto;font:12px ui-monospace,Consolas,monospace;color:var(--dim)}
+.row.sel{background:var(--accent);color:#fff}
+.row.sel .em,.row.sel .k{color:rgba(255,255,255,.85)}
+.row mark{background:transparent;color:var(--accent);font-weight:700}
+.row.sel mark{color:#fff}
+.empty{padding:26px;text-align:center;color:var(--dim);font-size:14px}
+.foot{
+  display:flex;gap:16px;padding:9px 16px;border-top:1px solid rgba(255,255,255,.08);
+  color:var(--dim);font-size:12px;
+}
+.toast{
+  position:fixed;left:50%;bottom:34px;z-index:20;pointer-events:none;
+  padding:10px 18px;border-radius:999px;font-size:13px;
+  background:var(--panel);border:1px solid var(--accent);color:var(--ink);
+  opacity:0;transform:translateX(-50%) translateY(8px);transition:.25s;
+}
+.toast.on{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="hint">按 <span class="kbd">Ctrl</span> + <span class="kbd">K</span> 唤起命令面板 · ↑↓ 选择 · Enter 执行</div>
+<button class="btn" id="open">打开命令面板</button>
+
+<div class="scrim" id="scrim">
+  <div class="panel">
+    <div class="field">
+      <span class="ico">⌕</span>
+      <input id="q" placeholder="输入命令或页面名称…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="list" id="list"></div>
+    <div class="foot"><span>↑↓ 选择</span><span>Enter 执行</span><span>Esc 关闭</span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const state={bg:'#0e1117',panel:'#171c26',ink:'#e6e9ef',dim:'#8b93a7',accent:'#5b8cff',radius:14,blur:10,w:560};
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+function apply(){
+  for(const k in state){
+    document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+  }
+}
+
+const CMDS=[
+  {t:'切换到暗色主题',k:'⇧D',g:'外观',e:'◐'},
+  {t:'导出当前画布为 PNG',k:'⌘E',g:'文件',e:'⇩'},
+  {t:'搜索素材库',k:'⌘F',g:'检索',e:'⌕'},
+  {t:'新建设计方案',k:'⌘N',g:'方案',e:'✚'},
+  {t:'复制提示词到剪贴板',k:'⌘C',g:'复用',e:'⎘'},
+  {t:'打开参数设置面板',k:'⌘,',g:'设置',e:'⚙'},
+  {t:'批量重排标签',k:'⌘R',g:'工具',e:'⇅'},
+  {t:'查看数据看板',k:'⌘B',g:'导航',e:'▦'}
+];
+
+const scrim=document.getElementById('scrim'),
+      input=document.getElementById('q'),
+      list=document.getElementById('list'),
+      toast=document.getElementById('toast');
+let sel=0, hits=CMDS.slice(), open=false;
+
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function mark(text,kw){
+  const i=text.toLowerCase().indexOf(kw.toLowerCase());
+  if(i<0||!kw) return esc(text);
+  return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+kw.length))+'</mark>'+esc(text.slice(i+kw.length));
+}
+function render(){
+  const kw=input.value.trim();
+  hits=kw?CMDS.filter(c=>c.t.toLowerCase().includes(kw.toLowerCase())):CMDS.slice();
+  if(sel>=hits.length) sel=0;
+  list.innerHTML=hits.length
+    ? hits.map((c,i)=>'<div class="row'+(i===sel?' sel':'')+'" data-i="'+i+'">'
+        +'<span class="em">'+c.e+'</span><span class="t">'+mark(c.t,kw)+'</span>'
+        +'<span class="k">'+c.k+'</span></div>').join('')
+    : '<div class="empty">没有匹配「'+esc(kw)+'」的命令</div>';
+}
+function show(){open=true;scrim.classList.add('on');input.value='';sel=0;render();input.focus();}
+function hide(){open=false;scrim.classList.remove('on');}
+function run(c){
+  hide();
+  toast.textContent='已执行：'+c.t;
+  toast.classList.add('on');
+  clearTimeout(run._t);
+  run._t=setTimeout(()=>toast.classList.remove('on'),1600);
+}
+
+list.addEventListener('click',e=>{
+  const r=e.target.closest('.row');
+  if(r){stopAuto();run(hits[+r.dataset.i]);}
+});
+document.getElementById('open').addEventListener('click',()=>{stopAuto();show();});
+scrim.addEventListener('mousedown',e=>{if(e.target===scrim){stopAuto();hide();}});
+input.addEventListener('input',()=>{stopAuto();sel=0;render();});
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();stopAuto();open?hide():show();return;}
+  if(!open) return;
+  if(e.key==='Escape'){stopAuto();hide();}
+  else if(e.key==='ArrowDown'){e.preventDefault();stopAuto();sel=(sel+1)%Math.max(hits.length,1);render();}
+  else if(e.key==='ArrowUp'){e.preventDefault();stopAuto();sel=(sel-1+hits.length)%Math.max(hits.length,1);render();}
+  else if(e.key==='Enter'){e.preventDefault();stopAuto();if(hits[sel])run(hits[sel]);}
+});
+
+// 缩略图与挂机预览不能依赖键盘，故空闲时自动轮播一遍完整流程
+const SEQ=['外观','导出','检索','方案'];
+let autoOn=true, autoT=null, step=0;
+function stopAuto(){autoOn=false;if(autoT){clearTimeout(autoT);autoT=null;}}
+function next(){
+  if(!autoOn) return;
+  const kw=SEQ[step++%SEQ.length];
+  show();
+  let i=0;
+  const ty=setInterval(()=>{
+    if(!autoOn){clearInterval(ty);return;}
+    if(i<kw.length){input.value+=kw[i++];render();return;}
+    clearInterval(ty);
+    autoT=setTimeout(()=>{
+      if(!autoOn) return;
+      sel=Math.min(1,Math.max(hits.length-1,0));render();
+      autoT=setTimeout(()=>{if(!autoOn)return;hide();autoT=setTimeout(next,900);},800);
+    },650);
+  },170);
+}
+
+apply();
+render();
+autoT=setTimeout(next,700);
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

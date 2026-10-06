@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>就地展开子菜单</title>
+<style>
+:root{
+  --bg:#f6f7f9;--panel:#ffffff;--ink:#1d2430;--dim:#7b8698;--accent:#3b6ef5;
+  --radius:12;--dur:.34;--stagger:.06;--indent:22;--lineW:1.5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font:15px/1.5 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.menu{
+  width:min(320px,92vw);background:var(--panel);
+  border-radius:calc(var(--radius) * 1px);
+  box-shadow:0 12px 36px rgba(20,28,44,.1);padding:8px;
+}
+.row{border-radius:calc(var(--radius) * .7 * 1px)}
+.head{
+  width:100%;display:flex;align-items:center;gap:10px;
+  min-height:44px;padding:0 12px;border:0;background:transparent;
+  color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-radius:inherit;
+}
+.head:hover{background:rgba(59,110,245,.07)}
+.head .ico{flex:0 0 auto;width:20px;color:var(--dim);font-size:14px}
+.head .t{flex:1;min-width:0}
+.head .arw{
+  flex:0 0 auto;color:var(--dim);font-size:11px;
+  transition:transform calc(var(--dur) * 1s) cubic-bezier(.2,.8,.3,1);
+}
+.row.open .head{color:var(--accent)}
+.row.open .head .ico{color:var(--accent)}
+.row.open .head .arw{transform:rotate(90deg);color:var(--accent)}
+.sub{
+  overflow:hidden;height:0;
+  transition:height calc(var(--dur) * 1s) cubic-bezier(.2,.8,.3,1);
+}
+.sub ul{
+  margin:0;padding:0;list-style:none;
+  /* 竖线从父项图标中心垂直落到最后一个子项，把层级关系画出来而不是靠缩进猜 */
+  margin-left:calc(var(--indent) * 1px + 9px);
+  border-left:calc(var(--lineW) * 1px) solid var(--accent);
+  opacity:.55;
+}
+.sub li{
+  position:relative;padding:0 0 0 16px;
+  opacity:0;transform:translateY(-6px);
+  transition:opacity calc(var(--dur) * 1s) ease,transform calc(var(--dur) * 1s) cubic-bezier(.2,.8,.3,1);
+}
+.row.open .sub li{opacity:1;transform:none}
+.sub a{
+  display:flex;align-items:center;min-height:44px;
+  color:var(--dim);text-decoration:none;font-size:14px;
+}
+.sub a:hover,.sub a.sel{color:var(--accent)}
+.sub li::before{
+  content:"";position:absolute;left:0;top:50%;
+  width:10px;height:calc(var(--lineW) * 1px);background:var(--accent);opacity:.55;
+}
+</style>
+</head>
+<body>
+<nav class="menu" id="menu"></nav>
+
+<script>
+const state={bg:'#f6f7f9',panel:'#ffffff',ink:'#1d2430',dim:'#7b8698',accent:'#3b6ef5',
+             radius:12,dur:.34,stagger:.06,indent:22,lineW:1.5};
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+function apply(){
+  for(const k in state){
+    document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+  }
+}
+
+const DATA=[
+  {e:'▦',t:'数据看板',sub:['实时概览','转化漏斗','留存曲线']},
+  {e:'✎',t:'方案编辑',sub:['版式骨架','配色板','字体规则']},
+  {e:'◎',t:'素材检索',sub:['按元素','按风格','按场景']},
+  {e:'⚙',t:'参数设置',sub:['导出项','快捷键','权限']}
+];
+const menu=document.getElementById('menu');
+menu.innerHTML=DATA.map((g,i)=>
+  '<div class="row" data-i="'+i+'">'
+  +'<button class="head"><span class="ico">'+g.e+'</span><span class="t">'+g.t+'</span>'
+  +'<span class="arw">▶</span></button>'
+  +'<div class="sub"><ul>'+g.sub.map((s,j)=>'<li><a href="#" data-j="'+j+'">'+s+'</a></li>').join('')+'</ul></div>'
+  +'</div>'
+).join('');
+const rows=[...menu.children];
+let openIdx=0;
+
+function paint(){
+  rows.forEach((row,i)=>{
+    const on=i===openIdx;
+    row.classList.toggle('open',on);
+    const sub=row.querySelector('.sub');
+    sub.style.height=on?sub.scrollHeight+'px':'0px';
+    // 子项逐个延后，让展开读起来是「依次落位」而不是整块弹出
+    [...row.querySelectorAll('.sub li')].forEach((li,j)=>{
+      li.style.transitionDelay=on?(j*state.stagger)+'s':'0s';
+    });
+  });
+}
+rows.forEach(row=>{
+  row.querySelector('.head').addEventListener('click',()=>{
+    stopAuto();
+    const i=+row.dataset.i;
+    openIdx=(openIdx===i?-1:i);
+    paint();
+  });
+});
+addEventListener('resize',paint);
+
+// 无鼠标时自动轮换展开，保证缩略图不是一张静止的收起态
+let autoOn=true, autoT=null, step=0;
+function stopAuto(){autoOn=false;if(autoT){clearTimeout(autoT);autoT=null;}}
+function cruise(){
+  if(!autoOn) return;
+  openIdx=step++%rows.length;
+  paint();
+  autoT=setTimeout(cruise,1900);
+}
+
+apply();
+paint();
+autoT=setTimeout(cruise,800);
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();paint();
+});
+</script>
+</body>
+</html>
