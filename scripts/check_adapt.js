@@ -7,7 +7,8 @@
 //   ② file:// 下 iframe 的 contentDocument 需要 `--allow-file-access-from-files` 才可读。
 //   ③ 临时容器必须与 demo 同目录（assets/demos/），否则 demo 内相对路径失效。
 // 用法（项目根目录）：node scripts/check_adapt.js [--materials] [demo路径...]
-//   不给参数 = 扫方案库全部 35 套；--materials = 扫素材库全部 182 条
+//   不给参数 = 扫方案库全部 49 套；--materials = 扫素材库全部 335 条（数量 2026-10-02 核定，会随入库增长，别写死在心里）
+//   ⚠️ 传具体 demo 路径时，表头仍显示「【方案库】」是按库口径打印的，素材 demo 也走同一段输出，不影响判定。
 const fs = require("fs"), path = require("path"), os = require("os"), { execFileSync } = require("child_process");
 const root = process.cwd();
 const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";

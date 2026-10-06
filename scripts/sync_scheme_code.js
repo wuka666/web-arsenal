@@ -29,9 +29,13 @@ let updated = 0, skipped = [];
 targets.forEach(s => {
   const demoRel = s.演示页;
   const html = fs.readFileSync(path.join(root, demoRel), "utf8");
-  const idAt = text.indexOf('id: "' + s.id + '"');
+  // 键写法两种并存（素材库 M183 起是 JSON 风格 `"id": "Mxxx"`），方案库目前只有对象字面量写法，
+  //   但为防哪天混入 JSON 风格导致静默漏同步，这里一开始就两种都认（2026-10-02）。
+  const idM = new RegExp('(?:"id"|id)\\s*:\\s*"' + s.id + '"').exec(text);
+  const idAt = idM ? idM.index : -1;
   if (idAt < 0) { skipped.push(s.id + " 找不到 id 锚点"); return; }
-  const codeAt = text.indexOf("代码:", idAt);
+  const codeM = /(?:"代码"|代码)\s*:/.exec(text.slice(idAt));
+  const codeAt = codeM ? idAt + codeM.index : -1;
   if (codeAt < 0) { skipped.push(s.id + " 无代码字段"); return; }
   // 锚点不许滑到下一条：代码必须落在本条目区间内
   const nextId = text.indexOf("\n  {\n", idAt + 10);

@@ -1,14 +1,25 @@
 // 标签全量重组：按新四维词表重写两库标签（删旧 分类/子类，写 适配端/元素/风格/场景）
 // 用法（项目根目录）：node scripts/rebuild_tags.js [--dry]
 // 安全边界：只在每条 id → 「代码」字段之间的**字段区**做改写，`代码` 与 demo 的逐字节一致性不受影响
+//
+// ⚠️⚠️ **本脚本已过时，日常不要跑**（2026-10-02 全库审计结论）：
+//   ① 重组逻辑依赖旧字段「分类▸子类」，当前条目（M183 起尤其如此）早已换成四维闭集，
+//      命中不到的会原样跳过并在结尾汇总，不会崩，但等于没干活；
+//   ② 方案定档表 SCHEME_TAGS 只到 S35，S36–S49 缺档 → 同样跳过并汇总；
+//   ③ 四维标签现在由 `scripts/check_all.js` 的 TAXONOMY 校验，改标签**直接改数据 + 跑 check_all** 即可。
+//   保留本脚本只为历史追溯；哪天真要再重组，先重写 transformMat / 补全 SCHEME_TAGS。
 const fs = require("fs"), path = require("path");
 const ROOT = process.cwd();
 const DRY = process.argv.includes("--dry");
 
 // ================= 闭集 =================
+// 🔴 必须与 scripts/check_all.js 的 TAXONOMY 逐字一致（2026-10-02 全库审计对齐）：
+//    此前本文件的 风格 13 值 / 场景 7 值 与 check_all 的 8 值 / 8 值 漂移——
+//    跑一次本脚本就会写出 check_all 判「不在词表闭集内」的值，全库校验立刻变红。
+//    改任意一边，另一边必须同步改（并同步 01-素材条目模板.md 的词表）。
 const ADAPT = ["通用", "PC 端", "移动端"];
-const STYLES = ["极简瑞士", "科技未来", "暗色", "iOS 原生", "品牌海报", "国风水墨", "玻璃拟态", "新拟态软 UI", "粗野·新粗野", "有机自然", "复古怀旧", "童趣黏土", "编辑杂志"];
-const SCENES = ["落地页·发布页", "官网·品牌站", "工具·SaaS", "后台·数据看板", "作品集·叙事", "内容·阅读", "电商·预订"];
+const STYLES = ["极简瑞士", "科技未来", "暗色", "iOS 原生", "品牌海报", "有机自然", "编辑杂志", "其他·特色风格"];
+const SCENES = ["落地页·发布页", "官网·品牌站", "工具·SaaS", "后台·数据看板", "作品集·叙事", "内容·阅读", "电商·预订", "其他·场景"];
 const ELEMS = ["动作", "输入", "导航", "反馈", "数据", "容器布局", "媒体", "文字", "动效", "背景氛围"];
 
 // ================= 映射表 A：分类▸子类 → 元素（52 格全覆盖）=================
@@ -134,15 +145,26 @@ function readLib(rel) {
   const w = {}; new Function("window", c)(w);
   return w;
 }
-const CODE_AT = /\n\s*代码:\s*["`]/;
+// ⚠️ 键写法两种并存（2026-10-02 修）：前半段对象字面量 `代码: "`，M183 起是 JSON 风格 `"代码": "`。
+//    只认前一种会静默漏掉 153 条且不报错——脚本看起来成功，其实一半库没动。
+const CODE_AT = /\n\s*(?:"代码"|代码)\s*:\s*["`]/;
 
 function rewrite(file, transform, idsFromText) {
   let text = fs.readFileSync(path.join(ROOT, file), "utf8");
   // 收集所有条目的 id 与其起始偏移（按出现顺序）
   const marks = [];
-  const re = /id:\s*"([A-Za-z]+\d+)"/g;
+  // 两种 id 写法都要认：id: "M001" 与 "id": "M183"（后半段 153 条是后者）
+  const re = /(?:"id"|id)\s*:\s*"([A-Za-z]+\d+)"/g;
   let m;
   while ((m = re.exec(text))) marks.push({ id: m[1], at: m.index });
+  // 🔴 覆盖自检：定位到的条数必须等于库里实际条数，少一条都说明定位逻辑又漏了（静默漏改是最难查的事故）
+  // idsFromText 可传「条数」也可传 id 数组，两种都认
+  const realCount = typeof idsFromText === "number" ? idsFromText
+    : (idsFromText ? idsFromText.length : null);
+  if (realCount !== null && marks.length !== realCount) {
+    console.error(`✗ 覆盖自检失败：文件里定位到 ${marks.length} 条，实际 ${realCount} 条 —— 键写法或格式又变了，先修定位正则再跑`);
+    process.exit(1);
+  }
   // 从后往前改，保证前面的偏移不被破坏
   const failed = [];
   for (let i = marks.length - 1; i >= 0; i--) {
@@ -161,10 +183,12 @@ function rewrite(file, transform, idsFromText) {
 
 // 字段级改写器：定位「行首的 名: 」并吃掉整个值（多行数组按括号配对扫描，单值吃到行尾）
 function findField(head, name) {
-  const m = head.match(new RegExp("\n(\\s*)" + name + "\\s*:\\s*"));
+  // 键同样两种写法：`适配端: ` 与 `"适配端": `
+  const m = head.match(new RegExp("\n(\\s*)(\"" + name + "\"|" + name + ")\\s*:\\s*"));
   if (!m) return null;
   const start = m.index + 1;                 // 该行首个字符
   const ind = m[1];
+  const key = m[2];                          // 原样保留键写法，写回时不制造新的混写
   let i = m.index + m[0].length;             // 值的第一个字符
   const valStart = i;
   let valEnd;
@@ -184,12 +208,12 @@ function findField(head, name) {
   }
   let end = valEnd;                          // 吃掉尾随逗号与空格，停在换行前
   while (end < head.length && head[end] !== "\n" && /[ \t,]/.test(head[end])) end++;
-  return { start, end, ind, raw: head.slice(valStart, valEnd) };
+  return { start, end, ind, key, raw: head.slice(valStart, valEnd) };
 }
 function replaceField(head, name, value) {
   const f = findField(head, name);
   if (!f) return head;
-  return head.slice(0, f.start) + f.ind + name + ": " + JSON.stringify(value) + "," + head.slice(f.end);
+  return head.slice(0, f.start) + f.ind + f.key + ": " + JSON.stringify(value) + "," + head.slice(f.end);
 }
 function removeField(head, name) {
   const f = findField(head, name);
@@ -209,13 +233,17 @@ const MAT = readLib("data/素材.js").WEB_ARSENAL;
 const matById = {}; MAT.forEach(e => matById[e.id] = e);
 const stat = { adapt: {}, style: {}, scene: {}, elem: {}, styleInfer: 0, sceneInfer: 0, noStyle: 0 };
 
+const skippedMat = [];
 function transformMat(id, head) {
   const e = matById[id];
   if (!e) return null;
+  // 本脚本的重组逻辑面向**旧版「分类▸子类」结构**。现在的条目早就换成四维闭集、
+  // 由 check_all 的 TAXONOMY 校验 —— 没有 分类/子类 的条目一律原样跳过，绝不硬套、也绝不中断。
+  if (!e.分类 || !e.子类) { skippedMat.push(id); return head; }
   const html = fs.readFileSync(path.join(ROOT, e.效果演示), "utf8");
 
   const elem = ELEM_MAP[e.分类 + "▸" + e.子类];
-  if (!elem) throw new Error("✗ 元素映射缺格：" + id + " " + e.分类 + "▸" + e.子类);
+  if (!elem) { skippedMat.push(id + "(映射缺格)"); return head; }
 
   let adapt = inferAdapt(e);
 
@@ -267,28 +295,44 @@ const SCHEME_TAGS = {
   S31: ["通用", "编辑杂志", "官网·品牌站"], S32: ["PC 端", "极简瑞士", "作品集·叙事"], S33: ["通用", "极简瑞士", "落地页·发布页"],
   S34: ["通用", "玻璃拟态", "落地页·发布页"], S35: ["PC 端", "编辑杂志", "内容·阅读"]
 };
+const skippedSchemes = [];
+// 定档表里残留着旧词表的值（玻璃拟态 / 粗野·新粗野 / 复古怀旧 / 国风水墨…），
+// 直接写回会被 check_all 判「不在词表闭集内」→ 一律归一到兜底桶，保证跑完仍全绿。
+const normStyle = v => (STYLES.includes(v) ? v : "其他·特色风格");
+const normScene = v => (SCENES.includes(v) ? v : "其他·场景");
 function transformSch(id, head) {
   const tag = SCHEME_TAGS[id];
-  if (!tag) throw new Error("✗ 方案缺定档：" + id);
+  // 缺定档（S36 及以后）：原样保留并汇总报告，不抛错中断——抛错会让人以为整脚本坏了
+  if (!tag) { skippedSchemes.push(id); return head; }
   let h = removeField(head, "适配端");
   h = removeField(h, "风格");
   h = removeField(h, "场景");
   h = insertAfterField(h, "风格名", [
     "适配端: " + JSON.stringify(tag[0]) + ",",
-    "风格: " + JSON.stringify(tag[1]) + ",",
-    "场景: " + JSON.stringify(tag[2]) + ","
+    "风格: " + JSON.stringify(normStyle(tag[1])) + ",",
+    "场景: " + JSON.stringify(normScene(tag[2])) + ","
   ]);
   return h;
 }
 
 // ================= 执行 =================
-const r1 = rewrite("data/素材.js", transformMat);
-const r2 = rewrite("data/方案.js", transformSch);
+const loadArr = (rel, key) => { const w = {}; new Function("window", fs.readFileSync(path.join(ROOT, rel), "utf8"))(w); return w[key].length; };
+const nMat = loadArr("data/素材.js", "WEB_ARSENAL"), nSch = loadArr("data/方案.js", "WEB_SCHEMES");
+const r1 = rewrite("data/素材.js", transformMat, nMat);
+const r2 = rewrite("data/方案.js", transformSch, nSch);
 if (r1.failed.length || r2.failed.length) {
   console.error("✗ 失败：" + [...r1.failed, ...r2.failed].join(" / "));
   process.exit(1);
 }
 console.log("素材改写 " + r1.count + " 条 / 方案改写 " + r2.count + " 条");
+if (skippedMat.length) {
+  console.log("⚠️ 素材跳过 " + skippedMat.length + " 条（无旧「分类/子类」字段，属当前数据结构，本脚本已不适用）："
+    + skippedMat.slice(0, 5).join(" ") + (skippedMat.length > 5 ? " …" : ""));
+}
+if (skippedSchemes.length) {
+  console.log("⚠️ 方案缺定档、已原样跳过 " + skippedSchemes.length + " 套：" + skippedSchemes.join(" ")
+    + "\n   （SCHEME_TAGS 只到 S35；要给它们定档就把 [适配端,风格,场景] 补进该表，风格/场景必须取当前闭集的值）");
+}
 if (DRY) { console.log("（--dry 干跑，不写盘）"); } else {
   fs.writeFileSync(path.join(ROOT, "data/素材.js"), r1.text, "utf8");
   fs.writeFileSync(path.join(ROOT, "data/方案.js"), r2.text, "utf8");

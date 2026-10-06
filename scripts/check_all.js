@@ -48,6 +48,17 @@ function audit(list, label, demoKey) {
     }
     // 参数 < 6（skeleton 类文档条目除外）
     if (params.length && params.length < 6) bad(`${label} ${e.id} ${t} 参数仅 ${params.length} 个（<6）`);
+    // 附加演示 / 随包库文件存在性（2026-10-02 全库审计补）：
+    //   此前只校验 效果演示/演示页，M066 与 S19 的 ThreeJS演示 指向已不存在的文件却长期全绿。
+    //   规矩 11⑤：带 ThreeJS演示 的 3D 素材，降级版与完整版缺一不可。
+    ['ThreeJS演示', '下载'].forEach(k => {
+      if (e[k] && !fs.existsSync(path.join(root, e[k]))) bad(`${label} ${e.id} ${t} ${k} 文件缺失: ${e[k]}（规矩 11⑤：完整版 / 随包库文件必须存在）`);
+    });
+    // 参数契约（2026-10-02 全库审计补）：index.html 唯一的调参通道是 iframe.contentWindow.postMessage({type:'param'})，
+    //   demo 没有 message 监听 = 参数面板拖了没反应。此前 S37–S42 六套方案的 :root 参数全是死的，校验却全绿。
+    if (params.length && !/addEventListener\(\s*['"]message['"]|onmessage/.test(html)) {
+      bad(`${label} ${e.id} ${t} demo 无 message 监听：参数面板调了不生效（规矩 10①：须支持 postMessage type='param' 调参）`);
+    }
     // 死参数：键不在 demo 里
     params.forEach(p => {
       const k = p.键 || "";
