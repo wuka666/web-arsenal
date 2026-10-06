@@ -80,7 +80,7 @@ body[data-glow="1"] .coral{box-shadow:0 0 calc(var(--faguang)*1px) var(--zhucai)
   <div class="block violet"><h3>实时告警</h3><div class="big">3</div><div class="lbl">2 高优 · 1 中优</div></div>
   <div class="block sage"><h3>跳转入口</h3><div class="lbl">报表 · 任务 · 设置 一触即达</div><button class="cta" style="background:var(--di);color:var(--zi)">前往控制台</button></div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -254,7 +254,7 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.55;padd
 <div class="trip"><span class="dot"></span><div>周日 返程高铁<br><span style="color:var(--cizi)">18:40 发车</span></div></div>
 </div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -409,7 +409,7 @@ body{min-height:100vh;line-height:1.55;padding:calc(var(--jianju)*1.5);color:var
 <div class="glass panel"><div class="k">风险预警</div><div class="v">2</div><div class="sub">汇率波动 · 集中度</div></div>
 <div class="glass panel wide"><div><div class="k">智能投顾建议</div><div class="sub">建议将 12% 仓位由货基转向中短债，平滑波动</div></div><button class="btn">采纳建议</button></div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',mo:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',mo:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -567,7 +567,7 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.5;paddi
 <div class="cell wide"><div class="t">快捷入口</div><div class="v" style="font-size:calc(var(--zihao)*1.1)">新建任务 · 发起评审 · 导出周报</div></div>
 <div class="cell"><div class="t">通知</div><div class="v">7</div><div class="sub"><span class="dot y"></span>新评论</div></div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',midu:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',midu:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -723,7 +723,7 @@ body[data-shouzi="1"] .multi p:first-child::first-letter{font-family:Georgia,ser
 <p>于是有人提出一种逆向的实验：把主干道的车道让出一条给自行车，把写字楼的电梯等候区改成可以发呆的角落。起初争议不断，半年后，街角的咖啡馆多了，遛狗的人也多了。</p>
 <p>慢，不是落后，而是一种被重新发现的奢侈。当一座城市愿意为停顿留出空间，生活才真正开始呼吸。</p>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='shouzi'){document.body.setAttribute('data-shouzi',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lan:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='shouzi'){document.body.setAttribute('data-shouzi',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lan:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -888,7 +888,7 @@ body{background:var(--di);color:var(--zi);font-family:system-ui,"Microsoft YaHei
     <div class="s"><b>M5</b><span>强劲芯片</span></div>
   </div>
 </section>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -974,7 +974,7 @@ body{background:var(--di);color:var(--zi);min-height:100vh;display:flex;flex-dir
 </div>
 <button class="cta">选购系列</button>
 <div class="visual"></div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1060,7 +1060,7 @@ body{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;line-height:1.5
 <div class="list">· 只做一件事，并把它做到极致<br>· 用结构代替装饰<br>· 让留白替你说话</div>
 <button class="btn">查看作品</button>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',bian:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',bian:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1229,7 +1229,7 @@ body[data-glow="1"] .panel.on{border-color:var(--zhucai);box-shadow:0 0 calc(var
 <div class="panel"><div class="k">今日调用</div><div class="v">9.2M</div><div class="spark"></div></div>
 </div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='glow'){document.body.setAttribute('data-glow',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='glow'){document.body.setAttribute('data-glow',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px',lie:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1391,7 +1391,7 @@ body[data-banbo="0"] .blob{border-radius:var(--yuanjiao);}
 </div>
 <button class="btn">开始规划路线</button>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='banbo'){document.body.setAttribute('data-banbo',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;if(d.key==='banbo'){document.body.setAttribute('data-banbo',d.value?'1':'0');return;}const U={yuanjiao:'px',jianju:'px',zihao:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1546,7 +1546,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:calc(v
 <div class="frame"><div class="img" style="background:linear-gradient(140deg,#6b4a36,#a07a55)">海岸 · 东冲</div><div class="cap"><span>No.04</span><span class="tag">待修</span></div></div>
 <div class="frame"><div class="img" style="background:linear-gradient(140deg,#6b4a36,#a07a55)">麦田 · 元阳</div><div class="cap"><span>No.05</span><span class="tag">精选</span></div></div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',grain:'',zhenkuan:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',grain:'',zhenkuan:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1697,7 +1697,7 @@ body{background:var(--di);color:var(--zi);min-height:100vh;line-height:1.8;paddi
 <div class="lead">茶不求浓，<span class="hl">器不争巧</span>。一席之间，留三分空，便是待客的礼。</div>
 <div class="body">我们寻访南糯山的古茶树，只取头春一芽二叶，以柴火铁锅手工杀青。茶汤入盏，先闻其香，再观其色，后品其回甘。器物不求名贵，只求手感温润、出水流利——茶与器，本就该这样彼此成全。</div>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',mo:'',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={yuanjiao:'px',jianju:'px',zihao:'px',mo:'',liubai:'px'};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -1898,7 +1898,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -2033,7 +2033,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -2173,7 +2173,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -2270,7 +2270,7 @@ body{background:var(--di);color:var(--zi);min-height:100vh;padding:var(--liubai)
   <span><i style="background:#6C5CE7"></i>back / 回弹</span>
   <span><i style="background:#2DCB73"></i>linear</span>
 </div>
-<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={jiange:'px',zihao:'px',liubai:'px',speed:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});</script>
+<script>addEventListener('message',e=>{const d=e.data;if(!d||d.type!=='param')return;const U={jiange:'px',zihao:'px',liubai:'px',speed:''};document.documentElement.style.setProperty('--'+d.key,d.value+(U[d.key]||''))});<\/script>
 </body>
 </html>
 `,
@@ -2427,7 +2427,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -2549,7 +2549,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -3005,7 +3005,7 @@ button{min-width:44px;min-height:44px}
   })
 
   try3D()
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -3144,7 +3144,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -3402,7 +3402,7 @@ addEventListener('message',function(e){
   var d=e.data;if(!d||d.type!=='param'||!(d.key in state))return;state[d.key]=d.value;apply();
 });
 apply();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -3683,7 +3683,7 @@ addEventListener('message',function(e){
 });
 apply();
 if(!reduce) requestAnimationFrame(loop);
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -3964,7 +3964,7 @@ resize();
 apply();
 var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(reduce){ draw(0); } else { requestAnimationFrame(draw); }
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -4310,7 +4310,7 @@ items.forEach(function(a, i){
     spec.innerHTML = sizes[i] + ' · 手工吹制 · <em>1180°C</em>';
   });
 });
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -4624,7 +4624,7 @@ addEventListener('message',function(e){
 var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,120);});
 active=1;apply();
 requestAnimationFrame(render);
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -4881,7 +4881,7 @@ addEventListener('message',function(e){
 var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){resize();buildShelf();},140);});
 resize();buildShelf();apply();
 requestAnimationFrame(track);
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -5128,7 +5128,7 @@ var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resiz
 resize();apply();
 draw(0);
 if(!reduce) requestAnimationFrame(loop);
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -5391,7 +5391,7 @@ addEventListener('message',function(e){
 var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,140);});
 resize();apply();
 requestAnimationFrame(draw);
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -5641,7 +5641,7 @@ addEventListener('message',function(e){
 var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,140);});
 resize();apply();
 if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ draw(0); } else { requestAnimationFrame(draw); }
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -6791,7 +6791,7 @@ a:focus-visible{outline:2px solid #9fe0ff; outline-offset:3px; border-radius:4px
     state[d.key]=d.value; apply();
   });
 })();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -7003,6 +7003,25 @@ document.querySelectorAll('.card').forEach(function(c){
   thumb.addEventListener('touchstart',down,{passive:true});window.addEventListener('touchmove',move,{passive:true});window.addEventListener('touchend',up);
 })();
 <\/script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"frame":"","screen":"","ink":"","gold":"","glassA":"","blur":"px","radius":"px"};
+  var RESP = [];
+  var state = {"frame":"#7c8a6f","screen":"#cfc8b4","ink":"#ffffff","gold":"#c79a3e","glassA":"0.16","blur":"4px","radius":"52px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
+<\/script>
 </body>
 </html>
 `,
@@ -7071,7 +7090,7 @@ document.querySelectorAll('.card').forEach(function(c){
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>云巅行者 — 登山者英雄页</title>
 <style>
-:root{
+:root{--gap:24px;
   --bg:#0a0e1c; --screen:#0a0e1c; --ink:#ffffff; --accent:#ed7a1a;
   --menuRed:#7a2e00; --menuDark:#1a0e00; --blur:6px; --radius:50px;
 }
@@ -7200,6 +7219,25 @@ document.querySelectorAll('.num[data-to]').forEach(function(el){
     el.textContent=Math.round(to*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
   setTimeout(function(){requestAnimationFrame(step);},900);
 });
+<\/script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","accent":"","ink":"","menuRed":"","menuDark":"","blur":"px","radius":"px","gap":"px"};
+  var RESP = [];
+  var state = {"bg":"#0a0e1c","accent":"#ed7a1a","ink":"#ffffff","menuRed":"#7a2e00","menuDark":"#1a0e00","blur":"6px","radius":"50px","gap":"24px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
 <\/script>
 </body>
 </html>
@@ -7375,6 +7413,25 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
     </div>
   </div>
 </div>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","panel":"","ink":"","accent":"","radius":"px","blur":"px"};
+  var RESP = [];
+  var state = {"bg":"#000000","panel":"#1A1A1A","ink":"#ffffff","accent":"#ffffff","radius":"12px","blur":"8px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
+<\/script>
 </body>
 </html>
 `,
@@ -7559,6 +7616,25 @@ body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-se
   var t=setInterval(function(){el.textContent=txt.slice(0,++i);if(i>=txt.length)clearInterval(t);},55);
 })();
 <\/script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","cream":"","ink":"","card":"","radius":"px","blur":"px"};
+  var RESP = [];
+  var state = {"bg":"#2a2320","cream":"#E8D5B5","ink":"#ffffff","card":"#F3ECDD","radius":"50px","blur":"6px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
+<\/script>
 </body>
 </html>
 `,
@@ -7724,6 +7800,25 @@ body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})},{threshold:.2});
   document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   setTimeout(function(){document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in')})},900);
+})();
+<\/script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","accent":"","cream":"","ink":"","panel":"","line":"","radius":"px","blur":"px"};
+  var RESP = [];
+  var state = {"bg":"#1c2417","accent":"#d98a3d","cream":"#efe6d2","ink":"#ffffff","panel":"#2a3324","line":"#3a4631","radius":"50px","blur":"6px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
 })();
 <\/script>
 </body>
@@ -8051,6 +8146,25 @@ function render(){
   document.getElementById('cnt').textContent = '共 ' + rows.length + ' 个型号 · 库存实时同步';
 }
 render();
+<\/script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   响应式键 cols 由 @media 控制，加载时不写 inline，用户显式调过才写（否则窄屏会被撑破）。 */
+(function(){
+  var U = {"bg":"","ink":"","accent":"","line":"","card":"","gap":"px","radius":"px","cols":""};
+  var RESP = ["cols"];
+  var state = {"bg":"#F5F3EF","ink":"#1E1B18","accent":"#A8452B","line":"#DDD7CE","card":"#FFFFFF","gap":"12px","radius":"6px","cols":"4"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
 <\/script>
 </body>
 </html>
@@ -8545,7 +8659,7 @@ body:not(.intro-ready) .header,.intro-ready .planet-list,.intro-ready .planet-co
     setTimeout(()=>{if(current==='yanhe')travel();},5500);
   }
 })();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -8932,7 +9046,7 @@ if(location.search.includes('autoshot')){
   setTimeout(()=>{window.scrollTo({top:1500,behavior:'auto'});requestTick();},800);
 }
 })();
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -9377,7 +9491,7 @@ window.addEventListener('message',e=>{
   if(!d||d.type!=='param'||!(d.key in state))return;
   state[d.key]=d.value;apply();fit();
 });
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -9648,7 +9762,7 @@ window.addEventListener('message',e=>{
   if(!d||d.type!=='param'||!(d.key in state))return;
   state[d.key]=d.value;apply();
 });
-</script>
+<\/script>
 </body>
 </html>
 `,
@@ -9800,7 +9914,7 @@ window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="para
 </body>
 </html>
 `,
- 片段: "",
+ 片段: "*{box-sizing:border-box;margin:0;padding:0}\n.shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg); font:500 14px/1.6 -apple-system,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;color:var(--fg)}\n.nav{position:absolute;left:0;top:0;z-index:6;width:100%;height:var(--navH);display:flex;align-items:center; gap:8px;padding:0 var(--pad);background:linear-gradient(180deg,var(--bg) 30%,transparent)}",
  参数: [
   {
    键: "bg",
@@ -9998,7 +10112,7 @@ window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="para
 </body>
 </html>
 `,
- 片段: "",
+ 片段: "*{box-sizing:border-box;margin:0;padding:0}\n.shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--page); font:500 14px/1.6 -apple-system,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;color:var(--ink)}\n.bar{height:var(--barH);display:flex;align-items:center;padding:0 var(--pad);background:var(--barBg); border-bottom:1px solid var(--edge);position:relative}",
  参数: [
   {
    键: "page",
@@ -10178,7 +10292,7 @@ window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="para
 </body>
 </html>
 `,
- 片段: "",
+ 片段: "*{box-sizing:border-box;margin:0;padding:0}\n.shell{position:relative;width:100%;height:100vh;overflow:hidden;background:var(--bg); font:500 14px/1.6 -apple-system,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;color:var(--fg)}\n.head{padding:calc(var(--topP)) var(--pad) 0;position:relative}\n.head .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}",
  参数: [
   {
    键: "bg",
