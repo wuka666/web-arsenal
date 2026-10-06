@@ -237,6 +237,8 @@
 
   // postMessage 调参
   // 把 M066 方案参数键映射到降级版内部 state：核心参数给可见反馈，3D 专属静默接受
+  // 降级版未覆盖项（规矩 11① 要求显式注明）：IGNORE_3D 这 6 个键是 Three.js 专属的辉光 / 光晕 / 暗角，
+  //   本 Canvas 2D 降级版会接收参数但画面不变——要看效果请打开完整版 粒子星系-ThreeJS.html（需本地 HTTP 服务）
   const PARAM_MAP = {
     starCount: 'count', size: 'size', scatter: 'scatter',
     backgroundRatio: 'bgRatio', rotationDepth: 'rotate',

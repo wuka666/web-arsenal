@@ -102,5 +102,24 @@ body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"
   setTimeout(function(){document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in')})},900);
 })();
 </script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","accent":"","cream":"","ink":"","panel":"","line":"","radius":"px","blur":"px"};
+  var RESP = [];
+  var state = {"bg":"#1c2417","accent":"#d98a3d","cream":"#efe6d2","ink":"#ffffff","panel":"#2a3324","line":"#3a4631","radius":"50px","blur":"6px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
+</script>
 </body>
 </html>

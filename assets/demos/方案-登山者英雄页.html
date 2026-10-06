@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>云巅行者 — 登山者英雄页</title>
 <style>
-:root{
+:root{--gap:24px;
   --bg:#0a0e1c; --screen:#0a0e1c; --ink:#ffffff; --accent:#ed7a1a;
   --menuRed:#7a2e00; --menuDark:#1a0e00; --blur:6px; --radius:50px;
 }
@@ -134,6 +134,25 @@ document.querySelectorAll('.num[data-to]').forEach(function(el){
     el.textContent=Math.round(to*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
   setTimeout(function(){requestAnimationFrame(step);},900);
 });
+</script>
+
+<script>
+/* 参数接线：state 键与方案参数一致，拖参数面板实时可见（postMessage type=param）。
+   单位后缀照 :root 原值拼（--blur:4px 补 px、--cols:4 不补），避免丢单位让元素算成 0 消失。
+   本页无响应式变量覆写。 */
+(function(){
+  var U = {"bg":"","accent":"","ink":"","menuRed":"","menuDark":"","blur":"px","radius":"px","gap":"px"};
+  var RESP = [];
+  var state = {"bg":"#0a0e1c","accent":"#ed7a1a","ink":"#ffffff","menuRed":"#7a2e00","menuDark":"#1a0e00","blur":"6px","radius":"50px","gap":"24px"};
+  var dirty = {};
+  function apply(){ for (var k in state) { if (RESP.indexOf(k) >= 0 && !dirty[k]) continue; document.documentElement.style.setProperty("--" + k, state[k]); } }
+  window.addEventListener("message", function(e){
+    var d = e.data; if (!d || d.type !== "param" || !(d.key in state)) return;
+    state[d.key] = (U[d.key] && typeof d.value === "number") ? d.value + U[d.key] : d.value;
+    dirty[d.key] = 1; apply();
+  });
+  apply();
+})();
 </script>
 </body>
 </html>
