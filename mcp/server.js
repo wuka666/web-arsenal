@@ -46,8 +46,8 @@ server.tool(
   {
     keyword: z.string().optional().describe('模糊关键词，匹配标题/标签/效果说明'),
     适配端: z.string().optional().describe('适配端（单选），通用 / PC 端 / 移动端'),
-    风格: z.string().optional().describe('风格（单选），如 极简瑞士 / 科技未来 / 暗色 / 国风水墨 / 玻璃拟态'),
-    场景: z.string().optional().describe('场景（单选），如 落地页·发布页 / 官网·品牌站 / 工具·SaaS / 后台·数据看板 / 内容·阅读 / 电商·预订 / 作品集·叙事'),
+    风格: z.string().optional().describe('风格（单选），如 极简瑞士 / 科技未来 / 暗色 / 品牌海报 / iOS 原生 / 其他·特色风格'),
+    场景: z.string().optional().describe('场景（单选），如 落地页·发布页 / 工具·SaaS / 官网·品牌站 / 电商·预订 / 后台·数据看板 / 内容·阅读'),
     元素: z.string().optional().describe('元素（单选），动作 / 输入 / 导航 / 反馈 / 数据 / 容器布局 / 媒体 / 文字 / 动效 / 背景氛围'),
     limit: z.number().optional().describe('最多返回条数，默认 20'),
   },
@@ -175,7 +175,7 @@ server.tool(
   { id: z.string().describe('方案 id，如 S01 / S02') },
   ({ id }) => {
     const s = SCHEMES.find(x => x.id === id);
-    if (!s) return { content: [{ type: 'text', text: `找不到方案 id=${id}。方案 id 形如 S01–S35（两位数）。` }] };
+    if (!s) return { content: [{ type: 'text', text: `找不到方案 id=${id}。方案 id 形如 S01–${SCHEMES[SCHEMES.length-1].id}。` }] };
     const params = (s.参数 || []).map(p => `- ${p.键}（${p.名}，${p.类型}）默认=${JSON.stringify(p.默认)}`).join('\n');
     const color = Object.entries(s.配色 || {}).map(([k, v]) => `${k} ${v}`).join(' / ');
     const text = [
