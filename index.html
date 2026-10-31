@@ -156,6 +156,20 @@
   .content-head span { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .head-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+  /* 排序（仿 GitHub 仓库列表的 sort 下拉：默认顺序 / 名称 / 更新时间 / 分组）
+     用原生 select：键盘、触屏、系统滚动轮盘都直接可用，不自己造下拉 */
+  .sort-box {
+    display: inline-flex; align-items: center; gap: 6px; height: 38px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--panel2);
+    padding: 0 8px 0 12px; transition: border-color .15s ease;
+  }
+  .sort-box:focus-within { border-color: var(--accent); }
+  .sort-box .ic { color: var(--muted); font-size: 13px; }
+  .sort-box select {
+    border: none; background: transparent; color: var(--ink); outline: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; height: 100%; padding-right: 4px;
+  }
+
   /* 搜索框（两库各记各自 query）
      借鉴：GitHub 全局搜索 ⌘/ 聚焦 + 清除按钮 + 结果高亮；Apple HIG 的 44px 触摸目标 + scope placeholder */
   .search-box {
@@ -252,7 +266,8 @@
   .tools-row .chip.on .chip-n { opacity: .7; }
 
   /* ============ 卡片 = 书 / 书脊 ============ */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  /* minmax 的 min 用 min(300px,100%)：浏览器放大/窄窗时列不会撑破容器、不出现横向滚动（规矩 32 · 批 3） */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; }
   .card {
     background: var(--cover); border: 1px solid var(--cover-edge); border-radius: 4px 9px 9px 4px;
     overflow: hidden; cursor: pointer; position: relative;
@@ -276,6 +291,15 @@
   .thumb { position: relative; aspect-ratio: 16 / 10; background: var(--panel2); overflow: hidden; box-shadow: inset 0 0 0 3px var(--cover), inset 0 0 0 4px color-mix(in srgb, var(--gold) 38%, var(--cover-edge)); }
   .thumb iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; transform-origin: 0 0; background: var(--panel2); }
   .thumb .loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; pointer-events: none; }
+  /* 演示加载失败 / 太久没响应时的降级提示（规矩 32 ③：不能伪装成「没有内容」） */
+  .thumb.demo-failed::after, .reader-demo.demo-failed::after {
+    content: "演示没能加载出来 —— 可能是文件缺失或浏览器拦了本地 iframe，可点卡片重开或刷新重试";
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    padding: 18px; text-align: center; font-size: 12px; line-height: 1.7; color: var(--muted);
+    background: color-mix(in srgb, var(--panel2) 88%, transparent);
+  }
+  .thumb.demo-failed, .reader-demo.demo-failed { position: relative; }
+  .reader-demo.demo-failed .rd-bar { z-index: 6; }
 
   /* 热点 = 28px 圆，深半透底 + 精钢描边，hover 反色（书房组件规范） */
   .add-btn {
@@ -316,9 +340,6 @@
   .detail { border-top: 1px dashed var(--line); display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; padding: 16px; background: var(--panel); }
   .detail[hidden] { display: none; }
   @media (max-width: 900px) { .detail { grid-template-columns: 1fr; } }
-
-  .demo-big { position: relative; align-self: start; height: 420px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel2); }
-  .demo-big iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; background: var(--panel2); transform-origin: 0 0; }
 
   .info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
   .info h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; gap: 10px; letter-spacing: .03em; }
@@ -372,11 +393,11 @@
   #grid.away { filter: blur(6px) brightness(.84); transform: scale(.97); transform-origin: center top;
     transition: filter .5s var(--ease-sheet), transform .5s var(--ease-sheet); pointer-events: none; }
   .reader-mask { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity .3s var(--ease-sheet); padding: 24px; }
+    opacity: 0; pointer-events: none; transition: opacity .3s var(--ease-sheet); padding: clamp(8px, 2.4vh, 24px); }
   .reader-mask.show { opacity: 1; pointer-events: auto; }
   .reader-scrim { position: absolute; inset: 0; background: rgba(22,17,10,.46);
     -webkit-backdrop-filter: blur(6px) brightness(.82); backdrop-filter: blur(6px) brightness(.82); cursor: zoom-out; }
-  .book-open { position: relative; width: min(880px, 94vw); height: min(560px, 86vh);
+  .book-open { position: relative; width: min(880px, 94vw); height: min(560px, 86vh); height: min(560px, calc(100dvh - 2 * clamp(8px, 2.4vh, 24px)));
     display: grid; grid-template-columns: 1fr 1fr; gap: 0;
     background: linear-gradient(180deg, var(--paper), var(--paper2)); border-radius: 6px; overflow: hidden;
     box-shadow: 0 34px 90px rgba(0,0,0,.6), inset 0 0 0 1px var(--cover-edge);
@@ -389,9 +410,55 @@
     background: repeating-linear-gradient(180deg, transparent 0 27px, color-mix(in srgb, var(--ink) 6%, transparent) 27px 28px), var(--paper); }
   .page h4 { margin: 0 0 14px; font-size: 13px; letter-spacing: 1px; color: var(--gold);
     font-family: system-ui, sans-serif; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
-  .reader-demo { position: absolute; inset: 56px 22px 22px; border-radius: 4px; background: var(--panel2);
+  /* 默认位置与大小写成变量，JS 的 rdDefaultBox() 也从这两个变量读，避免两边各写一套数字 */
+  .page.page-left { --rd-x: 22px; --rd-y: 78px; }
+  .reader-demo { position: absolute; inset: auto; left: var(--rd-x); top: var(--rd-y); right: var(--rd-x); bottom: var(--rd-x); z-index: 5; border-radius: 4px; background: var(--panel2);
     border: 1px solid var(--line); overflow: hidden; box-shadow: inset 0 0 0 3px var(--cover), inset 0 2px 10px rgba(0,0,0,.12); }
   .reader-demo iframe { position: absolute; top: 0; left: 0; transform-origin: 0 0; border: 0; background: var(--panel2); }
+  /* 预览窗可以拖边、拖角改大小，也可以拖标题条移动（尺寸记在 localStorage） */
+  .page.page-left { overflow: visible; z-index: 3; }
+  .page.page-right { z-index: 1; }
+  .reader-demo .rd-bar { position: absolute; left: 0; right: 0; top: 0; height: 22px; z-index: 7; display: flex; align-items: center; gap: 8px;
+    padding: 0 8px; font: 11px/1 system-ui, sans-serif; color: var(--muted); cursor: move; user-select: none; opacity: 0; pointer-events: none;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 96%, transparent), transparent); transition: opacity .15s ease; }
+  .reader-demo:hover .rd-bar { opacity: 1; pointer-events: auto; }
+  .reader-demo .rd-bar b { color: var(--ink); font-weight: 600; letter-spacing: .5px; }
+  .reader-demo .rd-bar .rd-size { margin-left: auto; font-variant-numeric: tabular-nums; }
+  /* 左页标题行右侧常驻的「新窗口」：不压演示区（规矩 24），也不靠 hover 才出现。
+     位置与 .page h4 的标题同一行，演示窗可以从它下方自由拖动。 */
+  .page-left-head { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
+  .page-left-head h4 { margin: 0; padding: 0; border: 0; flex: 1; }
+  .rd-open {
+    display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 11px; flex-shrink: 0;
+    border: 1px solid var(--line); border-radius: 7px; cursor: pointer;
+    background: var(--panel2); color: var(--muted);
+    font: 12px/1 system-ui, sans-serif;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .rd-open:hover, .rd-open:focus-visible { color: var(--accent); border-color: var(--accent); }
+  /* 手柄一律画在预览窗「里面」：外层是 overflow:hidden，之前放在负偏移上会被裁掉一半，
+     实测点不中（2026-10-28 用 elementFromPoint 复核过）。顺手加粗到 9px / 角 18px。 */
+  .reader-demo .rd-rz { position: absolute; z-index: 6; touch-action: none; }
+  .reader-demo .rd-rz.nw, .reader-demo .rd-rz.ne, .reader-demo .rd-rz.sw, .reader-demo .rd-rz.se { z-index: 9; }
+  .reader-demo .rd-rz.n { left: 18px; right: 18px; top: 0; height: 9px; cursor: ns-resize; }
+  .reader-demo .rd-rz.s { left: 18px; right: 18px; bottom: 0; height: 9px; cursor: ns-resize; }
+  .reader-demo .rd-rz.w { top: 18px; bottom: 18px; left: 0; width: 9px; cursor: ew-resize; }
+  .reader-demo .rd-rz.e { top: 18px; bottom: 18px; right: 0; width: 9px; cursor: ew-resize; }
+  .reader-demo .rd-rz.nw, .reader-demo .rd-rz.ne, .reader-demo .rd-rz.sw, .reader-demo .rd-rz.se { width: 18px; height: 18px; }
+  .reader-demo .rd-rz.nw { left: 0; top: 0; cursor: nwse-resize; }
+  .reader-demo .rd-rz.ne { right: 0; top: 0; cursor: nesw-resize; }
+  .reader-demo .rd-rz.sw { left: 0; bottom: 0; cursor: nesw-resize; }
+  .reader-demo .rd-rz.se { right: 0; bottom: 0; cursor: nwse-resize; }
+  /* 四角给一点可见暗示，不然光靠光标变化没人知道能拉 */
+  .reader-demo .rd-rz.se::after, .reader-demo .rd-rz.ne::after,
+  .reader-demo .rd-rz.sw::after, .reader-demo .rd-rz.nw::after {
+    content: ""; position: absolute; inset: 5px; border-right: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+    border-bottom: 2px solid color-mix(in srgb, var(--gold) 70%, transparent); opacity: .55; transition: opacity .15s ease; }
+  .reader-demo .rd-rz.ne::after, .reader-demo .rd-rz.nw::after { transform: rotate(-90deg); }
+  .reader-demo .rd-rz.sw::after { transform: rotate(90deg); }
+  .reader-demo:hover .rd-rz::after { opacity: .95; }
+  .reader-demo:hover { outline: 1px dashed color-mix(in srgb, var(--gold) 65%, transparent); outline-offset: 2px; }
   .reader-close { position: absolute; top: 14px; right: 16px; z-index: 6; width: 34px; height: 34px; border: 1px solid var(--line);
     border-radius: 50%; background: var(--panel2); color: var(--ink); font-size: 17px; cursor: pointer; box-shadow: 0 2px 8px var(--shadow); }
   .reader-close:hover { border-color: var(--gold); }
@@ -474,9 +541,10 @@
   }
 
   /* ============ 设置面板 ============ */
-  .settings-mask { position: fixed; inset: 0; z-index: 120; background: rgba(10,12,16,.5); display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(3px); }
+  /* padding 用 clamp：浏览器放大到 150%/200% 时，固定 24px 会把面板顶出视口 */
+  .settings-mask { position: fixed; inset: 0; z-index: 120; background: rgba(10,12,16,.5); display: flex; align-items: center; justify-content: center; padding: clamp(8px, 2.4vh, 24px); backdrop-filter: blur(3px); }
   .settings-mask[hidden] { display: none; }
-  .settings-panel { width: min(880px, 100%); max-height: 86vh; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 24px 80px rgba(0,0,0,.4); overflow: hidden; }
+  .settings-panel { width: min(880px, 100%); max-height: 86vh; max-height: calc(100dvh - 2 * clamp(8px, 2.4vh, 24px)); background: var(--panel); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 24px 80px rgba(0,0,0,.4); overflow: hidden; }
   .set-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
   .set-head h3 { font-size: 16px; font-family: Georgia,"Songti SC",serif; letter-spacing: .04em; }
   .set-close { border: none; background: transparent; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0 6px; }
@@ -521,10 +589,55 @@
   .help-list { list-style: none; padding: 8px 20px 20px; overflow-y: auto; }
   .help-list li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
   .help-list .k { font-family: ui-monospace,Consolas,monospace; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; font-size: 12px; flex-shrink: 0; }
+  /* 快捷键面板：分组表格 + 常驻提示条（规则见 Agent宪法 规矩 32 / 附录 C） */
+  .help-groups { padding: 6px 20px 18px; overflow-y: auto; }
+  .help-group + .help-group { margin-top: 16px; }
+  .help-group h4 { font-size: 11.5px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; margin: 0 0 6px; }
+  .help-group table { width: 100%; border-collapse: collapse; }
+  .help-group td { padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .help-group td:first-child { width: 124px; }
+  .help-group tr:last-child td { border-bottom: 0; }
+  .help-groups kbd, .help-tip kbd, .hint-bar kbd { font-family: ui-monospace,Consolas,monospace; background: var(--panel2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; font-size: 11.5px; margin-right: 4px; }
+  .help-tip { margin: 0; padding: 12px 20px 18px; font-size: 12px; color: var(--muted); line-height: 2; border-top: 1px solid var(--line); }
+  .hint-bar { display: flex; align-items: center; gap: 16px; margin: -4px 0 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .hint-bar span { white-space: nowrap; }
+  @media (max-width: 1100px) { .hint-bar { display: none; } }
   @media (max-width: 720px) {
     .set-body { flex-direction: column; }
     .set-tabs { width: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line); }
+    .settings-mask { padding: 10px; }
+    .settings-panel { border-radius: 12px; }
+    .set-content { padding: 14px 16px; }
+    .help-panel { max-height: calc(100dvh - 20px); }
   }
+
+  /* ============ 可拉伸浮窗：设置 / 帮助 / 方案 / 书页 都能拉边拉角 ============
+     手柄一律贴在内侧边缘（外层 overflow:hidden，放外面会被裁掉 → 点不中）*/
+  .settings-panel, .help-panel, .modal { position: relative; }
+  .fw-rz { position: absolute; z-index: 40; touch-action: none; }
+  .fw-n { left: 16px; right: 16px; top: 0; height: 8px; cursor: ns-resize; }
+  .fw-s { left: 16px; right: 16px; bottom: 0; height: 8px; cursor: ns-resize; }
+  .fw-w { top: 16px; bottom: 16px; left: 0; width: 8px; cursor: ew-resize; }
+  .fw-e { top: 16px; bottom: 16px; right: 0; width: 8px; cursor: ew-resize; }
+  .fw-nw, .fw-ne, .fw-sw, .fw-se { width: 18px; height: 18px; }
+  .fw-nw { left: 0; top: 0; cursor: nwse-resize; }
+  .fw-ne { right: 0; top: 0; cursor: nesw-resize; }
+  .fw-sw { left: 0; bottom: 0; cursor: nesw-resize; }
+  .fw-se { right: 0; bottom: 0; cursor: nwse-resize; }
+  .fw-se::after, .fw-ne::after, .fw-sw::after, .fw-nw::after {
+    content: ""; position: absolute; inset: 5px; opacity: .45;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    color: color-mix(in srgb, var(--gold) 85%, transparent); transition: opacity .15s ease; }
+  .fw-ne::after, .fw-nw::after { transform: rotate(-90deg); }
+  .fw-sw::after { transform: rotate(90deg); }
+  .fw-rz:hover::after { opacity: 1; }
+  body.fw-dragging, body.fw-dragging * { user-select: none !important; cursor: inherit; }
+  /* 拖拽期间不要动画，否则手柄会「追不上指针」 */
+  body.fw-dragging .book-open, body.fw-dragging .settings-panel,
+  body.fw-dragging .help-panel, body.fw-dragging .modal,
+  body.fw-dragging .cart-panel { transition: none !important; }
+  /* 书架抽屉：左边缘可拉宽 */
+  .cart-rz { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; cursor: ew-resize; z-index: 51; }
 
   /* ============ 布局状态类（设置·布局）============ */
   body.density-cozy .grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 22px; }
@@ -562,7 +675,8 @@
   <div class="settings-mask" id="helpMask" hidden>
     <div class="help-panel" role="dialog" aria-label="快捷键清单">
       <div class="set-head"><h3>键盘快捷键</h3><button class="set-close" id="helpClose" aria-label="关闭">×</button></div>
-      <ul class="help-list" id="helpList"></ul>
+      <div class="help-groups" id="helpGroups"></div>
+      <p class="help-tip">数字 <kbd>3</kbd>–<kbd>9</kbd> / <kbd>0</kbd> 直接选中当前库第 1–8 个筛选项（素材库=元素，方案库=场景）· <kbd>Esc</kbd> 先关最上层，再清搜索 · 键位可在设置里逐条重绑</p>
     </div>
   </div>
 
@@ -596,6 +710,15 @@
         <span id="catCount"></span>
       </div>
       <div class="head-tools">
+        <label class="sort-box" title="排序（跟随当前视图，方案库同理）">
+          <span class="ic" aria-hidden="true">⇅</span>
+          <select id="sortSel" aria-label="排序方式">
+            <option value="def">默认顺序</option>
+            <option value="title">标题 A→Z</option>
+            <option value="id">编号 新→旧</option>
+            <option value="adapt">适配端分组</option>
+          </select>
+        </label>
         <div class="search-box" id="searchBox">
           <span class="ic">⌕</span>
           <input type="text" id="searchInput" placeholder="在素材库里搜…" autocomplete="off" aria-label="搜索当前库" aria-controls="searchHistory" aria-autocomplete="list">
@@ -608,6 +731,8 @@
         <button class="cart-btn" id="cartBtn">书架 <span class="badge" id="cartBadge"></span></button>
       </div>
     </header>
+
+    <div class="hint-bar" id="hintBar" aria-hidden="true"></div>
 
     <div class="content-tools" id="contentTools">
       <div class="tools-row" id="adaptRow">
@@ -671,6 +796,7 @@
       <div class="onboard-item"><div class="k">2</div><div class="v"><b>翻开研读</b><p>点卡片本体，书会往前翻开成双页：左页是实时演示，右页是参数、提示词与完整代码，可一键复制。</p></div></div>
       <div class="onboard-item"><div class="k">3</div><div class="v"><b>挑本专著</b><p>切到「方案库」是按整站设计语言归档的专著，每张卡片直接演示效果，翻开看配色与 Agent 提示词。</p></div></div>
       <div class="onboard-item"><div class="k">4</div><div class="v"><b>调灯光</b><p>点右上角「⚙ 设置」→ 外观，可在亮色书房 / 暗室之间切换（带扩散动画）；快捷键也在这里改。</p></div></div>
+      <div class="onboard-item"><div class="k">5</div><div class="v"><b>排列与另开</b><p>顶部「⇅ 排序」可按标题、编号或适配端重排；书页左上角的「↗ 新窗口」把当前演示单独开一页，复杂交互更好操作。想每次都自动另开，去设置 → 布局打开。</p></div></div>
     </div>
     <div class="onboard-foot">
       <label class="chk"><input type="checkbox" id="onboardNoMore" checked> 不再提示</label>
@@ -685,8 +811,13 @@
   <div class="book-open" id="bookOpen" role="dialog" aria-modal="true" aria-label="书籍展开">
     <button class="reader-close" id="readerClose" aria-label="合上书">✕</button>
     <div class="page page-left">
-      <h4 class="reveal">实时演示</h4>
-      <div class="reader-demo" id="readerDemo"></div>
+      <div class="page-left-head">
+        <h4 class="reveal">实时演示</h4>
+        <button class="rd-open" id="readerOpen" title="在浏览器新窗口里打开这一页">↗ 新窗口</button>
+      </div>
+      <div class="reader-demo" id="readerDemo">
+        <div class="rd-bar" id="readerBar"><b>实时演示</b><span>拖动移动 · 拖边/角改大小 · 双击复位</span><span class="rd-size" id="readerSize"></span></div>
+      </div>
     </div>
     <div class="page page-right" id="readerInfoPage"></div>
   </div>
@@ -876,10 +1007,13 @@
 
 
   // 筛选无结果时的空态提示（先查再插，避免重复节点）
-  function setEmptyHint(gridBox, show) {
+  // 规矩 32 ③：不同原因给不同话术——「加载失败」不能伪装成「没有匹配」
+  function setEmptyHint(gridBox, show, text) {
     const old = gridBox.querySelector(".empty-filter");
     if (!show) { if (old) old.remove(); return; }
-    if (!old) gridBox.appendChild(el("p", "empty empty-filter", "没有匹配的素材，试试减少筛选条件或清空搜索"));
+    const msg = text || "没有匹配的素材，试试减少筛选条件或清空搜索";
+    if (old) { if (old.textContent !== msg) old.textContent = msg; return; }
+    gridBox.appendChild(el("p", "empty empty-filter", msg));
   }
   // 同步所有可见卡片的标题高亮（搜索词变化时调用）
   function refreshTitleHighlights(q) {
@@ -888,6 +1022,34 @@
       if (!h2 || !h2.dataset.title) return;
       h2.innerHTML = highlight(h2.dataset.title, q);
     });
+  }
+
+  // 排序：只重排 DOM 顺序（CSS Grid 自动重排，不用重建卡片，也不丢已加载的 iframe）
+  // 仿 GitHub 仓库列表：默认顺序 / 名称 / 最近 / 分组，四个够用，不再加
+  // 适配端排序权重直接复用 ADAPT_ORDER（同一份闭集顺序，避免两处定义漂移）
+  let sortMode = "def";
+  let cardSeq = 0;                // 建卡流水号 = 「默认顺序」的还原依据
+  function applySort() {
+    const gridBox = document.getElementById("grid");
+    if (!gridBox) return;
+    const cards = [...gridBox.querySelectorAll(".card")];
+    const key = (c) => {
+      const it = byId(c.dataset.id) || SCHEMES.find(s => s.id === c.dataset.id) || {};
+      if (sortMode === "title") return (it.标题 || it.风格名 || "").localeCompare("zh-Hans-CN");
+      if (sortMode === "id") return String(c.dataset.id);
+      if (sortMode === "adapt") return ADAPT_ORDER[it.适配端] ?? 9;
+      return c._ord || 0;
+    };
+    const dir = sortMode === "id" ? -1 : 1;
+    cards.sort((a, b) => {
+      const ka = key(a), kb = key(b);
+      const r = (typeof ka === "number" || typeof kb === "number")
+        ? (Number(ka) - Number(kb))
+        : String(ka).localeCompare(String(kb), "zh-Hans-CN");
+      return (r || (a._ord - b._ord)) * dir;
+    });
+    // 空态提示不是 .card，重排后自然留在末尾
+    cards.forEach(c => gridBox.appendChild(c));
   }
 
   function applyFilter() {
@@ -902,8 +1064,14 @@
         card.style.display = (card.dataset.view === "schemes" && okIds.has(card.dataset.id)) ? "" : "none";
       });
       refreshTitleHighlights(q);
-      setEmptyHint(gridBox, shown.length === 0);
+      // 方案库为空 ≠ 筛选没命中：一个是数据没读到，一个是条件太窄（规矩 32 ③）
+      if (!SCHEMES.length) {
+        setEmptyHint(gridBox, true, "方案数据没有加载出来（data/方案.js 可能没读到，或被浏览器拦了）。刷新一次试试；仍然空的话按 F12 看控制台报错。");
+      } else {
+        setEmptyHint(gridBox, shown.length === 0);
+      }
       renderFilters();
+      writeHash();
       return;
     }
     // 标题：无筛选时「全部素材」，有筛选则列出当前生效条件（体现四维交集）
@@ -921,6 +1089,7 @@
     setEmptyHint(gridBox, shown.length === 0);
 
     renderFilters();
+    writeHash();
   }
 
 
@@ -937,28 +1106,49 @@
     frame.style.transform = "scale(" + s + ")";
   }
 
-  const BLOCK_VW = 1000, BLOCK_VH = 640;
-  function fitBlockFrame(frame) {
-    const holder = frame.parentElement;
-    if (!holder) return;
-    const w = holder.clientWidth, h = holder.clientHeight;
-    if (!w || !h) return;
-    const sc = Math.max(w / BLOCK_VW, h / BLOCK_VH);
-    frame.style.width = BLOCK_VW + "px";
-    frame.style.height = BLOCK_VH + "px";
-    frame.style.transform = "scale(" + sc + ")";
-    frame.style.left = Math.round((w - BLOCK_VW * sc) / 2) + "px";
-    frame.style.top = Math.round((h - BLOCK_VH * sc) / 2) + "px";
-  }
   let fitTimer = null;
   function fitAllThumbs() {
     document.querySelectorAll(".thumb iframe").forEach(f => { if (f.src) fitThumbFrame(f); });
-    document.querySelectorAll(".demo-big iframe").forEach(f => { if (f.src) fitThumbFrame(f); });
   }
   window.addEventListener("resize", () => {
     clearTimeout(fitTimer);
-    fitTimer = setTimeout(fitAllThumbs, 160);
+    fitTimer = setTimeout(() => {
+      fitAllThumbs();
+      // 窗口变化后把阅读器预览窗夹回书页内，并重新适配缩放
+      if (rdBox) { rdBox = rdClampBox(rdBox); rdApply(); rdFit(); }
+    }, 160);
   });
+
+  // ---- 演示 iframe 的降级与卸载（规矩 32 ③⑤） ----
+  // ③ 加载失败：iframe 的 error 事件对 404 并不可靠，所以再做一道「超时未 load」兜底
+  const FRAME_TIMEOUT = 9000;
+  const frameTimers = new WeakMap();
+  function armFrameGuard(frame) {
+    clearTimeout(frameTimers.get(frame));
+    const holder = frame.parentElement;
+    if (holder) holder.classList.remove("demo-failed");
+    const t = setTimeout(() => {
+      if (frame.dataset.loaded !== "1" && frame.parentElement) frame.parentElement.classList.add("demo-failed");
+    }, FRAME_TIMEOUT);
+    frameTimers.set(frame, t);
+  }
+  function markFrameLoaded(frame) {
+    frame.dataset.loaded = "1";
+    clearTimeout(frameTimers.get(frame));
+    frameTimers.delete(frame);
+    const holder = frame.parentElement;
+    if (holder) holder.classList.remove("demo-failed");
+  }
+  document.addEventListener("load", (e) => {
+    const t = e.target;
+    if (t && t.tagName === "IFRAME") markFrameLoaded(t);
+  }, true);
+  document.addEventListener("error", (e) => {
+    const t = e.target;
+    if (t && t.tagName === "IFRAME" && t.parentElement) {
+      t.parentElement.classList.add("demo-failed");
+    }
+  }, true);
 
   // ---- 懒加载 ----
   const io = new IntersectionObserver(entries => {
@@ -966,10 +1156,44 @@
       if (!en.isIntersecting) return;
       const card = en.target;
       const iframe = card.querySelector("iframe[data-src]");
-      if (iframe && !iframe.src) { fitThumbFrame(iframe); iframe.src = iframe.dataset.src; }
+      if (iframe && !iframe.getAttribute("src")) { fitThumbFrame(iframe); armFrameGuard(iframe); iframe.src = iframe.dataset.src; }
       io.unobserve(card);
     });
   }, { rootMargin: "240px" });
+
+  // ⑤ 资源卸载：卡片滚远之后把 iframe 停到 about:blank，滚回来再重新加载。
+  // 只做「卸载」不做「暂停」——这些 demo 是独立页面，宿主页没法叫停它们自己的 rAF。
+  const parkTimers = new WeakMap();
+  const PARK_AFTER = 2500;
+  const ioPark = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      const card = en.target;
+      const iframe = card.querySelector("iframe[data-src]");
+      if (!iframe) return;
+      if (en.isIntersecting) {
+        clearTimeout(parkTimers.get(iframe));
+        parkTimers.delete(iframe);
+        const src = iframe.getAttribute("src");
+        if (!src || src === "about:blank") {
+          fitThumbFrame(iframe);
+          armFrameGuard(iframe);
+          iframe.src = iframe.dataset.src;
+        }
+        return;
+      }
+      const src = iframe.getAttribute("src");
+      if (!src || src === "about:blank") return;
+      if (iframe.closest("#readerDemo")) return;      // 阅读器里正在看的，不卸载
+      clearTimeout(parkTimers.get(iframe));
+      parkTimers.set(iframe, setTimeout(() => {
+        if (iframe.closest("#readerDemo")) return;
+        clearTimeout(frameTimers.get(iframe));
+        frameTimers.delete(iframe);
+        delete iframe.dataset.loaded;
+        iframe.src = "about:blank";
+      }, PARK_AFTER));
+    });
+  }, { rootMargin: "900px" });
 
 
   function syncCart() {
@@ -1022,43 +1246,61 @@
   });
 
 
-  function makeCard(it) {
+  // 卡片外壳：素材卡（makeCard）与方案卡（makeSchemeCard）逐字相同的 21 行收在这里，
+  // 差异段（角标 / 加书架按钮 / 标签栏 / 点击与键盘）各自在调用处拼。
+  // 注意 cardSeq++ 必须留在壳里：_ord 是「默认顺序」的还原依据，建卡时就得按真实顺序发号。
+  function makeCardShell({ id, title, demoTitle, demoSrc, ariaLabel, dataset }) {
     const card = el("article", "card");
-    card.dataset.id = it.id;
-
+    card.dataset.id = id;
+    for (const k in (dataset || {})) card.dataset[k] = dataset[k];
+    card._ord = cardSeq++;
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-expanded", "false");
-    card.setAttribute("aria-label", it.标题 + "：展开查看说明与提示词");
+    card.setAttribute("aria-label", ariaLabel);
 
     const thumb = el("div", "thumb");
     const loading = el("div", "loading", "演示加载中…");
     const iframe = document.createElement("iframe");
-    iframe.dataset.src = it.效果演示 || "";
-    iframe.title = it.标题 + " 演示";
+    iframe.dataset.src = demoSrc || "";
+    iframe.title = demoTitle;
     iframe.addEventListener("load", () => loading.remove());
+    thumb.append(loading, iframe);
+
+    const body = el("div", "card-body");
+    const top = el("div", "card-top");
+    const h2 = el("h2");
+    h2.dataset.title = title;
+    h2.innerHTML = highlight(title, search[view]);
+    return { card, thumb, iframe, body, top, h2 };
+  }
+  function makeCard(it) {
+    const title = it.标题 || "未命名";
+    const { card, thumb, iframe, body, top, h2 } = makeCardShell({
+      id: it.id,
+      title,
+      demoTitle: it.标题 + " 演示",
+      demoSrc: it.效果演示,
+      ariaLabel: it.标题 + "：展开查看说明与提示词",
+    });
+
     const add = el("button", "add-btn", "+");
     add.dataset.id = it.id;
     add.title = "加入书架";
     add.setAttribute("aria-label", "把 " + it.标题 + " 加入书架");
     add.addEventListener("click", (e) => { e.stopPropagation(); toggleCart(it.id); });
-    thumb.append(loading, iframe, add);
+    thumb.appendChild(add);
     // 降级预览标识：有 ThreeJS演示 字段的素材，卡片上标注"预览版"
     if (it.ThreeJS演示) {
       const badge = el("span", "preview-badge", "预览版");
       thumb.appendChild(badge);
     }
 
-    const body = el("div", "card-body");
-    const top = el("div", "card-top");
     const chip = el("span", "tagpill", it.适配端 || "通用");
     chip.dataset.cat = it.适配端 || "";
     if (it.元素) top.append(chip, el("span", "tagpill", it.元素));
     else top.append(chip);
     top.append(el("span", "cid", it.id || ""));
-    const h2 = el("h2");
-    h2.dataset.title = it.标题 || "未命名";
-    h2.innerHTML = highlight(it.标题 || "未命名", search[view]);
     const tags = el("div", "tags");
     asArr(it.风格).forEach(t => tags.appendChild(el("span", "tag style", t)));
     asArr(it.场景).forEach(t => tags.appendChild(el("span", "tag scene", t)));
@@ -1089,8 +1331,19 @@
   }
 
   let readerCard = null;
+  let readerDemoUrl = "";      // 当前这本书的演示页地址（给右下角「新窗口」用）
+  // 演示另开窗口：只有用户点了右下角按钮、或开了设置里的「自动另开窗口」才会走到这里。
+  // 开窗必须发生在用户手势里，否则会被浏览器静默拦掉——失败不报错，按钮本身还留着，用户可再点一次。
+  function openDemoInWindow(url) {
+    if (!url) return false;
+    try {
+      const w = window.open(url, "_blank", "noopener");
+      return !!w;
+    } catch (e) { return false; }
+  }
   function openReader(data, card, thumb, iframe, isScheme) {
-    if (!iframe.src) iframe.src = iframe.dataset.src;
+    const cur = iframe.getAttribute("src");
+    if (!cur || cur === "about:blank") { armFrameGuard(iframe); iframe.src = iframe.dataset.src; }
     const demo = document.getElementById("readerDemo");
     const infoPage = document.getElementById("readerInfoPage");
     demo.appendChild(iframe);
@@ -1106,7 +1359,13 @@
     readerCard = card;
     requestAnimationFrame(() => requestAnimationFrame(() => mask.classList.add("show")));
     document.getElementById("readerClose").focus();
-    fitThumbFrame(iframe);
+    rdInit(iframe);
+    // 记住这条演示的地址，并把「新窗口」按钮的可用状态同步过去
+    readerDemoUrl = (isScheme ? data.演示页 : data.效果演示) || "";
+    const ob = document.getElementById("readerOpen");
+    if (ob) { ob.hidden = !readerDemoUrl; ob.title = readerDemoUrl ? "在新窗口打开：" + readerDemoUrl : ""; }
+    if (settings.openDemoWindow && readerDemoUrl) openDemoInWindow(readerDemoUrl);
+    writeHash();
   }
   function closeReader() {
     const mask = document.getElementById("readerMask");
@@ -1122,15 +1381,160 @@
       readerCard = null;
     }
     document.getElementById("grid").classList.remove("away");
+    writeHash();
     const done = () => { mask.hidden = true; mask.removeEventListener("transitionend", done); };
     mask.addEventListener("transitionend", done);
     setTimeout(() => { if (!mask.classList.contains("show")) mask.hidden = true; }, 460);
   }
   document.getElementById("readerClose").addEventListener("click", closeReader);
   document.getElementById("readerScrim").addEventListener("click", closeReader);
+  // 右下角「新窗口」：点一下 = 这一次单独开；设置里勾了「自动另开」就不用每次点
+  document.getElementById("readerOpen").addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!openDemoInWindow(readerDemoUrl)) {
+      // 弹窗被拦：给一句能照着做的提示，别静默失败
+      const b = e.currentTarget;
+      b.textContent = "被浏览器拦了，再点一次";
+      setTimeout(() => { b.textContent = "↗ 新窗口"; }, 2400);
+    }
+  });
+
+  /* ============================================================
+     阅读器“小页面”：可拖动 / 拖四边四角改大小，尺寸记 localStorage
+     - 位置尺寸相对 .page-left 的 padding box（绝对定位坐标系）
+     - 上限到书页外框：横向可横跨两页（右页文字被盖住），复位用双击标题条
+     ============================================================ */
+  const RD_KEY = "arsenal-reader-stage";
+  const RD_MIN_W = 260, RD_MIN_H = 200;
+  let rdBox = null;
+
+  function rdPage(){ return document.querySelector(".page.page-left"); }
+  // 默认位置 / 边距从 CSS 变量读，改版式只改一处（之前 JS 与 CSS 各写一套 22 / 56，改标题行时容易对不上）
+  function rdInsets(pg){
+    if (!pg) return { x: 22, y: 78 };
+    const cs = getComputedStyle(pg);
+    return {
+      x: parseFloat(cs.getPropertyValue("--rd-x")) || 22,
+      y: parseFloat(cs.getPropertyValue("--rd-y")) || 78,
+    };
+  }
+  function rdDefaultBox(){
+    const pg = rdPage(); if (!pg) return null;
+    const p = rdInsets(pg);
+    return { x: p.x, y: p.y, w: Math.max(RD_MIN_W, pg.clientWidth - p.x * 2), h: Math.max(RD_MIN_H, pg.clientHeight - p.y - p.x) };
+  }
+  function rdBounds(){
+    // 边界取「整本书」而不是左页：拉大后可以横跨两页盖住右页说明（双击标题条复位回来）。
+    // 用 clientWidth/Height 而不是 getBoundingClientRect，避免开书 transform 动画期间量到缩放值。
+    const book = document.querySelector(".book-open"), pg = rdPage();
+    if (!book) return pg ? { right: pg.clientWidth - 6, bottom: pg.clientHeight - 6 } : { right: 600, bottom: 600 };
+    const w = book.clientWidth, h = book.clientHeight;
+    // 阅读器收起时（hidden）尺寸为 0，此时退回左页尺寸，别把预览窗夹成一条线
+    if (!w || !h) return pg ? { right: pg.clientWidth - 6, bottom: pg.clientHeight - 6 } : { right: 600, bottom: 600 };
+    return { right: w - 8, bottom: h - 8 };
+  }
+  function rdxClamp(v, min, max){ return Math.max(min, Math.min(v, Math.max(min, max))); }
+  function rdClampBox(b){
+    const bd = rdBounds();
+    const w = Math.min(Math.max(b.w, RD_MIN_W), Math.max(RD_MIN_W, bd.right - 2));
+    const h = Math.min(Math.max(b.h, RD_MIN_H), Math.max(RD_MIN_H, bd.bottom - 2));
+    const x = Math.min(Math.max(b.x, 2), Math.max(2, bd.right - w - 2));
+    const y = Math.min(Math.max(b.y, 2), Math.max(2, bd.bottom - h - 2));
+    return { x: x, y: y, w: w, h: h };
+  }
+  function rdApply(){
+    const demo = document.getElementById("readerDemo");
+    if (!demo || !rdBox) return;
+    demo.style.inset = "auto";
+    demo.style.left = rdBox.x + "px";
+    demo.style.top = rdBox.y + "px";
+    demo.style.width = rdBox.w + "px";
+    demo.style.height = rdBox.h + "px";
+    const sz = document.getElementById("readerSize");
+    if (sz) sz.textContent = Math.round(rdBox.w) + " × " + Math.round(rdBox.h);
+  }
+  function rdSaveBox(){ try { localStorage.setItem(RD_KEY, JSON.stringify(rdBox)); } catch (e) {} }
+  function rdDemoFrame(){ return document.querySelector("#readerDemo iframe"); }
+  function rdFit(){ const f = rdDemoFrame(); if (f) fitThumbFrame(f); }
+  function rdInit(iframe){
+    const d = rdDefaultBox(); if (!d) return;
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(RD_KEY) || "null"); } catch (e) { saved = null; }
+    rdBox = rdClampBox(saved && isFinite(saved.w) && isFinite(saved.h) ? saved : d);
+    rdApply();
+    if (iframe) fitThumbFrame(iframe);
+  }
+  function rdReset(){ const d = rdDefaultBox(); if (!d) return; rdBox = rdClampBox(d); rdApply(); rdSaveBox(); rdFit(); }
+
+  (function bindReaderStage(){
+    const demo = document.getElementById("readerDemo");
+    if (!demo) return;
+    ["n","s","w","e","nw","ne","sw","se"].forEach(function(d){
+      const h = document.createElement("span");
+      h.className = "rd-rz " + d; h.dataset.rz = d; demo.appendChild(h);
+    });
+    demo.querySelectorAll(".rd-rz").forEach(function(h){
+      h.addEventListener("pointerdown", function(e){
+        if (!rdBox) return;
+        e.preventDefault(); e.stopPropagation();
+        const dir = h.dataset.rz, sx = e.clientX, sy = e.clientY, b = { x: rdBox.x, y: rdBox.y, w: rdBox.w, h: rdBox.h };
+        try { h.setPointerCapture(e.pointerId); } catch (_) {}
+        const mv = function(ev){
+          const dx = ev.clientX - sx, dy = ev.clientY - sy;
+          const bd = rdBounds();
+          let w = b.w, hh = b.h, x = b.x, y = b.y;
+          // 每条边各自夹在自己的可用区间里，保证「拖哪条边只动哪条边」
+          if (dir.indexOf("e") >= 0) w = rdxClamp(b.w + dx, RD_MIN_W, bd.right - b.x - 2);
+          if (dir.indexOf("w") >= 0) { w = rdxClamp(b.w - dx, RD_MIN_W, b.x + b.w - 2); x = b.x + b.w - w; }
+          if (dir.indexOf("s") >= 0) hh = rdxClamp(b.h + dy, RD_MIN_H, bd.bottom - b.y - 2);
+          if (dir.indexOf("n") >= 0) { hh = rdxClamp(b.h - dy, RD_MIN_H, b.y + b.h - 2); y = b.y + b.h - hh; }
+          rdBox = { x: x, y: y, w: w, h: hh };
+          rdApply(); rdFit();
+        };
+        const up = function(){ h.removeEventListener("pointermove", mv); h.removeEventListener("pointerup", up); rdSaveBox(); };
+        h.addEventListener("pointermove", mv); h.addEventListener("pointerup", up);
+      });
+    });
+    const bar = document.getElementById("readerBar");
+    if (bar) {
+      bar.addEventListener("pointerdown", function(e){
+        if (!rdBox) return;
+        e.preventDefault(); e.stopPropagation();
+        const sx = e.clientX, sy = e.clientY, b = { x: rdBox.x, y: rdBox.y, w: rdBox.w, h: rdBox.h };
+        try { bar.setPointerCapture(e.pointerId); } catch (_) {}
+        const mv = function(ev){
+          rdBox = rdClampBox({ x: b.x + ev.clientX - sx, y: b.y + ev.clientY - sy, w: b.w, h: b.h });
+          rdApply();
+        };
+        const up = function(){ bar.removeEventListener("pointermove", mv); bar.removeEventListener("pointerup", up); rdSaveBox(); };
+        bar.addEventListener("pointermove", mv); bar.addEventListener("pointerup", up);
+      });
+      bar.addEventListener("dblclick", rdReset);
+    }
+  })();
 
   function sendParam(iframe, key, value) {
     if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage({ type: "param", key, value }, "*");
+  }
+
+  // 参数控件类型归一：数据侧历史上出现过中文类型（颜色/数字/字符串）、别名 text，
+  // 渲染端在这里做一次闭集映射。映射不到的返回 null，由调用方退化成文本框——
+  // 这样即使 data 里再冒出新写法，参数面板也不会整片空白。
+  const CTL_TYPE_ALIAS = {
+    颜色: "color", 色彩: "color",
+    数字: "number", 数值: "number",
+    字符串: "string", 文本: "string", 文字: "string", text: "string",
+    滑块: "slider", 滑杆: "slider",
+    开关: "switch", 开关量: "switch", 布尔: "switch",
+    下拉: "select", 下拉框: "select", 选项: "select",
+  };
+  const CTL_TYPES = new Set(["slider", "switch", "color", "number", "string", "select"]);
+  function normCtlType(t) {
+    const k = String(t == null ? "" : t).trim();
+    if (CTL_TYPES.has(k)) return k;
+    if (CTL_TYPE_ALIAS[k]) return CTL_TYPE_ALIAS[k];
+    const lower = k.toLowerCase();
+    return CTL_TYPES.has(lower) ? lower : null;   // null = 未知，交给调用方降级
   }
 
   function makeControls(it, iframe, current, refresh) {
@@ -1139,9 +1543,23 @@
     const sec = el("section", "controls");
     sec.appendChild(el("h3", null, "调参数（拖一下，演示实时变）"));
     const row = el("div", "controls-row");
-    params.forEach(p => {
+    params.forEach(raw => {
+      // 渲染端容错：数据里的类型可能是中文（颜色/数字/字符串）、别名（text）或将来
+      // 新冒出来的写法。normCtlType 认不出来时返回 null → 这里退化为 string 文本框，
+      // 保证「就算数据没归一 / 又出现新类型」也不会整条 label 空白。
+      const mapped = normCtlType(raw.类型);
+      const p = Object.assign({}, raw, { 类型: mapped || "string" });
       const label = el("label", "ctl ctl-" + p.类型);
-      label.appendChild(el("span", "ctl-name", p.名));
+      // label 文本三级回退：名 → 说明（老数据只有说明）→ 键，绝不出现空 label
+      const nameText = p.名 || p.说明 || p.键 || "";
+      const nameEl = el("span", "ctl-name", nameText);
+      label.appendChild(nameEl);
+      // 未知类型：label 上标注原始写法，提示数据侧待归一
+      if (!mapped) {
+        nameEl.title = (raw.名 && raw.说明 ? raw.说明 + "；" : "") + "未知类型：" + raw.类型;
+      } else if (!raw.名 && raw.说明) {
+        nameEl.title = raw.说明;
+      }
       if (p.类型 === "slider") {
         const input = document.createElement("input");
         input.type = "range"; input.min = p.最小; input.max = p.最大; input.step = p.步长; input.value = p.默认;
@@ -1220,6 +1638,17 @@
         });
         sel.addEventListener("change", () => { current[p.键] = sel.value; sendParam(iframe, p.键, sel.value); refresh(); });
         label.appendChild(sel);
+      } else {
+        // 理论上走不到：p.类型 已被 normCtlType 收口进 6 种闭集，未知类型会落到
+        // 上面的 string 分支（同样是文本框）。这里再兜一层，保证将来有人往闭集里
+        // 加了新类型却忘了写渲染分支时，label 依然是「有名字 + 有控件」。
+        const input = document.createElement("input");
+        input.type = "text"; input.className = "ctl-string";
+        input.value = p.默认 == null ? "" : p.默认;
+        input.addEventListener("input", () => {
+          current[p.键] = input.value; sendParam(iframe, p.键, input.value); refresh();
+        });
+        label.appendChild(input);
       }
       row.appendChild(label);
     });
@@ -1307,8 +1736,7 @@
     if (it.用法) info.appendChild(textSection("用法", it.用法));
     const meta = el("div", "meta");
     const srcP = el("p"); srcP.append(el("b", null, "来源："), it.来源 || "未标注");
-    const reuseP = el("p"); reuseP.append(el("b", null, "复用记录："), it.复用记录 || "还没用（复用了回填）");
-    meta.append(srcP, reuseP);
+    meta.append(srcP);
     info.appendChild(meta);
     refresh();
     return info;
@@ -1392,16 +1820,8 @@
   });
   document.getElementById("planClose").addEventListener("click", () => document.getElementById("planMask").hidden = true);
   document.getElementById("planMask").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
-  // Esc 关闭阅读器 / 方案弹窗 / 书架抽屉 / 新手引导（键盘可用性）
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    const mask = document.getElementById("planMask");
-    if (mask && !mask.hidden) mask.hidden = true;
-    const cartPanel = document.getElementById("cartPanel");
-    if (cartPanel && cartPanel.classList.contains("show")) cartPanel.classList.remove("show");
-    const ob = document.getElementById("onboardMask");
-    if (ob && !ob.hidden) ob.hidden = true;
-  });
+  // Esc 的分层处理已统一进可重绑快捷键系统（closeOverlay），此处不再单独挂键盘监听，
+  // 否则会绕过 keymap，还会在阅读器/设置打开时把背后的弹层一起关掉。
 
   // ---- 方案库（独立视图） ----
   function renderViewFilters() {
@@ -1415,11 +1835,9 @@
       box.appendChild(b);
     });
   }
-  function setView(v) {
-    view = v;
-    // 每次切换视图都重置为「全部」（用户要求：打开页面默认全选「全部」）
-    resetFilter();
-    renderViewFilters();
+  // 视图外壳：setView 与 hashchange 两处逐字相同的「筛选区可见 + 搜索框状态」收在这里。
+  // 只同步外壳状态，不碰 filter / 视图数据本身——hashchange 那条路必须保住 hash 里的筛选。
+  function applyViewChrome() {
     // 适配端 + 元素 在顶部、风格 + 场景 在左侧，两库通用
     document.getElementById("dimFilters").style.display = "";
     document.getElementById("contentTools").style.display = "";
@@ -1428,6 +1846,14 @@
     sInput.value = search[view];
     sInput.placeholder = view === "schemes" ? "在方案库里搜…" : "在素材库里搜…";
     document.getElementById("searchBox").classList.toggle("has", !!search[view]);
+  }
+
+  function setView(v) {
+    view = v;
+    // 每次切换视图都重置为「全部」（用户要求：打开页面默认全选「全部」）
+    resetFilter();
+    renderViewFilters();
+    applyViewChrome();
     document.getElementById("searchHistory").hidden = true;
     renderFilters();
     applyFilter();
@@ -1523,31 +1949,19 @@
     return info;
   }
   function makeSchemeCard(s) {
-    const card = el("article", "card");
-    card.dataset.id = s.id;
-    card.dataset.view = "schemes";
-    // 键盘可达（与素材卡一致）
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-expanded", "false");
-    card.setAttribute("aria-label", (s.风格名 || "方案") + "：展开查看配色与代码");
+    const title = s.风格名 || "未命名";
+    const { card, thumb, iframe, body, top, h2 } = makeCardShell({
+      id: s.id,
+      title,
+      demoTitle: s.风格名 + " 演示",
+      demoSrc: s.演示页,
+      ariaLabel: (s.风格名 || "方案") + "：展开查看配色与代码",
+      dataset: { view: "schemes" },
+    });
 
-    const thumb = el("div", "thumb");
-    const loading = el("div", "loading", "演示加载中…");
-    const iframe = document.createElement("iframe");
-    iframe.dataset.src = s.演示页 || "";
-    iframe.title = s.风格名 + " 演示";
-    iframe.addEventListener("load", () => loading.remove());
-    thumb.append(loading, iframe);
-
-    const body = el("div", "card-body");
-    const top = el("div", "card-top");
     const chip = el("span", "tagpill", "方案");
     chip.dataset.cat = "方案";
     top.append(chip, el("span", "tagpill", (s.风格名 || "方案").slice(0, 8)), el("span", "cid", s.id || ""));
-    const h2 = el("h2");
-    h2.dataset.title = s.风格名 || "未命名";
-    h2.innerHTML = highlight(s.风格名 || "未命名", search[view]);
     const tags = el("div", "tags");
     if (s.骨架) tags.appendChild(el("span", "tag", "骨架 " + s.骨架));
     if (s.重色落点) tags.appendChild(el("span", "tag style", s.重色落点));
@@ -1649,7 +2063,18 @@
     searchHistoryBox.hidden = false;
   }
 
+  // 输入法组合态：拼音没选完之前不重算 340 条（规矩 32 ④）
+  let searchComposing = false;
+  searchInput.addEventListener("compositionstart", () => { searchComposing = true; });
+  searchInput.addEventListener("compositionend", () => {
+    searchComposing = false;
+    search[view] = searchInput.value;
+    searchBox.classList.toggle("has", !!searchInput.value);
+    applyFilter();
+    saveSearchHistory(searchInput.value);
+  });
   searchInput.addEventListener("input", () => {
+    if (searchComposing) return;
     search[view] = searchInput.value;
     searchBox.classList.toggle("has", !!searchInput.value);
     applyFilter();
@@ -1720,6 +2145,7 @@
     uiScale: 1,              // 0.9 – 1.2
     showMeta: true,          // 卡片铭牌(规格行)显示
     dockPinned: true,        // 侧栏常驻
+    openDemoWindow: false,   // 翻书时另开独立窗口看演示（默认关闭，只影响预览窗）
   };
   const ACCENTS = {
     blue:      { "--accent": "#3d5fd6", "--accent2": "#b23a2e" },
@@ -1778,7 +2204,10 @@
     } catch (e) {}
     return Object.assign({}, DEFAULT_KEYMAP);
   }
-  function saveKeymap() { try { localStorage.setItem("arsenal-keymap", JSON.stringify(keymap)); } catch (e) {} }
+  function saveKeymap() {
+    try { localStorage.setItem("arsenal-keymap", JSON.stringify(keymap)); } catch (e) {}
+    if (typeof renderHintBar === "function") renderHintBar();   // 改键后常驻提示条同步
+  }
   let keymap = loadKeymap();
   function bindingFor(a) { return keymap[a] || ""; }
   function normKey(e) {
@@ -1815,17 +2244,50 @@
     if (!cart.includes(pick)) { cart.push(pick); syncCart(); }
   }
 
+  // 数字快筛：3–9 / 0 → 当前库第 1–8 个筛选项（素材库=元素，方案库=场景）
+  // 用固定键而非可重绑动作：它是「顺手用」的辅助键，不进设置页免得清单变长
+  const QUICK_DIGITS = { "3": 1, "4": 2, "5": 3, "6": 4, "7": 5, "8": 6, "9": 7, "0": 8 };
+  function quickFilter(idx) {
+    const box = view === "schemes" ? document.getElementById("sceneSideChips") : document.getElementById("elemChips");
+    if (!box) return false;
+    const btns = box.querySelectorAll("button.chip");
+    if (!btns[idx]) return false;
+    btns[idx].click();
+    return true;
+  }
+
   // 全局快捷键派发
   document.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;                        // 输入法组合态不抢键（规矩 32 ④）
     const str = normKey(e);
     const action = actionFor(str);
-    if (!action) return;
+    if (!action) {
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && QUICK_DIGITS[str] && !isTyping() && !anyModalOpen()) {
+        if (quickFilter(QUICK_DIGITS[str])) e.preventDefault();
+      }
+      return;
+    }
     if (action === "closeOverlay") {
-      const rm = document.getElementById("readerMask");
-      if (rm && !rm.hidden) { closeReader(); e.preventDefault(); return; }
-      if (document.getElementById("helpMask") && !document.getElementById("helpMask").hidden) { closeHelp(); e.preventDefault(); return; }
-      if (document.getElementById("settingsMask") && !document.getElementById("settingsMask").hidden) { closeSettings(); e.preventDefault(); return; }
-      return; // 其余浮层交给既有 Esc 处理
+      // Esc 分层：先关最上层浮层，再清搜索，最后才是失焦（参考 13009 的 Esc 语义）
+      const rm = document.getElementById("readerMask"), hm = document.getElementById("helpMask"),
+            sm = document.getElementById("settingsMask"), pm = document.getElementById("planMask"),
+            om = document.getElementById("onboardMask"), cp = document.getElementById("cartPanel"),
+            inp = document.getElementById("searchInput"), sb = document.getElementById("searchBox");
+      let handled = false;
+      if (rm && !rm.hidden) { closeReader(); handled = true; }
+      else if (hm && !hm.hidden) { closeHelp(); handled = true; }
+      else if (sm && !sm.hidden) { closeSettings(); handled = true; }
+      else if (pm && !pm.hidden) { pm.hidden = true; handled = true; }
+      else if (om && !om.hidden) { om.hidden = true; handled = true; }
+      else if (cp && cp.classList.contains("show")) { cp.classList.remove("show"); handled = true; }
+      else if (inp && (inp.value || document.activeElement === inp)) {
+        search[view] = ""; inp.value = ""; sb.classList.remove("has");
+        applyFilter(); renderSearchHistory(); inp.blur();
+        document.getElementById("searchHistory").hidden = true;
+        handled = true;
+      }
+      if (handled) e.preventDefault();
+      return;
     }
     if (action === "openSettings") { e.preventDefault(); toggleSettings(); return; }
     if (action === "showHelp") { e.preventDefault(); openHelp(); return; }
@@ -1837,9 +2299,14 @@
       case "viewArsenal": setView("arsenal"); break;
       case "viewSchemes": setView("schemes"); break;
       case "toggleTheme": {
+        // 只读一次 DOM 当前态，取反后先写 settings 再调 setTheme：
+        // setTheme 的 body.classList.toggle 在 620ms 后的 setTimeout 里才生效，
+        // 所以「回读 DOM」拿到的一定是旧值（等于没换）；而 syncThemeUI 在同一个
+        // 定时器里读 settings.theme，因此必须先写好 settings。
         const cur = document.body.classList.contains("dark") ? "dark" : "light";
-        setTheme(cur === "dark" ? "light" : "dark");
-        settings.theme = document.body.classList.contains("dark") ? "dark" : "light";
+        const next = cur === "dark" ? "light" : "dark";
+        settings.theme = next;
+        setTheme(next);
         saveSettings();
         break;
       }
@@ -1945,12 +2412,15 @@
         <div class="set-field"><button class="switch ${settings.showMeta ? 'on' : ''}" id="setMeta" role="switch" aria-checked="${settings.showMeta}"></button></div></div>
       <div class="set-row"><div><div class="lbl">侧栏常驻</div><div class="desc">关闭后筛选栏在窄屏自动收起</div></div>
         <div class="set-field"><button class="switch ${settings.dockPinned ? 'on' : ''}" id="setDock" role="switch" aria-checked="${settings.dockPinned}"></button></div></div>
+      <div class="set-row"><div><div class="lbl">演示自动另开窗口</div><div class="desc">翻开书页时，同时在浏览器新窗口打开这条演示；不勾则用预览窗右下角的「↗ 新窗口」按需开</div></div>
+        <div class="set-field"><button class="switch ${settings.openDemoWindow ? 'on' : ''}" id="setOpenWin" role="switch" aria-checked="${settings.openDemoWindow}"></button></div></div>
     `;
     setContent.querySelectorAll('#setDensity [data-d]').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.d; saveSettings(); applySettings(); }));
     const sc = setContent.querySelector('#setScale');
     sc.addEventListener('input', () => { settings.uiScale = parseFloat(sc.value); saveSettings(); document.documentElement.style.setProperty('--ui-scale', sc.value); document.getElementById('scaleDesc').textContent = Math.round(settings.uiScale * 100) + '%（影响全局）'; });
     const mt = setContent.querySelector('#setMeta'); mt.addEventListener('click', () => { settings.showMeta = !settings.showMeta; saveSettings(); applySettings(); mt.classList.toggle('on', settings.showMeta); mt.setAttribute('aria-checked', settings.showMeta); });
     const dk = setContent.querySelector('#setDock'); dk.addEventListener('click', () => { settings.dockPinned = !settings.dockPinned; saveSettings(); applySettings(); dk.classList.toggle('on', settings.dockPinned); dk.setAttribute('aria-checked', settings.dockPinned); });
+    const ow = setContent.querySelector('#setOpenWin'); ow.addEventListener('click', () => { settings.openDemoWindow = !settings.openDemoWindow; saveSettings(); ow.classList.toggle('on', settings.openDemoWindow); ow.setAttribute('aria-checked', settings.openDemoWindow); });
   }
 
   function renderKeys() {
@@ -2068,10 +2538,374 @@
   function closeHelp() { helpMask.hidden = true; }
   document.getElementById("helpClose").addEventListener("click", closeHelp);
   helpMask.addEventListener("click", (e) => { if (e.target === helpMask) closeHelp(); });
+  // 分组参考 13009 交互导图的做法：按「视图 / 搜索 / 收藏 / 浮层」分组，比平铺更好扫
+  const HELP_GROUPS = [
+    ["视图", [["viewArsenal", "切到「素材库」"], ["viewSchemes", "切到「方案库」"]]],
+    ["搜索与帮助", [["focusSearch", "聚焦搜索框"], ["showHelp", "打开本清单"]]],
+    ["书架与外观", [["openCart", "打开书架"], ["randomFill", "随机收藏一枚"], ["toggleTheme", "切换亮 / 暗主题"]]],
+    ["浮层", [["openSettings", "打开 / 关闭设置"], ["closeOverlay", "关最上层 → 清空搜索"]]],
+  ];
   function renderHelp() {
-    const list = document.getElementById("helpList");
-    list.innerHTML = Object.keys(SHORTCUTS).map(a => `<li><span>${SHORTCUTS[a].label}</span><span class="k">${bindingFor(a) || "—"}</span></li>`).join("");
+    const box = document.getElementById("helpGroups");
+    if (!box) return;
+    box.innerHTML = HELP_GROUPS.map(([title, items]) => `
+      <div class="help-group">
+        <h4>${title}</h4>
+        <table><tbody>${items.map(([a, label]) => `<tr><td><kbd>${escapeHtml(bindingFor(a) || "—")}</kbd></td><td>${label}</td></tr>`).join("")}</tbody></table>
+      </div>`).join("");
   }
+  // 常驻提示条：只列最常用的 5 件事，可发现性靠它（参考 13009 的 hint 条）
+  function renderHintBar() {
+    const bar = document.getElementById("hintBar");
+    if (!bar) return;
+    const items = [["showHelp", "快捷键"], ["focusSearch", "搜索"], ["closeOverlay", "逐层退出"]];
+    bar.innerHTML = items.map(([a, label]) => `<span><kbd>${escapeHtml(bindingFor(a) || "—")}</kbd>${label}</span>`).join("")
+      + `<span><kbd>1</kbd><kbd>2</kbd>切视图</span><span><kbd>3</kbd>–<kbd>0</kbd>元素 / 场景快筛</span>`;
+  }
+  renderHintBar();
+
+  /* ============================================================
+     规矩 32 收口（2026-10-27）
+     ① 焦点：弹层打开时背景 inert、Tab 在弹层内循环、关闭归还焦点
+     ② 状态：视图 / 四维筛选 / 搜索词 / 打开的书 → location.hash
+     ③ 降级：见上方 armFrameGuard（超时未 load 也提示，不只靠 onerror）
+     ⑤ 卸载：见上方 ioPark（滚远 2.5s 后 about:blank，滚回来重载）
+     ============================================================ */
+
+  // ---------- ② 状态写进地址栏 ----------
+  const DIM_CODE = { 适配端: "a", 元素: "e", 风格: "s", 场景: "c" };
+  let hashWritten = null;
+
+  function writeHash() {
+    const p = new URLSearchParams();
+    if (view !== "arsenal") p.set("v", view);
+    FILTER_DIMS.forEach(d => { if (filter[d] !== ALL) p.set(DIM_CODE[d], filter[d]); });
+    const q = (search[view] || "").trim();
+    if (q) p.set("q", q);
+    if (sortMode !== "def") p.set("o", sortMode);
+    const rmask = document.getElementById("readerMask");
+    if (rmask && !rmask.hidden && readerCard) p.set("rd", readerCard.dataset.id);
+    const s = p.toString();
+    if (s === hashWritten) return;
+    hashWritten = s;
+    try {
+      // file:// 下有的浏览器禁止改历史：失败就静默降级（滚动位置另由 sessionStorage 兜底）
+      history.replaceState(null, "", location.pathname + location.search + (s ? "#" + s : ""));
+    } catch (e) {}
+  }
+
+  function parseHash() {
+    const raw = (location.hash || "").replace(/^#/, "");
+    if (!raw) return new URLSearchParams();
+    try { return new URLSearchParams(raw); } catch (e) { return new URLSearchParams(); }
+  }
+
+  // 读 hash → 写回全局状态（视图 / 四维 / 搜索词），返回要重开的书 id
+  function restoreStateFromHash() {
+    const p = parseHash();
+    const v = p.get("v");
+    if (v === "schemes" || v === "arsenal") view = v;
+    const so = p.get("o");
+    if (so && ["def", "title", "id", "adapt"].includes(so)) sortMode = so;
+    FILTER_DIMS.forEach(d => {
+      filter[d] = ALL;
+      const val = p.get(DIM_CODE[d]);
+      if (!val) return;
+      const pool = d === "元素" ? ITEMS : ITEMS.concat(SCHEMES);
+      if (pool.some(x => x[d] === val)) filter[d] = val;
+    });
+    const q = p.get("q");
+    if (q) search[view] = q;
+    return p.get("rd");
+  }
+
+  function openReaderById(id) {
+    if (!id) return false;
+    const data = byId(id);
+    const card = Array.prototype.find.call(document.querySelectorAll(".card"), c => c.dataset.id === id);
+    if (!data || !card) return false;
+    const iframe = card.querySelector("iframe");
+    if (!iframe) return false;
+    openReader(data, card, card.querySelector(".thumb"), iframe, card.dataset.view === "schemes");
+    return true;
+  }
+
+  // 手工改地址栏 / 浏览器前进后退 → 跟着走
+  window.addEventListener("hashchange", () => {
+    if ((location.hash || "").replace(/^#/, "") === hashWritten) return;
+    const prevView = view;
+    const rd = restoreStateFromHash();
+    if (view !== prevView) {
+      // 不走 setView：它会重置筛选，而 hash 里带着筛选
+      renderViewFilters();
+    }
+    applyViewChrome();
+    renderFilters();
+    applyFilter();
+    const rmask = document.getElementById("readerMask");
+    if (rd && rmask.hidden) openReaderById(rd);
+    else if (!rd && !rmask.hidden) closeReader();
+  });
+
+  // 滚动位置 hash 装不下：sessionStorage（只活这个标签页）
+  const SCROLL_KEY = "arsenal-scroll-y";
+  let scrollTimer = 0;
+  window.addEventListener("scroll", () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      try { sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY))); } catch (e) {}
+    }, 250);
+  }, { passive: true });
+
+  // ---------- ① 焦点圈定 ----------
+  const LAYERS = [
+    { id: "cartPanel", z: 60, node: () => document.getElementById("cartPanel"), open: n => !!n && n.classList.contains("show") },
+    { id: "planMask", z: 70, node: () => document.getElementById("planMask"), open: n => !!n && !n.hidden },
+    { id: "onboardMask", z: 80, node: () => document.getElementById("onboardMask"), open: n => !!n && !n.hidden },
+    { id: "readerMask", z: 90, node: () => document.getElementById("readerMask"), open: n => !!n && !n.hidden },
+    { id: "settingsMask", z: 120, node: () => document.getElementById("settingsMask"), open: n => !!n && !n.hidden },
+    { id: "helpMask", z: 121, node: () => document.getElementById("helpMask"), open: n => !!n && !n.hidden }
+  ];
+  const INNER = { cartPanel: ".cart-panel", planMask: ".modal", onboardMask: ".onboard-card", readerMask: ".book-open", settingsMask: ".settings-panel", helpMask: ".help-panel" };
+  const FOCUS_SEL = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
+
+  function topLayer() {
+    let best = null;
+    LAYERS.forEach(l => {
+      const n = l.node();
+      if (l.open(n) && (!best || l.z > best.z)) best = l;
+    });
+    return best;
+  }
+  function layerBox(layer) {
+    const n = layer.node();
+    return (n && n.querySelector(INNER[layer.id])) || n;
+  }
+  function focusables(root) {
+    if (!root) return [];
+    return Array.prototype.filter.call(root.querySelectorAll(FOCUS_SEL), n => {
+      if (n.disabled || n.closest("[hidden]")) return false;
+      const r = n.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    });
+  }
+  // 记住「是谁打开的弹层」：pointerdown 时抓，因为打开函数里会主动把焦点送进弹层
+  let lastInteract = null;
+  document.addEventListener("pointerdown", e => { lastInteract = e.target; }, true);
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape" && e.key !== "Tab" && !e.isComposing) lastInteract = document.activeElement;
+  }, true);
+
+  let lastFocusBeforeLayer = null;
+  let layerKey = "";
+  let restoringFocus = false;
+
+  function focusTarget(node) {
+    if (!node || !document.contains(node)) return null;
+    if (node.matches && node.matches(FOCUS_SEL)) return node;
+    const near = node.closest && node.closest("button, a[href], input, [tabindex]");
+    if (near) return near;
+    return (node.querySelector && node.querySelector("button, a[href], iframe")) || null;
+  }
+
+  function syncLayerState() {
+    const top = topLayer();
+    const key = top ? top.id : "";
+    if (key === layerKey) return;
+    layerKey = key;
+    const app = document.querySelector(".app");
+    const stageAndDock = document.querySelectorAll(".stage-wrap, .dock");
+
+    if (top && top.id === "cartPanel") {
+      // 抽屉在 .app 内部：只让舞台与坞失活，抽屉本身保持可操作
+      stageAndDock.forEach(n => { n.inert = true; });
+      if (app) app.inert = false;
+    } else if (top) {
+      stageAndDock.forEach(n => { n.inert = false; });
+      if (app) app.inert = true;
+    } else {
+      stageAndDock.forEach(n => { n.inert = false; });
+      if (app) app.inert = false;
+    }
+
+    if (!top) {
+      const back = focusTarget(lastFocusBeforeLayer);
+      lastFocusBeforeLayer = null;
+      if (back) {
+        // 同步聚焦（headless / 后台标签页里 rAF 可能被饿死，不能只靠下一帧）
+        restoringFocus = true;
+        try { back.focus({ preventScroll: true }); } catch (e) {}
+        restoringFocus = false;
+      }
+      return;
+    }
+    if (!lastFocusBeforeLayer) lastFocusBeforeLayer = focusTarget(lastInteract) || document.activeElement;
+    const box = layerBox(top);
+    const first = focusables(box)[0];
+    if (first && !(box && box.contains(document.activeElement))) {
+      restoringFocus = true;
+      try { first.focus({ preventScroll: true }); } catch (e) {}
+      restoringFocus = false;
+    }
+  }
+
+  LAYERS.forEach(l => {
+    const n = l.node();
+    if (!n) return;
+    new MutationObserver(syncLayerState).observe(n, { attributes: true, attributeFilter: ["hidden", "class"] });
+  });
+  syncLayerState();
+
+  // Tab 在弹层内循环（含 Shift+Tab 反向）
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab" || e.isComposing) return;
+    const top = topLayer();
+    if (!top) return;
+    const box = layerBox(top);
+    const list = focusables(box);
+    if (!list.length) return;
+    const first = list[0], last = list[list.length - 1];
+    const active = document.activeElement;
+    if (!box.contains(active)) { e.preventDefault(); first.focus(); return; }
+    if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+  }, true);
+
+  // 兜底：焦点跑出弹层就拉回来（鼠标点到背景、脚本误 focus 都算）
+  document.addEventListener("focusin", (e) => {
+    if (restoringFocus) return;
+    const top = topLayer();
+    if (!top) return;
+    const box = layerBox(top);
+    if (box && box.contains(e.target)) return;
+    const first = focusables(box)[0];
+    if (first) {
+      restoringFocus = true;
+      try { first.focus({ preventScroll: true }); } catch (err) {}
+      restoringFocus = false;
+    }
+  });
+
+  /* ============================================================
+     浮窗拉伸（2026-10-28）
+     设置 / 快捷键 / 方案生成 / 书页 四边四角都能拖，书架抽屉只拖左边缘。
+     - 手柄画在面板内侧：外层是 overflow:hidden，放负偏移上会被裁掉点不中
+     - 面板在 flex 遮罩里居中 → 改变宽高时同步做一次半幅平移，让「被拖的那条边跟着指针走」
+     - 尺寸存 localStorage；双击任一手柄恢复默认
+     ============================================================ */
+  const FW_PREFIX = "arsenal-fw-";
+  function fwLoad(name) {
+    try {
+      const v = JSON.parse(localStorage.getItem(FW_PREFIX + name) || "null");
+      if (v && isFinite(v.w) && isFinite(v.h) && v.w > 0 && v.h > 0) return v;
+    } catch (e) {}
+    return null;
+  }
+  function fwStore(name, st) {
+    try { localStorage.setItem(FW_PREFIX + name, JSON.stringify({ w: Math.round(st.w), h: Math.round(st.h) })); } catch (e) {}
+  }
+  function initResizable(el, name, opt) {
+    if (!el) return;
+    opt = Object.assign({ minW: 320, minH: 220, maxW: 0, maxH: 0, dirs: ["n", "s", "w", "e", "nw", "ne", "sw", "se"], anchor: "center", title: "" }, opt);
+    const st = { w: 0, h: 0 };
+    let touched = false;
+
+    function clampSize(w, h) {
+      const parent = el.parentElement || document.body;
+      const pcs = getComputedStyle(parent);
+      const availW = Math.max(160, parent.clientWidth - parseFloat(pcs.paddingLeft || 0) - parseFloat(pcs.paddingRight || 0));
+      const availH = Math.max(160, parent.clientHeight - parseFloat(pcs.paddingTop || 0) - parseFloat(pcs.paddingBottom || 0));
+      const maxW = opt.maxW || availW, maxH = opt.maxH || availH;
+      return { w: Math.max(Math.min(opt.minW, maxW), Math.min(w, maxW)), h: Math.max(Math.min(opt.minH, maxH), Math.min(h, maxH)) };
+    }
+    function apply() {
+      if (!st.w || !st.h) return;
+      el.style.width = Math.round(st.w) + "px";
+      el.style.maxWidth = "none";
+      if (opt.height !== false) { el.style.height = Math.round(st.h) + "px"; el.style.maxHeight = "none"; }
+    }
+    function measure() {
+      const r = el.getBoundingClientRect();
+      return { w: r.width, h: r.height };
+    }
+    function reset() {
+      touched = false;
+      st.w = 0; st.h = 0;
+      el.style.width = ""; el.style.height = ""; el.style.maxWidth = ""; el.style.maxHeight = "";
+      el.style.transform = "";
+      try { localStorage.removeItem(FW_PREFIX + name); } catch (e) {}
+    }
+
+    opt.dirs.forEach(function (d) {
+      const h = document.createElement("span");
+      h.className = "fw-rz fw-" + d;
+      h.dataset.rz = d;
+      if (opt.title) h.title = opt.title;
+      el.appendChild(h);
+      h.addEventListener("dblclick", function (e) { e.preventDefault(); e.stopPropagation(); reset(); });
+      h.addEventListener("pointerdown", function (e) {
+        if (e.button !== 0) return;
+        e.preventDefault(); e.stopPropagation();
+        const m = measure();
+        if (!touched) { st.w = m.w; st.h = m.h; touched = true; }
+        const b = { x: e.clientX, y: e.clientY, w: st.w, h: st.h };
+        document.body.classList.add("fw-dragging");
+        try { h.setPointerCapture(e.pointerId); } catch (_) {}
+        const mv = function (ev) {
+          const dx = ev.clientX - b.x, dy = ev.clientY - b.y;
+          let w = b.w, hh = b.h;
+          if (d.indexOf("e") >= 0) w = b.w + dx;
+          if (d.indexOf("w") >= 0) w = b.w - dx;
+          if (d.indexOf("s") >= 0) hh = b.h + dy;
+          if (d.indexOf("n") >= 0) hh = b.h - dy;
+          const c = clampSize(w, hh);
+          st.w = c.w; st.h = c.h;
+          apply();
+          if (opt.anchor === "center") {
+            // 居中布局下，宽高变化会让两侧各扩一半；补一次半幅平移，被拖的边才跟手
+            const tx = (d === "n" || d === "s") ? 0 : dx / 2;
+            const ty = (d === "w" || d === "e") ? 0 : dy / 2;
+            el.style.transform = (tx || ty) ? "translate(" + tx + "px," + ty + "px)" : "";
+          }
+          if (opt.onResize) opt.onResize(st);
+        };
+        const up = function () {
+          h.removeEventListener("pointermove", mv);
+          h.removeEventListener("pointerup", up);
+          h.removeEventListener("pointercancel", up);
+          document.body.classList.remove("fw-dragging");
+          el.style.transform = "";   // 松手后交还给布局：尺寸已定，居中位置自然正确
+          if (opt.onResize) opt.onResize(st);
+          fwStore(name, st);
+        };
+        h.addEventListener("pointermove", mv);
+        h.addEventListener("pointerup", up);
+        h.addEventListener("pointercancel", up);
+      });
+    });
+
+    const saved = fwLoad(name);
+    if (saved) { st.w = saved.w; st.h = saved.h; touched = true; apply(); }
+    return { reset: reset, apply: apply };
+  }
+
+  const FW = {
+    settings: initResizable(document.querySelector(".settings-panel"), "settings", { minW: 520, minH: 320, title: "拖动改大小 · 双击复位" }),
+    help: initResizable(document.querySelector(".help-panel"), "help", { minW: 380, minH: 240, title: "拖动改大小 · 双击复位" }),
+    plan: initResizable(document.querySelector("#planMask .modal"), "plan", { minW: 420, minH: 260, title: "拖动改大小 · 双击复位" }),
+    book: initResizable(document.getElementById("bookOpen"), "book", {
+      minW: 640, minH: 420, title: "拖动改大小 · 双击复位",
+      onResize: function () { if (rdBox) { rdBox = rdClampBox(rdBox); rdApply(); rdFit(); } }
+    }),
+    cart: initResizable(document.querySelector(".cart-panel"), "cart", {
+      minW: 260, minH: 0, dirs: ["w"], anchor: "right", title: "拖动改宽度 · 双击复位", height: false
+    })
+  };
+  // 书页拉伸会改变左页尺寸，窗口尺寸变化时也要把预览窗夹回去（和 window.resize 同一套收尾）
+  if (FW.book) { /* onResize 已在上面接好 */ }
+
+  // 启动时先把 hash 里的状态读回来（视图 / 筛选 / 搜索 / 要重开的书）
+  const pendingReaderId = restoreStateFromHash();
 
   // ---- 启动 ----
   applySettings();          // 主题 / 强调色 / 密度 / 字号 / 铭牌 / 侧栏 / 减少动效
@@ -2087,6 +2921,7 @@
       const card = makeCard(it);
       document.getElementById("grid").appendChild(card);
       io.observe(card);
+      ioPark.observe(card);
     });
   }
   // 方案库卡片：默认隐藏，切到「方案库」视图才显示（复用懒加载 io）
@@ -2095,7 +2930,28 @@
     card.style.display = "none";
     document.getElementById("grid").appendChild(card);
     io.observe(card);
+    ioPark.observe(card);
   });
+
+  // hash 里带着的搜索词写回输入框（applyFilter 之前读过状态，这里只同步 UI）
+  {
+    const sInput = document.getElementById("searchInput");
+    sInput.value = search[view] || "";
+    document.getElementById("searchBox").classList.toggle("has", !!search[view]);
+  }
+  // 排序控件：初值从 hash 恢复，改了立刻重排并写回地址栏
+  {
+    const sel = document.getElementById("sortSel");
+    if (sel) {
+      sel.value = sortMode;
+      sel.addEventListener("change", () => {
+        sortMode = sel.value;
+        applySort();
+        writeHash();
+      });
+      applySort();
+    }
+  }
 
   // 从 localStorage 恢复书架（过滤掉数据里已不存在的 id）
   try {
@@ -2106,6 +2962,15 @@
 
   // 首屏卡片铺好后补一次尺寸计算（懒加载是异步的，时机可能早于布局稳定）
   requestAnimationFrame(() => setTimeout(fitAllThumbs, 80));
+
+  // ② 复原：地址栏里带着书就重新翻开（F5 停在原处）；否则恢复滚动位置
+  if (pendingReaderId) {
+    if (!openReaderById(pendingReaderId)) writeHash();   // 书已不存在：把失效的 rd 抹掉
+  } else {
+    let y = 0;
+    try { y = Number(sessionStorage.getItem(SCROLL_KEY) || 0) || 0; } catch (e) {}
+    if (y > 0) requestAnimationFrame(() => window.scrollTo(0, y));
+  }
 
   // 画布启动器：右下角「画布」按钮打开独立设计器 assets/canvas.html（与画廊解耦）
   document.getElementById("cvFab").addEventListener("click", () => window.open("assets/canvas.html", "_blank"));
