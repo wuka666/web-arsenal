@@ -3,6 +3,10 @@
 // 检查：demo存在 / 代码↔demo 逐字节 / 参数键↔demo state且默认值一致 / postMessage契约 / 零外链 / id不撞名
 const fs = require('fs');
 const path = require('path');
+const { loadMaterials } = require('./lib/data');
+const { compare } = require('./lib/code-sync');
+const { hasExternal, describe } = require('./lib/links');
+const { stateKeys, stateBlock } = require('./lib/state');
 const ROOT = process.cwd();
 const DATA = path.join(ROOT, 'data/素材.js');
 // 本批次清单：临时文件，每次校验前自行写入要查的条目 id（形状 [{id:"vXXX"}, ...]）
@@ -14,10 +18,8 @@ catch (e) {
 }
 const content = fs.readFileSync(DATA, 'utf8');
 
-// 用垫片加载数据源
-const sandbox = { window: {} };
-new Function('window', content)(sandbox.window);
-const ARS = sandbox.window.WEB_ARSENAL;
+// 数据加载统一走 lib/data（2026-10-31：原先各处自写 new Function 样板，行为不一致）
+const ARS = loadMaterials();
 const byId = {}; ARS.forEach(e => byId[e.id] = e);
 
 let fail = 0;
@@ -29,30 +31,26 @@ for (const m of meta) {
   const demoPath = path.join(ROOT, e.效果演示);
   if (!fs.existsSync(demoPath)) { console.log('✗', tag, 'demo 文件不存在', e.效果演示); fail++; continue; }
   const demoHtml = fs.readFileSync(demoPath, 'utf8');
-  // 代码↔demo 逐字节
-  // 素材库两种存储形态并存：单层序列化（值直接是 HTML，直接比）／双层（值需 eval 一次或两次）
-  const codeRaw = e.代码;
-  let codeOk = (codeRaw === demoHtml);
-  if (!codeOk) {
-    let v = null;
-    try { v = new Function('return ' + codeRaw)(); } catch (err) { v = null; }
-    if (v !== demoHtml && typeof v === 'string') { try { v = new Function('return ' + v)(); } catch (err) { } }
-    codeOk = (v === demoHtml);
-  }
-  if (!codeOk) { console.log('✗', tag, '代码字段与 demo 不一致（round-trip 失败）'); fail++; }
-  // 提取 demo 的 state 键
-  const stateKeys = new Set([...demoHtml.matchAll(/state\s*=\s*\{([^}]*)\}/g)].flatMap(mm => [...mm[1].matchAll(/([A-Za-z_]\w*)\s*:/g)].map(x => x[1])));
+  // 代码↔demo 逐字节：判据统一走 lib/code-sync（2026-10-31）。
+  //   原先这里和 check_all 一样用 eval 两次、不做双重转义反解 → 判不出来（假阴性）。
+  //   lib/code-sync 的 normalize/compare 就是 check_sync.js 那份唯一正确的实现。
+  const cs = compare(e.代码, demoHtml);
+  if (!cs.ok) { console.log('✗', tag, '代码字段与 demo 不一致（round-trip 失败）', '首个差异在第', cs.diffAt, '字节（代码', cs.codeLen, 'B / demo', cs.diskLen, 'B）'); fail++; }
+  // 提取 demo 的 state 键：解析器统一走 lib/state（2026-10-31）。
+  //   原先这里只认 `state = {`（漏 const state / 带引号键），比 check_vars 那份窄；
+  //   现取更全的那份 → 这里会**少报**死参数误报，属修复，不是放宽判据。
+  const stateKeysSet = new Set(stateKeys(demoHtml));
   // 参数键↔state 且默认值一致
   for (const p of (e.参数 || [])) {
     const k = p.键;
     // 键不在 state 但出现在 demo 里 = 降级版 PARAM_MAP 桥接（规矩 11 允许，demo 内有 IGNORE_3D 披露），
     // 不算死参数；真正的死参数是全文件都找不到键名
-    if (!stateKeys.has(k) && !demoHtml.includes(k)) { console.log('✗', tag, '参数键', k, '未在 demo 中出现（死参数）'); fail++; }
+    if (!stateKeysSet.has(k) && !demoHtml.includes(k)) { console.log('✗', tag, '参数键', k, '未在 demo 中出现（死参数）'); fail++; }
     // 默认值一致：只在 state 块里找。
     // 注：全文件搜会先命中 CSS（如 body{gap:18px}）而误报——必须在 state 块内取值
-    const stateBlock = (demoHtml.match(/state\s*=\s*\{([^}]*)\}/) || [])[1] || '';
+    const stateBlockText = (stateBlock(demoHtml) || {}).body || '';
     const re = new RegExp('(?:^|[\\s,{])' + k + '\\s*:\\s*("[^"]*"|\'[^\']*\'|[^,}\']+)');
-    const m2 = stateBlock.match(re);
+    const m2 = stateBlockText.match(re);
     if (m2) {
       let dv = m2[1].trim();
       if ((dv.startsWith('"') && dv.endsWith('"')) || (dv.startsWith("'") && dv.endsWith("'"))) dv = dv.slice(1, -1);
@@ -66,9 +64,10 @@ for (const m of meta) {
   if (!/addEventListener\(['"]message['"]/.test(demoHtml) || !/d\.type\s*!==\s*['"]param['"]/.test(demoHtml) || !/state\[d\.key\]\s*=/.test(demoHtml)) {
     console.log('✗', tag, 'postMessage 契约不完整'); fail++;
   }
-  // 零外链（w3.org 命名空间是 SVG 规范标识符，从不发起请求，不算外链）
-  const ext = /(https?:\/\/|cdn\.|@import|src\s*=\s*['"]https?:|<link)/i.test(demoHtml.replace(/http:\/\/www\.w3\.org\/\d{4}\/[a-z]+/g, ''));
-  if (ext) { console.log('✗', tag, 'demo 含外部链接（零外链硬门槛）'); fail++; }
+  // 零外链（判据统一走 lib/links，2026-10-31）：verify_entry 的这份是「更严」口径
+  //   （https?:// / cdn. / @import / src=远程 / <link>），现已作为唯一实现给 check_links 共用。
+  //   SVG xmlns 命名空间（http://www.w3.org/2000/svg 等）由 lib/links 内部剥掉——它是规范标识符，从不发起请求。
+  if (hasExternal(demoHtml)) { console.log('✗', tag, 'demo 含外部链接（零外链硬门槛）：' + describe(demoHtml)); fail++; }
   // 参数键必须被 CSS / setProperty / state 消费之一
   for (const p of (e.参数 || [])) {
     const k = p.键;

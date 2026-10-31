@@ -7,11 +7,12 @@
 //   ② file:// 下 iframe 的 contentDocument 需要 `--allow-file-access-from-files` 才可读。
 //   ③ 临时容器必须与 demo 同目录（assets/demos/），否则 demo 内相对路径失效。
 // 用法（项目根目录）：node scripts/check_adapt.js [--materials] [demo路径...]
-//   不给参数 = 扫方案库全部 49 套；--materials = 扫素材库全部 335 条（数量 2026-10-02 核定，会随入库增长，别写死在心里）
+//   不给参数 = 扫方案库全部 70 套；--materials = 扫素材库全部 348 条（数量 2026-10-31 核定，会随入库增长，别写死在心里）
 //   ⚠️ 传具体 demo 路径时，表头仍显示「【方案库】」是按库口径打印的，素材 demo 也走同一段输出，不影响判定。
-const fs = require("fs"), path = require("path"), os = require("os"), { execFileSync } = require("child_process");
+const fs = require("fs"), path = require("path"), os = require("os");
+const { loadMaterials, loadSchemes } = require("./lib/data");
+const { runHeadless, toFileUrl, cleanupFile } = require("./lib/chrome");
 const root = process.cwd();
-const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const VIEW = [375, 812];              // 真实手机视口（iPhone X 逻辑分辨率）
 const TMP_NAME = "_adapt_probe_tmp.html";
 
@@ -54,34 +55,36 @@ function probe(absDemo) {
   </body></html>`;
   const tmpPath = path.join(root, "assets/demos", TMP_NAME);
   fs.writeFileSync(tmpPath, wrap, "utf8");
-  // profile 目录必须每次用完就删：一个 demo 一个，全量跑一轮就留几百个，
-  // 2026-10-01 实测累积到 566 个才被发现（TEMP 里一堆 adf-*）。
-  const prof = path.join(os.tmpdir(), "adf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7));
+  // 无头 Chrome 启动 / profile 清理统一走 lib/chrome（2026-10-31）。
+  //   原先此处自己拼 CHROME 绝对路径 + 自己建/删 profile，5 个脚本各一份。
+  //   profile 必须每次用完就删：一个 demo 一个，全量跑一轮就留几百个（2026-10-01 累积到 566 个才被发现）。
   try {
-    const url = "file:///" + tmpPath.split(path.sep).join("/");
-    const out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox",
-      "--disable-background-networking", "--disable-component-update", "--no-first-run",
-      "--hide-scrollbars", "--allow-file-access-from-files",
-      "--window-size=900,900", "--virtual-time-budget=5000",
-      "--user-data-dir=" + prof,
-      "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
+    const out = runHeadless({
+      url: toFileUrl(tmpPath),
+      dumpDom: true,
+      profilePrefix: "adf",
+      extraArgs: ["--window-size=900,900", "--virtual-time-budget=5000"],
+    });
     const m = out.match(/ADAPTRESULT (\{[\s\S]*?\})</);
     return m ? JSON.parse(m[1]) : null;
+  } catch (e) {
+    // 首跑偶发：Chrome 无头进程异常退出 / 临时 profile 争用 → 直接抛会让整个进程崩，
+    // 连带后面所有 demo 都测不到。这里降级为「探针未执行」，由主循环打印并跳过本条。
+    console.error("  ⚠️ 探针执行失败 " + path.basename(absDemo) + "：" + String(e.message || e).split("\n")[0]);
+    return null;
   } finally {
-    try { fs.unlinkSync(tmpPath); } catch (e) { }
-    try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
+    cleanupFile(tmpPath); // 带重试：Chrome 刚退出时句柄可能还没放开（lib/chrome 提供）
   }
 }
 
 let files = process.argv.slice(2).filter(a => !a.startsWith("--"));
 const MATERIALS = process.argv.includes("--materials");
 if (!files.length) {
+  // 数据加载统一走 lib/data（2026-10-31）
   if (MATERIALS) {
-    const m = {}; new Function("window", fs.readFileSync(path.join(root, "data/素材.js"), "utf8"))(m);
-    files = m.WEB_ARSENAL.map(e => e.效果演示);
+    files = loadMaterials().map(e => e.效果演示);
   } else {
-    const s = {}; new Function("window", fs.readFileSync(path.join(root, "data/方案.js"), "utf8"))(s);
-    files = s.WEB_SCHEMES.map(e => e.演示页);
+    files = loadSchemes().map(e => e.演示页);
   }
 }
 console.log("375×812 手机视口实测（iframe 内渲染）：" + (MATERIALS ? "【素材库】" : "【方案库】") + "\n");

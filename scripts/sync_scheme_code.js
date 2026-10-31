@@ -7,9 +7,10 @@ const DATA = path.join(root, "data/方案.js");
 let text = fs.readFileSync(DATA, "utf8");
 
 // 先摸清现有条目 id 与演示页，避免依赖外部清单
-const w = {};
-new Function("window", text)(w);
-const S = w.WEB_SCHEMES;
+// 数据加载统一走 lib/data（2026-10-31）——注意：text 变量是「待改写的原文」，
+//   与加载用的是同一份内容，但必须分别读：加载器只负责解析，不改 text。
+const { loadSchemes } = require("./lib/data");
+const S = loadSchemes({ root: root });
 
 const args = process.argv.slice(2);
 const targets = args.length ? S.filter(s => args.includes(s.id)) : S.filter(s => s.演示页 && fs.existsSync(path.join(root, s.演示页)));

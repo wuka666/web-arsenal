@@ -6,9 +6,11 @@ const root = process.cwd();
 let fail = 0;
 const bad = (msg) => { fail++; console.log("  ✗ " + msg); };
 
-function load(rel) { const w = {}; new Function("window", fs.readFileSync(path.join(root, rel), "utf8"))(w); return w; }
-const M = load("data/素材.js").WEB_ARSENAL;
-const S = load("data/方案.js").WEB_SCHEMES;
+// 数据加载统一走 lib/data（2026-10-31：原先 12 处各写一份 new Function 样板，行为还不一致）
+const { loadMaterials, loadSchemes } = require("./lib/data");
+const { compare } = require("./lib/code-sync");
+const M = loadMaterials();
+const S = loadSchemes();
 const sIds = new Set(S.map(s => s.id));
 
 // 1) 语法
@@ -35,16 +37,11 @@ function audit(list, label, demoKey) {
     const fp = path.join(root, demo);
     if (!fs.existsSync(fp)) { bad(`${label} ${e.id} ${t} 演示文件缺失: ${demo}`); return; }
     const html = fs.readFileSync(fp, "utf8");
-    // 代码 = demo：素材库两种存储形态并存（单层序列化=值直接是 HTML；双层=值再求值一次），都要试
+    // 代码 = demo：判据统一走 lib/code-sync（2026-10-31）。
+    //   原先这里用 eval 试两次、不做双重转义反解 → 287 条双重转义存储的条目永远判不出来（假阴性）。
+    //   lib/code-sync 的 normalize/compare 就是 check_sync.js 那份唯一正确的实现，判据只会更严。
     if (Object.prototype.hasOwnProperty.call(e, "代码")) {
-      let ok = (e.代码 === html);
-      if (!ok) {
-        let v = null;
-        try { v = new Function("return " + e.代码)(); } catch (err) { }
-        if (v !== html && typeof v === "string") { try { v = new Function("return " + v)(); } catch (err) { } }
-        ok = (v === html);
-      }
-      if (!ok) bad(`${label} ${e.id} ${t} 代码字段 ≠ demo`);
+      if (!compare(e.代码, html).ok) bad(`${label} ${e.id} ${t} 代码字段 ≠ demo`);
     }
     // 参数 < 6（skeleton 类文档条目除外）
     if (params.length && params.length < 6) bad(`${label} ${e.id} ${t} 参数仅 ${params.length} 个（<6）`);
@@ -116,20 +113,46 @@ console.log("  ✅ 标签闭集：四维取值全部在词表内");
 //   桶太碎 = 筛一下只出一两条 = 等于没有筛选。规则：素材 风格/场景 ≥10、适配端/元素 ≥5；方案 适配端 ≥3（移动端方案天然少，2026-09-27 起下调）、风格/场景 ≥5。
 //   不足的桶必须合并进相邻桶，或降级为「仅搜索命中」不做成筛选 chip。
 //   依据：GitHub React Bits 200+ 组件只用 5 个顶层分类（≈40 条/桶），不设自由标签墙。
+//
+// ⚠️ 2026-10-31 修（用户点名的「问题7」）：
+//   原实现只遍历 `cnt` 里出现过的值（`Object.keys(cnt)`），于是「0 条的档」根本不进循环、
+//   永远不会被统计 —— 6 个 0 条档长期隐形（素材：风格「有机自然」「编辑杂志」、
+//   场景「作品集·叙事」「其他·场景」；方案：风格「iOS 原生」「品牌海报」）。
+//   现改为**遍历完整词表**：词表里有、数据里 0 条的档也要现身。
+//   但 0 条档不能直接报 ✗（那会让基线立刻变红），而是汇总成一条 `⚠️ 0 条档` 告警行，
+//   **不计入 fail、不 exit 1**。将来有人往里落 1 条（>0 但 <阈值）时，走下面的 MIN_BUCKET
+//   逻辑照常报错；0 条则始终只是「提醒」。
 const MIN_BUCKET = {
   素材: { 适配端: 5, 元素: 5, 风格: 10, 场景: 10 },
   方案: { 适配端: 3, 风格: 5, 场景: 5 }
 };
+// 0 条档的审计结果（只告警、不判不合格）
+const zeroBuckets = [];
 [["素材", M, ["适配端", "元素", "风格", "场景"]], ["方案", S, ["适配端", "风格", "场景"]]].forEach(([label, list, dims]) => {
   dims.forEach(dim => {
     const cnt = {};
     list.forEach(e => { const v = (e[dim] || "").trim(); if (v) cnt[v] = (cnt[v] || 0) + 1; });
+    const min = MIN_BUCKET[label][dim];
+    // ① 完整词表：词表里有、但数据里 0 条的档 —— 只记入 zeroBuckets，不判不合格
+    (TAXONOMY[dim] || []).forEach(v => {
+      if ((cnt[v] || 0) === 0) zeroBuckets.push({ label, dim, value: v, min, gap: min });
+    });
+    // ② 数据里出现过的档：低于阈值照常报错（0 条的已在 ① 里拦下，不会重复判红）
     Object.keys(cnt).sort((a, b) => cnt[a] - cnt[b]).forEach(v => {
-      const min = MIN_BUCKET[label][dim];
       if (cnt[v] < min) bad(`${label} ${dim}「${v}」仅 ${cnt[v]} 条 < 最小桶容量 ${min}（须合并相邻桶，或降级为仅搜索命中）`);
     });
   });
 });
+// 0 条档告警行：⚠️ 前缀 + 汇总，明确「不判不合格」，免得以后有人误以为该删档
+if (zeroBuckets.length) {
+  const detail = zeroBuckets
+    .map(z => `${z.label}·${z.dim}「${z.value}」0 条（阈值 ${z.min}，差 ${z.gap} 条）`)
+    .join("；");
+  console.log(`  ⚠️ 0 条档 ${zeroBuckets.length} 个（只告警、不计不合格；词表里有但暂无条目）：`);
+  console.log("     " + detail);
+} else {
+  console.log("  ✅ 0 条档：词表内每一档都已有条目");
+}
 
 // 4.6) 入库标准硬门槛（2026-09-27 立，对应宪法规矩 5）
 //   本段为「裸规矩接脚本」：规矩5 要求「效果说明满两行以上 + 用法 + 来源」，此前无任何脚本校验，

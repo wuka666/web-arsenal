@@ -140,11 +140,8 @@ function inferStyle(html) {
 
 // ================= 改写引擎 =================
 const asArr = v => Array.isArray(v) ? v : (v ? [v] : []);
-function readLib(rel) {
-  const c = fs.readFileSync(path.join(ROOT, rel), "utf8");
-  const w = {}; new Function("window", c)(w);
-  return w;
-}
+// 数据加载统一走 lib/data（2026-10-31）：原先 readLib / loadArr 两处各写一份 new Function 样板
+const { loadMaterials, loadSchemes } = require("./lib/data");
 // ⚠️ 键写法两种并存（2026-10-02 修）：前半段对象字面量 `代码: "`，M183 起是 JSON 风格 `"代码": "`。
 //    只认前一种会静默漏掉 153 条且不报错——脚本看起来成功，其实一半库没动。
 const CODE_AT = /\n\s*(?:"代码"|代码)\s*:\s*["`]/;
@@ -229,7 +226,7 @@ function insertAfterField(head, name, lines) {
 }
 
 // ---------------- 素材库 ----------------
-const MAT = readLib("data/素材.js").WEB_ARSENAL;
+const MAT = loadMaterials({ root: ROOT });
 const matById = {}; MAT.forEach(e => matById[e.id] = e);
 const stat = { adapt: {}, style: {}, scene: {}, elem: {}, styleInfer: 0, sceneInfer: 0, noStyle: 0 };
 
@@ -274,7 +271,7 @@ function transformMat(id, head) {
 }
 
 // ---------------- 方案库 ----------------
-const SCH = readLib("data/方案.js").WEB_SCHEMES;
+const SCH = loadSchemes({ root: ROOT });
 const schById = {}; SCH.forEach(e => schById[e.id] = e);
 // 方案 = 整站设计语言，35 套逐个人工定档 [适配端, 风格, 场景]
 // 适配端判定依据（2026-09-20 加测）：375×812 实测（scripts/check_adapt.js）+ 2026 响应式标准
@@ -316,8 +313,7 @@ function transformSch(id, head) {
 }
 
 // ================= 执行 =================
-const loadArr = (rel, key) => { const w = {}; new Function("window", fs.readFileSync(path.join(ROOT, rel), "utf8"))(w); return w[key].length; };
-const nMat = loadArr("data/素材.js", "WEB_ARSENAL"), nSch = loadArr("data/方案.js", "WEB_SCHEMES");
+const nMat = loadMaterials({ root: ROOT }).length, nSch = loadSchemes({ root: ROOT }).length;
 const r1 = rewrite("data/素材.js", transformMat, nMat);
 const r2 = rewrite("data/方案.js", transformSch, nSch);
 if (r1.failed.length || r2.failed.length) {

@@ -26,6 +26,7 @@
  *   新增白名单必须写清理由（哪族、为什么保留），别拿它当消音器。
  */
 const fs = require('fs'), path = require('path');
+const { jaccard } = require('./lib/sim');
 
 const argv = process.argv.slice(2);
 const argOf = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
@@ -79,10 +80,12 @@ const fps = files.map(f => ({ f, ...fingerprint(fs.readFileSync(path.join(dir, f
 
 const hits = [];
 for (let i = 0; i < fps.length; i++) for (let j = i + 1; j < fps.length; j++) {
-  const A = fps[i], B = fps[j], uni = new Set([...A.grams, ...B.grams]).size;
-  if (!uni) continue;
+  const A = fps[i], B = fps[j];
+  if (!A.grams.size || !B.grams.size) continue;
+  // Jaccard 统一走 lib/sim（2026-10-31）：原先此处是内联实现，
+  // 与 audit_overlap.js 那份在全库 83,293 对上逐对实测数值 0 处不同 → 合并为一个。
+  const jac = jaccard(A.grams, B.grams);
   let inter = 0; for (const g of A.grams) if (B.grams.has(g)) inter++;
-  const jac = inter / uni;
   const contain = inter / Math.min(A.grams.size, B.grams.size); // 包含度：短骨架被整段复用
   if (jac >= threshold || contain >= 0.9) hits.push({ a: A.f, b: B.f, jac, contain });
 }

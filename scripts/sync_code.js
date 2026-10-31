@@ -5,13 +5,13 @@
 // 用扫描器定位收尾引号，不做裸 indexOf 划区间
 const fs = require('fs');
 const path = require('path');
+const { loadMaterials } = require('./lib/data');
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
 let meta;
 if (args.length) {
-  const w = {};
-  new Function('window', fs.readFileSync(path.join(ROOT, 'data/素材.js'), 'utf8'))(w);
-  meta = w.WEB_ARSENAL.filter(e => args.includes(e.id)).map(e => ({ id: e.id, 效果演示: e.效果演示 }));
+  // 数据加载统一走 lib/data（2026-10-31）
+  meta = loadMaterials({ root: ROOT }).filter(e => args.includes(e.id)).map(e => ({ id: e.id, 效果演示: e.效果演示 }));
   const found = new Set(meta.map(m => m.id));
   args.filter(a => !found.has(a)).forEach(a => console.log('WARN 素材库无此 id:', a));
 } else {

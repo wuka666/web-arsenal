@@ -10,9 +10,10 @@
 //
 // 用法（项目根目录）：node scripts/check_touch_targets.js [--materials] [--schemes] [demo路径...]
 //   不给参数 = 两库全量；--materials 仅素材库；--schemes 仅方案库
-const fs = require("fs"), path = require("path"), os = require("os"), { execFileSync } = require("child_process");
+const fs = require("fs"), path = require("path"), os = require("os");
+const { loadMaterials, loadSchemes } = require("./lib/data");
+const { runHeadless, toFileUrl, cleanupFile } = require("./lib/chrome");
 const root = process.cwd();
-const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const TMP_NAME = "_touch_probe_tmp.html";
 const MOBILE_W = 375, DESK_W = 1440;
 const MOBILE_MIN = 44, DESK_MIN = 24;   // 达标线（附录B B1）
@@ -101,21 +102,18 @@ function probe(absDemo) {
   </body></html>`;
   const tmpPath = path.join(root, "assets/demos", TMP_NAME);
   fs.writeFileSync(tmpPath, wrap, "utf8");
-  // profile 用后即删（同 check_adapt / check_vars）：不然全量跑一轮 TEMP 里多几百个目录
-  const prof = path.join(os.tmpdir(), "ttf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7));
+  // 无头 Chrome 启动 / profile 清理统一走 lib/chrome（2026-10-31）
   try {
-    const url = "file:///" + tmpPath.split(path.sep).join("/");
-    const out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox",
-      "--disable-background-networking", "--disable-component-update", "--no-first-run",
-      "--hide-scrollbars", "--allow-file-access-from-files",
-      "--window-size=1900,950", "--virtual-time-budget=6000",
-      "--user-data-dir=" + prof,
-      "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
+    const out = runHeadless({
+      url: toFileUrl(tmpPath),
+      dumpDom: true,
+      profilePrefix: "ttf",
+      extraArgs: ["--window-size=1900,950", "--virtual-time-budget=6000"],
+    });
     const m = out.match(/TTOUT (\{[\s\S]*?\})</);
     return m ? JSON.parse(m[1]) : null;
   } finally {
-    try { fs.unlinkSync(tmpPath); } catch (e) { }
-    try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
+    cleanupFile(tmpPath); // 带重试：Chrome 刚退出时句柄可能还没放开（lib/chrome 提供）
   }
 }
 
@@ -132,12 +130,10 @@ const ONLY_M = process.argv.includes("--materials");
 const ONLY_S = process.argv.includes("--schemes");
 let entries = [];
 if (!ONLY_S) {
-  const m = {}; new Function("window", fs.readFileSync(path.join(root, "data/素材.js"), "utf8"))(m);
-  m.WEB_ARSENAL.forEach(e => entries.push({ src: e.效果演示, id: e.id, 标题: e.标题, 适配端: e.适配端 || "通用", lib: "素材" }));
+  loadMaterials().forEach(e => entries.push({ src: e.效果演示, id: e.id, 标题: e.标题, 适配端: e.适配端 || "通用", lib: "素材" }));
 }
 if (!ONLY_M) {
-  const s = {}; new Function("window", fs.readFileSync(path.join(root, "data/方案.js"), "utf8"))(s);
-  s.WEB_SCHEMES.forEach(e => entries.push({ src: e.演示页, id: e.id, 标题: e.风格名, 适配端: e.适配端 || "通用", lib: "方案" }));
+  loadSchemes().forEach(e => entries.push({ src: e.演示页, id: e.id, 标题: e.风格名, 适配端: e.适配端 || "通用", lib: "方案" }));
 }
 if (files.length) entries = files.map(f => ({ src: f, id: path.basename(f), 标题: path.basename(f), 适配端: "通用", lib: "?" }));
 

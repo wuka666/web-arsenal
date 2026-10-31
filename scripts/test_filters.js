@@ -1,8 +1,8 @@
 // 分级筛选回归测试：无头浏览器注入点击，验证「每级都有全部 / 默认全部 / 两库都能筛」
 // 用法（项目根目录）：node scripts/test_filters.js
-const fs = require("fs"), path = require("path"), os = require("os"), { execFileSync } = require("child_process");
+const fs = require("fs"), path = require("path"), os = require("os");
+const { runHeadless, toFileUrl } = require("./lib/chrome");
 const root = process.cwd();
-const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const src = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
 // 注入探针：切视图 / 点各层筛选 / 验证交集与「全部」默认
@@ -58,15 +58,16 @@ if (cut < 0) { console.error("✗ 找不到 </body>"); process.exit(1); }
 // 测试副本必须放在项目根目录，否则 data/素材.js 这类相对路径解析不到（数据会是 0 条）
 const testPath = path.join(root, "_filter_test.html");
 fs.writeFileSync(testPath, src.slice(0, cut) + probe + src.slice(cut), "utf8");
-const url = "file:///" + testPath.split(path.sep).join("/");
-const prof = path.join(os.tmpdir(), "flt-" + Date.now());
+const url = toFileUrl(testPath);
 let out = "";
 try {
-  out = execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox", "--virtual-time-budget=9000",
-    "--user-data-dir=" + prof, "--dump-dom", url], { encoding: "utf8", maxBuffer: 1024 * 1024 * 40 });
+  // 无头 Chrome 启动 / profile 清理统一走 lib/chrome（2026-10-31）
+  //   profile 清理必须在 finally 里（宪法规矩 4 / 附录 A5）：每个几十 MB，漏一次就永久堆在 %TEMP%
+  out = runHeadless({
+    url, dumpDom: true, profilePrefix: "flt", timeoutMs: 90000,
+    extraArgs: ["--virtual-time-budget=9000"],
+  });
 } finally {
-  // 无头脚本必须自己收拾 Chrome profile（宪法规矩 4 / 附录 A5）：每个几十 MB，漏一次就永久堆在 %TEMP%
-  try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e) { }
   try { fs.unlinkSync(testPath); } catch (e) { console.log("（临时测试文件删除被拦截，稍后手工清理：" + path.basename(testPath) + "）"); }
 }
 const m = out.match(/TESTRESULT ([^<]*)/);

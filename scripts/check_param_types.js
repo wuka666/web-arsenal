@@ -3,10 +3,9 @@
 // 扫「参数类型 vs demo 实际用法」冲突：类型是 color，却被当数字参与计算（calc/除法/乘）
 const fs = require("fs"), path = require("path");
 const root = process.cwd();
-const w = {};
-new Function("window", fs.readFileSync(path.join(root, "data/方案.js"), "utf8"))(w);
-const m = {};
-new Function("window", fs.readFileSync(path.join(root, "data/素材.js"), "utf8"))(m);
+const { loadSchemes, loadMaterials } = require("./lib/data");
+const schemes = loadSchemes();
+const materials = loadMaterials();
 
 function scan(list, libName) {
   const out = [];
@@ -28,6 +27,6 @@ function scan(list, libName) {
   });
   return out;
 }
-const r = [].concat(scan(w.WEB_SCHEMES, "方案"), scan(m.WEB_ARSENAL, "素材"));
+const r = [].concat(scan(schemes, "方案"), scan(materials, "素材"));
 console.log("=== 参数类型 vs 用法 冲突：" + r.length + " 处 ===");
 r.forEach(x => console.log("  - " + x));

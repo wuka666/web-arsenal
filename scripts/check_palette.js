@@ -2,9 +2,8 @@
 // 用法（项目根目录）：node scripts/check_palette.js
 const fs = require("fs"), path = require("path");
 const root = process.cwd();
-const w = {};
-new Function("window", fs.readFileSync(path.join(root, "data/方案.js"), "utf8"))(w);
-const schemes = w.WEB_SCHEMES;
+const { loadSchemes } = require("./lib/data");
+const schemes = loadSchemes();
 
 const norm = s => String(s || "").trim().toLowerCase().replace(/\s+/g, '');
 const rows = [];
