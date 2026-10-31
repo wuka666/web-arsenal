@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>横阅品牌索引</title>
+<style>
+:root{
+  --bg:#f6f3ee;--card:#fffdf8;--ink:#1b1712;--dim:#8d8275;--accent:#b4462f;
+  --radius:10;--gap:14;--fs:15;--cardW:230;--ctaH:52;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#14120f;display:flex;align-items:center;justify-content:center;
+  font-family:Georgia,"Songti SC","Noto Serif SC",serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;overflow:hidden;position:relative;
+  background:var(--bg);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;
+}
+.masthead{
+  flex:0 0 auto;padding:22px calc(var(--gap) * 1px) 14px;
+  border-bottom:1px solid rgba(27,23,18,.14);
+}
+.brand{
+  display:flex;align-items:baseline;justify-content:space-between;
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);letter-spacing:.06em;
+}
+.claim{
+  margin:14px 0 0;font-size:calc(var(--fs) * 1.75 * 1px);font-weight:700;
+  line-height:1.18;letter-spacing:-.01em;
+}
+.claim i{font-style:normal;color:var(--accent)}
+.lede{
+  margin:8px 0 0;color:var(--dim);font-size:calc(var(--fs) * .88 * 1px);
+  max-width:30ch;
+}
+.belt{
+  flex:0 0 auto;overflow-x:auto;overflow-y:hidden;
+  display:flex;gap:calc(var(--gap) * .75 * 1px);
+  padding:calc(var(--gap) * 1px);
+  scrollbar-width:none;
+}
+.belt::-webkit-scrollbar{display:none}
+.idea{
+  flex:0 0 auto;width:calc(var(--cardW) * 1px);
+  background:var(--card);border-radius:calc(var(--radius) * 1px);
+  padding:14px;display:flex;flex-direction:column;gap:7px;
+  border:1px solid rgba(27,23,18,.08);
+}
+.idea .no{
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--accent);letter-spacing:.14em;
+}
+.idea b{font-size:calc(var(--fs) * 1.02 * 1px);font-weight:680;line-height:1.3}
+.idea p{margin:0;color:var(--dim);font-size:calc(var(--fs) * .84 * 1px);line-height:1.45}
+.index{
+  flex:1;min-height:0;overflow:auto;padding:0 calc(var(--gap) * 1px);
+}
+.index .h{
+  color:var(--dim);font-size:calc(var(--fs) * .74 * 1px);
+  letter-spacing:.1em;padding:10px 0 6px;
+}
+.line{
+  display:flex;align-items:center;gap:12px;min-height:56px;
+  padding:0 2px;border-top:1px solid rgba(27,23,18,.12);cursor:pointer;
+}
+.line:first-of-type{border-top:0}
+.line .no{
+  flex:0 0 auto;width:26px;color:var(--dim);
+  font-size:calc(var(--fs) * .78 * 1px);font-variant-numeric:tabular-nums;
+}
+.line .nm{flex:1;min-width:0;font-size:calc(var(--fs) * 1.02 * 1px)}
+.line .ar{flex:0 0 auto;color:var(--dim);transition:.25s}
+.line.on .nm{color:var(--accent)}
+.line.on .no{color:var(--accent)}
+.line.on .ar{color:var(--accent);transform:translateX(4px)}
+.cta{
+  flex:0 0 auto;height:calc(var(--ctaH) * 1px);
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:calc(var(--fs) * .95 * 1px);letter-spacing:.04em;
+  font-family:system-ui,-apple-system,"PingFang SC",sans-serif;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header class="masthead">
+    <div class="brand"><span>叁隅 SANCORNER</span><span>EST. 2019</span></div>
+    <h1 class="claim">把一件事<br>做到<i>能被记住</i></h1>
+    <p class="lede">我们只做三件事，每件都做了六年。</p>
+  </header>
+
+  <div class="belt" id="belt"></div>
+
+  <div class="index">
+    <div class="h">我们做什么</div>
+    <div id="lines"></div>
+  </div>
+
+  <div class="cta">预约一次到访 →</div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={bg:'#f6f3ee',card:'#fffdf8',ink:'#1b1712',dim:'#8d8275',accent:'#b4462f',
+             radius:10,gap:14,fs:15,cardW:230,ctaH:52};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const IDEAS=[
+  ['01','先想清楚','开工前把"为什么做"写满三页纸，写不出来就不开工。'],
+  ['02','慢一点','一年只接六个项目，每个都留够返工的时间。'],
+  ['03','留下来','交付后两年内免费维护，让作品真的站得住。']
+];
+const LINES=[
+  ['01','空间与陈设'],
+  ['02','品牌与出版'],
+  ['03','器物与包装'],
+  ['04','展览与活动']
+];
+const belt=document.getElementById('belt');
+const lines=document.getElementById('lines');
+
+belt.innerHTML=IDEAS.map(i=>
+  '<div class="idea"><span class="no">'+i[0]+'</span><b>'+i[1]+'</b><p>'+i[2]+'</p></div>'
+).join('');
+lines.innerHTML=LINES.map((l,i)=>
+  '<div class="line" data-i="'+i+'"><span class="no">'+l[0]+'</span>'
+  +'<span class="nm">'+l[1]+'</span><span class="ar">→</span></div>'
+).join('');
+
+let step=0;
+function tick(){
+  // 横滑卡片带无人操作时自己往前走一段，缩略图与挂机预览不会是一张静止的图
+  const max=belt.scrollWidth-belt.clientWidth;
+  const pos=(step%3)*(state.cardW+state.gap*0.75);
+  belt.scrollTo({left:Math.min(pos,max),behavior:'smooth'});
+  lines.querySelectorAll('.line').forEach((el,i)=>el.classList.toggle('on',i===(step%LINES.length)));
+  step++;
+}
+
+apply();
+tick();
+setInterval(tick,2400);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();tick();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底滑操作台</title>
+<style>
+:root{
+  --paper:#f5f3ec;--ink:#2f3a2e;--dim:#7f8b76;--rule:#e0e3d8;--accent:#6f9a58;
+  --card:#ffffff;--radius:16;--gap:18;--fs:16;--sheet:296;--icon:52;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e8e5da;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(50,60,40,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .sub{margin-left:auto;font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+.body{
+  flex:1;min-height:0;overflow:auto;padding:16px calc(var(--gap) * 1px) 120px;
+}
+.body::-webkit-scrollbar{width:0}
+.hint{
+  font-size:calc(var(--fs) * .82 * 1px);color:var(--dim);line-height:1.7;
+  margin:0 0 14px;
+}
+.task{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 14px;margin-bottom:10px;
+  display:flex;align-items:center;gap:11px;
+}
+.task .dot{
+  flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--accent);
+}
+.task.done .dot{background:transparent;border:1.5px solid var(--dim)}
+.task .tx{flex:1;min-width:0;font-size:calc(var(--fs) * .9 * 1px)}
+.task.done .tx{color:var(--dim);text-decoration:line-through}
+.task .tm{flex:0 0 auto;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim)}
+/* 遮罩：只在面板展开时接管点击，收起时完全不可点，避免挡住正文滚动 */
+.scrim{
+  position:absolute;inset:0;z-index:5;background:rgba(40,48,36,.32);
+  opacity:0;pointer-events:none;transition:opacity .34s ease;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+/* 底滑面板：靠 translateY 在「露出把手」与「完全展开」之间走，不做 display 切换以便保留过渡 */
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:6;
+  height:calc(var(--sheet) * 1px);
+  background:var(--card);border-top:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px) calc(var(--radius) * 1px) 0 0;
+  box-shadow:0 -14px 34px rgba(50,60,40,.18);
+  transform:translateY(calc(var(--sheet) * 1px - 56px));
+  transition:transform .42s cubic-bezier(.22,.9,.24,1);
+  display:flex;flex-direction:column;
+}
+.sheet.drag{transition:none}
+.sheet.on{transform:translateY(0)}
+.handle{
+  flex:0 0 auto;height:56px;display:flex;align-items:center;gap:11px;
+  padding:0 calc(var(--gap) * 1px);cursor:grab;touch-action:none;
+}
+.handle .bar{width:38px;height:4px;border-radius:3px;background:var(--rule)}
+.handle .tt{flex:1;font-size:calc(var(--fs) * .88 * 1px);font-weight:600}
+.handle .ar{
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  color:var(--dim);transition:transform .42s cubic-bezier(.22,.9,.24,1);
+}
+.sheet.on .handle .ar{transform:rotate(180deg)}
+.handle .ar svg{width:20px;height:20px;display:block}
+.grid{
+  flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px 4px;padding:4px calc(var(--gap) * 1px) 16px;
+  align-content:start;
+}
+.act{
+  border:0;background:transparent;cursor:pointer;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font:inherit;font-size:calc(var(--fs) * .7 * 1px);
+  min-height:76px;padding:4px 0;
+}
+.act i{
+  width:calc(var(--icon) * 1px);height:calc(var(--icon) * 1px);
+  border-radius:14px;background:var(--paper);
+  border:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s ease,color .3s ease;
+}
+.act i svg{width:23px;height:23px;display:block}
+.act.hot i{background:var(--accent);border-color:var(--accent);color:#fff}
+.act span{color:var(--dim)}
+.act.hot span{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>今日工作台</h1>
+    <span class="sub">3 待办 · 2 已逾</span>
+  </div>
+
+  <div class="body">
+    <p class="hint">向上拖动底部把手（或点箭头）唤起操作台 —— 高频动作收在一层里，主页面只留清单。</p>
+    <div class="task"><span class="dot"></span><span class="tx">把 Q3 报表导出给客户</span><span class="tm">今天</span></div>
+    <div class="task"><span class="dot"></span><span class="tx">评审新版 onboarding 文案</span><span class="tm">逾 1 天</span></div>
+    <div class="task"><span class="dot"></span><span class="tx">补充团队权限白名单</span><span class="tm">逾 2 天</span></div>
+    <div class="task done"><span class="dot"></span><span class="tx">同步上周会议纪要</span><span class="tm">已完成</span></div>
+    <div class="task done"><span class="dot"></span><span class="tx">更新 API 变更日志</span><span class="tm">已完成</span></div>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="handle" id="handle">
+      <span class="bar"></span>
+      <span class="tt">快捷操作</span>
+      <span class="ar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M6 15l6-6 6 6"/>
+        </svg>
+      </span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f5f3ec',ink:'#2f3a2e',dim:'#7f8b76',rule:'#e0e3d8',accent:'#6f9a58',
+             card:'#ffffff',radius:16,gap:18,fs:16,sheet:296,icon:52};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const ICON={
+  doc:'M6 3.5h7l5 5v12H6zM13 3.5V9h5',
+  up:'M12 17V6M12 6l-4 4M12 6l4 4',
+  inv:'M15.5 19a3.5 3.5 0 0 0 0-7v-1a5.5 5.5 0 0 0-5.5 5.5M8.5 19a3.5 3.5 0 0 0 0-7v-1A5.5 5.5 0 0 1 14 16.5',
+  scan:'M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16',
+  tpl:'M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5zM4 9h16M9 9v11',
+  cal:'M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v12A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5zM4 10h16M8 3.5v3M16 3.5v3',
+  bell:'M12 4a5 5 0 0 1 5 5v3.5l1.5 3H6.5L8 12.5V9a5 5 0 0 1 5-5zM10 18.5a2 2 0 0 0 4 0',
+  set:'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM19.4 12c0-.5-.05-1-.14-1.5l2-1.4-2-3.4-2.2 1a7.6 7.6 0 0 0-2.6-1.5L15 3H9l.5 2.2a7.6 7.6 0 0 0-2.6 1.5l-2.2-1-2 3.4 2 1.4a7.4 7.4 0 0 0 0 3l-2 1.4 2 3.4 2.2-1a7.6 7.6 0 0 0 2.6 1.5L9 21h6l-.5-2.2a7.6 7.6 0 0 0 2.6-1.5l2.2 1 2-3.4-2-1.4c.09-.5.14-1 .14-1.5z'
+};
+const ACTS=[
+  ['新建文档','doc',1],['上传文件','up',0],['邀请成员','inv',0],['扫码录入','scan',0],
+  ['模板库','tpl',0],['排日程','cal',0],['设提醒','bell',1],['空间设置','set',0]
+];
+
+const grid=document.getElementById('grid');
+ACTS.forEach(([name,key,hot],i)=>{
+  const b=document.createElement('button');
+  b.className='act'+(hot?' hot':'');
+  b.innerHTML='<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="'+ICON[key]+'"/></svg></i><span>'+name+'</span>';
+  b.addEventListener('click',()=>{
+    // 选中态只在本层内互斥：面板是「一次性动作入口」，不留多选
+    grid.querySelectorAll('.act').forEach(x=>x.classList.remove('hot'));
+    b.classList.add('hot');
+  });
+  grid.appendChild(b);
+});
+
+const sheet=document.getElementById('sheet');
+const scrim=document.getElementById('scrim');
+const handle=document.getElementById('handle');
+let open=false;
+
+function setOpen(v){
+  open=v;
+  sheet.classList.toggle('on',open);
+  scrim.classList.toggle('on',open);
+}
+
+// 点击把手整条（含箭头）都能开合：把手是 56px 高的独立触控区，箭头只是其中的视觉指示
+handle.addEventListener('click',()=>setOpen(!open));
+scrim.addEventListener('click',()=>setOpen(false));
+
+// 拖拽：只改 translateY，松手按「过了半程」判展开/收起，避免落在一个中间态
+let dragging=false,startY=0,baseY=0;
+handle.addEventListener('pointerdown',e=>{
+  dragging=true;startY=e.clientY;
+  baseY=open?0:(state.sheet-56);
+  sheet.classList.add('drag');
+  handle.setPointerCapture(e.pointerId);
+});
+handle.addEventListener('pointermove',e=>{
+  if(!dragging) return;
+  let y=baseY+(e.clientY-startY);
+  y=Math.max(0,Math.min(state.sheet-56,y));
+  sheet.style.transform='translateY('+y+'px)';
+});
+handle.addEventListener('pointerup',e=>{
+  if(!dragging) return;
+  dragging=false;
+  sheet.classList.remove('drag');
+  sheet.style.transform='';
+  const curY=baseY+(e.clientY-startY);
+  setOpen(curY < (state.sheet-56)/2);
+});
+
+apply();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

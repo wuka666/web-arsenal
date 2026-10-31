@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日期范围预订</title>
+<style>
+:root{
+  --bg:#0b1220;--ink:#dce6f5;--dim:#7e8aa3;--line:#1d2a40;
+  --accent:#5b8cff;--soft:#131e30;--radius:12;--gap:16;--fs:14;--maxw:1000;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px);display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+.panel{background:var(--soft);border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px)}
+.panel h2{margin:0 0 12px;font-size:calc(var(--fs)*1.2*1px)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--ink);font:inherit;cursor:pointer;min-height:34px}
+.day.mute{color:var(--dim);opacity:.4;cursor:default}
+.day.in{background:var(--accent);color:#06122c;font-weight:600}
+.day.bd{box-shadow:0 0 0 2px var(--accent)}
+.rooms{display:flex;flex-direction:column;gap:12px}
+.room{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.room.on{border-color:var(--accent);background:rgba(91,140,255,.08)}
+.room .pic{width:60px;height:60px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--soft));display:flex;align-items:center;justify-content:center;color:#06122c;font-weight:700}
+.room .nm{font-weight:600}
+.room .mt{color:var(--dim);font-size:calc(var(--fs)*.84*1px)}
+.room .pr{margin-left:auto;font-weight:700;color:var(--accent);white-space:nowrap;text-align:right}
+.room .pr small{display:block;font-weight:400;color:var(--dim);font-size:calc(var(--fs)*.74*1px)}
+.summary{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.summary .big{font-size:calc(var(--fs)*1.7*1px);font-weight:700}
+.summary .big small{color:var(--dim);font-size:calc(var(--fs)*.8*1px);font-weight:400}
+.book{min-height:46px;padding:0 22px;border-radius:calc(var(--radius)*1px);border:0;background:var(--accent);color:#06122c;font:inherit;font-weight:700;cursor:pointer}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h2>选择日期</h2>
+    <div class="cal" id="cal"></div>
+    <div style="color:var(--dim);font-size:calc(var(--fs)*.82*1px);margin-top:10px" id="range">点击选择入住与退房日期</div>
+  </div>
+  <div class="panel">
+    <h2>选择房型</h2>
+    <div class="rooms" id="rooms"></div>
+    <div class="summary">
+      <div>
+        <div style="color:var(--dim);font-size:calc(var(--fs)*.82*1px)" id="nights">— 晚</div>
+        <div class="big">¥<span id="sum">0</span><small> 总计</small></div>
+      </div>
+      <button class="book" id="book">预订</button>
+    </div>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#0b1220',ink:'#dce6f5',accent:'#5b8cff',radius:12,gap:16,fs:14,maxw:1000};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const ROOMS=[
+  {nm:'标准大床房',mt:'22㎡ · 1.8m 床 · 含早',pr:368},
+  {nm:'高级城景房',mt:'30㎡ · 落地窗 · 含早',pr:528},
+  {nm:'行政套房',mt:'55㎡ · 客厅 · 行政酒廊',pr:888},
+];
+let first=null, second=null, ri=1;
+const calEl=document.getElementById('cal');
+const roomsEl=document.getElementById('rooms');
+
+function renderCal(){
+  const days=[];
+  for(let i=0;i<3;i++) days.push({m:true});
+  for(let d=1;d<=30;d++) days.push({d});
+  calEl.innerHTML=days.map(x=>{
+    if(x.m) return '<div class="day mute">·</div>';
+    let cls='day';
+    if(first!==null && second!==null){
+      if(x.d>first && x.d<second) cls+=' in';
+      if(x.d===first||x.d===second) cls+=' in bd';
+    } else if(x.d===first){ cls+=' in bd'; }
+    return '<div class="'+cls+'" data-d="'+x.d+'">'+x.d+'</div>';
+  }).join('');
+  calEl.querySelectorAll('.day:not(.mute)').forEach(el=>el.addEventListener('click',()=>{
+    const d=+el.dataset.d;
+    if(first===null || (first!==null&&second!==null)){ first=d; second=null; }
+    else if(d>first){ second=d; }
+    else { first=d; }
+    renderCal(); update();
+  }));
+}
+function renderRooms(){
+  roomsEl.innerHTML=ROOMS.map((r,i)=>'<div class="room'+(i===ri?' on':'')+'" data-i="'+i+'"><div class="pic">'+['A','B','C'][i]+'</div><div><div class="nm">'+r.nm+'</div><div class="mt">'+r.mt+'</div></div><div class="pr">¥'+r.pr+'<small>/晚</small></div></div>').join('');
+  roomsEl.querySelectorAll('.room').forEach(el=>el.addEventListener('click',()=>{ri=+el.dataset.i;renderRooms();update();}));
+}
+function nights(){ return (first!==null&&second!==null)?(second-first):0; }
+function update(){
+  const n=nights();
+  document.getElementById('nights').textContent=n?n+' 晚':'— 晚';
+  document.getElementById('sum').textContent=n*ROOMS[ri].pr;
+  document.getElementById('range').textContent=(first!==null?('入住 '+first+' 日'):'点击选择入住')+(second!==null?(' · 退房 '+second+' 日'):'');
+}
+document.getElementById('book').addEventListener('click',()=>{
+  document.getElementById('range').textContent = nights()? '已生成订单，去支付' : '请先选择日期';
+});
+apply();renderCal();renderRooms();update();
+
+// 预览/挂机自动演示：自动选日期区间 + 切房型；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%3===0){ first=8; second=11; renderCal(); update(); }
+  else if(step%3===1){ ri=(ri+1)%ROOMS.length; renderRooms(); update(); }
+  else { first=14; second=18; renderCal(); update(); }
+},2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

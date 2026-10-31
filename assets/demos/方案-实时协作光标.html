@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>实时协作光标</title>
+<style>
+:root{
+  --bg:#0f1419;--card:#161c24;--ink:#e8edf2;--dim:#8a97a5;--line:#222b35;
+  --accent:#22d3ee;--radius:14;--gap:16;--fs:15;--maxw:900;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1px);min-height:100vh;display:flex;flex-direction:column}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.head h1{margin:0;font-size:calc(var(--fs) * 1.7 * 1px);font-weight:680}
+/* 在线头像堆叠 */
+.avatars{display:flex}
+.avatars .a{
+  width:34px;height:34px;border-radius:999px;margin-left:-10px;border:2px solid var(--bg);
+  display:flex;align-items:center;justify-content:center;color:#0f1419;font-weight:700;font-size:calc(var(--fs) * .82 * 1px);
+}
+.avatars .a:first-child{margin-left:0}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--dim);font-size:calc(var(--fs) * .85 * 1px)}
+.live .dot{width:8px;height:8px;border-radius:999px;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+/* 协作画布 */
+.canvas{
+  position:relative;flex:1;min-height:340px;background:var(--card);border:1px solid var(--line);
+  border-radius:calc(var(--radius) * 1px);overflow:hidden;
+}
+.canvas .doc{padding:22px;max-width:62ch}
+.canvas .doc h3{margin:0 0 8px;font-size:calc(var(--fs) * 1.2 * 1px)}
+.canvas .doc p{margin:0 0 10px;color:var(--dim)}
+/* 协作光标 */
+.cur{position:absolute;top:0;left:0;pointer-events:none;transition:transform .9s cubic-bezier(.4,0,.2,1);will-change:transform}
+.cur svg{display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.cur .name{position:absolute;left:14px;top:14px;white-space:nowrap;color:#0f1419;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px}
+/* 输入气泡 */
+.bubble{
+  position:absolute;background:var(--ink);color:var(--bg);font-size:calc(var(--fs) * .82 * 1px);
+  padding:7px 12px;border-radius:12px;max-width:220px;opacity:0;transform:translateY(6px);
+  transition:opacity .3s,transform .3s;pointer-events:none;
+}
+.bubble.on{opacity:1;transform:translateY(0)}
+.bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.bar button{
+  min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--card);
+  color:var(--ink);font:inherit;cursor:pointer;
+}
+.bar button.on{background:var(--accent);color:#06222a;border-color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">协作文档</h1>
+    <div class="avatars" id="avatars"></div>
+  </div>
+  <div class="head">
+    <span class="live"><span class="dot"></span><span id="liveN">3 人在线</span></span>
+  </div>
+
+  <div class="canvas" id="canvas">
+    <div class="doc">
+      <h3>产品需求文档 · 实时共创</h3>
+      <p>把分散的想法汇到一处。每个人的光标都在动，改动即时可见。</p>
+      <p>这一部分由阿岚正在编辑……</p>
+    </div>
+    <!-- 协作光标由脚本注入 -->
+    <div class="bubble" id="bubble"></div>
+  </div>
+
+  <div class="bar">
+    <button id="btnPause">暂停演示</button>
+    <button id="btnAdd">模拟加入协作者</button>
+  </div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0f1419',card:'#161c24',ink:'#e8edf2',accent:'#22d3ee',radius:14,gap:16,fs:15,maxw:900};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const PEERS=[
+  {name:'阿岚',color:'#f97316'},
+  {name:'Mira',color:'#22d3ee'},
+  {name:'陈默',color:'#a78bfa'}
+];
+const canvas=document.getElementById('canvas');
+const avatarsEl=document.getElementById('avatars');
+const bubble=document.getElementById('bubble');
+const liveN=document.getElementById('liveN');
+
+function paintAvatars(){
+  avatarsEl.innerHTML=PEERS.map(p=>'<span class="a" style="background:'+p.color+'">'+p.name[0]+'</span>').join('');
+  liveN.textContent=PEERS.length+' 人在线';
+}
+
+const cursors=PEERS.map((p,i)=>{
+  const el=document.createElement('div');
+  el.className='cur';
+  el.innerHTML='<svg width="22" height="22" viewBox="0 0 22 22"><path d="M3 2 L3 17 L7.5 13 L10.5 19 L13 18 L10 12 L16 12 Z" fill="'+p.color+'"/></svg><span class="name" style="background:'+p.color+'">'+p.name+'</span>';
+  canvas.appendChild(el);
+  return {el,phase:i*2.1,sp:0.5+i*0.13};
+});
+
+let t=0, paused=false;
+const BUBBLES=['在改这段…','加一句价值主张','这里配图更好','已同步远端'];
+function frame(){
+  if(!paused){
+    t+=0.016;
+    cursors.forEach((c,i)=>{
+      const ph=c.phase+t*c.sp;
+      const x=18+ (Math.sin(ph)*0.5+0.5) * (canvas.clientWidth-150);
+      const y=20+ (Math.cos(ph*0.8+i)*0.5+0.5) * (canvas.clientHeight-90);
+      c.el.style.transform='translate('+x+'px,'+y+'px)';
+    });
+    const bi=Math.floor(t/2.4)%BUBBLES.length;
+    bubble.textContent=PEERS[bi%PEERS.length].name+'：'+BUBBLES[bi];
+    bubble.style.left=(20+ (Math.sin(t*0.5)*0.5+0.5)*(canvas.clientWidth-200))+'px';
+    bubble.style.top=(30+ (Math.cos(t*0.4)*0.5+0.5)*(canvas.clientHeight-80))+'px';
+    if(Math.floor(t*10)%12===0) bubble.classList.add('on'); else if(Math.floor(t*10)%12===6) bubble.classList.remove('on');
+  }
+  requestAnimationFrame(frame);
+}
+
+document.getElementById('btnPause').addEventListener('click',function(){
+  paused=!paused; this.classList.toggle('on',paused); this.textContent=paused?'继续演示':'暂停演示';
+});
+document.getElementById('btnAdd').addEventListener('click',function(){
+  if(PEERS.length>=5) return;
+  const more=[{name:'Leo',color:'#34d399'},{name:'晚晴',color:'#f472b6'}];
+  const p=more[PEERS.length-3];
+  if(!p) return;
+  PEERS.push(p);
+  const el=document.createElement('div');el.className='cur';
+  el.innerHTML='<svg width="22" height="22" viewBox="0 0 22 22"><path d="M3 2 L3 17 L7.5 13 L10.5 19 L13 18 L10 12 L16 12 Z" fill="'+p.color+'"/></svg><span class="name" style="background:'+p.color+'">'+p.name+'</span>';
+  canvas.appendChild(el);
+  cursors.push({el,phase:Math.random()*6,sp:0.5+Math.random()*0.2});
+  paintAvatars();
+});
+
+apply();paintAvatars();requestAnimationFrame(frame);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

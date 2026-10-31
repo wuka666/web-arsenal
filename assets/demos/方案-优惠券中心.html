@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>优惠券中心</title>
+<style>
+:root{
+  --paper:#f4f2f7;--ink:#241f2e;--dim:#7d7288;--rule:#ded8e6;--accent:#6d4fa8;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--face:40;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e6e2ec;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(56,44,76,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .rule{
+  margin-left:auto;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);
+  text-decoration:underline;text-underline-offset:2px;
+}
+/* 分类 Tab：移动端触控门槛 44px，三个均分也够放，不做豁免 */
+.tabs{
+  flex:0 0 auto;display:flex;gap:8px;padding:10px calc(var(--gap) * 1px);
+  border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.tab{
+  flex:1;min-height:44px;border:1px solid var(--rule);border-radius:22px;
+  background:var(--card);color:var(--dim);font:inherit;
+  font-size:calc(var(--fs) * .82 * 1px);cursor:pointer;
+}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.scroll{flex:1;min-height:0;overflow:auto;padding:14px calc(var(--gap) * 1px) 20px}
+.scroll::-webkit-scrollbar{width:0}
+
+/* 票券形态：左右两个半圆缺口咬在卡片上下边缘，中间走一道虚线，是「券」而非「卡」的识别点 */
+.cpn{
+  position:relative;background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);margin-bottom:12px;
+  display:flex;align-items:stretch;overflow:visible;
+}
+.cpn .face{
+  flex:0 0 116px;padding:14px 10px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--accent);
+}
+.cpn .face .v{
+  font-size:calc(var(--face) * 1px);font-weight:800;line-height:1.05;letter-spacing:-.02em;
+}
+.cpn .face .v small{font-size:calc(var(--fs) * .82 * 1px);font-weight:700;margin-right:1px}
+.cpn .face .c{
+  font-size:calc(var(--fs) * .7 * 1px);color:var(--dim);margin-top:5px;
+}
+.cpn .split{
+  flex:0 0 auto;width:1px;margin:12px 0;
+  border-left:1px dashed var(--rule);
+}
+.cpn .nt{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--rule);
+  left:116px;margin-left:-7px;z-index:2;
+}
+.cpn .nt.t{top:-7px}
+.cpn .nt.b{bottom:-7px}
+.cpn .info{
+  flex:1;min-width:0;padding:13px 12px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+}
+.cpn .nm{font-size:calc(var(--fs) * .9 * 1px);font-weight:650;line-height:1.35}
+.cpn .ex{font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);line-height:1.5}
+.get{
+  flex:0 0 auto;align-self:center;margin-right:12px;
+  min-height:44px;min-width:74px;padding:0 14px;border:0;border-radius:22px;
+  background:var(--accent);color:#fff;font:inherit;font-weight:650;
+  font-size:calc(var(--fs) * .8 * 1px);cursor:pointer;
+}
+/* 失效态：整张退成灰阶，按钮保留占位但明确不可点，避免用户反复点 */
+.cpn.used{opacity:.62}
+.cpn.used .face{color:var(--dim)}
+.cpn.used .get{background:transparent;color:var(--dim);border:1px solid var(--rule);cursor:default}
+.empty{
+  text-align:center;padding:52px 20px;color:var(--dim);
+  font-size:calc(var(--fs) * .82 * 1px);line-height:1.8;
+}
+.tip{
+  margin-top:6px;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);line-height:1.7;
+  text-align:center;
+}
+.toast{
+  position:absolute;left:50%;bottom:30px;z-index:8;transform:translate(-50%,10px);
+  background:var(--ink);color:var(--paper);border-radius:20px;padding:9px 16px;
+  font-size:calc(var(--fs) * .78 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>优惠券</h1>
+    <span class="rule">使用规则</span>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="scroll">
+    <div id="list"></div>
+    <p class="tip">每单限用 1 张，不可与会员折扣叠加</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f4f2f7',ink:'#241f2e',dim:'#7d7288',rule:'#ded8e6',accent:'#6d4fa8',
+             card:'#ffffff',radius:14,gap:16,fs:16,face:40};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const TABS=['可用','已用','过期'];
+const CPNS=[
+  {v:30,c:'满 199 可用',n:'全品类通用券',e:'有效期至 10-31',s:'可用'},
+  {v:15,c:'满 99 可用',n:'堂食专享券',e:'有效期至 10-25',s:'可用'},
+  {v:50,c:'满 299 可用',n:'新客首单礼',e:'有效期至 11-15',s:'可用'},
+  {v:20,c:'满 149 可用',n:'周末回馈券',e:'已于 10-02 使用',s:'已用'},
+  {v:25,c:'满 199 可用',n:'中秋团圆券',e:'已于 09-30 过期',s:'过期'}
+];
+
+let cur='可用';
+const tabsEl=document.getElementById('tabs');
+const listEl=document.getElementById('list');
+const toastEl=document.getElementById('toast');
+let toastT=0;
+
+TABS.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='tab'+(t===cur?' on':'');
+  b.textContent=t;
+  b.addEventListener('click',()=>{
+    cur=t;
+    tabsEl.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.textContent===t));
+    render();
+  });
+  tabsEl.appendChild(b);
+});
+
+function toast(s){
+  toastEl.textContent=s;toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toastEl.classList.remove('on'),1500);
+}
+
+function render(){
+  const rows=CPNS.filter(c=>c.s===cur);
+  listEl.innerHTML='';
+  if(!rows.length){
+    listEl.innerHTML='<div class="empty">这里还没有券<br>下单后会自动发放到本页</div>';
+    return;
+  }
+  rows.forEach((c,i)=>{
+    const dead=(cur!=='可用')||c.got;
+    const d=document.createElement('div');
+    d.className='cpn'+(dead?' used':'');
+    d.innerHTML=
+      '<span class="face"><span class="v"><small>¥</small>'+c.v+'</span><span class="c">'+c.c+'</span></span>'+
+      '<span class="split"></span><span class="nt t"></span><span class="nt b"></span>'+
+      '<span class="info"><span class="nm">'+c.n+'</span><span class="ex">'+c.e+'</span></span>';
+    const b=document.createElement('button');
+    b.className='get';
+    if(c.got){ b.textContent='已领取'; b.disabled=true; }
+    else if(cur==='已用'){ b.textContent='已使用'; b.disabled=true; }
+    else if(cur==='过期'){ b.textContent='已过期'; b.disabled=true; }
+    else{ b.textContent='领取'; }
+    if(!b.disabled){
+      b.addEventListener('click',()=>{
+        c.got=true;
+        render();
+        toast('已领取 ¥'+c.v+' 券');
+      });
+    }
+    d.appendChild(b);
+    listEl.appendChild(d);
+  });
+}
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>

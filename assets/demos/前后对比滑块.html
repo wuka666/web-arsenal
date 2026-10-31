@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>前后对比滑块</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--page);padding:16px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg);
+  }
+  .col{width:100%;max-width:var(--w)}
+  .cmp{
+    position:relative;width:100%;aspect-ratio:1.4;border-radius:var(--radius);
+    overflow:hidden;background:var(--beforeA);cursor:ew-resize;touch-action:none;
+  }
+  /* 底层 = 前（灰度）；上层 = 后（彩色），用 clip-path 从左裁到手柄位置 */
+  .layer{position:absolute;inset:0}
+  .layer.before{background:var(--beforeA)}
+  .layer.after{
+    background:var(--afterA);
+    clip-path:inset(0 calc(100% - var(--pos)) 0 0);
+  }
+  .handle{
+    position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;
+    background:var(--handle);z-index:3;
+  }
+  .knob{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:var(--knob);height:var(--knob);border-radius:50%;
+    background:var(--handle);border:2px solid var(--page);
+    display:flex;align-items:center;justify-content:center;color:var(--accent);
+    box-shadow:0 2px 8px rgba(20,24,40,.22);
+  }
+  .knob svg{width:14px;height:14px;display:block}
+  .lab{
+    position:absolute;top:10px;z-index:2;font-size:11px;letter-spacing:.08em;
+    padding:4px 9px;border-radius:20px;background:rgba(0,0,0,.42);color:#fff;
+  }
+  .lab.l{left:10px}
+  .lab.r{right:10px}
+  .cap{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="col">
+    <div class="cmp" id="cmp">
+      <div class="layer before"></div>
+      <div class="layer after"></div>
+      <div class="lab l">BEFORE</div>
+      <div class="lab r">AFTER</div>
+      <div class="handle"><div class="knob">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M9 7l-4 5 4 5M15 7l4 5-4 5"/>
+        </svg>
+      </div></div>
+    </div>
+    <div class="cap"><span id="cap">拖动手柄或点击自动对比</span><span id="pct">50%</span></div>
+  </div>
+</div>
+<script>
+// 素材库口径：apply() 侧按 UNIT 拼单位，CSS 里直接 var(--x)，不要再乘 1px
+var state={page:"#f7f5f2",fg:"#1c1c1e",dim:"#8b8f98",beforeA:"#b9b9b9",afterA:"#e8734a",
+           accent:"#2f2a26",handle:"#ffffff",w:340,radius:14,pos:50,knob:36};
+var UNIT={w:"px",radius:"px",pos:"%",knob:"px"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+
+var cmp=document.getElementById("cmp"),pct=document.getElementById("pct"),cap=document.getElementById("cap");
+function setPos(p){state.pos=Math.max(2,Math.min(98,p));pct.textContent=Math.round(state.pos)+"%";apply();}
+
+// 拖拽：只在按下后接管，松手即释放，避免和页面其它手势抢
+var dragging=false;
+function posFromEvent(e){
+  var r=cmp.getBoundingClientRect();
+  return (e.clientX-r.left)/r.width*100;
+}
+cmp.addEventListener("pointerdown",function(e){
+  dragging=true;auto=false;cap.textContent="手动对比中";
+  setPos(posFromEvent(e));cmp.setPointerCapture(e.pointerId);
+});
+cmp.addEventListener("pointermove",function(e){if(dragging)setPos(posFromEvent(e));});
+cmp.addEventListener("pointerup",function(){dragging=false;});
+cmp.addEventListener("pointercancel",function(){dragging=false;});
+
+// 自动来回：没人拖的时候自己走，让缩略图与截图也能看出这是个对比控件
+var auto=true,dir=1;
+setInterval(function(){
+  if(!auto||dragging)return;
+  var p=state.pos+dir*2.4;
+  if(p>=82){p=82;dir=-1;}
+  if(p<=18){p=18;dir=1;}
+  setPos(p);
+},60);
+
+apply();
+window.addEventListener("message",function(e){
+  var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

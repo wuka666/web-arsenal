@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文档式产品页</title>
+<style>
+:root{
+  --bg:#0d1117;--side:#0b0e13;--panel:#11161d;--ink:#e6edf3;--dim:#8b98a5;
+  --line:#1e2630;--accent:#3b82f6;--codebg:#0a0d12;--radius:10;--gap:16;--fs:15;--maxw:1180;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.6;
+}
+.shell{display:flex;min-height:100vh;max-width:calc(var(--maxw) * 1px);margin:0 auto}
+/* 左：固定目录树，多级可展开 */
+.side{
+  width:240px;flex:0 0 auto;background:var(--side);border-right:1px solid var(--line);
+  padding:calc(var(--gap) * 1px);position:sticky;top:0;align-self:flex-start;height:100vh;overflow:auto;
+}
+.brand{display:flex;align-items:center;gap:8px;font-weight:680;margin-bottom:18px}
+.brand .dot{width:18px;height:18px;border-radius:5px;background:var(--accent)}
+.tree{list-style:none;margin:0;padding:0;font-size:calc(var(--fs) * .9 * 1px)}
+.tree li{min-height:34px;display:flex;align-items:center;padding:0 8px;border-radius:7px;color:var(--dim);cursor:pointer}
+.tree li.on{background:var(--panel);color:var(--ink)}
+.tree li .ar{width:14px;display:inline-block;color:var(--dim)}
+.sub{list-style:none;margin:2px 0 6px;padding-left:18px}
+.sub li{font-size:calc(var(--fs) * .84 * 1px);color:var(--dim);min-height:30px;display:flex;align-items:center}
+.sub li.on{color:var(--accent)}
+/* 右：内容 + 暗色代码块 */
+.main{flex:1;min-width:0;padding:calc(var(--gap) * 1.4 * 1px) calc(var(--gap) * 2 * 1px)}
+.crumb{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px);margin-bottom:10px}
+h1{margin:0 0 12px;font-size:calc(var(--fs) * 2 * 1px);font-weight:680;letter-spacing:-.01em}
+.lead{color:var(--dim);max-width:64ch;margin:0 0 24px}
+h2{font-size:calc(var(--fs) * 1.25 * 1px);margin:28px 0 10px;font-weight:640}
+p{margin:0 0 14px;max-width:68ch}
+.code{
+  background:var(--codebg);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:16px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:calc(var(--fs) * .84 * 1px);line-height:1.7;color:var(--ink);
+}
+.code .k{color:#ff7b72}.code .s{color:#a5d6ff}.code .c{color:#8b98a5}.code .f{color:#d2a8ff}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;color:var(--dim);font-size:calc(var(--fs) * .9 * 1px);max-width:68ch}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="side">
+    <div class="brand"><span class="dot"></span><span>Quill API</span></div>
+    <ul class="tree">
+      <li class="on"><span class="ar">▾</span> 快速开始</li>
+      <ul class="sub">
+        <li>安装</li><li class="on">初始化</li><li>鉴权</li>
+      </ul>
+      <li><span class="ar">▸</span> 核心概念</li>
+      <li><span class="ar">▸</span> SDK 参考</li>
+      <li><span class="ar">▸</span> 部署</li>
+      <li><span class="ar">▸</span> 更新日志</li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <div class="crumb">快速开始 / 初始化</div>
+    <h1 id="title">初始化客户端</h1>
+    <p class="lead" id="sub">用一行配置把 SDK 接入你的项目。文档即产品首页——开发者读到这里就已经在用起来了。</p>
+
+    <h2>安装</h2>
+    <div class="code" id="code1"><span class="c"># 使用你习惯的包管理器</span>
+<span class="f">npm</span> install @quill/sdk</div>
+
+    <h2>初始化</h2>
+    <p>引入客户端并传入项目令牌，SDK 会自动拉取默认配置。</p>
+    <div class="code" id="code2"><span class="k">import</span> { Quill } <span class="k">from</span> <span class="s">'@quill/sdk'</span>;
+
+<span class="k">const</span> client = <span class="k">new</span> <span class="f">Quill</span>({
+  token: process.env.<span class="s">QUILL_TOKEN</span>,
+  region: <span class="s">'ap-chongqing'</span>
+});</div>
+
+    <div class="note"><span>◆</span><span>令牌只应在服务端读取，切勿写入前端打包产物——此处仅为文档示意。</span></div>
+
+    <h2>下一步</h2>
+    <p>完成初始化后，继续阅读「鉴权」了解如何为用户签发短期凭证，或直接进入「SDK 参考」查看全部方法。</p>
+  </main>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0d1117',side:'#0b0e13',panel:'#11161d',ink:'#e6edf3',accent:'#3b82f6',radius:10,gap:16,fs:15,maxw:1180};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+apply();
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

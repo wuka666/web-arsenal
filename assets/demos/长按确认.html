@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长按确认</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--bg);padding:24px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);
+  }
+  .card{width:100%;max-width:320px;text-align:center}
+  .card p{font-size:12px;font-weight:400;color:var(--dim);margin-bottom:22px}
+  /* 触摸目标 56px：拇指区够大，按久了也不容易滑出去 */
+  .hold{
+    position:relative;width:var(--size);height:var(--size);margin:0 auto;border-radius:50%;
+    background:var(--face);border:1px solid var(--ring);
+    /* 单格栅格：进度环与两个图标是叠在同一处，不是并排三栏（窄屏不该被读成横排） */
+    display:grid;place-items:center;
+    cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;
+    transition:background .22s ease,border-color .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .hold:active{transform:scale(.96)}
+  .hold svg{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);transform:rotate(-90deg)}
+  .track{fill:none;stroke:var(--ring);stroke-width:3;opacity:.55}
+  .prog{
+    fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;
+    stroke-dasharray:var(--circ);stroke-dashoffset:var(--circ);
+  }
+  .hold .ico{position:relative;width:26px;height:26px;color:var(--accent);transition:color .22s ease,opacity .18s ease}
+  .hold .ico svg{position:static;width:26px;height:26px;transform:none;inset:auto}
+  .ico.check{position:absolute;opacity:0;transform:scale(.6)}
+  .hold.done{background:var(--ok);border-color:var(--ok)}
+  .hold.done .ico.lock{opacity:0;transform:scale(.7)}
+  .hold.done .ico.check{opacity:1;transform:scale(1);color:#fff;transition:opacity .2s ease .05s,transform .28s cubic-bezier(.34,1.56,.64,1) .05s}
+  .hold.done .prog{stroke:#fff}
+  .lbl{margin-top:16px;font-size:12px;font-weight:500;color:var(--dim);letter-spacing:.02em;min-height:18px}
+  .lbl.ok{color:var(--ok)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p>按住圆钮确认 · 松手即取消</p>
+    <div class="hold" id="hold" role="button" tabindex="0" aria-label="按住 0.6 秒确认执行">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="track" cx="50" cy="50" r="46"/>
+        <circle class="prog" id="prog" cx="50" cy="50" r="46"/>
+      </svg>
+      <span class="ico lock" id="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.6a4 4 0 0 1 8 0v2.9"/>
+        </svg>
+      </span>
+      <span class="ico check" id="chk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.5l4.6 4.6L19 7.4"/>
+        </svg>
+      </span>
+    </div>
+    <div class="lbl" id="lbl">按住不放</div>
+  </div>
+</div>
+<script>
+// 参数：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {bg:"#f2f2f7",face:"#ffffff",ring:"#d8d8de",accent:"#0a84ff",ok:"#34c759",
+             text:"#1c1c1e",dim:"#8e8e93",size:72,press:600};
+var UNIT = {size:"px",press:""};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+var hold = document.getElementById("hold"), prog = document.getElementById("prog");
+var lbl = document.getElementById("lbl");
+var CIRC = 2 * Math.PI * 46;
+prog.style.setProperty("--circ", CIRC);
+prog.style.strokeDasharray = CIRC;
+prog.style.strokeDashoffset = CIRC;
+
+var raf = 0, startAt = 0, done = false, pressed = false;
+
+function paint(p){
+  // p ∈ [0,1]：环按进度收回 dashoffset，视觉上顺时针长满
+  prog.style.strokeDashoffset = CIRC * (1 - p);
+}
+
+function tick(now){
+  if(!pressed){ raf = 0; return; }
+  if(!startAt) startAt = now;
+  var p = Math.min(1, (now - startAt) / state.press);
+  paint(p);
+  if(p >= 1){ finish(); return; }
+  raf = requestAnimationFrame(tick);
+}
+
+function finish(){
+  done = true; pressed = false;
+  if(raf){ cancelAnimationFrame(raf); raf = 0; }
+  paint(1);
+  hold.classList.add("done");
+  lbl.textContent = "已确认";
+  lbl.classList.add("ok");
+  scheduleReset();
+}
+
+// 松手 / 指针离开 / 被系统打断 → 立即回弹复位（不是等它自己涨完）
+function reset(){
+  if(done) return;
+  pressed = false;
+  if(raf){ cancelAnimationFrame(raf); raf = 0; }
+  startAt = 0;
+  paint(0);
+  lbl.textContent = "按住不放";
+  lbl.classList.remove("ok");
+}
+
+function press(){
+  if(done) return;
+  pressed = true; startAt = 0;
+  hold.classList.remove("done");
+  lbl.textContent = "继续按住…";
+  if(!raf) raf = requestAnimationFrame(tick);
+}
+
+// 用 pointer 事件：手机触摸 / 鼠标 / 触控笔同一套通道，不写死 mousedown
+hold.addEventListener("pointerdown", function(e){
+  if(hold.setPointerCapture){ try{ hold.setPointerCapture(e.pointerId); }catch(err){} }
+  press();
+  e.preventDefault();
+});
+hold.addEventListener("pointerup", reset);
+hold.addEventListener("pointercancel", reset);
+hold.addEventListener("pointerleave", reset);
+// 键盘可达：空格 / 回车同样走「按住才涨」，keyup 复位
+hold.addEventListener("keydown", function(e){
+  if(e.key === " " || e.key === "Enter"){ if(!e.repeat) press(); e.preventDefault(); }
+});
+hold.addEventListener("keyup", function(e){
+  if(e.key === " " || e.key === "Enter") reset();
+});
+hold.addEventListener("blur", reset);
+
+// 完成态停 1.2s 后复原，方便循环演示（定时器统一登记，卸载即清）
+var backId = 0;
+function scheduleReset(){
+  if(backId) clearTimeout(backId);
+  backId = setTimeout(function(){
+    backId = 0;
+    done = false;
+    hold.classList.remove("done");
+    paint(0);
+    lbl.textContent = "按住不放";
+    lbl.classList.remove("ok");
+    demoId = setTimeout(demoPress, 800);
+  }, 1200);
+}
+
+// 演示循环：按住 → 环涨满 → 对勾完成态停 1.2s → 复原 → 再来一次
+var demoId = 0;
+function demoPress(){
+  demoId = 0;
+  if(pressed || done) return;
+  press();
+}
+
+function clearAll(){
+  if(raf){ cancelAnimationFrame(raf); raf = 0; }
+  if(backId){ clearTimeout(backId); backId = 0; }
+  if(demoId){ cancelAnimationFrame(demoId); clearTimeout(demoId); demoId = 0; }
+}
+
+addEventListener("pagehide", clearAll);
+addEventListener("beforeunload", clearAll);
+
+apply();
+paint(0);
+demoId = setTimeout(demoPress, 900);
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

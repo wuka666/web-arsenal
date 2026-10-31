@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命令面板优先</title>
+<style>
+:root{
+  --bg:#fafafa;--panel:#ffffff;--ink:#1c1c1e;--dim:#8a8a8e;--line:#e6e6e8;
+  --accent:#2563eb;--soft:#eef2ff;--radius:12;--gap:14;--fs:15;--maxw:760;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  display:flex;flex-direction:column;align-items:center;
+}
+.wrap{width:100%;max-width:calc(var(--maxw) * 1px);padding:calc(var(--gap) * 1px);flex:1;display:flex;flex-direction:column}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px}
+.hero h1{margin:0;font-size:calc(var(--fs) * 2.4 * 1px);font-weight:680;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--dim);max-width:42ch}
+/* 触发条：模拟「按 ⌘K 唤起」的入口，整页只有它一个主操作 */
+.trigger{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;
+  background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  color:var(--dim);font:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.trigger .kbd{
+  font-size:calc(var(--fs) * .82 * 1px);padding:2px 7px;border:1px solid var(--line);
+  border-radius:6px;background:var(--soft);color:var(--ink);font-weight:600;
+}
+/* 命令面板：居中模态，键盘驱动 */
+.scrim{position:fixed;inset:0;background:rgba(20,22,28,.32);display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
+.scrim.on{display:flex}
+.palette{
+  width:min(560px,92vw);background:var(--panel);border:1px solid var(--line);
+  border-radius:calc(var(--radius) * 1px);box-shadow:0 24px 60px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+.palette .search{display:flex;align-items:center;gap:8px;padding:4px 16px;border-bottom:1px solid var(--line)}
+.palette .search input{
+  flex:1;min-height:44px;border:0;outline:0;background:transparent;font:inherit;color:var(--ink);font-size:calc(var(--fs) * 1px);
+}
+.palette .search .mag{color:var(--dim)}
+.list{max-height:300px;overflow:auto;padding:6px}
+.item{
+  display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;cursor:pointer;
+}
+.item .ic{width:26px;height:26px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:7px;background:var(--soft);color:var(--accent);font-size:14px}
+.item .tx{flex:1;min-width:0}
+.item .tx b{font-weight:600;display:block}
+.item .tx span{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px)}
+.item .key{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.item.cur{background:var(--soft)}
+.item.cur .ic{background:var(--accent);color:#fff}
+.foot{display:flex;gap:14px;padding:10px 16px;border-top:1px solid var(--line);color:var(--dim);font-size:calc(var(--fs) * .76 * 1px)}
+.foot .kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.toast{
+  position:fixed;left:50%;bottom:8vh;transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:calc(var(--fs) * .9 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1 id="title">Flowdeck</h1>
+    <p id="sub">把产品装进一个命令面板。任何操作，一次按键抵达。</p>
+    <button class="trigger" id="trigger"><span>快速命令</span><span class="kbd" id="kbd">⌘ K</span></button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="palette" role="dialog" aria-label="命令面板">
+    <div class="search"><span class="mag">⌕</span><input id="q" placeholder="输入命令或搜索…" autocomplete="off"></div>
+    <div class="list" id="list"></div>
+    <div class="foot"><span><span class="kbd">↑↓</span> 选择</span><span><span class="kbd">↵</span> 执行</span><span><span class="kbd">esc</span> 关闭</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1c1c1e',accent:'#2563eb',radius:12,gap:14,fs:15,maxw:760};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const CMDS=[
+  {ic:'＋',t:'新建文档',d:'在当前空间创建空白文档',k:'N'},
+  {ic:'⌕',t:'全局搜索',d:'跨项目检索文件与消息',k:'P'},
+  {ic:'↻',t:'同步数据',d:'拉取最新远端变更',k:'S'},
+  {ic:'⚙',t:'打开设置',d:'偏好、成员与集成',k:','},
+  {ic:'◑',t:'切换主题',d:'在亮色与暗色之间切换',k:'T'},
+  {ic:'⎋',t:'邀请协作',d:'生成团队邀请链接',k:'I'},
+  {ic:'⤓',t:'导出',d:'导出当前视图为 PDF',k:'E'}
+];
+
+const scrim=document.getElementById('scrim');
+const listEl=document.getElementById('list');
+const qEl=document.getElementById('q');
+const toastEl=document.getElementById('toast');
+let cur=0, open=false, filt=CMDS;
+
+function render(){
+  listEl.innerHTML=filt.map((c,i)=>
+    '<div class="item'+(i===cur?' cur':'')+'" data-i="'+i+'">'
+    +'<span class="ic">'+c.ic+'</span>'
+    +'<span class="tx"><b>'+c.t+'</b><span>'+c.d+'</span></span>'
+    +'<span class="key">'+c.k+'</span></div>'
+  ).join('');
+  listEl.querySelectorAll('.item').forEach(el=>{
+    el.addEventListener('mousemove',()=>{cur=+el.dataset.i;render();});
+    el.addEventListener('click',()=>run(+el.dataset.i));
+  });
+}
+function openP(){ open=true; scrim.classList.add('on'); cur=0; filt=CMDS; qEl.value=''; render(); setTimeout(()=>qEl.focus(),30); }
+function closeP(){ open=false; scrim.classList.remove('on'); }
+function run(i){
+  const c=filt[i]; if(!c) return;
+  closeP();
+  toastEl.textContent='已执行：'+c.t;
+  toastEl.classList.add('on');
+  clearTimeout(run._t); run._t=setTimeout(()=>toastEl.classList.remove('on'),1400);
+}
+function move(d){ cur=(cur+d+filt.length)%filt.length; render(); }
+
+document.getElementById('trigger').addEventListener('click',openP);
+scrim.addEventListener('click',e=>{ if(e.target===scrim) closeP(); });
+qEl.addEventListener('input',()=>{
+  const v=qEl.value.trim().toLowerCase();
+  filt=v?CMDS.filter(c=>c.t.toLowerCase().includes(v)||c.d.toLowerCase().includes(v)):CMDS;
+  cur=0; render();
+});
+
+addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); open?closeP():openP(); return; }
+  if(!open) return;
+  if(e.key==='Escape'){ closeP(); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); move(1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); move(-1); }
+  else if(e.key==='Enter'){ e.preventDefault(); run(cur); }
+});
+
+apply();render();
+// 预览/挂机：默认就展开命令面板（缩略图第一眼看到的就是面板本身）；一旦有人操作立即停掉自动演示
+let auto=true;
+addEventListener('pointerdown',()=>{ auto=false; },{once:true});
+addEventListener('keydown',()=>{ auto=false; },{once:true});
+openP();
+setInterval(()=>{
+  if(!auto) return;
+  closeP();
+  setTimeout(()=>{ if(auto) openP(); },900);
+},4200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

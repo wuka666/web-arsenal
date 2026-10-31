@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>习惯打卡盘</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--di);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--wenzi);
+  }
+  .card{width:100%;max-width:340px;text-align:center}
+  .hd{margin-bottom:16px}
+  .hd b{display:block;font-size:14px;font-weight:600}
+  .hd span{display:block;margin-top:3px;font-size:11px;font-weight:400;opacity:.55}
+  /* 表盘尺寸跟半径参数联动：半径变了盘子跟着变，不用手改宽高 */
+  .dial{
+    position:relative;margin:0 auto;
+    width:calc(var(--banjing) * 2 + 52px);height:calc(var(--banjing) * 2 + 52px);
+  }
+  .dial svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform:rotate(-90deg)}
+  .track{fill:none;stroke:var(--dian);stroke-width:3;opacity:.32}
+  /* 进度环：dasharray = 全周长，dashoffset 由 0 收到 满长 —— 沿圆周连续画出去 */
+  .prog{
+    fill:none;stroke:var(--da);stroke-width:4;stroke-linecap:round;
+    transition:stroke-dashoffset calc(var(--shichang) / 1000 * 1s) cubic-bezier(.3,.8,.3,1),
+               stroke .3s ease;
+  }
+  .dial.full .prog{stroke:var(--wan)}
+  /* 七天节点：rotate(θ) translate(R) rotate(-θ) —— 先把坐标系转到角度上，
+     再沿半径推出去，最后转回来，图标和文字才不会跟着歪 */
+  /* 用 margin 把 44px 的方块摆到圆心，transform 才能整块留给「转到角度再推出去」；
+     若靠 translate(-50%,-50%) 居中，:active 的缩放会把定位那段一起覆盖掉 */
+  .node{
+    position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;
+    border:0;border-radius:50%;
+    background:var(--ka);color:var(--wenzi);cursor:pointer;touch-action:manipulation;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font:600 10px/1.1 inherit;letter-spacing:.02em;
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+    transition:background .26s ease,color .26s ease,box-shadow .26s ease;
+  }
+  .node em{font-style:normal;font-size:9px;font-weight:400;opacity:.5;margin-top:1px}
+  .node:focus-visible{outline:2px solid var(--da);outline-offset:2px}
+  .node.done{background:var(--da);color:#fff;box-shadow:0 6px 16px rgba(10,132,255,.28)}
+  .node.done em{opacity:.78}
+  /* 打卡光圈：从节点边缘荡开一圈，用 keyframes 起来一次；重播靠移除再强制重排加回 */
+  .node .ring{
+    position:absolute;inset:0;border-radius:50%;border:2px solid var(--da);
+    opacity:0;pointer-events:none;
+  }
+  .node.done .ring{animation:ping calc(var(--shichang) / 1000 * 1s) ease-out}
+  @keyframes ping{
+    0%{opacity:.65;transform:scale(1)}
+    100%{opacity:0;transform:scale(2.1)}
+  }
+  /* 盘心：数字滚动 + 单位 */
+  .mid{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .mid b{font-size:32px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .mid span{margin-top:5px;font-size:10px;opacity:.5;letter-spacing:.04em}
+  .tip{margin-top:18px;font-size:11px;min-height:17px;color:var(--wenzi);opacity:.6}
+  .tip.ok{color:var(--wan);opacity:1;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hd"><b>早起打卡</b><span>本周 7 天 · 点节点可手动打卡</span></div>
+    <div class="dial" id="dial">
+      <svg id="svg" aria-hidden="true">
+        <circle id="track" class="track"/>
+        <circle id="prog" class="prog"/>
+      </svg>
+      <div class="mid"><b id="num">0</b><span>/ 7 天</span></div>
+    </div>
+    <div class="tip" id="tip">还差 7 天完成本周目标</div>
+  </div>
+</div>
+<script>
+// 参数：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {di:"#f2f2f7",ka:"#ffffff",dian:"#c7c7cc",da:"#0a84ff",wan:"#34c759",
+             wenzi:"#1c1c1e",banjing:96,shichang:520};
+var UNIT = {banjing:"px",shichang:""};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+var dial = document.getElementById("dial");
+var svgEl = document.getElementById("svg");
+var track = document.getElementById("track");
+var prog = document.getElementById("prog");
+var numEl = document.getElementById("num");
+var tip = document.getElementById("tip");
+
+var N = 7, SW = 4;
+var nodes = [], done = [], timers = [], rafs = [];
+var shown = 0, autoOn = true, holdId = 0;
+
+var DAYS = ["一","二","三","四","五","六","日"];
+
+function later(fn, ms){
+  var id = setTimeout(function(){
+    timers = timers.filter(function(t){ return t !== id; });
+    fn();
+  }, ms);
+  timers.push(id);
+  return id;
+}
+
+// 画表盘：SVG 的半径、节点位置都按 --banjing 现算，半径一改整盘跟着走
+function layout(){
+  var R = Math.max(40, Number(state.banjing) || 96);
+  var size = R * 2 + 52;
+  svgEl.setAttribute("viewBox", "0 0 " + size + " " + size);
+  var c = size / 2;
+  [track, prog].forEach(function(el){
+    el.setAttribute("cx", c);
+    el.setAttribute("cy", c);
+    el.setAttribute("r", Math.max(10, R - SW / 2));
+  });
+  var CIRC = 2 * Math.PI * Math.max(10, R - SW / 2);
+  prog.style.strokeDasharray = CIRC;
+  paint();
+
+  // 圆周定位：先把坐标系转到该天所在角度 → 沿半径推出去 → 再转回来，
+  // 最后那步「转回来」是关键，否则数字和光圈的朝向会跟着角度一起歪。
+  nodes.forEach(function(el, i){
+    var deg = -90 + i * (360 / N);
+    el.style.transform = "rotate(" + deg + "deg) translate(" + R + "px) rotate(" + (-deg) + "deg)";
+  });
+}
+
+// 进度环：dashoffset 从全周长收到 0，视觉上沿圆周顺时针长满
+function paint(){
+  var R = Math.max(40, Number(state.banjing) || 96);
+  var CIRC = 2 * Math.PI * Math.max(10, R - SW / 2);
+  var p = done.filter(Boolean).length / N;
+  prog.style.strokeDashoffset = (CIRC * (1 - p)).toFixed(2);
+  dial.classList.toggle("full", p >= 1);
+}
+
+// 建 7 个节点
+for(var i = 0; i < N; i++){
+  var b = document.createElement("button");
+  b.className = "node";
+  b.type = "button";
+  b.innerHTML = "<span>" + DAYS[i] + "</span><em>" + (i + 1) + "</em><span class=\"ring\"></span>";
+  b.setAttribute("aria-label", "周" + DAYS[i] + "，未打卡");
+  (function(idx, node){
+    node.addEventListener("click", function(){ userToggle(idx); });
+  })(i, b);
+  dial.appendChild(b);
+  nodes.push(b);
+  done.push(false);
+}
+
+// 打卡 / 取消：节点变色 + 光圈荡开 + 中圈数字滚动 + 进度环推进，四件事一起发生
+function setDay(i, v){
+  if(done[i] === v) return;
+  done[i] = v;
+  var node = nodes[i];
+  node.classList.toggle("done", v);
+  node.setAttribute("aria-label", "周" + DAYS[i] + (v ? "，已打卡" : "，未打卡"));
+  if(v){
+    // 重播 keyframes：先摘掉类并强制重排，再加回去
+    var ring = node.querySelector(".ring");
+    ring.style.animation = "none";
+    void ring.offsetWidth;
+    ring.style.animation = "";
+  }
+  paint();
+  var n = done.filter(Boolean).length;
+  rollTo(n);
+  tip.textContent = n >= N ? "本周七天全勤，继续保持" : ("还差 " + (N - n) + " 天完成本周目标");
+  tip.classList.toggle("ok", n >= N);
+}
+
+// 数字滚动：从当前显示值补到目标值，不做「啪一下换字」
+function rollTo(target){
+  var from = shown;
+  if(from === target) return;
+  shown = target;
+  var t0 = 0, span = Math.max(180, Math.min(620, Number(state.shichang) || 520));
+  function step(now){
+    if(!t0) t0 = now;
+    var p = Math.min(1, (now - t0) / span);
+    var e = 1 - Math.pow(1 - p, 3);
+    numEl.textContent = Math.round(from + (target - from) * e);
+    if(p < 1) rafs.push(requestAnimationFrame(step));
+  }
+  rafs.push(requestAnimationFrame(step));
+}
+
+// 用户手动点：停掉自动演示，只认手动操作
+function userToggle(i){
+  autoOn = false;
+  timers.forEach(clearTimeout);
+  timers = [];
+  setDay(i, !done[i]);
+}
+
+// 演示循环：每 700ms 打一格，打满 7 格停 1.6s 再清空重来
+function tickDemo(){
+  if(!autoOn) return;
+  var next = done.indexOf(false);
+  if(next < 0){
+    holdId = later(function(){
+      for(var i = 0; i < N; i++) setDay(i, false);
+      shown = 0; numEl.textContent = "0";
+      tip.textContent = "还差 7 天完成本周目标";
+      tip.classList.remove("ok");
+      autoOn = true;
+      holdId = later(tickDemo, 700);
+    }, 1600);
+    return;
+  }
+  setDay(next, true);
+  holdId = later(tickDemo, 700);
+}
+
+function clearAll(){
+  timers.forEach(clearTimeout);
+  timers = [];
+  rafs.forEach(cancelAnimationFrame);
+  rafs = [];
+}
+
+addEventListener("pagehide", clearAll);
+addEventListener("beforeunload", clearAll);
+
+apply();
+layout();
+numEl.textContent = "0";
+holdId = later(tickDemo, 900);
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+  // 半径 / 时长改了要重排：半径影响 SVG 与节点坐标，时长影响过渡
+  layout();
+});
+</script>
+</body>
+</html>

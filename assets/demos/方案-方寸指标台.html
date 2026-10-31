@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方寸指标台</title>
+<style>
+:root{
+  --bg:#f2f4f7;--card:#ffffff;--ink:#14181f;--dim:#8b95a5;--accent:#2f6df0;
+  --up:#e5484d;--down:#18a058;--radius:14;--gap:12;--fs:15;--safePad:22;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#0d1016;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;overflow:hidden;
+  background:var(--bg);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.45;
+  border-radius:26px;box-shadow:0 28px 70px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;position:relative;
+}
+/* 系统控件占位：右上角胶囊区由宿主环境绘制，自绘导航必须给它让位 */
+.capsule{
+  position:absolute;right:10px;top:8px;height:30px;width:88px;z-index:5;
+  border:1px solid rgba(0,0,0,.12);border-radius:999px;background:rgba(255,255,255,.7);
+}
+.nav{
+  flex:0 0 auto;padding:14px calc(var(--gap) * 1px) 0;
+  display:flex;align-items:baseline;gap:8px;
+}
+.nav h1{margin:0;font-size:calc(var(--fs) * 1.35 * 1px);font-weight:650;letter-spacing:.01em}
+.nav .sub{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px)}
+.seg{
+  flex:0 0 auto;display:flex;gap:6px;margin:10px calc(var(--gap) * 1px) 0;
+}
+.seg button{
+  flex:1;min-height:44px;padding:0 6px;border:0;border-radius:8px;
+  background:transparent;color:var(--dim);font:inherit;font-size:calc(var(--fs) * .85 * 1px);cursor:pointer;
+}
+.seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(20,24,31,.06)}
+.body{
+  flex:1;min-height:0;overflow:auto;
+  padding:calc(var(--gap) * 1px);
+  display:flex;flex-direction:column;gap:calc(var(--gap) * 1px);
+}
+.grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:calc(var(--gap) * 1px);
+}
+.kpi{
+  background:var(--card);border-radius:calc(var(--radius) * 1px);
+  padding:12px;display:flex;flex-direction:column;gap:6px;
+}
+.kpi .lab{color:var(--dim);font-size:calc(var(--fs) * .8 * 1px)}
+.kpi .num{
+  font-size:calc(var(--fs) * 1.6 * 1px);font-weight:680;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.kpi .chg{font-size:calc(var(--fs) * .78 * 1px);display:flex;align-items:center;gap:3px}
+.kpi .chg.up{color:var(--up)}
+.kpi .chg.down{color:var(--down)}
+.spark{height:22px;display:block;width:100%}
+.panel{
+  background:var(--card);border-radius:calc(var(--radius) * 1px);padding:12px;
+}
+.panel .ph{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.panel .ph b{font-weight:640;font-size:calc(var(--fs) * .95 * 1px)}
+.panel .ph span{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:110px}
+.bars i{
+  flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:3px;
+  transition:height .5s cubic-bezier(.22,.9,.24,1);
+}
+.bars i.hi{opacity:1}
+.bars i.lo{opacity:.38}
+.xlab{display:flex;gap:6px;margin-top:6px}
+.xlab span{flex:1;text-align:center;color:var(--dim);font-size:calc(var(--fs) * .72 * 1px)}
+.list{display:flex;flex-direction:column}
+.row{
+  display:flex;align-items:center;gap:10px;min-height:44px;
+  padding:0 2px;border-top:1px solid rgba(20,24,31,.07);
+}
+.row:first-child{border-top:0}
+.row .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .v{font-variant-numeric:tabular-nums;font-weight:600}
+.tabbar{
+  flex:0 0 auto;display:flex;background:var(--card);
+  padding:6px 0 calc(var(--safePad) * 1px);
+  border-top:1px solid rgba(20,24,31,.07);
+}
+.tabbar button{
+  flex:1;border:0;background:transparent;color:var(--dim);
+  font:inherit;font-size:calc(var(--fs) * .72 * 1px);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding-top:4px;
+}
+.tabbar button .ic{font-size:17px;line-height:1}
+.tabbar button.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="capsule"></div>
+
+  <div class="nav"><h1>方寸指标台</h1><span class="sub">本周 · 全渠道</span></div>
+  <div class="seg">
+    <button class="on">今日</button><button>7 天</button><button>30 天</button>
+  </div>
+
+  <div class="body">
+    <div class="grid" id="kpis"></div>
+
+    <div class="panel">
+      <div class="ph"><b>访客趋势</b><span id="trendSum">—</span></div>
+      <div class="bars" id="bars"></div>
+      <div class="xlab" id="xlab"></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><b>渠道明细</b><span>按转化排序</span></div>
+      <div class="list" id="rows"></div>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabbar"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={bg:'#f2f4f7',card:'#ffffff',ink:'#14181f',dim:'#8b95a5',accent:'#2f6df0',
+             up:'#e5484d',down:'#18a058',radius:14,gap:12,fs:15,safePad:22};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const KPIS=[
+  {lab:'访问量',  base:12840, unit:''},
+  {lab:'成交单',  base:326,   unit:''},
+  {lab:'转化率',  base:2.54,  unit:'%', dec:2},
+  {lab:'客单价',  base:186.4, unit:'元', dec:1}
+];
+const DAYS=['一','二','三','四','五','六','日'];
+const SRC=[{t:'自然搜索',v:0},{t:'短视频',v:0},{t:'社群',v:0},{t:'直接访问',v:0}];
+const TABS=[['▤','概览'],['≡','明细'],['△','预警'],['◍','我的']];
+
+const kpisEl=document.getElementById('kpis');
+const barsEl=document.getElementById('bars');
+const xlabEl=document.getElementById('xlab');
+const rowsEl=document.getElementById('rows');
+const tabEl=document.getElementById('tabbar');
+const trendSum=document.getElementById('trendSum');
+
+kpisEl.innerHTML=KPIS.map((k,i)=>
+  '<div class="kpi"><span class="lab">'+k.lab+'</span>'
+  +'<span class="num" data-k="'+i+'">0</span>'
+  +'<span class="chg" data-c="'+i+'">—</span>'
+  +'<svg class="spark" data-s="'+i+'" viewBox="0 0 100 22" preserveAspectRatio="none"></svg></div>'
+).join('');
+barsEl.innerHTML=DAYS.map((d,i)=>'<i data-b="'+i+'"></i>').join('');
+xlabEl.innerHTML=DAYS.map(d=>'<span>'+d+'</span>').join('');
+tabEl.innerHTML=TABS.map((t,i)=>'<button data-t="'+i+'"'+(i===0?' class="on"':'')+'><span class="ic">'+t[0]+'</span>'+t[1]+'</button>').join('');
+
+function fmt(v,k){
+  const n=k.dec? v.toFixed(k.dec) : Math.round(v).toLocaleString('zh-CN');
+  return n + (k.unit||'');
+}
+function series(seed){
+  // 固定形状的伪随机序列：同一指标每轮走向相近但不同，视觉上像真的在刷新
+  const out=[];let s=seed%97;
+  for(let i=0;i<7;i++){ s=(s*31+i*17+7)%89; out.push(28+s); }
+  return out;
+}
+function paintSpark(el,data,color){
+  const max=Math.max(...data), min=Math.min(...data), span=(max-min)||1;
+  const pts=data.map((v,i)=>(i/(data.length-1)*100).toFixed(1)+','+(20-((v-min)/span)*18).toFixed(1)).join(' ');
+  el.innerHTML='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+}
+
+let round=0;
+function tick(){
+  round++;
+  KPIS.forEach((k,i)=>{
+    const drift=1+(((round*13+i*29)%17)-8)/220;
+    const cur=k.base*drift;
+    const prev=k.base*(1+((((round-1)*13+i*29)%17)-8)/220);
+    const pct=((cur-prev)/prev)*100;
+    const up=pct>=0;
+    const numEl=kpisEl.querySelector('[data-k="'+i+'"]');
+    const chgEl=kpisEl.querySelector('[data-c="'+i+'"]');
+    numEl.textContent=fmt(cur,k);
+    chgEl.textContent=(up?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'%';
+    chgEl.className='chg '+(up?'up':'down');
+    paintSpark(kpisEl.querySelector('[data-s="'+i+'"]'), series(round*7+i), up?state.up:state.down);
+  });
+
+  const bars=series(round*3+5);
+  const hi=bars.indexOf(Math.max(...bars));
+  bars.forEach((v,i)=>{
+    const el=barsEl.querySelector('[data-b="'+i+'"]');
+    el.style.height=v+'%';
+    el.className=i===hi?'hi':'lo';
+  });
+  trendSum.textContent='峰值 '+Math.max(...bars)+' · 均值 '+Math.round(bars.reduce((a,b)=>a+b,0)/bars.length);
+
+  SRC.forEach(s=>{s.v=Math.round(120+((round*23+s.t.length*37)%260));});
+  SRC.sort((a,b)=>b.v-a.v);
+  rowsEl.innerHTML=SRC.map(s=>
+    '<div class="row"><span class="t">'+s.t+'</span><span class="v">'+s.v+'</span></div>'
+  ).join('');
+
+  tabEl.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===(round%TABS.length)));
+}
+
+tabEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  tabEl.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+}));
+
+apply();
+tick();
+// 缩略图与挂机预览无人操作，靠自动刷新保证画面一直是"活的"而不是静止图
+setInterval(tick,2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();tick();
+});
+</script>
+</body>
+</html>

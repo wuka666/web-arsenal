@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>目标导向看板</title>
+<style>
+/* 数值型参数一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)，两边都带单位会算成非法值而静默失效 */
+:root{
+  --di:#0f1419;--ka:#171d25;--zi:#e6edf3;--ci:#8b98a5;--zhu:#3ddc97;--fu:#5b8cff;
+  --yuanjiao:12;--jianju:14;--zihao:14;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--di);color:var(--zi);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--zihao) * 1px);line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 段① 顶部栏：56px 定高，Logo / 页面标题 / 日周切换 / 头像 ── */
+.topbar{
+  height:56px;display:flex;align-items:center;gap:calc(var(--jianju) * 1px);
+  padding:0 calc(var(--jianju) * 1.4px);
+  border-bottom:1px solid rgba(255,255,255,.07);background:var(--ka);
+  position:sticky;top:0;z-index:9;
+}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.01em}
+.brand .mark{
+  width:20px;height:20px;border-radius:6px;
+  background:linear-gradient(135deg,var(--zhu),var(--fu));
+  box-shadow:0 0 0 3px rgba(61,220,151,.12);
+}
+.brand .name{font-size:calc(var(--zihao) * .96px)}
+.ptitle{color:var(--ci);font-size:calc(var(--zihao) * .82px);padding-left:calc(var(--jianju) * 1px);border-left:1px solid rgba(255,255,255,.1)}
+.seg{margin-left:auto;display:flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.05)}
+.segbtn{
+  min-width:56px;height:30px;border-radius:999px;font-size:calc(var(--zihao) * .8px);
+  color:var(--ci);transition:color .2s,background .2s;
+}
+.segbtn.on{background:var(--zhu);color:#08211a;font-weight:700}
+.avatar{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(91,140,255,.18);color:var(--fu);font-size:calc(var(--zihao) * .78px);font-weight:700;
+}
+
+/* ── 三栏骨架：左 280 定宽 / 中弹性 / 右 320 定宽 ── */
+.grid{
+  display:grid;grid-template-columns:280px minmax(0,1fr) 320px;
+  gap:calc(var(--jianju) * 1px);
+  padding:calc(var(--jianju) * 1.2px) calc(var(--jianju) * 1.4px) 0;
+  align-items:start;
+}
+.col{display:grid;gap:calc(var(--jianju) * 1px);min-width:0}
+.card{
+  background:var(--ka);border:1px solid rgba(255,255,255,.07);
+  border-radius:calc(var(--yuanjiao) * 1px);padding:calc(var(--jianju) * 1.1px);
+  min-width:0;
+}
+.cardhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(var(--jianju) * .8px)}
+.ct{font-size:calc(var(--zihao) * .86px);font-weight:650;letter-spacing:.02em}
+.pill{
+  font-size:calc(var(--zihao) * .68px);padding:3px 9px;border-radius:999px;
+  background:rgba(61,220,151,.14);color:var(--zhu);
+}
+
+/* ── 段② 今日目标区：大数字 + 环形进度 + 还差多少 ── */
+.goalcard{display:flex;flex-direction:column;align-items:center}
+.ringwrap{position:relative;width:150px;height:150px;margin:calc(var(--jianju) * .3px) 0 calc(var(--jianju) * .7px)}
+.ring{width:150px;height:150px;transform:rotate(-90deg)}
+.ring .track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:12}
+.ring .prog{
+  fill:none;stroke:var(--zhu);stroke-width:12;stroke-linecap:round;
+  stroke-dasharray:351.86;stroke-dashoffset:351.86;
+  transition:stroke-dashoffset .62s cubic-bezier(.3,.8,.3,1),stroke .3s;
+}
+.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringtxt .porc{font-size:calc(var(--zihao) * 1.62px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.ringtxt .cap{font-size:calc(var(--zihao) * .68px);color:var(--ci);margin-top:2px}
+.remain{font-size:calc(var(--zihao) * .84px);color:var(--ci)}
+.remain b{color:var(--zhu);font-size:calc(var(--zihao) * .96px)}
+.sub{
+  margin-top:calc(var(--jianju) * .5px);padding-top:calc(var(--jianju) * .6px);
+  border-top:1px dashed rgba(255,255,255,.1);width:100%;text-align:center;
+  font-size:calc(var(--zihao) * .72px);color:var(--ci);
+}
+
+/* ── 段③ 快捷操作区：4 个图标按钮横排 ── */
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--jianju) * .5px)}
+.act{
+  min-height:56px;border-radius:calc(var(--yuanjiao) * .76px);
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:background .18s,border-color .18s,transform .12s;
+}
+.act:hover{background:rgba(61,220,151,.1);border-color:rgba(61,220,151,.36)}
+.act:active{transform:scale(.96)}
+.act .ico{font-size:calc(var(--zihao) * 1.05px);line-height:1}
+.act .lb{font-size:calc(var(--zihao) * .66px);color:var(--ci)}
+.hint{margin-top:calc(var(--jianju) * .6px);font-size:calc(var(--zihao) * .68px);color:var(--ci);text-align:center}
+
+/* ── 段⑥ 关键指标条：3 个数字卡，压在图表卡上沿（叠层） ── */
+.strip{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:calc(var(--jianju) * .8px);position:relative;z-index:2;
+  margin-bottom:-18px;
+}
+.metric{
+  background:var(--ka);border:1px solid rgba(255,255,255,.09);
+  border-radius:calc(var(--yuanjiao) * 1px);
+  padding:calc(var(--jianju) * .72px) calc(var(--jianju) * .9px);
+  box-shadow:0 10px 24px rgba(0,0,0,.34);
+}
+.metric .mk{font-size:calc(var(--zihao) * .7px);color:var(--ci)}
+.metric .mv{font-size:calc(var(--zihao) * 1.34px);font-weight:800;letter-spacing:-.01em;margin-top:2px}
+.metric .md{font-size:calc(var(--zihao) * .66px);color:var(--zhu);margin-top:1px}
+.metric .md.dn{color:#f27d7d}
+
+/* ── 段⑤ 主图表区：柱状趋势，日/周切换换数据 ── */
+.chartcard{padding-top:calc(var(--jianju) * 1.9px)}
+.legend{display:flex;gap:12px;font-size:calc(var(--zihao) * .68px);color:var(--ci)}
+.legend .lg{display:flex;align-items:center;gap:5px}
+.legend .dot{width:8px;height:8px;border-radius:3px;background:var(--zhu)}
+.legend .dot.alt{background:rgba(255,255,255,.16)}
+.plot{position:relative;height:230px;margin-top:calc(var(--jianju) * .9px)}
+.glines{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.gl{height:1px;background:rgba(255,255,255,.055)}
+.bars{position:absolute;inset:0 0 24px 0;display:flex;align-items:flex-end;gap:calc(var(--jianju) * .42px)}
+.barslot{position:relative;flex:1;height:100%}
+.bar{
+  position:absolute;left:0;right:0;bottom:0;border-radius:7px 7px 3px 3px;
+  background:linear-gradient(180deg,var(--zhu),color-mix(in srgb,var(--zhu) 22%,transparent));
+  transition:height .55s cubic-bezier(.4,0,.2,1),opacity .3s;
+}
+.bar .bv{position:absolute;left:0;right:0;top:-17px;text-align:center;font-size:calc(var(--zihao) * .64px);color:var(--ci);font-weight:600}
+.bar.peak{background:linear-gradient(180deg,var(--fu),color-mix(in srgb,var(--fu) 22%,transparent))}
+.bar.peak .bv{color:var(--fu)}
+.xaxis{position:absolute;left:0;right:0;bottom:0;height:24px;display:flex;gap:calc(var(--jianju) * .42px)}
+.xlab{flex:1;text-align:center;font-size:calc(var(--zihao) * .64px);color:var(--ci);line-height:24px}
+
+/* ── 段④ 助手模块 + 段⑦ 次级图表（右栏） ── */
+.aicard{border-color:rgba(91,140,255,.26)}
+.aitip{font-size:calc(var(--zihao) * .76px);color:var(--zi);line-height:1.62}
+.aitip em{color:var(--zhu);font-style:normal;font-weight:650}
+.aibtn{
+  margin-top:calc(var(--jianju) * .7px);min-height:36px;min-width:88px;
+  padding:0 14px;border-radius:calc(var(--yuanjiao) * .7px);
+  background:rgba(91,140,255,.16);color:var(--fu);font-size:calc(var(--zihao) * .74px);font-weight:600;
+  transition:background .18s;
+}
+.aibtn:hover{background:rgba(91,140,255,.26)}
+.rlist{margin-top:calc(var(--jianju) * .5px);display:flex;flex-direction:column}
+.ritem{display:flex;align-items:center;gap:8px;padding:calc(var(--jianju) * .46px) 0;border-top:1px solid rgba(255,255,255,.055)}
+.ritem:first-child{border-top:0}
+.rdot{width:6px;height:6px;border-radius:50%;background:var(--ci);flex:0 0 auto}
+.rdot.warn{background:#f0b429}
+.rdot.hold{background:var(--zhu)}
+.rtxt{font-size:calc(var(--zihao) * .72px);flex:1;min-width:0}
+.rtime{font-size:calc(var(--zihao) * .64px);color:var(--ci);flex:0 0 auto}
+
+.donutwrap{display:flex;align-items:center;gap:calc(var(--jianju) * .9px)}
+.donut{
+  width:104px;height:104px;border-radius:50%;flex:0 0 auto;position:relative;
+  transition:background .45s ease;
+}
+.donut .hole{
+  position:absolute;inset:15px;border-radius:50%;background:var(--ka);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.donut .hole b{font-size:calc(var(--zihao) * .92px);font-weight:800}
+.donut .hole span{font-size:calc(var(--zihao) * .58px);color:var(--ci)}
+.dlegend{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ditem{display:flex;align-items:center;gap:7px;font-size:calc(var(--zihao) * .7px)}
+.dswatch{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+.dname{flex:1;min-width:0;color:var(--ci);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dval{font-weight:700}
+
+/* ── 段⑧ 底部统计：横排 4 项 ── */
+.stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:calc(var(--jianju) * 1px);
+  margin:calc(var(--jianju) * 1.2px) calc(var(--jianju) * 1.4px) 0;
+  padding:calc(var(--jianju) * .9px) 0;
+  border-top:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.stat{min-width:0}
+.stat .sk{font-size:calc(var(--zihao) * .68px);color:var(--ci)}
+.stat .sv{font-size:calc(var(--zihao) * .96px);font-weight:700;margin-top:3px}
+
+/* ── 段⑨ 页尾 ── */
+.pagefoot{
+  padding:calc(var(--jianju) * .9px) calc(var(--jianju) * 1.4px) calc(var(--jianju) * 1.4px);
+  font-size:calc(var(--zihao) * .64px);color:var(--ci);
+  display:flex;justify-content:space-between;gap:10px;
+}
+
+/* 数字换数时的轻过渡（日/周切换、打卡后都能看到） */
+@keyframes popIn{from{opacity:.12;transform:translateY(6px)}to{opacity:1;transform:none}}
+.swapin{animation:popIn .4s cubic-bezier(.3,.8,.3,1)}
+
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);
+  background:#0b1015;border:1px solid rgba(61,220,151,.4);color:var(--zi);
+  padding:10px 18px;border-radius:999px;font-size:calc(var(--zihao) * .76px);
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:99;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* 窄屏：三栏塌成单栏，叠层指标条退回常规流，所有横排容器允许换行（不换行横排会撑破 375） */
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:8px;gap:8px}
+  .seg{margin-left:0}
+  .strip{grid-template-columns:1fr;margin-bottom:0}
+  .chartcard{padding-top:calc(var(--jianju) * 1.1px)}
+  .stats{grid-template-columns:1fr 1fr}
+  .acts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .brand,.ptitle,.seg,.cardhd,.legend,.donutwrap,.aibtn,.ritem,.ditem,.pagefoot{flex-wrap:wrap}
+  /* 窄屏命中区补到 44（附录B B1 移动端底线），这里只放大不改视觉比例 */
+  .segbtn{min-height:44px}
+  .aibtn{min-height:44px}
+  .act{min-height:64px}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:1fr}
+  .acts{grid-template-columns:1fr}
+  .bars,.xaxis{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- 段① 顶部栏 -->
+<header class="topbar">
+  <div class="brand"><span class="mark"></span><span class="name">目标台</span></div>
+  <div class="ptitle">学习目标看板</div>
+  <div class="seg">
+    <button class="segbtn on" id="btnDay" data-mode="day">日</button>
+    <button class="segbtn" id="btnWeek" data-mode="week">周</button>
+  </div>
+  <div class="avatar">W</div>
+</header>
+
+<main class="grid">
+  <!-- 左栏：段② 今日目标 + 段③ 快捷操作 -->
+  <section class="col">
+    <div class="card goalcard">
+      <div class="cardhd"><span class="ct" id="goalTitle">今日目标</span><span class="pill" id="goalPill">进行中</span></div>
+      <div class="ringwrap">
+        <svg class="ring" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+          <circle class="track" cx="75" cy="75" r="56"></circle>
+          <circle class="prog" id="ringProg" cx="75" cy="75" r="56"></circle>
+        </svg>
+        <div class="ringtxt">
+          <span class="porc" id="ringPct">0%</span>
+          <span class="cap" id="ringCap">完成度</span>
+        </div>
+      </div>
+      <div class="remain">还差 <b id="remainTxt">0</b> 小时达成</div>
+      <div class="sub" id="goalSub">目标 0h · 已完成 0h</div>
+    </div>
+
+    <div class="card">
+      <div class="cardhd"><span class="ct">快捷操作</span></div>
+      <div class="acts">
+        <button class="act" id="actDo"><span class="ico">＋</span><span class="lb">记半小时</span></button>
+        <button class="act" id="actAdd"><span class="ico">↑</span><span class="lb">加量</span></button>
+        <button class="act" id="actSkip"><span class="ico">→</span><span class="lb">跳过</span></button>
+        <button class="act" id="actReset"><span class="ico">↺</span><span class="lb">还原</span></button>
+      </div>
+      <div class="hint" id="actHint">点一下就能记一笔</div>
+    </div>
+  </section>
+
+  <!-- 中栏：段⑥ 关键指标条 + 段⑤ 主图表 -->
+  <section class="col">
+    <div class="strip" id="strip">
+      <div class="metric"><div class="mk" id="mk0">完成率</div><div class="mv" id="mv0">0%</div><div class="md" id="md0">+0%</div></div>
+      <div class="metric"><div class="mk" id="mk1">连续打卡</div><div class="mv" id="mv1">0 天</div><div class="md" id="md1">+0</div></div>
+      <div class="metric"><div class="mk" id="mk2">平均专注</div><div class="mv" id="mv2">0 分</div><div class="md" id="md2">+0</div></div>
+    </div>
+
+    <div class="card chartcard">
+      <div class="cardhd">
+        <span class="ct" id="chartTitle">今日专注分布</span>
+        <span class="legend"><span class="lg"><i class="dot"></i>专注时长</span><span class="lg"><i class="dot alt"></i>目标线</span></span>
+      </div>
+      <div class="plot">
+        <div class="glines"><i class="gl"></i><i class="gl"></i><i class="gl"></i><i class="gl"></i></div>
+        <div class="bars" id="bars"></div>
+        <div class="xaxis" id="xaxis"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右栏：段④ 助手模块 + 段⑦ 次级图表 -->
+  <section class="col">
+    <div class="card aicard">
+      <div class="cardhd"><span class="ct">AI 助手建议</span><span class="pill">实时</span></div>
+      <div class="aitip" id="aiTip">今天的专注曲线还行，继续按节奏走。</div>
+      <button class="aibtn" id="aiBtn">按建议调整目标</button>
+      <div class="rlist" id="rlist"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhd"><span class="ct" id="donutTitle">今日时间去向</span></div>
+      <div class="donutwrap">
+        <div class="donut" id="donut"><div class="hole"><b id="donutBig">0%</b><span id="donutCap">刷题占比</span></div></div>
+        <div class="dlegend" id="dlegend"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 段⑧ 底部统计 -->
+<footer class="stats" id="stats">
+  <div class="stat"><div class="sk" id="sk0">统计</div><div class="sv" id="sv0">--</div></div>
+  <div class="stat"><div class="sk" id="sk1">统计</div><div class="sv" id="sv1">--</div></div>
+  <div class="stat"><div class="sk" id="sk2">统计</div><div class="sv" id="sv2">--</div></div>
+  <div class="stat"><div class="sk" id="sk3">统计</div><div class="sv" id="sv3">--</div></div>
+</footer>
+
+<!-- 段⑨ 页尾 -->
+<div class="pagefoot"><span>© 2026 目标台 · 方案演示</span><span>数据为示例，走 file:// 也能跑</span></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 参数：数值型不拼单位，CSS 侧统一 calc(var(--x) * 1px)
+var state = {di:"#0f1419",ka:"#171d25",zi:"#e6edf3",ci:"#8b98a5",zhu:"#3ddc97",fu:"#5b8cff",
+             yuanjiao:12,jianju:14,zihao:14};
+var UNIT = {};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k] || "")); } }
+
+// 两套数据：日视图 / 周视图。切换时指标条、趋势柱、环形占比、底部统计一起换。
+var DATA = {
+  day: {
+    modeName: "今日",
+    goal: 6.0, done: 4.2, unit: "小时",
+    chartTitle: "今日专注分布 · 每 2 小时一格",
+    chatLabels: ["08","10","12","14","16","18","20"],
+    chatVals: [18, 42, 26, 64, 50, 88, 56],
+    strip: [
+      {k:"完成率", v:"70%", d:"+6%",  dn:false},
+      {k:"连续打卡", v:"12 天", d:"+1", dn:false},
+      {k:"平均专注", v:"42 分", d:"+3", dn:false}
+    ],
+    donutTitle: "今日时间去向",
+    donut: [{n:"刷题",v:38},{n:"阅读",v:26},{n:"复盘",v:21},{n:"视频",v:15}],
+    donutCap: "刷题占比",
+    stats: [{k:"今日番茄",v:"6 个"},{k:"最长连段",v:"52 分"},{k:"中断次数",v:"2 次"},{k:"完成事项",v:"9 / 12"}],
+    remind: [
+      {t:"18:30 前把 14349 真题做完", r:"18:30", s:"warn"},
+      {t:"英语 10 分钟技术文档阅读", r:"20:00", s:"hold"},
+      {t:"写今天的 Obsidian 日报", r:"22:00", s:""}
+    ],
+    ai: "今日进度 <em>70%</em>，18 点后效率最高。建议把剩下的 1.8h 拆成两个 50 分钟，中间 10 分钟离开屏幕。"
+  },
+  week: {
+    modeName: "本周",
+    goal: 42.0, done: 26.5, unit: "小时",
+    chartTitle: "本周每日专注时长 · 周一至周日",
+    chatLabels: ["周一","周二","周三","周四","周五","周六","周日"],
+    chatVals: [72, 61, 84, 38, 66, 92, 44],
+    strip: [
+      {k:"完成率", v:"63%", d:"-4%", dn:true},
+      {k:"连续打卡", v:"5 天", d:"+2", dn:false},
+      {k:"平均专注", v:"48 分", d:"+5", dn:false}
+    ],
+    donutTitle: "本周时间去向",
+    donut: [{n:"刷题",v:44},{n:"阅读",v:22},{n:"复盘",v:18},{n:"视频",v:16}],
+    donutCap: "刷题占比",
+    stats: [{k:"本周番茄",v:"31 个"},{k:"最长连段",v:"73 分"},{k:"中断次数",v:"9 次"},{k:"完成事项",v:"46 / 60"}],
+    remind: [
+      {t:"周三那天下滑到 38%，回看是哪门课卡的", r:"周三", s:"warn"},
+      {t:"周六补了 92%，周末节奏可以固定下来", r:"周六", s:"hold"},
+      {t:"本周收尾：周复盘写进 Obsidian", r:"周日", s:""}
+    ],
+    ai: "本周 <em>63%</em>，比上周低 4 个点。缺口全在周三与周日，建议把这两天的目标从 6h 下调到 4.5h，先守住连续性。"
+  }
+};
+
+var ORIG = {
+  day:  {goal: 6.0, done: 4.2},
+  week: {goal: 42.0, done: 26.5}
+};
+
+var mode = "day";
+var CIRC = 2 * Math.PI * 56;   // 环形周长，r=56
+var DONUT_COLORS = ["var(--zhu)", "var(--fu)", "#4fc3c0", "#9a86ff"];
+
+var $ = function(id){ return document.getElementById(id); };
+var barsEl = $("bars"), xaxisEl = $("xaxis");
+var barSlots = [];
+
+// 柱状图骨架先建一次，之后只改高度 → 高度变化带 transition，切换看得出来在动
+function buildBars(n){
+  barsEl.innerHTML = "";
+  barSlots = [];
+  for (var i = 0; i < n; i++){
+    var slot = document.createElement("div");
+    slot.className = "barslot";
+    var bar = document.createElement("div");
+    bar.className = "bar";
+    bar.style.height = "0%";
+    var bv = document.createElement("b");
+    bv.className = "bv";
+    bar.appendChild(bv);
+    slot.appendChild(bar);
+    barsEl.appendChild(slot);
+    barSlots.push({ bar: bar, bv: bv });
+  }
+}
+
+function swapIn(el){
+  el.classList.remove("swapin");
+  void el.offsetWidth;
+  el.classList.add("swapin");
+}
+
+function drawChart(d){
+  var vals = d.chatVals;
+  if (barSlots.length !== vals.length) buildBars(vals.length);
+  var max = Math.max.apply(null, vals) || 1;
+  var peak = vals.indexOf(Math.max.apply(null, vals));
+  vals.forEach(function(v, i){
+    var s = barSlots[i];
+    s.bar.style.height = Math.round(v / max * 92) + "%";
+    s.bar.classList.toggle("peak", i === peak);
+    s.bv.textContent = v;
+    swapIn(s.bv);
+  });
+  xaxisEl.innerHTML = "";
+  d.chatLabels.forEach(function(t){
+    var x = document.createElement("div");
+    x.className = "xlab";
+    x.textContent = t;
+    xaxisEl.appendChild(x);
+  });
+}
+
+function drawRing(d){
+  var pct = d.goal <= 0 ? 0 : Math.min(d.done / d.goal, 1);
+  var prog = $("ringProg");
+  prog.style.strokeDasharray = CIRC;
+  prog.style.strokeDashoffset = CIRC * (1 - pct);
+  prog.style.stroke = pct >= 1 ? "var(--fu)" : "var(--zhu)";
+  $("ringPct").textContent = Math.round(pct * 100) + "%";
+  $("ringPct").style.color = pct >= 1 ? "var(--fu)" : "var(--zhu)";
+  $("goalPill").textContent = pct >= 1 ? "已达成" : "进行中";
+  $("remainTxt").textContent = Math.max(d.goal - d.done, 0).toFixed(1);
+  $("goalSub").textContent = "目标 " + d.goal.toFixed(1) + "h · 已完成 " + d.done.toFixed(1) + "h";
+  swapIn($("ringPct"));
+}
+
+function drawStrip(d){
+  d.strip.forEach(function(m, i){
+    $("mk" + i).textContent = m.k;
+    $("mv" + i).textContent = m.v;
+    var md = $("md" + i);
+    md.textContent = m.d;
+    md.classList.toggle("dn", !!m.dn);
+    swapIn($("mv" + i));
+  });
+}
+
+function drawDonut(d){
+  $("donutTitle").textContent = d.donutTitle;
+  var acc = 0, stops = [];
+  d.donut.forEach(function(it, i){
+    var from = acc; acc += it.v;
+    stops.push(DONUT_COLORS[i % DONUT_COLORS.length] + " " + from + "% " + acc + "%");
+  });
+  $("donut").style.background = "conic-gradient(" + stops.join(",") + ")";
+  var top = d.donut[0];
+  $("donutBig").textContent = top.v + "%";
+  $("donutCap").textContent = d.donutCap;
+  var lg = $("dlegend");
+  lg.innerHTML = "";
+  d.donut.forEach(function(it, i){
+    var row = document.createElement("div");
+    row.className = "ditem";
+    var sw = document.createElement("i");
+    sw.className = "dswatch";
+    sw.style.background = DONUT_COLORS[i % DONUT_COLORS.length];
+    var nm = document.createElement("span");
+    nm.className = "dname";
+    nm.textContent = it.n;
+    var vl = document.createElement("span");
+    vl.className = "dval";
+    vl.textContent = it.v + "%";
+    row.appendChild(sw); row.appendChild(nm); row.appendChild(vl);
+    lg.appendChild(row);
+  });
+}
+
+function drawStats(d){
+  d.stats.forEach(function(s, i){
+    $("sk" + i).textContent = s.k;
+    $("sv" + i).textContent = s.v;
+    swapIn($("sv" + i));
+  });
+}
+
+function drawRemind(d){
+  var list = $("rlist");
+  list.innerHTML = "";
+  d.remind.forEach(function(r){
+    var row = document.createElement("div");
+    row.className = "ritem";
+    var dot = document.createElement("i");
+    dot.className = "rdot" + (r.s ? " " + r.s : "");
+    var txt = document.createElement("span");
+    txt.className = "rtxt";
+    txt.textContent = r.t;
+    var tm = document.createElement("span");
+    tm.className = "rtime";
+    tm.textContent = r.r;
+    row.appendChild(dot); row.appendChild(txt); row.appendChild(tm);
+    list.appendChild(row);
+  });
+}
+
+function render(){
+  var d = DATA[mode];
+  $("goalTitle").textContent = d.modeName + "目标";
+  $("chartTitle").textContent = d.chartTitle;
+  $("aiTip").innerHTML = d.ai;
+  drawRing(d);
+  drawStrip(d);
+  drawChart(d);
+  drawDonut(d);
+  drawStats(d);
+  drawRemind(d);
+}
+
+function switchMode(next){
+  if (next === mode) return;
+  mode = next;
+  $("btnDay").classList.toggle("on", mode === "day");
+  $("btnWeek").classList.toggle("on", mode === "week");
+  render();
+  toast(mode === "day" ? "已切到日视图" : "已切到周视图");
+}
+
+var toastT = 0;
+function toast(s){
+  var el = $("toast");
+  el.textContent = s;
+  el.classList.add("on");
+  clearTimeout(toastT);
+  toastT = setTimeout(function(){ el.classList.remove("on"); }, 1600);
+}
+
+$("btnDay").addEventListener("click", function(){ switchMode("day"); });
+$("btnWeek").addEventListener("click", function(){ switchMode("week"); });
+
+$("actDo").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.done = Math.min(d.done + 0.5, d.goal);
+  render();
+  toast("已记 30 分钟，还差 " + Math.max(d.goal - d.done, 0).toFixed(1) + "h");
+});
+
+$("actAdd").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.goal = d.goal + 0.5;
+  render();
+  toast("目标加 0.5h，现在 " + d.goal.toFixed(1) + "h");
+});
+
+$("actSkip").addEventListener("click", function(){
+  $("actHint").textContent = "已跳过一段，不计入统计";
+  toast("已跳过这一段");
+});
+
+$("actReset").addEventListener("click", function(){
+  var d = DATA[mode], o = ORIG[mode];
+  d.goal = o.goal;
+  d.done = o.done;
+  $("actHint").textContent = "已还原到初始数据";
+  render();
+  toast("数据已还原");
+});
+
+$("aiBtn").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.goal = Math.max(d.goal - 0.5, d.done);
+  render();
+  toast("按建议下调目标 0.5h");
+});
+
+apply();
+render();
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if (!d || d.type !== "param") return;
+  if (!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

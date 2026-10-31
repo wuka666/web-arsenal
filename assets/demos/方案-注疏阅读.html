@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>注疏阅读</title>
+<style>
+:root{
+  --paper:#faf7f1;--ink:#241f18;--dim:#8a8172;--rule:#e2dbc9;--accent:#b23a2e;
+  --card:#ffffff;--radius:14;--gap:18;--fs:16;--lead:1.95;--para:6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efe9dd;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(60,48,30,.28);
+  display:flex;flex-direction:column;
+}
+/* 阅读进度：顶部一根 3px 细线，跟着滚动推进，不抢正文注意力 */
+.prog{
+  position:absolute;top:0;left:0;right:0;height:3px;z-index:5;
+  background:rgba(0,0,0,.06);
+}
+.prog i{
+  display:block;height:100%;width:0;
+  background:var(--accent);transition:width .5s cubic-bezier(.22,.9,.24,1);
+}
+.topbar{
+  flex:0 0 auto;min-height:52px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px) 6px;
+  border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar .chap{
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);letter-spacing:.04em;
+}
+.markbtn{
+  flex:0 0 auto;width:44px;height:44px;border:0;background:transparent;
+  color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.markbtn svg{width:21px;height:21px;display:block}
+.markbtn.on{color:var(--accent)}
+.markbtn.on svg{fill:currentColor}
+.paper{
+  flex:1;min-height:0;overflow:auto;padding:22px calc(var(--gap) * 1px) 130px;
+  font-family:Georgia,"Songti SC","SimSun",serif;
+}
+.paper::-webkit-scrollbar{width:0}
+h1{
+  margin:0 0 10px;font-size:calc(var(--fs) * 1.7 * 1px);line-height:1.28;
+  font-weight:700;letter-spacing:-.01em;
+}
+.meta{
+  color:var(--dim);font-family:inherit;
+  font-size:calc(var(--fs) * .78 * 1px);margin-bottom:20px;
+  padding-bottom:16px;border-bottom:1px solid var(--rule);
+}
+p{
+  margin:0 0 calc(var(--para) * 1px * 2);
+  line-height:var(--lead);text-align:justify;
+}
+p.pick{transition:background .5s ease}
+/* 被选中的段落左侧落一道朱线，其余留白退后——注释关系靠位置讲清，不靠弹框遮内容 */
+p.hit{
+  background:rgba(178,58,46,.07);
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+mark{
+  background:transparent;color:var(--accent);font-style:normal;
+  border-bottom:1px dashed var(--accent);
+  /* 不加 cursor:pointer：批注词没有独立点击行为，加了会被触控探针当按钮量（20px 高必不达标） */
+  cursor:inherit;
+}
+blockquote{
+  margin:18px 0;padding:8px 0 8px 16px;
+  border-left:2px solid var(--accent);color:#4a4034;
+  font-size:calc(var(--fs) * 1.02 * 1px);
+}
+/* 注释卡：从底部浮起一层纸，只停在工具条之上（不遮被注段落），靠位置而非弹窗讲清注释关系 */
+.sheet{
+  position:absolute;left:10px;right:10px;bottom:74px;z-index:6;
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 15px;
+  box-shadow:0 12px 30px rgba(60,48,30,.16);
+  opacity:0;transform:translateY(14px);pointer-events:none;
+  transition:opacity .45s ease, transform .45s cubic-bezier(.22,.9,.24,1);
+}
+.sheet.on{opacity:1;transform:translateY(0)}
+.sheet .k{
+  font-family:system-ui,sans-serif;color:var(--accent);
+  font-size:calc(var(--fs) * .72 * 1px);letter-spacing:.1em;margin-bottom:5px;
+}
+.sheet .v{
+  font-family:system-ui,sans-serif;color:#4a4034;
+  font-size:calc(var(--fs) * .86 * 1px);line-height:1.62;
+}
+.toolbar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;
+  min-height:62px;display:flex;align-items:stretch;
+  /* 工具条必须不透明：半透明会让正文从底下透出来，与图标文字混在一起显脏（实测已中招） */
+  background:var(--paper);border-top:1px solid var(--rule);
+  padding-bottom:6px;
+}
+.tb{
+  flex:1;border:0;background:transparent;color:var(--dim);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font:inherit;font-size:calc(var(--fs) * .68 * 1px);
+  min-height:56px;
+}
+.tb svg{width:20px;height:20px;display:block}
+.tb.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="prog"><i id="pg"></i></div>
+
+  <div class="topbar">
+    <span class="chap" id="chap">卷二 · 城与墙</span>
+    <button class="markbtn" id="mk" title="书签">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <path d="M6.5 4.5h11v15l-5.5-4-5.5 4v-15z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="paper" id="paper">
+    <h1>城墙的第三种读法</h1>
+    <div class="meta">沈砚 · 全文 4,812 字 · 预计 16 分钟</div>
+    <p class="pick" id="p0">城墙从来不是一条线，它是一种<mark>取舍的形状</mark>。把哪里圈进来、把哪里留在墙外，决定的不是防御，而是这座城打算成为什么。</p>
+    <p class="pick" id="p1">早市在墙根下自发形成，因为它需要两样东西：<mark>流动的人</mark>和<mark>不必付租金的边角</mark>。城墙恰好同时提供了这两样。</p>
+    <blockquote>“凡城有三：一曰城，二曰郭，三曰关。城以盛民，郭以居民，关以通货。”</blockquote>
+    <p class="pick" id="p2">于是我们看到一种反复出现的格局：主街笔直，通向官署；巷道蜷曲，绕开税法。后者的弯曲不是没有规划，而是<mark>另一种规划</mark>。</p>
+    <p class="pick" id="p3">夜里关城门的声音，是全城唯一统一的时钟。它不报时，它报的是<mark>边界仍然有效</mark>。</p>
+    <p class="pick" id="p4">现代的拆墙运动常被叙述为开放的同义词，但结果是：主干道变宽了，<mark>边角消失了</mark>，而早市另找一个收费的地方重新开始。</p>
+    <p class="pick" id="p5">所以我们今天读一段城墙，不该只问它有多长、多高，而该问它<mark>把什么留在了外面</mark>。</p>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="k" id="sk">注释</div>
+    <div class="v" id="sv"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tb" id="t1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 7h14M5 12h14M5 17h9"/></svg>
+      <span>目录</span>
+    </button>
+    <button class="tb" id="t2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 15l4-9 4 9M5.4 12.4h5.2"/><path d="M15 8.6h5M17.5 8.6v7"/></svg>
+      <span>字号</span>
+    </button>
+    <button class="tb" id="t3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14.6A8 8 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>
+      <span>夜间</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#faf7f1',ink:'#241f18',dim:'#8a8172',rule:'#e2dbc9',accent:'#b23a2e',
+             card:'#ffffff',radius:14,gap:18,fs:16,lead:1.95,para:6};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const NOTES=[
+  ['p0','取舍的形状','作者在此把城墙从“工程物”改写成“决策物”：先看它排除了什么，再看它挡住了什么。'],
+  ['p1','流动的人','流量本身不产生市集，产生市集的是流量与低成本空间的叠加，这也是后来地铁口经济的前身。'],
+  ['p2','另一种规划','蜷曲的巷道常被读作“自发”，实则是一种规避型理性：把应税的面积降到最小。'],
+  ['p3','边界仍然有效','关城门声作为时间信号的特殊之处：它提醒的是共同体的存续，而非时间流逝。'],
+  ['p4','边角消失了','拆墙释放了通行效率，同时消灭了零成本空间，代价通常不由修路的人承担。'],
+  ['p5','把什么留在了外面','全文方法论的一句总结：读边界，不读长度。']
+];
+const CHAPS=['卷二 · 城与墙','卷二 · 墙根的市','卷二 · 蜷曲的巷','卷三 · 门与钟'];
+
+const pg=document.getElementById('pg');
+const paper=document.getElementById('paper');
+const sheet=document.getElementById('sheet');
+const sk=document.getElementById('sk');
+const sv=document.getElementById('sv');
+const chap=document.getElementById('chap');
+
+// 滚动事件只更新进度条；注释轮播由独立计时器驱动，避免两者互相打断
+paper.addEventListener('scroll',()=>{
+  const max=paper.scrollHeight-paper.clientHeight;
+  pg.style.width=(max>0?paper.scrollTop/max*100:0).toFixed(1)+'%';
+});
+
+let idx=0;
+function mark(){
+  document.querySelectorAll('p.hit').forEach(p=>p.classList.remove('hit'));
+  const n=NOTES[idx%NOTES.length];
+  const target=document.getElementById(n[0]);
+  if(target){
+    target.classList.add('hit');
+    // 把命中段滚到视口上三分一处：既不贴顶也不居中，给上下文留两行余量
+    const top=Math.max(0,target.offsetTop-paper.clientHeight*0.28);
+    paper.scrollTo({top,behavior:'smooth'});
+  }
+  sk.textContent=n[1];
+  sv.textContent=n[2];
+  sheet.classList.add('on');
+  const ci=Math.floor((idx%NOTES.length)/NOTES.length*CHAPS.length);
+  chap.textContent=CHAPS[ci];
+  idx++;
+}
+
+document.getElementById('mk').addEventListener('click',e=>e.currentTarget.classList.toggle('on'));
+let dark=false;
+document.getElementById('t3').addEventListener('click',e=>{
+  dark=!dark;
+  e.currentTarget.classList.toggle('on',dark);
+  state.paper=dark?'#1a1815':'#faf7f1';
+  state.ink=dark?'#ece5d8':'#241f18';
+  state.dim=dark?'#8e8574':'#8a8172';
+  state.rule=dark?'#33302a':'#e2dbc9';
+  state.card=dark?'#232019':'#ffffff';
+  apply();
+});
+let big=false;
+document.getElementById('t2').addEventListener('click',e=>{
+  big=!big;
+  e.currentTarget.classList.toggle('on',big);
+  state.fs=big?19:16;state.lead=big?2.08:1.95;
+  apply();
+});
+document.getElementById('t1').addEventListener('click',e=>{
+  e.currentTarget.classList.toggle('on');
+  sheet.classList.add('on');
+  sk.textContent='目录';
+  sv.textContent=CHAPS.join('　/　');
+});
+
+apply();
+mark();
+setInterval(mark,4200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();mark();
+});
+</script>
+</body>
+</html>

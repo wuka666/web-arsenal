@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>选座预订·网格</title>
+<style>
+:root{
+  --bg:#0f1115;--ink:#e8edf2;--dim:#8b95a3;--line:#222833;
+  --accent:#22d3ee;--soft:#16202b;--radius:12;--gap:14;--fs:14;--maxw:520;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px)}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.head h1{margin:0;font-size:calc(var(--fs)*1.5*1px);font-weight:700}
+.pick{color:var(--dim);font-size:calc(var(--fs)*.9*1px)}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--dim);font:inherit;cursor:pointer}
+.tab.on{background:var(--accent);color:#04222a;border-color:var(--accent);font-weight:600}
+.screen{height:6px;border-radius:999px;background:var(--accent);opacity:.5;margin-bottom:18px}
+.seats{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--gap);justify-items:center}
+.seat{width:100%;aspect-ratio:1/1;border-radius:7px;background:var(--soft);border:1px solid var(--line);cursor:pointer;min-height:32px}
+.seat.taken{background:transparent;border-style:dashed;opacity:.4;cursor:not-allowed}
+.seat.on{background:var(--accent);border-color:var(--accent)}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:12px;flex-wrap:wrap}
+.total{font-size:calc(var(--fs)*1.6*1px);font-weight:700}
+.total small{color:var(--dim);font-size:calc(var(--fs)*.8*1px);font-weight:400}
+.go{min-height:48px;padding:0 22px;border-radius:calc(var(--radius)*1px);border:0;background:var(--accent);color:#04222a;font:inherit;font-weight:700;cursor:pointer}
+@media(max-width:680px){.seats{gap:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><h1>选座预订</h1><span class="pick" id="when">周五 20:00</span></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="screen"></div>
+  <!-- 座位网格登记 WCAG 2.5.8 例外：8 列密集点选，44px×8 在 375 容器内横向溢出约 32px，本质紧凑不可行；同 M054 日历网格豁免。理由见 data-touch-exempt 属性值。 -->
+  <div class="seats" id="seats" data-touch-exempt="seat-grid：8列密集点选选择器，44px×8 在 375px 容器溢出约 32px，本质紧凑不可行；参照 M054 日历网格豁免（密集点选网格）"></div>
+  <div class="bar">
+    <span class="pick">已选 <b id="cnt">0</b> 座 · <span id="list">—</span></span>
+    <span class="total">¥<span id="sum">0</span><small> / 含服务费</small></span>
+  </div>
+  <div style="text-align:right;margin-top:12px"><button class="go" id="go">确认预订</button></div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#0f1115',ink:'#e8edf2',accent:'#22d3ee',radius:12,gap:14,fs:14,maxw:520};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const SHOWS=['周五 20:00','周六 14:30','周六 19:30','周日 15:00'];
+let si=0;
+const PRICE=120;
+let taken={}, sel=new Set();
+function rndTaken(){
+  taken={};
+  for(let i=0;i<32;i++){ if(Math.random()<0.35) taken[i]=1; }
+}
+const tabsEl=document.getElementById('tabs');
+const seatsEl=document.getElementById('seats');
+function renderTabs(){
+  tabsEl.innerHTML=SHOWS.map((s,i)=>'<button class="tab'+(i===si?' on':'')+'" data-i="'+i+'">'+s+'</button>').join('');
+  tabsEl.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>{
+    si=+el.dataset.i; document.getElementById('when').textContent=SHOWS[si]; rndTaken(); sel.clear(); renderSeats();
+  }));
+}
+function seatLabel(i){ return String.fromCharCode(65+Math.floor(i/8))+(i%8+1); }
+function renderSeats(){
+  seatsEl.innerHTML=[...Array(32)].map((_,i)=>{
+    const t=taken[i]?' taken':''; const o=sel.has(i)?' on':'';
+    return '<div class="seat'+(t+o)+'" data-i="'+i+'"></div>';
+  }).join('');
+  seatsEl.querySelectorAll('.seat').forEach(el=>el.addEventListener('click',()=>{
+    const i=+el.dataset.i; if(taken[i]) return;
+    if(sel.has(i)) sel.delete(i); else sel.add(i);
+    renderSeats();
+  }));
+  update();
+}
+function update(){
+  document.getElementById('cnt').textContent=sel.size;
+  document.getElementById('sum').textContent=sel.size*PRICE;
+  const arr=[...sel].sort((a,b)=>a-b);
+  document.getElementById('list').textContent=arr.length?arr.map(seatLabel).join('、'):'—';
+}
+document.getElementById('go').addEventListener('click',()=>{
+  document.getElementById('when').textContent = sel.size? '已锁 '+sel.size+' 座，去支付' : SHOWS[si];
+});
+rndTaken();
+apply();renderTabs();renderSeats();
+
+// 预览/挂机自动演示：换场次 + 随机选/取消座位；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%4===0){
+    si=(si+1)%SHOWS.length; document.getElementById('when').textContent=SHOWS[si]; rndTaken(); sel.clear(); renderSeats();
+  } else {
+    const avail=[]; for(let i=0;i<32;i++) if(!taken[i]) avail.push(i);
+    if(!avail.length) return;
+    const pick=avail[Math.floor(Math.random()*avail.length)];
+    if(sel.has(pick)) sel.delete(pick); else if(sel.size<4) sel.add(pick);
+    renderSeats();
+  }
+},2200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

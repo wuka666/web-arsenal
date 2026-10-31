@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品详情·转化优先</title>
+<style>
+:root{
+  --bg:#fafafa;--ink:#1a1a1a;--dim:#8a8a8e;--line:#e6e6e6;
+  --accent:#2563eb;--soft:#eef2ff;--radius:14;--gap:16;--fs:15;--maxw:960;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs)*1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px);display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+/* 左：图 */
+.media{display:flex;flex-direction:column;gap:calc(var(--gap)*1px)}
+.stage{
+  position:relative;aspect-ratio:1/1;border-radius:calc(var(--radius)*1px);overflow:hidden;
+  background:linear-gradient(135deg,var(--soft),#fff);display:flex;align-items:center;justify-content:center;
+}
+.stage .ph{font-size:calc(var(--fs)*2.4*1px);color:var(--accent);font-weight:700;letter-spacing:.04em}
+.thumbs{display:flex;gap:10px}
+.thumb{flex:1;aspect-ratio:1/1;border-radius:10px;background:var(--soft);border:2px solid transparent;cursor:pointer;min-height:44px}
+.thumb.on{border-color:var(--accent)}
+/* 右：信息 */
+.info{display:flex;flex-direction:column;gap:14px}
+.brand{color:var(--dim);font-size:calc(var(--fs)*.86*1px);letter-spacing:.08em;text-transform:uppercase}
+.title{margin:0;font-size:calc(var(--fs)*1.7*1px);font-weight:700;letter-spacing:-.01em}
+.price{font-size:calc(var(--fs)*2*1px);font-weight:700;color:var(--accent)}
+.price s{color:var(--dim);font-size:calc(var(--fs)*1px);font-weight:400;margin-left:8px}
+.row{display:flex;flex-direction:column;gap:8px}
+.row .lab{color:var(--dim);font-size:calc(var(--fs)*.86*1px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  min-height:44px;padding:0 16px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;cursor:pointer;
+}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.qty button{min-height:44px;width:44px;border:0;background:#fff;color:var(--ink);font:inherit;font-size:calc(var(--fs)*1.2*1px);cursor:pointer}
+.qty .n{min-width:44px;text-align:center;min-height:44px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+.cta{display:flex;gap:10px;margin-top:4px}
+.cta button{min-height:48px;flex:1;border-radius:calc(var(--radius)*1px);border:1px solid var(--line);font:inherit;font-weight:600;cursor:pointer}
+.cta .buy{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cta .cart{background:#fff;color:var(--ink)}
+.note{color:var(--dim);font-size:calc(var(--fs)*.82*1px);min-height:20px}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="media">
+    <div class="stage" id="stage"><span class="ph" id="ph">图 1</span></div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+  <div class="info">
+    <div class="brand">AURA STUDIO</div>
+    <h1 class="title">城市通勤双肩包</h1>
+    <div class="price">¥399 <s>¥599</s></div>
+    <div class="row">
+      <span class="lab">颜色</span>
+      <div class="chips" id="colors"></div>
+    </div>
+    <div class="row">
+      <span class="lab">数量</span>
+      <div class="qty"><button id="minus">−</button><span class="n" id="qn">1</span><button id="plus">＋</button></div>
+    </div>
+    <div class="cta">
+      <button class="cart" id="add">加入购物车</button>
+      <button class="buy" id="buy">立即购买</button>
+    </div>
+    <div class="note" id="note">现货 · 48 小时内发货 · 七天无理由</div>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1a1a1a',accent:'#2563eb',radius:14,gap:16,fs:15,maxw:960};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const COLORS=['石墨黑','雾灰','燕麦'];
+let ci=0, qi=1, ti=0;
+const thumbsEl=document.getElementById('thumbs');
+const colorsEl=document.getElementById('colors');
+const phEl=document.getElementById('ph');
+const qnEl=document.getElementById('qn');
+
+function renderThumbs(){
+  thumbsEl.innerHTML=[0,1,2,3].map(i=>'<div class="thumb'+(i===ti?' on':'')+'" data-i="'+i+'"></div>').join('');
+  thumbsEl.querySelectorAll('.thumb').forEach(el=>el.addEventListener('click',()=>{ti=+el.dataset.i;renderThumbs();}));
+  phEl.textContent='图 '+(ti+1);
+}
+function renderColors(){
+  colorsEl.innerHTML=COLORS.map((c,i)=>'<button class="chip'+(i===ci?' on':'')+'" data-i="'+i+'">'+c+'</button>').join('');
+  colorsEl.querySelectorAll('.chip').forEach(el=>el.addEventListener('click',()=>{ci=+el.dataset.i;renderColors();}));
+}
+function setQ(d){ qi=Math.max(1,Math.min(9,qi+d)); qnEl.textContent=qi; }
+document.getElementById('minus').addEventListener('click',()=>setQ(-1));
+document.getElementById('plus').addEventListener('click',()=>setQ(1));
+document.getElementById('add').addEventListener('click',()=>{ document.getElementById('note').textContent='已加入购物车 · '+COLORS[ci]+' × '+qi; });
+document.getElementById('buy').addEventListener('click',()=>{ document.getElementById('note').textContent='正在前往结算 · '+COLORS[ci]+' × '+qi; });
+
+apply();renderThumbs();renderColors();
+
+// 预览/挂机自动演示：轮播缩略图 + 偶尔切颜色/数量；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%3===0){ ti=(ti+1)%4; renderThumbs(); }
+  else if(step%3===1){ ci=(ci+1)%COLORS.length; renderColors(); }
+  else { setQ(step%2?1:-1); }
+},2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

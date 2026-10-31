@@ -1,0 +1,164 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>日程轨道</title>
+<style>
+:root{--c1:#2f6fe4;--c2:#dfe4ef;--c3:#1b1f2a;--bg:#f6f7fb;--step:15;--now:840;--h:300;}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--c3);min-height:100vh;padding:20px 16px}
+.wrap{width:100%;max-width:440px;margin:0 auto}
+h1{font-size:17px;font-weight:700;letter-spacing:.01em;margin-bottom:4px}
+.sub{font-size:14px;color:#5a6273;margin-bottom:16px}
+.track{position:relative;height:calc(var(--h)*1px);border:1px solid var(--c2);border-radius:14px;background:#fff;overflow:hidden;touch-action:none}
+.tick{position:absolute;left:0;right:0;height:1px;background:var(--c2)}
+.tick span{position:absolute;left:8px;top:-9px;font-size:11px;color:#8b93a5;background:#fff;padding:0 3px;line-height:18px}
+.ev{position:absolute;height:52px;border-radius:10px;background:var(--c1);color:#fff;padding:6px 8px;overflow:hidden;cursor:grab;transition:left .22s cubic-bezier(.2,.7,.3,1),top .22s;user-select:none;outline:none;
+  display:flex;flex-direction:column;justify-content:center}
+.ev:focus-visible{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--c1)}
+.ev.drag{cursor:grabbing;transition:none;z-index:3;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+.ev b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ev i{font-size:12px;font-style:normal;opacity:.92;white-space:nowrap}
+.now{position:absolute;top:0;bottom:0;width:2px;background:#e2544a;transition:left .3s ease;pointer-events:none}
+.now::before{content:"";position:absolute;top:-1px;left:-5px;width:12px;height:12px;border-radius:50%;background:#e2544a;box-shadow:0 0 0 4px rgba(226,84,74,.18)}
+.foot{margin-top:14px;font-size:14px;color:#5a6273}
+.foot b{color:var(--c3)}
+</style></head><body>
+<div class="wrap">
+  <h1>今日日程轨道</h1>
+  <p class="sub">按住事件块左右拖动改时间，相邻块自动让位</p>
+  <div class="track" id="track" role="listbox" aria-label="日程轨道"></div>
+  <p class="foot">当前 <b id="nowt">14:00</b> · 吸附 <b id="stept">15</b> 分钟 · 聚焦块后可用 ← → 微调</p>
+</div>
+<script>
+const L=document.getElementById('track');
+const state={c1:"#2f6fe4",c2:"#dfe4ef",c3:"#1b1f2a",bg:"#f6f7fb",step:15,now:840,h:300};
+const r=document.documentElement.style;
+// 轨道覆盖 06:00–24:00，用整数分钟当唯一数据源——
+// 拖动只做分钟加减再按 step 取整，反复拖不会积累浮点误差
+const START=360, SPAN=1080, MINW=88, GAP=6;
+
+let events=[
+  {id:1,title:"晨会",start:540,dur:60},
+  {id:2,title:"写接口",start:660,dur:120},
+  {id:3,title:"自习",start:840,dur:90},
+  {id:4,title:"复盘",start:1020,dur:60}
+];
+const fmt=m=>String(Math.floor(m/60)).padStart(2,'0')+":"+String(m%60).padStart(2,'0');
+const pctOf=m=>(m-START)/SPAN*100;
+const minOf=px=>START+px/trackW()*SPAN;
+
+function trackW(){return L?L.clientWidth:400;}
+
+function apply(){
+  r.setProperty('--c1',state.c1);r.setProperty('--c2',state.c2);r.setProperty('--c3',state.c3);
+  // --h 必须是纯数字：CSS 侧已写成 calc(var(--h)*1px)，两边都带单位会算成非法值而整块高度塌成 0
+  r.setProperty('--bg',state.bg);r.setProperty('--h',state.h);
+  const n=document.querySelector('.now');if(n)n.style.left='calc('+pctOf(state.now)+'% - 1px)';
+  const nt=document.getElementById('nowt');if(nt)nt.textContent=fmt(state.now);
+  const st=document.getElementById('stept');if(st)st.textContent=state.step;
+  layout();
+}
+
+// 让位在「像素域」里算，不是分钟域：
+// 因为块有最小可读宽度 MINW，1 小时的块实际占的像素比它的时长比例更宽，
+// 只按分钟比较会算出一堆视觉上仍然重叠的块
+function resolve(){
+  const W=trackW();
+  const items=events.slice().sort((a,b)=>a.start-b.start);
+  const pos=items.map(e=>Math.max(0,Math.min(W-minW(e,W),pctOf(e.start)/100*W)));
+  const wid=items.map(e=>minW(e,W));
+  for(let i=1;i<items.length;i++){
+    const min=pos[i-1]+wid[i-1]+GAP;
+    if(pos[i]<min)pos[i]=min;
+  }
+  if(pos[items.length-1]+wid[items.length-1]>W){
+    pos[items.length-1]=W-wid[items.length-1];
+    for(let i=items.length-2;i>=0;i--){
+      const max=pos[i+1]-wid[i]-GAP;
+      if(pos[i]>max)pos[i]=max;
+    }
+    if(pos[0]<0)pos[0]=0;
+  }
+  items.forEach((e,i)=>{
+    let m=minOf(pos[i]);
+    m=Math.round(m/state.step)*state.step;
+    e.start=Math.max(START,Math.min(START+SPAN-e.dur,m));
+  });
+}
+function minW(e,W){return Math.max(e.dur/SPAN*W,MINW);}
+
+function layout(){
+  if(!L)return;
+  const W=trackW();
+  L.querySelectorAll('.ev').forEach(el=>{
+    const e=events.find(x=>String(x.id)===el.dataset.id);if(!e)return;
+    el.style.left='calc('+pctOf(e.start)+'% + 3px)';
+    el.style.width=minW(e,W)+'px';
+    el.style.maxWidth='calc('+(e.dur/SPAN*100)+'% - 6px)';
+    // max-width 会把 minW 压回去，所以这里不用 max-width，宽度统一走 minW
+    el.style.maxWidth='none';
+    const t=el.querySelector('i');if(t)t.textContent=fmt(e.start)+"–"+fmt(e.start+e.dur);
+  });
+}
+
+function build(){
+  const tickHtml=[];
+  for(let h=6;h<=24;h+=3){
+    const m=h*60;if(m>START+SPAN)break;
+    tickHtml.push('<div class="tick" style="top:calc('+pctOf(m)+'% )"><span>'+String(h).padStart(2,'0')+':00</span></div>');
+  }
+  L.innerHTML=tickHtml.join('')+'<div class="now"></div>';
+  events.forEach((e,i)=>{
+    const el=document.createElement('div');
+    el.className='ev';el.dataset.id=e.id;el.tabIndex=0;
+    el.setAttribute('role','option');
+    el.innerHTML='<b>'+e.title+'</b><i></i>';
+    // 竖直方向按序错开，块之间不互相遮挡
+    el.style.top='calc(14px + '+(i*64)+'px)';
+    L.appendChild(el);
+    bindDrag(el);
+  });
+  layout();
+}
+
+let cur=null;
+function bindDrag(el){
+  el.addEventListener('pointerdown',ev=>{
+    ev.preventDefault();
+    if(el.setPointerCapture)el.setPointerCapture(ev.pointerId);
+    const e=events.find(x=>String(x.id)===el.dataset.id);
+    cur={el,e,x0:ev.clientX,s0:e.start,w:trackW()};
+    el.classList.add('drag');
+  });
+  el.addEventListener('pointermove',ev=>{
+    if(!cur||cur.el!==el)return;
+    const dm=Math.round((ev.clientX-cur.x0)/cur.w*SPAN);
+    let s=cur.s0+dm;
+    s=Math.round(s/state.step)*state.step;
+    cur.e.start=Math.max(START,Math.min(START+SPAN-cur.e.dur,s));
+    layout();
+  });
+  const end=()=>{
+    if(!cur||cur.el!==el)return;
+    el.classList.remove('drag');
+    resolve();layout();cur=null;
+  };
+  el.addEventListener('pointerup',end);
+  el.addEventListener('pointercancel',end);
+  el.addEventListener('keydown',ev=>{
+    const e=events.find(x=>String(x.id)===el.dataset.id);
+    if(ev.key==='ArrowLeft'||ev.key==='ArrowRight'){
+      ev.preventDefault();
+      const d=(ev.key==='ArrowRight'?1:-1)*state.step;
+      e.start=Math.max(START,Math.min(START+SPAN-e.dur,e.start+d));
+      resolve();layout();
+    }
+  });
+}
+
+build();apply();
+addEventListener('resize',()=>{resolve();layout();});
+addEventListener('message',e=>{
+  const d=e.data;if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value;
+  apply();
+});
+</script></body></html>

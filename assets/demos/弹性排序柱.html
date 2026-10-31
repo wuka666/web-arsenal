@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>弹性排序柱</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--bg);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);
+  }
+  .card{width:100%;max-width:460px;background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px}
+  .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .hd b{font-size:14px;font-weight:600;letter-spacing:.02em}
+  .hd span{display:block;margin-top:3px;font-size:11px;font-weight:400;color:var(--dim)}
+  .btn{
+    min-height:44px;padding:0 16px;border-radius:9px;border:1px solid var(--accent);
+    background:rgba(34,211,238,.08);color:var(--accent);font:500 12px/1 inherit;cursor:pointer;
+    transition:background .2s ease,transform .2s ease;
+  }
+  .btn:hover{background:rgba(34,211,238,.18)}
+  .btn:active{transform:scale(.97)}
+  /* 柱子容器：flex 一行，换位靠 order 重排 + transform 位移（不改 width） */
+  .bars{display:flex;align-items:flex-end;gap:var(--gap);height:200px;margin-top:26px}
+  .bar{
+    position:relative;flex:1;height:0;border-radius:6px 6px 2px 2px;
+    background:linear-gradient(180deg,var(--bar1),var(--bar2));
+    transition:height calc(var(--dur) * 1s) cubic-bezier(.22,.9,.24,1) calc(var(--i) * var(--step)),
+               transform calc(var(--swap) * 1s) cubic-bezier(.34,1.56,.64,1);
+    will-change:transform,height;
+  }
+  /* 数值跟着柱顶走：它是柱子的子元素，柱高变它就跟着上移 */
+  .bar b{
+    position:absolute;left:0;right:0;top:-19px;text-align:center;
+    font:600 11px/1 inherit;color:var(--text);font-variant-numeric:tabular-nums;
+  }
+  .ticks{display:flex;gap:var(--gap);margin-top:12px}
+  .ticks span{flex:1;text-align:center;font-size:11px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hd">
+      <div><b>本周访问</b><span>5 天 · 单位：百次</span></div>
+      <button class="btn" id="sort">按数值排序</button>
+    </div>
+    <div class="bars" id="bars"></div>
+    <div class="ticks">
+      <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span>
+    </div>
+  </div>
+</div>
+<script>
+// 参数：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {bg:"#0b1220",panel:"#121c2e",bar1:"#22d3ee",bar2:"#4f46e5",accent:"#22d3ee",
+             text:"#e6edf7",dim:"#7d8ca6",dur:0.75,step:80,swap:0.55,gap:14};
+var UNIT = {dur:"s",step:"ms",swap:"s",gap:"px"};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+// 5 根柱子：周一~周五，数值 = 柱高（% of 图表高）
+var DATA = [
+  {d:"周一", v:38},{d:"周二", v:64},{d:"周三", v:47},{d:"周四", v:86},{d:"周五", v:57}
+];
+var barsEl = document.getElementById("bars");
+var btn = document.getElementById("sort");
+var els = [], raf = 0, timers = [], sorted = false, counting = false;
+
+DATA.forEach(function(item, i){
+  var el = document.createElement("div");
+  el.className = "bar";
+  el.style.setProperty("--i", i);
+  el.style.order = i;
+  el.appendChild(document.createElement("b")).textContent = "0";
+  barsEl.appendChild(el);
+  els.push(el);
+});
+
+// 数值同步：不做假计数器——每帧读柱子真实高度换算，柱高与数字天然同源
+function countNumbers(){
+  if(counting) return;
+  counting = true;
+  var t0 = performance.now();
+  var span = state.dur * 1000 + 4 * state.step + 40;
+  function tick(now){
+    var box = barsEl.getBoundingClientRect().height;
+    for(var i=0;i<els.length;i++){
+      var h = els[i].getBoundingClientRect().height;
+      els[i].firstChild.textContent = box ? Math.round(h / box * 100) : 0;
+    }
+    if(now - t0 < span){ raf = requestAnimationFrame(tick); }
+    else { counting = false; raf = 0; }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+// 错峰生长：height 从 0 长到目标值，transition-delay 按 --i * --step 递增
+function grow(){
+  els.forEach(function(el){ el.style.height = "0%"; });
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      els.forEach(function(el, i){ el.style.height = DATA[i].v + "%"; });
+      countNumbers();
+    });
+  });
+}
+
+// 按数值排序：order 重排（flex 会让位），FLIP 先量后写，用 transform 把位移补回去再放掉
+function arrange(toSorted){
+  var before = els.map(function(el){ return el.getBoundingClientRect().left; });
+  var rank = {};
+  els.map(function(_, i){ return i; })
+     .sort(function(a, b){ return DATA[b].v - DATA[a].v; })
+     .forEach(function(k, pos){ rank[k] = pos; });
+  els.forEach(function(el, i){ el.style.order = toSorted ? rank[i] : i; });
+  els.forEach(function(el, i){
+    var after = el.getBoundingClientRect().left;
+    el.style.transition = "none";
+    el.style.transform = "translateX(" + (before[i] - after) + "px)";
+  });
+  void barsEl.offsetWidth;
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      els.forEach(function(el){
+        el.style.transition = "";
+        el.style.transform = "translateX(0)";
+      });
+    });
+  });
+}
+
+// 循环演示：排一次 → 复原 → 再排一次…… 定时器统一登记，卸载时全部清掉（不泄漏）
+function later(fn, ms){
+  var id = setTimeout(function(){
+    timers = timers.filter(function(t){ return t !== id; });
+    fn();
+  }, ms);
+  timers.push(id);
+  return id;
+}
+function clearTimers(){
+  timers.forEach(clearTimeout);
+  timers = [];
+  if(raf) cancelAnimationFrame(raf);
+  raf = 0;
+}
+function autoCycle(){
+  arrange(!sorted);
+  sorted = !sorted;
+  later(autoCycle, 2400);
+}
+
+btn.addEventListener("click", function(){
+  clearTimers();
+  arrange(!sorted);
+  sorted = !sorted;
+  later(autoCycle, 2600);
+});
+
+// 卸载 / 隐藏即清理：规矩 32⑤
+addEventListener("pagehide", clearTimers);
+addEventListener("beforeunload", clearTimers);
+
+apply();
+grow();
+later(autoCycle, 2600);
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>下拉刷新消息台</title>
+<style>
+:root{
+  --paper:#f7f1e8;--ink:#33291f;--dim:#94826d;--rule:#e6dccd;--accent:#c2603a;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--pull:60;--ava:44;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e9e1d4;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(70,52,32,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .cnt{
+  margin-left:auto;min-width:26px;height:26px;padding:0 8px;border-radius:13px;
+  background:var(--accent);color:#fff;font-size:calc(var(--fs) * .7 * 1px);font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+/* 筛选胶囊：移动端触控门槛 44px，宁可做大也不让探针判不达标（不做 data-touch-exempt 豁免） */
+.filters{
+  flex:0 0 auto;display:flex;gap:8px;padding:10px calc(var(--gap) * 1px);
+  overflow-x:auto;border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.filters::-webkit-scrollbar{height:0}
+.chip{
+  flex:0 0 auto;min-height:44px;padding:0 15px;border:1px solid var(--rule);
+  border-radius:22px;background:var(--card);color:var(--dim);
+  font:inherit;font-size:calc(var(--fs) * .82 * 1px);cursor:pointer;
+  display:flex;align-items:center;white-space:nowrap;
+}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.list{
+  flex:1;min-height:0;overflow:auto;padding:0 calc(var(--gap) * 1px) 96px;touch-action:pan-y;
+}
+.list::-webkit-scrollbar{width:0}
+.wrap{transform:translateY(0)}
+.wrap.anim{transition:transform .38s cubic-bezier(.22,.9,.24,1)}
+.pull{
+  height:calc(var(--pull) * 1px);margin-top:calc(var(--pull) * -1px);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  color:var(--dim);font-size:calc(var(--fs) * .76 * 1px);
+}
+.pull .ico{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  transition:transform .2s linear;
+}
+.pull .ico svg{width:19px;height:19px;display:block}
+.pull.spin .ico{animation:spin .85s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:12px 13px;margin-bottom:10px;
+  display:flex;gap:11px;align-items:flex-start;
+}
+.msg .ava{
+  flex:0 0 auto;width:calc(var(--ava) * 1px);height:calc(var(--ava) * 1px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:calc(var(--fs) * .82 * 1px);
+  letter-spacing:.02em;
+}
+.msg .bd{flex:1;min-width:0}
+.msg .tt{
+  display:flex;align-items:baseline;gap:8px;
+  font-size:calc(var(--fs) * .9 * 1px);font-weight:600;
+}
+.msg .tt .tm{
+  margin-left:auto;flex:0 0 auto;font-weight:400;
+  font-size:calc(var(--fs) * .7 * 1px);color:var(--dim);
+}
+.msg .ds{
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);line-height:1.55;margin-top:3px;
+}
+.msg .ud{
+  flex:0 0 auto;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);margin-top:6px;
+}
+.msg.read{opacity:.72}
+.msg.read .ud{background:transparent}
+.fab{
+  position:absolute;right:calc(var(--gap) * 1px);bottom:calc(var(--gap) * 1px);z-index:7;
+  width:56px;height:56px;border:0;border-radius:50%;background:var(--accent);color:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(194,96,58,.34);
+}
+.fab svg{width:24px;height:24px;display:block}
+.toast{
+  position:absolute;left:50%;bottom:88px;z-index:8;transform:translate(-50%,10px);
+  background:var(--ink);color:var(--paper);border-radius:20px;
+  padding:9px 16px;font-size:calc(var(--fs) * .78 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;
+  white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>通知中心</h1>
+    <span class="cnt" id="cnt">4</span>
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="list" id="list">
+    <div class="wrap" id="wrap">
+      <div class="pull" id="pull">
+        <span class="ico" id="ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M12 5v13M12 18l-5-5M12 18l5-5"/>
+          </svg>
+        </span>
+        <span id="tip">下拉可以刷新</span>
+      </div>
+      <div id="msgs"></div>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" title="全部标为已读">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+      <path d="M5 12.5l4.5 4.5L19 7"/>
+    </svg>
+  </button>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f7f1e8',ink:'#33291f',dim:'#94826d',rule:'#e6dccd',accent:'#c2603a',
+             card:'#ffffff',radius:14,gap:16,fs:16,pull:60,ava:44};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const FILTERS=['全部','未读','提及我','系统'];
+const MSGS=[
+  {n:'林',c:'#c2603a',t:'林澈 在《Q3 渠道复盘》中提到了你',d:'“这里的数据口径要不要统一到周？” —— 点击查看上下文',tm:'2 分钟前',u:1,k:'提及我'},
+  {n:'系',c:'#7d8b74',t:'系统维护通知',d:'本周六 02:00–04:00 将进行数据库升级，期间导出功能不可用。',tm:'28 分钟前',u:1,k:'系统'},
+  {n:'周',c:'#5b7fa6',t:'周雯 邀请你加入「客户画像」空间',d:'她给你开了编辑权限，进入后可直接改字段映射。',tm:'1 小时前',u:1,k:'全部'},
+  {n:'陈',c:'#a6854e',t:'陈舸 回复了你的评论',d:'“已按你说的把阈值调低一档，等明天数据再看。”',tm:'3 小时前',u:1,k:'提及我'},
+  {n:'系',c:'#7d8b74',t:'导出任务已完成',d:'「8 月全量订单」共 12,483 行，文件保留 7 天。',tm:'昨天',u:0,k:'系统'},
+  {n:'吴',c:'#8a6fa8',t:'吴桐 提交了审批',d:'预算调整单 #2043 等待你确认，金额 ¥18,600。',tm:'昨天',u:0,k:'全部'}
+];
+const PULL_NEW=[
+  {n:'林',c:'#c2603a',t:'林澈 更新了《Q3 渠道复盘》',d:'新增两段结论，并修正了上周的口径错误。',tm:'刚刚',u:1,k:'全部'},
+  {n:'系',c:'#7d8b74',t:'你有一个待确认的权限变更',d:'管理员把你的空间权限从「只读」升到「可编辑」。',tm:'刚刚',u:1,k:'系统'}
+];
+
+let cur='全部', fresh=0;
+const msgsEl=document.getElementById('msgs');
+const listEl=document.getElementById('list');
+const wrapEl=document.getElementById('wrap');
+const pullEl=document.getElementById('pull');
+const icoEl=document.getElementById('ico');
+const tipEl=document.getElementById('tip');
+const cntEl=document.getElementById('cnt');
+const toastEl=document.getElementById('toast');
+
+const filtersEl=document.getElementById('filters');
+FILTERS.forEach(f=>{
+  const b=document.createElement('button');
+  b.className='chip'+(f===cur?' on':'');
+  b.textContent=f;
+  b.addEventListener('click',()=>{
+    cur=f;
+    filtersEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.textContent===f));
+    render();
+  });
+  filtersEl.appendChild(b);
+});
+
+function render(){
+  const rows=MSGS.filter(m=>cur==='全部'||m.k===cur||(cur==='未读'&&m.u));
+  msgsEl.innerHTML='';
+  rows.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='msg'+(m.u?'':' read');
+    d.innerHTML='<span class="ava" style="background:'+m.c+'">'+m.n+'</span>'+
+      '<span class="bd"><span class="tt">'+m.t+'<span class="tm">'+m.tm+'</span></span>'+
+      '<span class="ds">'+m.d+'</span></span>'+
+      '<span class="ud"></span>';
+    msgsEl.appendChild(d);
+  });
+  cntEl.textContent=MSGS.filter(m=>m.u).length;
+}
+
+let toastT=0;
+function toast(s){
+  toastEl.textContent=s;toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toastEl.classList.remove('on'),1600);
+}
+
+// 下拉刷新：只有在列表已滚到顶部时才接管手势，否则交给系统滚动，避免和内容滚动打架
+let pulling=false,startY=0,dist=0,busy=false;
+function setY(y,anim){
+  wrapEl.classList.toggle('anim',!!anim);
+  wrapEl.style.transform='translateY('+y+'px)';
+}
+listEl.addEventListener('pointerdown',e=>{
+  if(busy||listEl.scrollTop>0) return;
+  pulling=true;startY=e.clientY;dist=0;
+  wrapEl.classList.remove('anim');
+  listEl.setPointerCapture(e.pointerId);
+});
+listEl.addEventListener('pointermove',e=>{
+  if(!pulling) return;
+  // 越往下阻力越大，最大只让面板露出 108px，手感上接近真实 App
+  dist=Math.min(108,Math.max(0,(e.clientY-startY)*0.55));
+  if(dist<=0){setY(0);return;}
+  setY(dist);
+  icoEl.style.transform='rotate('+(dist*4)+'deg)';
+  tipEl.textContent=dist>=state.pull?'松开立即刷新':'下拉可以刷新';
+});
+function endPull(){
+  if(!pulling) return;
+  pulling=false;
+  if(dist>=state.pull){ doRefresh(); }
+  else{ setY(0,true); dist=0; }
+}
+listEl.addEventListener('pointerup',endPull);
+listEl.addEventListener('pointercancel',endPull);
+
+function doRefresh(){
+  busy=true;
+  setY(state.pull,true);
+  pullEl.classList.add('spin');
+  tipEl.textContent='正在刷新…';
+  setTimeout(()=>{
+    // 新消息插在最前，且只插前两条，避免刷新几次后列表无限变长
+    const add=PULL_NEW[fresh%PULL_NEW.length];
+    MSGS.unshift(Object.assign({},add,{tm:'刚刚'}));
+    fresh++;
+    render();
+    pullEl.classList.remove('spin');
+    icoEl.style.transform='rotate(0deg)';
+    setY(0,true);
+    busy=false;
+    toast('已更新 1 条新消息');
+  },1200);
+}
+
+document.getElementById('fab').addEventListener('click',()=>{
+  MSGS.forEach(m=>m.u=0);
+  render();
+  toast('已全部标为已读');
+});
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>

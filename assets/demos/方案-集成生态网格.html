@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>集成生态网格</title>
+<style>
+:root{
+  --bg:#0e1116;--card:#171c24;--ink:#eef2f6;--dim:#8b97a5;--line:#222a34;
+  --accent:#7c5cff;--radius:14;--gap:16;--fs:15;--maxw:980;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1.4 * 1px) calc(var(--gap) * 1px);text-align:center}
+.head{margin-bottom:22px}
+.head h1{margin:0 0 8px;font-size:calc(var(--fs) * 2 * 1px);font-weight:680}
+.head p{margin:0;color:var(--dim);max-width:54ch;margin-inline:auto}
+/* 生态：中央节点 + 环绕集成卡网格 */
+.eco{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:calc(var(--gap) * 1px);align-items:center;padding:10px 0}
+.hub{
+  width:120px;height:120px;flex:0 0 auto;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #9d83ff, var(--accent));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 0 8px rgba(124,92,255,.12),0 18px 40px rgba(124,92,255,.3);
+  color:#fff;font-weight:700;z-index:2;
+}
+.hub small{font-weight:400;opacity:.8;font-size:calc(var(--fs) * .76 * 1px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:calc(var(--gap) * 1px);flex:1;min-width:280px;max-width:620px}
+.tile{
+  background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;
+  transition:border-color .2s,transform .2s,box-shadow .2s;min-height:56px;
+}
+.tile:hover,.tile.on{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 24px rgba(124,92,255,.18)}
+.tile .logo{width:30px;height:30px;flex:0 0 auto;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.tile .meta b{display:block;font-size:calc(var(--fs) * .92 * 1px)}
+.tile .meta span{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px)}
+.bar{margin-top:22px;color:var(--dim);font-size:calc(var(--fs) * .88 * 1px);font-family:system-ui,sans-serif}
+.bar b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">一个中枢，连接你的全部工具</h1>
+    <p>把分散在各处的系统接到一起。生态，就是产品的护城河。</p>
+  </div>
+
+  <div class="eco">
+    <div class="hub"><span id="hubName">Linkflow</span><small>中枢</small></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="bar" id="bar">已接入 <b id="cnt">8</b> 个集成 · 每周新增</div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0e1116',card:'#171c24',ink:'#eef2f6',accent:'#7c5cff',radius:14,gap:16,fs:15,maxw:980};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+const INTEG=[
+  {n:'Notion',d:'文档与知识库',c:'#111'},
+  {n:'GitHub',d:'代码与 CI',c:'#24292e'},
+  {n:'Slack',d:'团队消息',c:'#4a154b'},
+  {n:'Figma',d:'设计稿同步',c:'#a259ff'},
+  {n:'Stripe',d:'支付与账单',c:'#635bff'},
+  {n:'飞书',d:'协作与审批',c:'#3370ff'},
+  {n:'Postgres',d:'业务数据库',c:'#336791'},
+  {n:'Datadog',d:'监控告警',c:'#632ca6'}
+];
+const grid=document.getElementById('grid');
+grid.innerHTML=INTEG.map((it,i)=>
+  '<div class="tile" data-i="'+i+'">'
+  +'<span class="logo" style="background:'+it.c+'">'+it.n[0]+'</span>'
+  +'<span class="meta"><b>'+it.n+'</b><span>'+it.d+'</span></span>'
+  +'</div>'
+).join('');
+document.getElementById('cnt').textContent=INTEG.length;
+
+grid.querySelectorAll('.tile').forEach(el=>{
+  const on=()=>{ grid.querySelectorAll('.tile').forEach(x=>x.classList.remove('on')); el.classList.add('on'); };
+  el.addEventListener('mouseenter',on);
+  el.addEventListener('click',on);
+});
+
+apply();
+// 缩略图/挂机：轮询高亮，保证预览是"活的"
+let di=0;
+setInterval(()=>{
+  const tiles=grid.querySelectorAll('.tile');
+  tiles.forEach(x=>x.classList.remove('on'));
+  tiles[di%tiles.length].classList.add('on');
+  di++;
+},2200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

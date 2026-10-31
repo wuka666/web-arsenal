@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>快捷控制台</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--di);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--wenzi);
+  }
+  .card{width:100%;max-width:380px}
+  .hd{margin-bottom:14px}
+  .hd b{display:block;font-size:15px;font-weight:600;letter-spacing:.01em}
+  .hd span{display:block;margin-top:3px;font-size:11px;font-weight:400;opacity:.55}
+  /* 场景预设：两枚胶囊，按下即批量改写下面所有设备 */
+  .scenes{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .scene{
+    min-height:44px;padding:0 18px;border-radius:22px;cursor:pointer;
+    border:1px solid rgba(0,0,0,.09);background:var(--ka);color:var(--wenzi);
+    font:500 12px/1 inherit;letter-spacing:.02em;
+    transition:background .2s ease,color .2s ease,transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .scene:active{transform:scale(.96)}
+  .scene.on{background:var(--liang);border-color:var(--liang);color:#fff}
+  /* 设备卡：开关自身是按钮，48px 命中区 */
+  .dev{
+    display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:10px;
+    background:var(--ka);border-radius:var(--yuanjiao);
+    transition:background .24s ease,box-shadow .24s ease;
+  }
+  .dev .ico{
+    flex:0 0 34px;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--an);color:#fff;
+    transition:background .24s ease,transform .24s cubic-bezier(.34,1.56,.64,1);
+  }
+  .dev .txt{flex:1;min-width:0}
+  .dev .txt b{display:block;font-size:13px;font-weight:600}
+  .dev .txt span{display:block;margin-top:2px;font-size:11px;opacity:.55;font-variant-numeric:tabular-nums}
+  .sw{
+    flex:0 0 auto;position:relative;width:52px;height:44px;border:0;background:none;cursor:pointer;
+    padding:0;touch-action:manipulation;
+  }
+  .sw .track{
+    position:absolute;left:2px;top:10px;width:48px;height:26px;border-radius:13px;background:var(--an);
+    transition:background .24s ease;
+  }
+  .sw .knob{
+    position:absolute;left:5px;top:13px;width:20px;height:20px;border-radius:50%;background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.24);
+    transition:transform .26s cubic-bezier(.34,1.56,.64,1);
+  }
+  .dev.on{background:var(--ka)}
+  .dev.on .ico{background:var(--liang);transform:scale(1.04)}
+  .dev.on .sw .track{background:var(--liang)}
+  .dev.on .sw .knob{transform:translateX(22px)}
+  /* 错峰只在「批量切场景」时生效：容器加 .stagger，每张卡按 --i 依次延迟。
+     平时单设备自己点，延迟为 0 —— 手点一下要是还得等 140ms 才动，就是卡不是节奏。 */
+  .stagger .dev,
+  .stagger .dev .ico,
+  .stagger .dev .sw .track,
+  .stagger .dev .sw .knob{transition-delay:calc(var(--i) * var(--cuoluo))}
+  .foot{margin-top:14px;font-size:11px;opacity:.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hd"><b>快捷控制</b><span>场景一键切换 · 单设备可独调</span></div>
+    <div class="scenes" id="scenes"></div>
+    <div id="devs"></div>
+    <div class="foot" id="foot">全部关闭</div>
+  </div>
+</div>
+<script>
+// 参数：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {di:"#f2f2f7",ka:"#ffffff",liang:"#0a84ff",an:"#c7c7cc",wenzi:"#1c1c1e",yuanjiao:14,cuoluo:70};
+var UNIT = {yuanjiao:"px",cuoluo:"ms"};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+// 三台设备 + 两组场景。preset 里的 true/false 直接盖到设备状态上
+var DEVS = [
+  { n: "客厅灯", sub: ["已关闭", "已开启"], on: false, icon: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8V16h7.2v-2.2A6 6 0 0 0 12 3z"/>' },
+  { n: "空调", sub: ["26.0°C 待机", "22.0°C 制冷"], on: true, icon: '<rect x="3" y="5" width="18" height="9" rx="2.5"/><path d="M7 18v-1.5M12 18v-2M17 18v-1.5"/>' },
+  { n: "雨声", sub: ["静音", "音量 40%"], on: false, icon: '<path d="M7 15a4 4 0 0 1 .5-8 5.5 5.5 0 0 1 10.4 1.6A3.6 3.6 0 0 1 17.5 15"/><path d="M8 18l-1 2M12.5 18l-1 2M17 18l-1 2"/>' }
+];
+var PRESETS = [
+  { n: "回家", v: [true, true, false] },
+  { n: "睡眠", v: [false, false, true] }
+];
+
+var scenesEl = document.getElementById("scenes");
+var devsEl = document.getElementById("devs");
+var foot = document.getElementById("foot");
+var nodes = [], sceneBtns = [], timers = [], curScene = -1;
+
+function later(fn, ms){
+  var id = setTimeout(function(){
+    timers = timers.filter(function(t){ return t !== id; });
+    fn();
+  }, ms);
+  timers.push(id);
+  return id;
+}
+
+// 建场景按钮
+PRESETS.forEach(function(p, i){
+  var b = document.createElement("button");
+  b.className = "scene";
+  b.type = "button";
+  b.textContent = p.n;
+  b.addEventListener("click", function(){ playScene(i); });
+  scenesEl.appendChild(b);
+  sceneBtns.push(b);
+});
+
+// 建设备卡：整张卡不响应点击，只有开关按钮可点（避免误触整行）
+DEVS.forEach(function(d, i){
+  var row = document.createElement("div");
+  row.className = "dev";
+  row.style.setProperty("--i", i);
+  row.innerHTML =
+    '<span class="ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + d.icon + '</svg></span>' +
+    '<span class="txt"><b>' + d.n + '</b><span>' + d.sub[0] + '</span></span>' +
+    '<button class="sw" type="button" role="switch" aria-checked="false" aria-label="' + d.n + '开关">' +
+      '<span class="track"></span><span class="knob"></span></button>';
+  devsEl.appendChild(row);
+  var sw = row.querySelector(".sw");
+  sw.addEventListener("click", function(){ setOne(i, !DEVS[i].on, true); });
+  nodes.push({ row: row, sw: sw, label: row.querySelector(".txt span") });
+});
+
+// 单设备切换：只改自己，并把「当前场景」标为自定义（不再高亮任何预设）
+function setOne(i, on, fromUser){
+  DEVS[i].on = on;
+  paint(i);
+  if(fromUser){
+    curScene = -1;
+    sceneBtns.forEach(function(b){ b.classList.remove("on"); });
+    // 手动点单个开关时不能带批量错峰，否则按下去要过一会儿才动
+    devsEl.classList.remove("stagger");
+  }
+  refreshFoot();
+}
+
+function paint(i){
+  var d = DEVS[i], nd = nodes[i];
+  nd.row.classList.toggle("on", d.on);
+  nd.sw.setAttribute("aria-checked", d.on ? "true" : "false");
+  nd.label.textContent = d.sub[d.on ? 1 : 0];
+}
+
+// 场景批量：逐台错峰写入，间隔 = --cuoluo，文案跟着状态一起变
+function playScene(idx){
+  curScene = idx;
+  sceneBtns.forEach(function(b, i){ b.classList.toggle("on", i === idx); });
+  var want = PRESETS[idx].v;
+  var step = Math.max(0, Number(state.cuoluo) || 0);
+  // 错峰靠容器上的 .stagger 打开（静止态延迟为 0），批量时才有先后
+  devsEl.classList.add("stagger");
+  want.forEach(function(v, i){
+    later(function(){ setOne(i, v, false); }, i * step);
+  });
+  refreshFoot();
+}
+
+function refreshFoot(){
+  var on = DEVS.filter(function(d){ return d.on; }).length;
+  foot.textContent = on ? ("已开启 " + on + " / " + DEVS.length + " 台") : "全部关闭";
+}
+
+function clearAll(){
+  timers.forEach(clearTimeout);
+  timers = [];
+}
+
+addEventListener("pagehide", clearAll);
+addEventListener("beforeunload", clearAll);
+
+apply();
+DEVS.forEach(function(_, i){ paint(i); });
+refreshFoot();
+
+// 演示循环：回家 → 停 2.6s → 睡眠 → 停 2.6s → 回家……
+// 用独立的 autoOn 开关判断要不要续，别拿 timers.length 当「还在跑」——
+// later() 触发时会先把自己从数组里摘掉，用数组长度判断会让循环在第一轮就停死。
+var AUTO = [0, 1];
+var k = 0, autoOn = true;
+function autoCycle(){
+  if(!autoOn) return;
+  playScene(AUTO[k % AUTO.length]);
+  k++;
+  later(autoCycle, 2600);
+}
+
+// 用户一碰就停掉自动演示，避免手和机器抢控制权
+function stopAuto(){
+  autoOn = false;
+  timers.forEach(clearTimeout);
+  timers = [];
+}
+sceneBtns.forEach(function(b){ b.addEventListener("pointerdown", stopAuto); });
+nodes.forEach(function(nd){ nd.sw.addEventListener("pointerdown", stopAuto); });
+
+later(autoCycle, 1200);
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

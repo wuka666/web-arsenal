@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>订单状态时间轴</title>
+<style>
+:root{
+  --paper:#fcfbf8;--ink:#232019;--dim:#8b8478;--rule:#e3ded3;--accent:#3f6b57;
+  --card:#ffffff;--radius:14;--gap:18;--fs:16;--dot:22;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efece5;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(50,44,32,.24);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .no{
+  margin-left:auto;font-family:ui-monospace,Consolas,monospace;
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);
+}
+.scroll{flex:1;min-height:0;overflow:auto;padding:16px calc(var(--gap) * 1px) 110px}
+.scroll::-webkit-scrollbar{width:0}
+.sum{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:14px;margin-bottom:20px;
+}
+.sum .row{display:flex;align-items:center;gap:10px}
+.sum .nm{font-size:calc(var(--fs) * .96 * 1px);font-weight:650}
+.badge{
+  margin-left:auto;flex:0 0 auto;padding:4px 10px;border-radius:6px;
+  background:var(--accent);color:#fff;font-size:calc(var(--fs) * .7 * 1px);font-weight:600;
+}
+.sum .dt{
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);margin-top:7px;line-height:1.6;
+}
+.sum .amt{
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);
+  display:flex;align-items:baseline;gap:6px;
+}
+.sum .amt b{font-size:calc(var(--fs) * 1.18 * 1px);color:var(--accent)}
+.sum .amt span{font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+
+/* 时间轴：每个节点左侧留出圆点列，竖线只画在「已完成」段，未完成段保持灰，进度靠颜色讲 */
+.tl{padding-left:2px}
+.node{display:flex;gap:14px;align-items:flex-start}
+.node .lc{
+  flex:0 0 calc(var(--dot) * 1px);position:relative;align-self:stretch;
+  display:flex;justify-content:center;
+}
+.node .dot{
+  width:calc(var(--dot) * 1px);height:calc(var(--dot) * 1px);border-radius:50%;
+  background:var(--paper);border:2px solid var(--rule);margin-top:2px;
+  transition:background .45s ease,border-color .45s ease,box-shadow .45s ease;
+}
+.node .line{
+  position:absolute;top:calc(var(--dot) * 1px + 4px);bottom:-4px;left:50%;
+  width:2px;margin-left:-1px;background:var(--rule);
+  transition:background .45s ease;
+}
+.node:last-child .line{display:none}
+.node.done .dot{background:var(--accent);border-color:var(--accent)}
+.node.done .line{background:var(--accent)}
+.node.now .dot{
+  background:var(--paper);border-color:var(--accent);
+  box-shadow:0 0 0 5px rgba(63,107,87,.14);
+  animation:pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(63,107,87,.16)}
+  50%{box-shadow:0 0 0 8px rgba(63,107,87,.05)}
+}
+.node .bd{flex:1;min-width:0;padding-bottom:22px}
+.node .ti{
+  font-size:calc(var(--fs) * .92 * 1px);font-weight:600;color:var(--dim);
+  transition:color .45s ease;
+}
+.node.done .ti,.node.now .ti{color:var(--ink)}
+.node.now .ti{color:var(--accent)}
+.node .tm{
+  font-family:ui-monospace,Consolas,monospace;
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);margin-top:3px;
+}
+.node .ds{
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);line-height:1.6;margin-top:5px;
+}
+/* 底部操作条必须不透明：半透明会让时间轴从底下透出来，与按钮文字混在一起显脏 */
+.bar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;min-height:64px;
+  background:var(--paper);border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:10px;padding:10px calc(var(--gap) * 1px);
+}
+.btn{
+  flex:1;min-height:44px;border:1px solid var(--rule);border-radius:22px;
+  background:var(--card);color:var(--ink);font:inherit;
+  font-size:calc(var(--fs) * .84 * 1px);cursor:pointer;
+}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>订单进度</h1>
+    <span class="no">#20261014-8831</span>
+  </div>
+
+  <div class="scroll">
+    <div class="sum">
+      <div class="row">
+        <span class="nm">周末双人套餐 · 含配送</span>
+        <span class="badge" id="bdg">配送中</span>
+      </div>
+      <div class="dt">拾味小馆（观音桥店）· 预计 11:20 前送达 · 吴女士 138****6271</div>
+      <div class="amt"><b>¥128.00</b><span>已支付 · 微信</span></div>
+    </div>
+
+    <div class="tl" id="tl"></div>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="b1">联系商家</button>
+    <button class="btn pri" id="b2">确认收货</button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#fcfbf8',ink:'#232019',dim:'#8b8478',rule:'#e3ded3',accent:'#3f6b57',
+             card:'#ffffff',radius:14,gap:18,fs:16,dot:22};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const STEPS=[
+  ['已下单','10-14 09:22','订单已提交，等待商家确认。'],
+  ['商家已接单','10-14 09:31','拾味小馆已确认，开始备餐。'],
+  ['制作中','10-14 10:05','你的餐品正在制作，预计 20 分钟完成。'],
+  ['配送中','10-14 10:48','骑手王师傅已取餐，距你 1.8km。'],
+  ['已送达','10-14 11:20','已送达前台，请及时取用。']
+];
+
+const tl=document.getElementById('tl');
+const bdg=document.getElementById('bdg');
+const b2=document.getElementById('b2');
+let cur=0;
+
+STEPS.forEach((s,i)=>{
+  const n=document.createElement('div');
+  n.className='node';
+  n.innerHTML='<span class="lc"><span class="dot"></span><span class="line"></span></span>'+
+    '<span class="bd"><span class="ti">'+s[0]+'</span>'+
+    '<span class="tm">'+s[1]+'</span>'+
+    '<span class="ds">'+s[2]+'</span></span>';
+  tl.appendChild(n);
+});
+
+function render(){
+  const nodes=tl.querySelectorAll('.node');
+  nodes.forEach((n,i)=>{
+    // 已完成段（不含当前）用实心 + 强调色，当前节点用脉冲环，未到达段保持灰
+    n.classList.toggle('done',i<cur);
+    n.classList.toggle('now',i===cur);
+  });
+  bdg.textContent=STEPS[cur][0];
+  b2.textContent=(cur===STEPS.length-1)?'再来一单':'确认收货';
+}
+
+// 自动推进只在「未送达」时走：到了最后一格就停住，符合真实订单语义，不做无意义循环
+let timer=setInterval(()=>{
+  if(cur<STEPS.length-1){ cur++; render(); }
+  else{ clearInterval(timer); }
+},2800);
+
+b2.addEventListener('click',()=>{
+  if(cur<STEPS.length-1){ cur++; render(); }
+  else{ cur=0; render(); timer=setInterval(()=>{
+    if(cur<STEPS.length-1){ cur++; render(); }
+    else{ clearInterval(timer); }
+  },2800); }
+});
+document.getElementById('b1').addEventListener('click',e=>{
+  const t=e.currentTarget.textContent;
+  e.currentTarget.textContent='已呼叫 ✓';
+  setTimeout(()=>{e.currentTarget.textContent=t;},1500);
+});
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>

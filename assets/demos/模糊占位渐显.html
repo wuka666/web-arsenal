@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模糊占位渐显</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--page);padding:16px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg);
+  }
+  .col{width:100%;max-width:var(--w)}
+  .shot{
+    position:relative;width:100%;aspect-ratio:1.5;border-radius:var(--radius);
+    overflow:hidden;background:var(--track);cursor:pointer;
+  }
+  /* 占位层：只用低信息量的色块 + 大模糊，真实场景换成 20px 宽的 LQIP 缩略图 */
+  .ph{
+    position:absolute;inset:0;background:var(--phA);
+    filter:blur(var(--blur));transform:scale(1.08);
+    transition:opacity var(--dur) ease;
+  }
+  /* 清晰层：加载完成后模糊推到 0 + 淡入——「blur-up」的识别点就在这两个属性同时收 */
+  .full{
+    position:absolute;inset:0;background:var(--imgA);
+    opacity:var(--op);filter:blur(var(--fblur));
+    transition:opacity var(--dur) ease,filter var(--dur) ease;
+  }
+  .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.22)}
+  .bar i{display:block;height:100%;width:var(--p);background:var(--accent);transition:width .12s linear}
+  .tag{
+    position:absolute;top:10px;left:10px;font-size:11px;padding:4px 9px;border-radius:20px;
+    background:rgba(0,0,0,.42);color:#fff;
+  }
+  .cap{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="col">
+    <div class="shot" id="shot">
+      <div class="ph" id="ph"></div>
+      <div class="full" id="full"></div>
+      <div class="tag" id="tag">已加载</div>
+      <div class="bar"><i id="pi"></i></div>
+    </div>
+    <div class="cap"><span id="cap">点击重播加载过程</span><span id="pct">100%</span></div>
+  </div>
+</div>
+<script>
+// 素材库口径：apply() 侧按 UNIT 拼单位，CSS 里直接 var(--x)，不要再乘 1px（两边都带会算成非法值）
+var state={page:"#f4f5f7",fg:"#1c1c1e",dim:"#8b8f98",track:"#e3e6ec",phA:"#c9cfd8",
+           imgA:"#5b7fa6",accent:"#2f6df6",w:320,radius:14,blur:18,fblur:0,op:1,dur:0.7,p:100};
+var UNIT={w:"px",radius:"px",blur:"px",fblur:"px",dur:"s",p:"%"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+
+var ph=document.getElementById("ph"),full=document.getElementById("full");
+var pi=document.getElementById("pi"),pct=document.getElementById("pct");
+var tag=document.getElementById("tag"),cap=document.getElementById("cap");
+
+// 一次完整加载：占位模糊 → 进度推进 → 到位后清晰层同时收模糊与淡入
+function play(){
+  state.p=0;state.op=0;state.fblur=state.blur;
+  tag.textContent="加载中";cap.textContent="占位模糊 + 进度推进";
+  apply();
+  var t=setInterval(function(){
+    state.p=Math.min(100,state.p+7);
+    pct.textContent=Math.round(state.p)+"%";
+    apply();
+    if(state.p>=100){
+      clearInterval(t);
+      state.op=1;state.fblur=0;
+      tag.textContent="已加载";cap.textContent="清晰层渐显完成";
+      apply();
+    }
+  },90);
+}
+document.getElementById("shot").addEventListener("click",play);
+// 🔴 加载时必须先调一次 apply()：否则首帧所有 var(--x) 全空，整页没有底色也没有尺寸，
+//    要等 3.4 秒后第一趟 play() 才补上（check_vars 就是专抓这个：空变量 14/14）
+apply();
+// 初始即完成态：缩略图与 headless 截图直接看到清晰图，不必等一轮加载
+setInterval(play,3400);
+window.addEventListener("message",function(e){
+  var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

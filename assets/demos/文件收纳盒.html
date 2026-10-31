@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文件收纳盒</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--di);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--wenzi);
+  }
+  .card{width:100%;max-width:420px}
+  .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .hd b{font-size:14px;font-weight:600}
+  .hd span{font-size:11px;font-weight:400;opacity:.55}
+  /* 舞台：飞行轨迹的坐标系，position:relative 才能量起点终点 */
+  .stage{
+    position:relative;height:300px;border-radius:18px;background:var(--mian);
+    border:1px solid rgba(0,0,0,.06);overflow:hidden;
+  }
+  .cap{position:absolute;left:14px;top:12px;font-size:11px;opacity:.5;letter-spacing:.02em}
+  /* 文件夹：抬起来接住文件的那 8px 就是「接收」的可读信号 */
+  .folder{
+    position:absolute;right:14px;bottom:12px;width:96px;height:74px;
+    transition:transform .16s cubic-bezier(.34,1.56,.64,1);transform-origin:50% 100%;
+  }
+  .folder.lift{transform:translateY(-8px)}
+  .tab{
+    position:absolute;left:0;top:6px;width:44px;height:16px;border-radius:6px 6px 0 0;
+    background:var(--jia);filter:brightness(1.1);
+  }
+  .pocket{
+    position:absolute;left:0;bottom:0;width:96px;height:58px;border-radius:9px 12px 12px 12px;
+    background:var(--jia);box-shadow:0 10px 22px rgba(0,0,0,.18);
+  }
+  .pocket::after{
+    content:"";position:absolute;left:10px;right:10px;top:12px;height:2px;border-radius:2px;
+    background:rgba(255,255,255,.42);
+  }
+  .badge{
+    position:absolute;right:-4px;top:-6px;min-width:24px;height:24px;padding:0 7px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--jiaobiao);color:#fff;font:600 12px/1 inherit;font-variant-numeric:tabular-nums;
+    box-shadow:0 4px 12px rgba(0,0,0,.24);
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  }
+  .badge.pop{transform:scale(1.28)}
+  /* 飞行中的文件：位置与缩放一帧一改，只碰 transform，不碰 left/top */
+  .file{
+    position:absolute;left:0;top:0;width:54px;height:64px;border-radius:8px;padding:10px 9px;
+    background:var(--wen);border:1px solid rgba(0,0,0,.07);
+    box-shadow:0 8px 18px rgba(0,0,0,.16);
+    transform-origin:50% 50%;will-change:transform,opacity;pointer-events:none;
+  }
+  .file i{display:block;height:3px;border-radius:2px;background:rgba(0,0,0,.13);margin-bottom:6px}
+  .file i:nth-child(2){width:72%}
+  .file i:nth-child(3){width:46%;margin-bottom:0}
+  .foot{display:flex;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:6px}
+  .foot span{font-size:11px;opacity:.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hd"><b>收件箱</b><span>弧线投递 · 接住即计数</span></div>
+    <div class="stage" id="stage">
+      <div class="cap" id="cap">待归档 3 个</div>
+      <div class="folder" id="folder" aria-live="polite" aria-label="文件夹，当前 0 个">
+        <span class="tab"></span>
+        <span class="pocket"></span>
+        <span class="badge" id="badge">0</span>
+      </div>
+    </div>
+    <div class="foot"><span>贝塞尔弧线 · 边飞边缩</span><span>共 5 个</span></div>
+  </div>
+</div>
+<script>
+// 参数：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {di:"#f2f2f7",mian:"#ffffff",wen:"#eef1f6",jia:"#0a84ff",jiaobiao:"#ff3b30",wenzi:"#1c1c1e",
+             gaodu:96,shichang:720,suofang:0.32};
+var UNIT = {gaodu:"px",shichang:"ms",suofang:""};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+var stage = document.getElementById("stage");
+var folder = document.getElementById("folder");
+var badge = document.getElementById("badge");
+var cap = document.getElementById("cap");
+var TOTAL = 5, PENDING = 3;
+var count = 0, timers = [], rafs = [];
+var FW = 54, FH = 64;   // 文件尺寸，和 .file 的宽高保持一致
+
+function later(fn, ms){
+  var id = setTimeout(function(){
+    timers = timers.filter(function(t){ return t !== id; });
+    fn();
+  }, ms);
+  timers.push(id);
+  return id;
+}
+
+// 二次贝塞尔：一个控制点就能得到一条「抛过去」的弧，比三次曲线少两个待调参数
+function quad(a, c, b, t){
+  var u = 1 - t;
+  return u * u * a + 2 * u * t * c + t * t * b;
+}
+
+// 投一个文件：起点左上 → 控制点抬到弧顶（高度由 --gaodu 决定）→ 终点文件夹口袋中心
+function spawn(){
+  var box = stage.getBoundingClientRect();
+  var fb = folder.getBoundingClientRect();
+  var p0 = { x: 46, y: 46 };
+  var p2 = { x: fb.left - box.left + fb.width / 2, y: fb.top - box.top + fb.height * 0.74 };
+  var apex = Math.min(p0.y, p2.y) - (Number(state.gaodu) || 96);
+  var p1 = { x: (p0.x + p2.x) / 2, y: apex };
+
+  var el = document.createElement("div");
+  el.className = "file";
+  el.innerHTML = "<i></i><i></i><i></i>";
+  el.style.transform = "translate(" + (p0.x - FW / 2) + "px," + (p0.y - FH / 2) + "px) scale(1)";
+  stage.appendChild(el);
+
+  var t0 = 0;
+  var dur = Math.max(160, Number(state.shichang) || 720);
+  var end = Number(state.suofang);
+  if(isNaN(end)) end = 0.32;
+
+  function step(now){
+    if(!t0) t0 = now;
+    var p = (now - t0) / dur;
+    if(p > 1) p = 1;
+    // 先快后慢：出发干脆，落袋时仍有余速，像被吸进去
+    var e = 1 - Math.pow(1 - p, 2.2);
+    var x = quad(p0.x, p1.x, p2.x, e);
+    var y = quad(p0.y, p1.y, p2.y, e);
+    var s = 1 + (end - 1) * e;
+    el.style.transform = "translate(" + (x - FW / 2).toFixed(1) + "px," + (y - FH / 2).toFixed(1) + "px) scale(" + s.toFixed(4) + ")";
+    el.style.opacity = p > 0.82 ? (1 - (p - 0.82) / 0.18).toFixed(3) : "1";
+    if(p < 1) rafs.push(requestAnimationFrame(step));
+    else land(el);
+  }
+  rafs.push(requestAnimationFrame(step));
+}
+
+// 落袋：文件移除、文件夹抬起再落回、角标 +1 —— 三件事同一时刻发生，才读得出「接住」
+function land(el){
+  if(el && el.parentNode) el.parentNode.removeChild(el);
+  folder.classList.add("lift");
+  later(function(){ folder.classList.remove("lift"); }, 130);
+
+  count++;
+  badge.textContent = count;
+  folder.setAttribute("aria-label", "文件夹，当前 " + count + " 个");
+  badge.classList.add("pop");
+  later(function(){ badge.classList.remove("pop"); }, 180);
+  PENDING = Math.max(0, PENDING - 1);
+  cap.textContent = PENDING ? ("待归档 " + PENDING + " 个") : "全部归档完成";
+
+  if(count >= TOTAL) later(reset, 900);
+}
+
+// 复位：清掉舞台上残留的飞行体与计数，重新来一轮
+function reset(){
+  var fly = stage.querySelectorAll(".file");
+  for(var i = 0; i < fly.length; i++){ if(fly[i].parentNode) fly[i].parentNode.removeChild(fly[i]); }
+  count = 0; PENDING = 3;
+  badge.textContent = "0";
+  folder.setAttribute("aria-label", "文件夹，当前 0 个");
+  cap.textContent = "待归档 3 个";
+  schedule();
+}
+
+// 节拍：飞行时长 + 余量，避免两个文件在同一帧叠在一处
+function schedule(){
+  var gap = Math.max(720, (Number(state.shichang) || 720) + 420);
+  later(spawn, gap);
+  later(schedule, gap);
+}
+
+function clearAll(){
+  timers.forEach(clearTimeout);
+  timers = [];
+  rafs.forEach(cancelAnimationFrame);
+  rafs = [];
+}
+
+addEventListener("pagehide", clearAll);
+addEventListener("beforeunload", clearAll);
+
+apply();
+later(spawn, 500);
+later(schedule, 1900);
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

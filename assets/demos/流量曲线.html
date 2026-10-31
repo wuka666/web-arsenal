@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>流量曲线</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--bg);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);
+  }
+  .card{
+    width:100%;max-width:520px;background:var(--panel);border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;padding:18px 16px 14px;
+  }
+  .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+  .hd b{font-size:14px;font-weight:600}
+  .hd span{font-size:11px;font-weight:400;color:var(--dim)}
+  .plot{position:relative;height:var(--h);touch-action:none}
+  svg{display:block;width:100%;height:100%;overflow:visible}
+  .grid{stroke:var(--grid);stroke-width:1;shape-rendering:crispEdges}
+  .line{
+    fill:none;stroke:var(--c1);stroke-width:var(--lw);stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+    transition:stroke-dashoffset calc(var(--dur) * 1s) cubic-bezier(.3,.8,.3,1);
+  }
+  .line.on{stroke-dashoffset:0}
+  /* 面积与曲线同一进度：dash 管曲线，遮罩按同一个 p 从右往左擦开 */
+  .area{fill:url(#g1);clip-path:inset(0 var(--rest) 0 0);transition:clip-path calc(var(--dur) * 1s) cubic-bezier(.3,.8,.3,1)}
+  .area.on{clip-path:inset(0 0 0 0)}
+  .s1{stop-color:var(--c2);stop-opacity:.62}
+  .s2{stop-color:var(--c2);stop-opacity:0}
+  .axis{font-size:10px;fill:var(--dim)}
+  .probe{
+    position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;
+    transition:opacity .18s ease;pointer-events:none;
+  }
+  .probe.on{opacity:1}
+  .vline{stroke:var(--vline);stroke-width:1;stroke-dasharray:3 4}
+  .dot{fill:var(--c1);stroke:var(--panel);stroke-width:2}
+  .tip{
+    position:absolute;left:0;top:0;transform:translate(-50%,-100%);
+    background:var(--tipbg);color:var(--text);border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;padding:6px 9px;font-size:11px;line-height:1.4;white-space:nowrap;
+    box-shadow:0 8px 22px rgba(0,0,0,.42);pointer-events:none;
+    opacity:0;transition:opacity .18s ease;
+  }
+  .tip.on{opacity:1}
+  .tip b{display:block;font-weight:600;font-variant-numeric:tabular-nums;font-size:13px}
+  .tip i{font-style:normal;color:var(--dim)}
+  .foot{display:flex;justify-content:space-between;margin-top:8px}
+  .foot span{font-size:10px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hd"><b>访问趋势</b><span>近 7 天 · 拖动曲线可查看</span></div>
+    <div class="plot" id="plot">
+      <svg viewBox="0 0 520 180" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" class="s1"/><stop offset="100%" class="s2"/>
+          </linearGradient>
+        </defs>
+        <g id="grid"></g>
+        <path id="area" class="area" d=""/>
+        <path id="line" class="line" d=""/>
+      </svg>
+      <svg class="probe" id="probe" viewBox="0 0 520 180" preserveAspectRatio="none" aria-hidden="true">
+        <line id="vline" class="vline" x1="0" y1="0" x2="0" y2="180"/>
+        <circle id="dot" class="dot" cx="0" cy="0" r="4.5" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="tip" id="tip"><i id="tipd">—</i><b id="tipv">0</b></div>
+    </div>
+  </div>
+</div>
+<script>
+// 参数字段：apply() 按 UNIT 拼单位，CSS 里直接 var(--x)
+var state = {bg:"#080d16",panel:"#101a29",c1:"#38bdf8",c2:"#6366f1",grid:"rgba(148,163,184,.22)",
+             vline:"rgba(56,189,248,.55)",text:"#e6edf7",dim:"#7b8aa3",tipbg:"#1b2740",h:190,lw:2.2,dur:1.1};
+var UNIT = {h:"px",lw:"",dur:"s"};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k]||"")); } }
+
+var DAYS = ["周一","周二","周三","周四","周五","周六","周日"];
+var VAL  = [820, 1180, 940, 1520, 1310, 1780, 2260];
+var W = 520, H = 180, PADL = 8, PADR = 8, PADT = 26, PADB = 22;
+var PW = W - PADL - PADR, PH = H - PADT - PADB;
+var MAX = 2600;
+
+var lineEl = document.getElementById("line"), areaEl = document.getElementById("area");
+var gridEl = document.getElementById("grid"), plot = document.getElementById("plot");
+var probeEl = document.getElementById("probe"), vline = document.getElementById("vline");
+var dot = document.getElementById("dot"), tip = document.getElementById("tip");
+var tipd = document.getElementById("tipd"), tipv = document.getElementById("tipv");
+
+var X = VAL.map(function(_, i){ return PADL + PW * i / (VAL.length - 1); });
+var Y = VAL.map(function(v){ return PADT + PH * (1 - v / MAX); });
+
+function d3(p0, c0, c1, p1){
+  return "C" + c0.x.toFixed(1) + "," + c0.y.toFixed(1) + " "
+             + c1.x.toFixed(1) + "," + c1.y.toFixed(1) + " "
+             + p1.x.toFixed(1) + "," + p1.y.toFixed(1);
+}
+// Catmull-Rom → 三次贝塞尔，节点处切线取左右邻点连线，平滑不过冲
+function smooth(pts){
+  var d = "M" + pts[0].x.toFixed(1) + "," + pts[0].y.toFixed(1);
+  for(var i = 0; i < pts.length - 1; i++){
+    var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    var c1 = {x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6};
+    var c2 = {x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6};
+    d += " " + d3(p1, c1, c2, p2);
+  }
+  return d;
+}
+
+var PTS = X.map(function(x, i){ return {x: x, y: Y[i]}; });
+var curve = smooth(PTS);
+lineEl.setAttribute("d", curve);
+areaEl.setAttribute("d", curve + " L" + PTS[PTS.length-1].x.toFixed(1) + "," + (PADT+PH) + " L" + PTS[0].x.toFixed(1) + "," + (PADT+PH) + " Z");
+
+// 横向参考线
+for(var r = 0; r <= 3; r++){
+  var gl = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  gl.setAttribute("class", "grid");
+  gl.setAttribute("x1", PADL); gl.setAttribute("x2", W - PADR);
+  var yy = (PADT + PH * r / 3).toFixed(1);
+  gl.setAttribute("y1", yy); gl.setAttribute("y2", yy);
+  gridEl.appendChild(gl);
+}
+
+var LEN = lineEl.getTotalLength();
+root.style.setProperty("--len", LEN);
+root.style.setProperty("--rest", "100%");
+
+// 生长：曲线走 dashoffset，面积遮罩同一时长从 100% 收到 0
+function grow(){
+  lineEl.classList.remove("on"); areaEl.classList.remove("on");
+  lineEl.style.strokeDashoffset = LEN;
+  root.style.setProperty("--rest", "100%");
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      lineEl.style.strokeDashoffset = 0;
+      lineEl.classList.add("on");
+      root.style.setProperty("--rest", "0%");
+      areaEl.classList.add("on");
+    });
+  });
+}
+
+// 探针：按 x 求曲线上的点（getPointAtLength，保证点永远贴着线走）
+function probeAt(t){
+  t = Math.max(0, Math.min(1, t));
+  var pt = lineEl.getPointAtLength(t * LEN);
+  var gx = pt.x, gy = pt.y;
+  vline.setAttribute("x1", gx); vline.setAttribute("x2", gx);
+  vline.setAttribute("y1", gy); vline.setAttribute("y2", PADT + PH);
+  dot.setAttribute("cx", gx); dot.setAttribute("cy", gy);
+  probeEl.classList.add("on");
+
+  // 数值按 x 在相邻两天之间线性插值，读数不会跳
+  var f = t * (VAL.length - 1), i0 = Math.min(VAL.length - 2, Math.floor(f)), frac = f - i0;
+  var v = Math.round(VAL[i0] + (VAL[i0 + 1] - VAL[i0]) * frac);
+  tipd.textContent = frac < 0.5 ? DAYS[i0] : DAYS[i0 + 1];
+  tipv.textContent = v.toLocaleString("en-US");
+  // 浮层跟随：按百分比定位，左右夹紧在画布内；点太靠上时翻到下方，避免压住标题（规矩 25）
+  var pct = Math.max(11, Math.min(89, gx / W * 100));
+  tip.style.left = pct + "%";
+  tip.style.top = (gy / H * 100) + "%";
+  tip.style.transform = gy < 52 ? "translate(-50%,10px)" : "translate(-50%,calc(-100% - 10px))";
+  tip.classList.add("on");
+}
+
+function tFromEvent(e){
+  var b = plot.getBoundingClientRect();
+  var vx = (e.clientX - b.left) / b.width * W;
+  return (vx - PADL) / PW;
+}
+
+var dragging = false, swept = false, raf = 0;
+plot.addEventListener("pointerdown", function(e){
+  dragging = true; swept = true;
+  if(plot.setPointerCapture) plot.setPointerCapture(e.pointerId);
+  probeAt(tFromEvent(e));
+  e.preventDefault();
+});
+plot.addEventListener("pointermove", function(e){
+  if(!dragging) return;
+  probeAt(tFromEvent(e));
+});
+function release(){ dragging = false; }
+plot.addEventListener("pointerup", release);
+plot.addEventListener("pointercancel", release);
+plot.addEventListener("pointerleave", function(){ dragging = false; });
+
+// 待机自动扫一遍，让截图里能看到探针与浮层；用户一碰就停（定时器 / rAF 全登记，卸载即清）
+var autoId = 0;
+function autoSweep(){
+  if(swept) return;
+  var t0 = performance.now(), span = 3600;
+  function step(now){
+    if(swept){ autoId = 0; return; }
+    var p = (now - t0) / span;
+    if(p >= 1){ probeAt(1); autoId = setTimeout(function(){ autoSweep(); }, 900); return; }
+    probeAt(p);
+    autoId = requestAnimationFrame(step);
+  }
+  autoId = requestAnimationFrame(step);
+}
+function stopAuto(){
+  if(autoId){ cancelAnimationFrame(autoId); clearTimeout(autoId); autoId = 0; }
+}
+
+addEventListener("pagehide", stopAuto);
+addEventListener("beforeunload", stopAuto);
+
+apply();
+grow();
+probeAt(0.72);
+autoSweep();
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if(!d || d.type !== "param") return;
+  if(!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+</script>
+</body>
+</html>

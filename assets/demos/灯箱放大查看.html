@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灯箱放大查看</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{
+    width:100%;height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--page);padding:20px;
+    font:500 13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--fg);
+  }
+  .col{width:100%;max-width:var(--w)}
+  .hint{margin-bottom:12px;font-size:12px;color:var(--dim)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
+  .thumb{
+    position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;
+    background:var(--card);cursor:pointer;border:1px solid transparent;
+    transition:transform var(--dur) ease,border-color var(--dur) ease;
+  }
+  .thumb i{position:absolute;inset:6px;border-radius:calc(var(--radius) - 4px);background:var(--c)}
+  .thumb:hover{transform:translateY(-3px);border-color:var(--accent)}
+  /* 灯箱：遮罩必须不透明压满，半透明会让底层缩略图透上来显脏 */
+  .lb{
+    position:fixed;inset:0;z-index:20;background:var(--scrim);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+    opacity:0;pointer-events:none;transition:opacity var(--dur) ease;padding:24px;
+  }
+  .lb.on{opacity:1;pointer-events:auto}
+  .stage{
+    width:100%;max-width:var(--sw);aspect-ratio:1.5;border-radius:var(--radius);
+    background:var(--c);box-shadow:0 24px 60px rgba(0,0,0,.5);
+    transform:scale(.94);transition:transform var(--dur) cubic-bezier(.22,.9,.24,1);
+  }
+  .lb.on .stage{transform:scale(1)}
+  .meta{display:flex;align-items:center;gap:14px;color:var(--dim);font-size:12px}
+  .meta b{color:var(--fg);font-weight:600;font-size:14px}
+  .nav{
+    width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08);color:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav svg{width:18px;height:18px;display:block}
+  .nav:hover{background:rgba(255,255,255,.16)}
+  .close{
+    position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
+    color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .close svg{width:18px;height:18px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="col">
+    <div class="hint">点击任意缩略图打开灯箱 · ← → 翻页 · Esc 关闭</div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<div class="lb" id="lb">
+  <button class="close" id="close" title="关闭 (Esc)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="stage" id="stage"></div>
+  <div class="meta">
+    <button class="nav" id="prev" title="上一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6l-6 6 6 6"/></svg>
+    </button>
+    <b id="title">—</b><span id="cnt">1 / 4</span>
+    <button class="nav" id="next" title="下一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// 素材库口径：apply() 侧按 UNIT 拼单位，CSS 里直接 var(--x)，不要再乘 1px
+var state={page:"#14161a",fg:"#eceef2",dim:"#8b93a0",card:"#1e222a",accent:"#6ea8fe",
+           scrim:"rgba(8,10,14,.88)",w:420,sw:560,gap:10,radius:12,dur:0.34};
+var UNIT={w:"px",sw:"px",gap:"px",radius:"px",dur:"s"};
+var root=document.documentElement;
+function apply(){for(var k in state){root.style.setProperty("--"+k,state[k]+(UNIT[k]||""));}}
+
+var SHOTS=[
+  {c:"#5b7fa6",t:"江边清晨"},{c:"#a6724a",t:"旧巷午后"},
+  {c:"#4f7f63",t:"山道雨后"},{c:"#7a5f96",t:"夜市灯火"}
+];
+var grid=document.getElementById("grid"),lb=document.getElementById("lb");
+var stage=document.getElementById("stage"),title=document.getElementById("title");
+var cnt=document.getElementById("cnt");
+var cur=0,open=false;
+
+SHOTS.forEach(function(s,i){
+  var d=document.createElement("div");
+  d.className="thumb";
+  d.innerHTML='<i style="--c:'+s.c+'"></i>';
+  d.addEventListener("click",function(){cur=i;openBox();});
+  grid.appendChild(d);
+});
+
+function render(){
+  stage.style.setProperty("--c",SHOTS[cur].c);
+  title.textContent=SHOTS[cur].t;
+  cnt.textContent=(cur+1)+" / "+SHOTS.length;
+}
+function openBox(){open=true;render();lb.classList.add("on");}
+function closeBox(){open=false;lb.classList.remove("on");}
+function step(d){cur=(cur+d+SHOTS.length)%SHOTS.length;render();}
+
+document.getElementById("close").addEventListener("click",closeBox);
+document.getElementById("prev").addEventListener("click",function(){step(-1);});
+document.getElementById("next").addEventListener("click",function(){step(1);});
+// 点遮罩空白处关闭，但点在图片/按钮上不算（避免翻页时误关）
+lb.addEventListener("click",function(e){if(e.target===lb)closeBox();});
+addEventListener("keydown",function(e){
+  if(!open)return;
+  if(e.key==="Escape")closeBox();
+  else if(e.key==="ArrowLeft")step(-1);
+  else if(e.key==="ArrowRight")step(1);
+});
+
+// 自动演示：打开 → 翻两张 → 关闭，循环，让缩略图与截图都能看到灯箱形态
+var phase=0;
+setInterval(function(){
+  phase++;
+  if(phase%4===1){cur=phase%SHOTS.length;openBox();}
+  else if(phase%4===2||phase%4===3){step(1);}
+  else{closeBox();}
+},2000);
+
+apply();
+window.addEventListener("message",function(e){
+  var d=e.data;if(!d||d.type!=="param")return;if(!(d.key in state))return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

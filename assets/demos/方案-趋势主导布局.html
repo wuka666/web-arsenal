@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>趋势主导布局</title>
+<style>
+/* 数值型参数一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)，两边都带单位会算成非法值而静默失效 */
+:root{
+  --di:#f7f8fa;--ka:#ffffff;--zi:#0f1419;--ci:#6b7684;--zhu:#2563eb;--fu:#f59e0b;
+  --yuanjiao:14;--jianju:16;--zihao:14;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--di);color:var(--zi);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--zihao) * 1px);line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding:calc(var(--jianju) * 1.2px);
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 段① 顶栏：只放定位与时间范围，不放导航树 ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 0 calc(var(--jianju) * .7px);margin-bottom:calc(var(--jianju) * .7px);
+  border-bottom:1px solid rgba(15,20,25,.07);
+}
+.brand{display:flex;align-items:center;gap:calc(var(--jianju) * .6px);font-weight:700;font-size:1.06em}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--zhu)}
+.topbar .sub{color:var(--ci);font-size:.92em;margin-left:calc(var(--jianju) * .6px)}
+.seg{display:flex;gap:3px;background:rgba(15,20,25,.05);padding:3px;border-radius:999px}
+.seg b{
+  padding:5px 13px;border-radius:999px;font-weight:600;font-size:.92em;color:var(--ci);
+  transition:background .2s,color .2s;
+}
+.seg b.on{background:var(--ka);color:var(--zi);box-shadow:0 1px 3px rgba(15,20,25,.14)}
+
+/* ── 段② 主视觉：一张趋势图吃掉首屏，高度是整页最重的一块 ── */
+.stage{
+  display:grid;grid-template-columns:minmax(0,1fr) 268px;
+  gap:calc(var(--jianju) * 1px);align-items:stretch;
+}
+.hero{
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);
+  border:1px solid rgba(15,20,25,.06);
+  padding:calc(var(--jianju) * 1.1px) calc(var(--jianju) * 1.2px) calc(var(--jianju) * .5px);
+  display:flex;flex-direction:column;
+}
+.hero .hd{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--jianju) * .8px);margin-bottom:calc(var(--jianju) * .5px)}
+.hero .k{font-size:.92em;color:var(--ci);letter-spacing:.02em}
+.hero .now{display:flex;align-items:baseline;gap:calc(var(--jianju) * .5px)}
+.hero .now b{font-size:3.2em;font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero .now i{font-style:normal;font-size:.94em;font-weight:600;color:var(--zhu);background:rgba(37,99,235,.1);padding:3px 9px;border-radius:999px}
+.hero .legend{display:flex;gap:calc(var(--jianju) * .9px);font-size:.9em;color:var(--ci)}
+.hero .legend span{display:flex;align-items:center;gap:6px}
+.hero .legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
+.chartbox{position:relative;flex:1;min-height:0;margin-top:calc(var(--jianju) * .3px)}
+svg{width:100%;height:100%;display:block;min-height:260px}
+.grid{stroke:rgba(15,20,25,.07);stroke-width:1}
+.base{stroke:rgba(15,20,25,.14);stroke-width:1}
+.line{fill:none;stroke:var(--zhu);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.line2{fill:none;stroke:var(--fu);stroke-width:2;stroke-dasharray:6 5;stroke-linecap:round;opacity:.85}
+.probe{stroke:rgba(15,20,25,.22);stroke-width:1;stroke-dasharray:4 4}
+.pt{fill:var(--ka);stroke:var(--zhu);stroke-width:2.6}
+.xlabel{fill:var(--ci);font-size:12px}
+.yval{fill:var(--ci);font-size:11px}
+.tip{
+  position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-118%);
+  background:var(--zi);color:#fff;font-size:.86em;line-height:1.35;white-space:nowrap;
+  padding:6px 10px;border-radius:8px;transition:opacity .16s,left .12s,top .12s;
+}
+.tip.on{opacity:1}
+.tip b{font-weight:700}
+
+/* ── 段③ 右窄栏：只承担「所以呢」的结论与事件，不抢图表 ── */
+.side{display:flex;flex-direction:column;gap:calc(var(--jianju) * .8px)}
+.card{
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);
+  border:1px solid rgba(15,20,25,.06);padding:calc(var(--jianju) * .9px) calc(var(--jianju) * 1px);
+}
+.card h3{margin:0 0 calc(var(--jianju) * .5px);font-size:.92em;color:var(--ci);font-weight:600;letter-spacing:.02em}
+.verdict{font-size:1.02em;font-weight:700;line-height:1.45}
+.verdict em{font-style:normal;color:var(--zhu)}
+.verdict s{text-decoration:none;color:var(--fu)}
+.events{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:calc(var(--jianju) * .55px)}
+.events li{display:flex;gap:9px;font-size:.92em;color:var(--ci);line-height:1.4}
+.events i{flex:none;width:7px;height:7px;border-radius:50%;margin-top:7px;background:var(--zhu)}
+.events li:nth-child(2) i{background:var(--fu)}
+.events li:nth-child(3) i{background:rgba(15,20,25,.28)}
+.events b{color:var(--zi);font-weight:600;display:block;font-size:1em}
+
+/* ── 段④ 底部窄统计条：四项横排、贴底，高度压到 56px 以内 ── */
+.strip{
+  margin-top:calc(var(--jianju) * 1px);display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);border:1px solid rgba(15,20,25,.06);
+  padding:calc(var(--jianju) * .6px) 0;
+}
+.strip div{padding:0 calc(var(--jianju) * .9px);border-left:1px solid rgba(15,20,25,.06)}
+.strip div:first-child{border-left:0}
+.strip span{display:block;font-size:.84em;color:var(--ci);margin-bottom:2px}
+.strip b{font-size:1.16em;font-weight:700}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .side{flex-direction:row;flex-wrap:wrap}
+  .side .card{flex:1 1 220px}
+  .hero .now b{font-size:2.4em}
+  .strip{grid-template-columns:repeat(2,1fr);row-gap:calc(var(--jianju) * .6px)}
+  .strip div:nth-child(3){border-left:0}
+}
+@media (max-width:430px){
+  body{padding:12px}
+  .topbar{flex-wrap:wrap;gap:8px}
+  .topbar .sub{display:none}
+  .side .card{flex:1 1 100%}
+  svg{min-height:210px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>增长看板<span class="sub">近 30 天 · 全渠道</span></div>
+  <div class="seg" id="seg"><b class="on">30 天</b><b>90 天</b><b>全年</b></div>
+</div>
+
+<div class="stage">
+  <section class="hero">
+    <div class="hd">
+      <div>
+        <div class="k">活跃用户 · 日活</div>
+        <div class="now"><b id="bigNum">12,480</b><i id="delta">+18.6%</i></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--zhu)"></i>本期</span>
+        <span><i style="background:var(--fu)"></i>上期</span>
+      </div>
+    </div>
+    <div class="chartbox" id="box">
+      <svg id="chart" viewBox="0 0 1000 330" preserveAspectRatio="none" aria-label="趋势图"></svg>
+      <div class="tip" id="tip"><b>—</b><br>本期 0 · 上期 0</div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="card">
+      <h3>一句话结论</h3>
+      <p class="verdict">增长集中在<em>月末最后 7 天</em>，前 3 周是平的——不是整体变好，是<em>一段冲刺</em>；<s>上期同段无此形态</s>。</p>
+    </div>
+    <div class="card">
+      <h3>关键事件</h3>
+      <ul class="events">
+        <li><i></i><span><b>10-12 版本发布</b>次日爬升，斜率是全月最陡</span></li>
+        <li><i></i><span><b>10-19 投放起量</b>与曲线抬升同步出现</span></li>
+        <li><i></i><span><b>10-25 回落</b>幅度小于抬升，留存被撑住</span></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<div class="strip">
+  <div><span>人均时长</span><b>7.4 分钟</b></div>
+  <div><span>次日留存</span><b>41.2%</b></div>
+  <div><span>转化率</span><b>3.86%</b></div>
+  <div><span>数据口径</span><b>自然日</b></div>
+</div>
+
+<script>
+var state={di:"#f7f8fa",ka:"#ffffff",zi:"#0f1419",ci:"#6b7684",zhu:"#2563eb",fu:"#f59e0b",
+  yuanjiao:14,jianju:16,zihao:14};
+
+// 两张图共用同一套横轴，本期是实线、上期是虚线——比较关系靠线型，不靠图例去猜
+var THIS=[62,64,61,66,70,68,72,75,73,78,74,80,83,86,90,88,94,99,104,101,108,113,110,117,124,121,128,134,131,138];
+var PREV=[55,57,56,58,60,59,61,62,61,63,62,64,65,66,67,66,68,69,70,69,71,72,71,73,74,73,75,76,75,77];
+
+var r=document.documentElement.style;
+var chart=document.getElementById('chart');
+var box=document.getElementById('box');
+var tip=document.getElementById('tip');
+var W=1000,H=330,PADL=6,PADR=6,PADT=18,PADB=30;
+
+function px(i,n){return PADL+(W-PADL-PADR)*(i/(n-1));}
+function py(v,max){return PADT+(H-PADT-PADB)*(1-v/max);}
+
+function pathOf(arr,max){
+  var d="";
+  for(var i=0;i<arr.length;i++){
+    d+=(i?"L":"M")+px(i,arr.length).toFixed(1)+" "+py(arr[i],max).toFixed(1)+" ";
+  }
+  return d;
+}
+function areaOf(arr,max){
+  var p=pathOf(arr,max);
+  return p+"L"+px(arr.length-1,arr.length).toFixed(1)+" "+(H-PADB)+" L"+px(0,arr.length).toFixed(1)+" "+(H-PADB)+" Z";
+}
+
+function render(){
+  var max=Math.max.apply(null,THIS.concat(PREV))*1.12;
+  var g="";
+  for(var t=1;t<=3;t++){
+    var y=py(max*t/4,max).toFixed(1);
+    g+='<line class="grid" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'"/>';
+  }
+  var lab="";
+  var names=["10-01","10-08","10-15","10-22","10-29"];
+  for(var k=0;k<names.length;k++){
+    var idx=Math.round((THIS.length-1)*k/(names.length-1));
+    var anchor=k===0?"start":(k===names.length-1?"end":"middle");
+    lab+='<text class="xlabel" x="'+px(idx,THIS.length).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+anchor+'">'+names[k]+'</text>';
+  }
+  chart.innerHTML=
+    '<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="var(--zhu)" stop-opacity="0.22"/>'+
+    '<stop offset="100%" stop-color="var(--zhu)" stop-opacity="0"/>'+
+    '</linearGradient></defs>'+
+    g+
+    '<line class="base" x1="0" y1="'+(H-PADB)+'" x2="'+W+'" y2="'+(H-PADB)+'"/>'+
+    '<path d="'+areaOf(THIS,max)+'" fill="url(#g1)"/>'+
+    '<path class="line2" d="'+pathOf(PREV,max)+'"/>'+
+    '<path class="line" d="'+pathOf(THIS,max)+'"/>'+
+    '<g id="probe"><line class="probe" x1="0" y1="'+PADT+'" x2="0" y2="'+(H-PADB)+'" style="opacity:0"/>'+
+    '<circle class="pt" r="4.6" cx="0" cy="0" style="opacity:0"/></g>'+
+    lab;
+}
+
+function apply(){
+  r.setProperty('--di',state.di);r.setProperty('--ka',state.ka);
+  r.setProperty('--zi',state.zi);r.setProperty('--ci',state.ci);
+  r.setProperty('--zhu',state.zhu);r.setProperty('--fu',state.fu);
+  r.setProperty('--yuanjiao',state.yuanjiao);
+  r.setProperty('--jianju',state.jianju);
+  r.setProperty('--zihao',state.zihao);
+  render();
+}
+
+// 悬停探针：只读当前索引，不改数据，所以位移不重排版面
+box.addEventListener('pointermove',function(ev){
+  var b=box.getBoundingClientRect();
+  var ratio=(ev.clientX-b.left)/b.width;
+  var i=Math.round(ratio*(THIS.length-1));
+  i=Math.max(0,Math.min(THIS.length-1,i));
+  var max=Math.max.apply(null,THIS.concat(PREV))*1.12;
+  var x=px(i,THIS.length);
+  var pr=document.getElementById('probe');
+  if(!pr)return;
+  pr.children[0].setAttribute('x1',x);
+  pr.children[0].setAttribute('x2',x);
+  pr.children[0].style.opacity=.9;
+  pr.children[1].setAttribute('cx',x);
+  pr.children[1].setAttribute('cy',py(THIS[i],max));
+  pr.children[1].style.opacity=1;
+  tip.classList.add('on');
+  tip.style.left=(x/W*100)+"%";
+  tip.style.top=(py(THIS[i],max)/H*100)+"%";
+  tip.innerHTML="<b>10-"+(i+1<10?"0"+(i+1):(i+1))+"</b><br>本期 "+THIS[i]+" · 上期 "+PREV[i];
+});
+box.addEventListener('pointerleave',function(){
+  tip.classList.remove('on');
+  var pr=document.getElementById('probe');
+  if(pr){
+    pr.children[0].style.opacity=0;
+    pr.children[1].style.opacity=0;
+  }
+});
+
+var segs=document.querySelectorAll('#seg b');
+for(var s=0;s<segs.length;s++){
+  segs[s].addEventListener('click',function(){
+    for(var j=0;j<segs.length;j++)segs[j].classList.remove('on');
+    this.classList.add('on');
+  });
+}
+
+apply();
+
+addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value;
+  apply();
+});
+</script>
+</body>
+</html>

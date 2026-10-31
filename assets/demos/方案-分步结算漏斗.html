@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分步结算漏斗</title>
+<style>
+:root{
+  --bg:#fafafa;--ink:#1a1a1a;--dim:#8a8a8e;--line:#e6e6e6;
+  --accent:#2563eb;--soft:#eef2ff;--radius:14;--gap:16;--fs:15;--maxw:920;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.4*1px);display:grid;grid-template-columns:1.6fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+.steps{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.step{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:calc(var(--fs)*.9*1px)}
+.step .dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;font-size:calc(var(--fs)*.82*1px)}
+.step.on{color:var(--ink);font-weight:600}
+.step.on .dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.step.done .dot{background:var(--soft);color:var(--accent);border-color:var(--accent)}
+.bar{flex:1;height:2px;background:var(--line)}
+.card{background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px)}
+.card h2{margin:0 0 14px;font-size:calc(var(--fs)*1.3*1px)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{color:var(--dim);font-size:calc(var(--fs)*.86*1px)}
+.field input, .field select{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;color:var(--ink);font:inherit}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.aside{background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px);align-self:start}
+.aside h3{margin:0 0 12px;font-size:calc(var(--fs)*1.05*1px)}
+.ln{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:calc(var(--fs)*.9*1px)}
+.ln.tot{border-top:2px solid var(--ink);margin-top:6px;font-weight:700;font-size:calc(var(--fs)*1.1*1px)}
+.promo{display:flex;gap:8px;margin:10px 0}
+.promo input{flex:1;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit}
+.promo button{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--soft);font:inherit;cursor:pointer}
+.next{min-height:48px;width:100%;border:0;border-radius:calc(var(--radius)*1px);background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer;margin-top:8px}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="steps" id="steps">
+      <div class="step on" data-s="0"><span class="dot">1</span>购物车</div>
+      <div class="bar"></div>
+      <div class="step" data-s="1"><span class="dot">2</span>配送</div>
+      <div class="bar"></div>
+      <div class="step" data-s="2"><span class="dot">3</span>支付</div>
+    </div>
+    <div class="card" id="stage"></div>
+  </div>
+  <div class="aside">
+    <h3>订单摘要</h3>
+    <div class="ln"><span>城市通勤双肩包 ×1</span><span>¥399</span></div>
+    <div class="ln"><span>极简钱包 ×1</span><span>¥89</span></div>
+    <div class="ln"><span>运费</span><span id="ship">¥12</span></div>
+    <div class="ln"><span>优惠</span><span id="off">−¥0</span></div>
+    <div class="ln tot"><span>合计</span><span id="tot">¥500</span></div>
+    <div class="promo"><input id="promo" placeholder="优惠码"><button id="applyc">应用</button></div>
+    <button class="next" id="next">下一步</button>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1a1a1a',accent:'#2563eb',radius:14,gap:16,fs:15,maxw:920};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const VIEWS=[
+  {h:'购物车',body:'<div class="ln"><span>城市通勤双肩包 ×1</span><span>¥399</span></div><div class="ln"><span>极简钱包 ×1</span><span>¥89</span></div><div class="ln"><span>合计商品</span><span>¥488</span></div>'},
+  {h:'配送信息',body:'<div class="field"><label>收货人</label><input value="王砚"></div><div class="row2"><div class="field"><label>手机</label><input value="138****0000"></div><div class="field"><label>邮编</label><input value="400000"></div></div><div class="field"><label>地址</label><input value="重庆市渝中区…"></div><div class="field"><label>配送方式</label><select><option>标准快递 ¥12</option><option>顺丰次日 ¥23</option></select></div>'},
+  {h:'支付',body:'<div class="field"><label>持卡人</label><input value="WANG YAN"></div><div class="field"><label>卡号</label><input value="**** **** **** 4242"></div><div class="row2"><div class="field"><label>有效期</label><input value="08/29"></div><div class="field"><label>CVV</label><input value="***"></div></div>'},
+];
+let cur=0, off=0;
+const shipEl=document.getElementById('ship');
+const offEl=document.getElementById('off');
+const totEl=document.getElementById('tot');
+function renderSteps(){
+  document.querySelectorAll('#steps .step').forEach((el,i)=>{
+    el.classList.toggle('on',i===cur);
+    el.classList.toggle('done',i<cur);
+  });
+}
+function renderStage(){
+  document.getElementById('stage').innerHTML='<h2>'+VIEWS[cur].h+'</h2>'+VIEWS[cur].body;
+  renderSteps();
+}
+function calc(){
+  const ship=12, goods=488, total=goods+ship-off;
+  shipEl.textContent='¥'+ship;
+  offEl.textContent='−¥'+off;
+  totEl.textContent='¥'+total;
+}
+document.getElementById('next').addEventListener('click',()=>{
+  if(cur<2){ cur++; renderStage(); }
+  else { document.getElementById('next').textContent='支付成功 ✓'; }
+});
+document.getElementById('applyc').addEventListener('click',()=>{
+  const code=document.getElementById('promo').value.trim().toUpperCase();
+  off = code==='SAVE50'? 50 : 0;
+  calc();
+});
+apply();renderStage();calc();
+
+// 预览/挂机自动演示：轮换步骤；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  cur=(cur+1)%3; renderStage();
+},2800);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

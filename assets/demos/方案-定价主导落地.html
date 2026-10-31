@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>定价主导落地</title>
+<style>
+:root{
+  --bg:#fbfaf7;--ink:#1c1a17;--dim:#7a7468;--line:#e7e2d8;--accent:#c2603f;
+  --soft:#f3ece3;--radius:16;--gap:18;--fs:15;--maxw:1080;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:Georgia,"Songti SC","PingFang SC",system-ui,serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.55;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1.6 * 1px) calc(var(--gap) * 1px);text-align:center}
+.top{margin-bottom:26px}
+.top h1{margin:0 0 10px;font-size:calc(var(--fs) * 2.3 * 1px);font-weight:700;letter-spacing:-.01em}
+.top p{margin:0;color:var(--dim)}
+/* 月/年切换 */
+.toggle{display:inline-flex;align-items:center;gap:12px;margin:20px 0 4px}
+.toggle .lab{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .9 * 1px)}
+.toggle button{
+  min-height:44px;padding:0 20px;border:1px solid var(--line);background:var(--soft);color:var(--ink);
+  font:inherit;font-family:system-ui,sans-serif;cursor:pointer;border-radius:999px;
+}
+.toggle button.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.save{color:var(--accent);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .82 * 1px);font-weight:600;margin-left:6px}
+/* 三栏定价 */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--gap) * 1px);margin-top:24px;text-align:left}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:26px 22px;display:flex;flex-direction:column;position:relative;
+}
+.card.hot{border:2px solid var(--accent);box-shadow:0 18px 40px rgba(194,96,63,.16)}
+.card .tag{
+  position:absolute;top:-12px;right:18px;background:var(--accent);color:#fff;
+  font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .78 * 1px);font-weight:600;padding:3px 12px;border-radius:999px;
+}
+.card h2{margin:0 0 4px;font-size:calc(var(--fs) * 1.3 * 1px);font-family:system-ui,sans-serif}
+.card .desc{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .86 * 1px);min-height:38px}
+.card .price{font-size:calc(var(--fs) * 2.4 * 1px);font-weight:700;margin:14px 0 2px;font-family:system-ui,sans-serif}
+.card .price small{font-size:calc(var(--fs) * .9 * 1px);color:var(--dim);font-weight:400}
+.card .per{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .8 * 1px);margin-bottom:16px}
+.card ul{list-style:none;margin:0 0 20px;padding:0;font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .88 * 1px);flex:1}
+.card li{padding:7px 0;border-top:1px solid var(--line);display:flex;gap:8px;color:var(--ink)}
+.card li .ck{color:var(--accent);font-weight:700}
+.card .cta{
+  min-height:46px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font:inherit;font-family:system-ui,sans-serif;font-weight:600;cursor:pointer;
+}
+.card.hot .cta{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1 id="title">简单透明的定价</h1>
+    <p>从个人到团队，按需选择。随时升级或降级。</p>
+    <div class="toggle">
+      <span class="lab">按月</span>
+      <button id="m" class="on" onclick="setCycle('m')">月付</button>
+      <button id="y" onclick="setCycle('y')">年付</button>
+      <span class="save" id="save">省 2 个月</span>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#fbfaf7',ink:'#1c1a17',accent:'#c2603f',radius:16,gap:18,fs:15,maxw:1080};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+const PLANS=[
+  {name:'入门',desc:'适合个人尝鲜与小型项目',m:0,y:0,feat:['1 个项目','社区支持','基础模板'],hot:false,cta:'免费开始'},
+  {name:'专业',desc:'成长中的团队最常用的一档',m:99,y:990,feat:['无限项目','优先支持','高级分析','团队协作'],hot:true,cta:'选择专业版'},
+  {name:'企业',desc:'需要合规与专属支持的规模团队',m:299,y:2990,feat:['SSO 单点登录','审计日志','专属客户经理','SLA 保障'],hot:false,cta:'联系销售'}
+];
+let cycle='m';
+function priceOf(p){
+  const v = cycle==='m'? p.m : (p.y? Math.round(p.y/12) : 0);
+  return v;
+}
+function render(){
+  document.getElementById('cards').innerHTML=PLANS.map(p=>
+    '<div class="card'+(p.hot?' hot':'')+'">'
+    + (p.hot?'<span class="tag">最受欢迎</span>':'')
+    + '<h2>'+p.name+'</h2>'
+    + '<div class="desc">'+p.desc+'</div>'
+    + '<div class="price">¥'+priceOf(p)+'<small> / 月</small></div>'
+    + '<div class="per">'+(cycle==='y'&&p.y?'按年付 ¥'+p.y+' · 已均摊':'按月付，随时取消')+'</div>'
+    + '<ul>'+p.feat.map(f=>'<li><span class="ck">✓</span>'+f+'</li>').join('')+'</ul>'
+    + '<button class="cta">'+p.cta+'</button>'
+    + '</div>'
+  ).join('');
+}
+function setCycle(c){
+  cycle=c;
+  document.getElementById('m').classList.toggle('on',c==='m');
+  document.getElementById('y').classList.toggle('on',c==='y');
+  render();
+}
+apply();render();
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时段预约横滑</title>
+<style>
+:root{
+  --paper:#faf4ee;--ink:#4a3b32;--dim:#97836e;--rule:#e6d9c7;--accent:#c98a5e;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--day:60;--slot:48;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efe4d6;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(90,64,40,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .sub{margin-left:auto;font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+.scroll{flex:1;min-height:0;overflow:auto;padding:14px 0 120px}
+.scroll::-webkit-scrollbar{width:0}
+.shop{
+  margin:0 calc(var(--gap) * 1px) 16px;background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 14px;
+}
+.shop .nm{font-size:calc(var(--fs) * .98 * 1px);font-weight:650}
+.shop .ad{
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);margin-top:4px;line-height:1.55;
+}
+.shop .tag{
+  display:inline-block;margin-top:8px;padding:3px 9px;border-radius:6px;
+  background:var(--paper);border:1px solid var(--rule);
+  font-size:calc(var(--fs) * .68 * 1px);color:var(--dim);
+}
+h2{
+  margin:0 calc(var(--gap) * 1px) 10px;font-size:calc(var(--fs) * .86 * 1px);
+  font-weight:650;letter-spacing:.02em;
+}
+/* 日期条：7 个胶囊横排总宽大于 375，靠手指横滑推进，是移动端专属的取日期方式 */
+.days{
+  display:flex;gap:8px;padding:2px calc(var(--gap) * 1px) 14px;
+  overflow-x:auto;border-bottom:1px solid var(--rule);
+}
+.days::-webkit-scrollbar{height:0}
+.day{
+  flex:0 0 calc(var(--day) * 1px);min-height:66px;
+  border:1px solid var(--rule);border-radius:12px;background:var(--card);
+  color:var(--dim);cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.day .w{font-size:calc(var(--fs) * .7 * 1px)}
+.day .d{font-size:calc(var(--fs) * 1.06 * 1px);font-weight:700;color:var(--ink)}
+.day.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.day.on .d{color:#fff}
+.slots{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;
+  padding:14px calc(var(--gap) * 1px) 0;
+}
+.slot{
+  min-height:calc(var(--slot) * 1px);border:1px solid var(--rule);
+  border-radius:11px;background:var(--card);color:var(--ink);
+  font:inherit;font-size:calc(var(--fs) * .84 * 1px);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.slot.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* 满约态：置灰 + 明确不可点，避免用户点了才发现约不上 */
+.slot.off{
+  background:transparent;border-style:dashed;color:var(--dim);
+  cursor:not-allowed;text-decoration:line-through;
+}
+.note{
+  margin:14px calc(var(--gap) * 1px) 0;font-size:calc(var(--fs) * .74 * 1px);
+  color:var(--dim);line-height:1.65;
+}
+/* 底部确认栏必须不透明：半透明会让下面的时段从底透出来，与文字混在一起显脏 */
+.bar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;min-height:64px;
+  background:var(--paper);border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:12px;padding:10px calc(var(--gap) * 1px);
+}
+.bar .info{flex:1;min-width:0}
+.bar .sel{font-size:calc(var(--fs) * .8 * 1px);color:var(--dim)}
+.bar .pri{
+  font-size:calc(var(--fs) * 1.22 * 1px);font-weight:700;color:var(--accent);margin-top:2px;
+}
+.bar .pri small{font-size:calc(var(--fs) * .7 * 1px);font-weight:400;color:var(--dim)}
+.go{
+  flex:0 0 auto;min-height:44px;padding:0 22px;border:0;border-radius:22px;
+  background:var(--accent);color:#fff;font:inherit;font-weight:650;
+  font-size:calc(var(--fs) * .9 * 1px);cursor:pointer;
+}
+.go[disabled]{background:var(--rule);color:var(--dim);cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>预约到店</h1>
+    <span class="sub">木工坊 · 体验课</span>
+  </div>
+
+  <div class="scroll">
+    <div class="shop">
+      <div class="nm">拾木工坊 · 观音桥店</div>
+      <div class="ad">江北区观音桥步行街 9 号 3F-07　距你 1.2km</div>
+      <span class="tag">今日可约 · 提前 2 小时</span>
+    </div>
+
+    <h2>选择日期</h2>
+    <div class="days" id="days"></div>
+
+    <h2 style="margin-top:16px">选择时段</h2>
+    <div class="slots" id="slots"></div>
+
+    <p class="note">每场体验课约 90 分钟，含材料与工具。改约请提前 4 小时，逾期不可退。</p>
+  </div>
+
+  <div class="bar">
+    <div class="info">
+      <div class="sel" id="sel">未选择时段</div>
+      <div class="pri"><small>¥</small><span id="pri">168</span></div>
+    </div>
+    <button class="go" id="go" disabled>确认预约</button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#faf4ee',ink:'#4a3b32',dim:'#97836e',rule:'#e6d9c7',accent:'#c98a5e',
+             card:'#ffffff',radius:14,gap:16,fs:16,day:60,slot:48};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const DAYS=[
+  {w:'周一',d:12},{w:'周二',d:13},{w:'周三',d:14},{w:'周四',d:15},
+  {w:'周五',d:16},{w:'周六',d:17},{w:'周日',d:18}
+];
+// 每个日期的时段表不同，用来体现「换日期=换可选时段」这条真实业务规则
+const SLOTS={
+  12:[['09:00',1],['10:30',1],['14:00',0],['15:30',1],['19:00',0],['20:30',1]],
+  13:[['09:00',0],['10:30',1],['14:00',1],['15:30',1],['19:00',1],['20:30',0]],
+  14:[['09:00',1],['10:30',1],['14:00',1],['15:30',0],['19:00',1],['20:30',1]],
+  15:[['09:00',1],['10:30',0],['14:00',1],['15:30',1],['19:00',0],['20:30',1]],
+  16:[['09:00',1],['10:30',1],['14:00',0],['15:30',1],['19:00',1],['20:30',1]],
+  17:[['09:00',1],['10:30',1],['14:00',1],['15:30',1],['19:00',1],['20:30',1]],
+  18:[['09:00',0],['10:30',1],['14:00',1],['15:30',0],['19:00',1],['20:30',1]]
+};
+const PRICE={w:168,e:198};
+
+let dayIdx=2, picked=null;
+const daysEl=document.getElementById('days');
+const slotsEl=document.getElementById('slots');
+const selEl=document.getElementById('sel');
+const priEl=document.getElementById('pri');
+const goEl=document.getElementById('go');
+
+DAYS.forEach((d,i)=>{
+  const b=document.createElement('button');
+  b.className='day'+(i===dayIdx?' on':'');
+  b.innerHTML='<span class="w">'+d.w+'</span><span class="d">'+d.d+'</span>';
+  b.addEventListener('click',()=>{
+    dayIdx=i;picked=null;
+    daysEl.querySelectorAll('.day').forEach((x,xi)=>x.classList.toggle('on',xi===i));
+    renderSlots();syncBar();
+  });
+  daysEl.appendChild(b);
+});
+
+function isWeekend(i){ return i>=5; }
+
+function renderSlots(){
+  slotsEl.innerHTML='';
+  SLOTS[DAYS[dayIdx].d].forEach(([t,av])=>{
+    const b=document.createElement('button');
+    b.className='slot'+(av?'':' off')+(picked===t?' on':'');
+    b.textContent=av?t:t+' 满';
+    if(av){
+      b.addEventListener('click',()=>{
+        picked=(picked===t)?null:t;
+        slotsEl.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));
+        if(picked) b.classList.add('on');
+        syncBar();
+      });
+    }else{
+      b.disabled=true;
+    }
+    slotsEl.appendChild(b);
+  });
+}
+
+function syncBar(){
+  const weekend=isWeekend(dayIdx);
+  const price=weekend?PRICE.e:PRICE.w;
+  priEl.textContent=price;
+  if(picked){
+    selEl.textContent=DAYS[dayIdx].w+'（'+DAYS[dayIdx].d+'日） '+picked+(weekend?' · 周末场':'');
+    goEl.disabled=false;
+  }else{
+    selEl.textContent='未选择时段';
+    goEl.disabled=true;
+  }
+}
+
+goEl.addEventListener('click',()=>{
+  goEl.textContent='已预约 ✓';
+  setTimeout(()=>{goEl.textContent='确认预约';},1600);
+});
+
+apply();
+renderSlots();
+syncBar();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();renderSlots();syncBar();
+});
+</script>
+</body>
+</html>

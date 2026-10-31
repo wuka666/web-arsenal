@@ -3704,8 +3704,8 @@ if(!reduce) requestAnimationFrame(loop);
     { 键: "wang", 名: "探方网格(px)", 类型: "slider", 默认: 44, 最小: 20, 最大: 96, 步长: 2 },
     { 键: "zihao", 名: "基准字号", 类型: "slider", 默认: 17, 最小: 13, 最大: 22, 步长: 1 },
     { 键: "yuanjiao", 名: "卡片圆角", 类型: "slider", 默认: 10, 最小: 0, 最大: 28, 步长: 1 },
-    { 键: "t1", 名: "主标题文本", 类型: "text", 默认: '探方 T4 · 第三层' },
-    { 键: "t2", 名: "副标题文本", 类型: "text", 默认: '编号 12-B · 灰陶残片，出土于东壁灰坑，胎质夹砂' }
+    { 键: "t1", 名: "主标题文本", 类型: "string", 默认: '探方 T4 · 第三层' },
+    { 键: "t2", 名: "副标题文本", 类型: "string", 默认: '编号 12-B · 灰陶残片，出土于东壁灰坑，胎质夹砂' }
   ],
     来源: "机制参考自 motionsites.ai nival-cyberspace（ConSentinel 演示页，2026-09-19 分析）：光标驱动的圆形揭示遮罩 + 双图层切换；已换题重推为「考古档案库」，视觉表达全部重做，非复刻"
   },
@@ -10383,5 +10383,5333 @@ window.addEventListener("message",function(e){var d=e.data;if(!d||d.type!=="para
   }
  ],
  来源: "自研（零依赖单文件 demo，未临摹特定站点）"
+},
+{
+ id: "S50",
+ 风格名: "方寸指标台",
+ 适配端: "移动端",
+ 风格: "极简瑞士",
+ 场景: "后台·数据看板",
+ 骨架: "顶部标题行（标题 + 周期副标）→ 三档周期分段控件 → 2×2 指标卡组（大数值 + 环比箭头 + 迷你走势线）→ 访客趋势柱状图面板 → 渠道明细列表 → 底部标签栏（4 项）+ 底部安全区。全部信息压在一条 375px 宽的单栏里，不出现任何横向并排的第二栏。",
+ 配色: "浅灰底 #f2f4f7，纯白 #ffffff 承载全部信息块，墨黑 #14181f 只给主数值，冷灰 #8b95a5 给标签与次要文字，强调蓝 #2f6df0 只用在选中态与趋势柱；涨 #e5484d 与跌 #18a058 两色仅出现在环比箭头上。全页无渐变、无阴影，层级靠底色与留白。",
+ 布局骨架: "单栏纵向，左右与上下留白一律 12px；指标卡 2 列等宽、圆角 14px、零阴影；柱状图面板高 110px、柱间 6px；明细行高 44px（触控底线）；底部标签栏 48px + 22px 安全区占位，右上角留出宿主系统控件的胶囊区。",
+ 重色落点: "强调蓝只落在三处：选中的周期段、趋势柱、当前标签栏项。红绿只落在四张卡的环比箭头上。除此之外全页只有白、浅灰底、墨黑、冷灰四种中性色。",
+ 第一屏内容: "标题「方寸指标台」+ 副标「本周 · 全渠道」，紧接三档周期切换，首屏收在 4 张指标卡的下沿——数字是首屏唯一的主角，图表要往下滚才看见。",
+ 删减元素: "不要卡片阴影与渐变；不要侧边导航、顶部汉堡菜单、下拉筛选器；底部标签不超过 4 项（移动端规范建议 ≤4 项以确保点击区域）；图表只用一种形态，不同时给折线与柱状。",
+ 适用: "后台 / BI / 运营看板的移动端形态，或在手机上快速扫一眼核心指标的工具型产品；也适合内部系统的「老板视图」。",
+ 禁忌: "不要把 PC 看板的多栏并排照搬进手机（会被压碎，属破版）；不要把涨跌做成同色——中文语境红涨绿跌是硬约定；不要同时出现超过 1 个加载动画；不要把错误提示做成一闪而过。",
+ 我的说明: "唯一走「指标卡组 + 趋势柱 + 明细列表 + 底部标签栏」骨架的一套。移动端「后台·数据看板」场景此前为 0，与现有六套移动端方案（S38 / S40 / S41 / S47 / S48 / S49）的首屏落点与信息组织无重叠。",
+ Agent提示词: "1 视觉主题与氛围：一屏收尽核心数字的移动端指标台。气质是「冷静、可信、扫一眼就够」——不炫技、不装饰，数字本身就是视觉主角，其余全部退成灰阶背景。密度中等偏松（12px 呼吸），情绪中性。\n2 色彩板与角色：#f2f4f7 页面底（唯一大面积色，负责把白卡托出来）；#ffffff 卡片底（承载全部信息）；#14181f 主数值（全页最高对比，只给数字）；#8b95a5 标签与次要文字；#2f6df0 强调（仅用于：选中的周期段、趋势柱、当前标签栏项）；#e5484d 涨 / #18a058 跌（仅 4 处环比箭头）。禁止第四种强调色，禁止渐变。\n3 字体规则：系统字体栈（-apple-system / PingFang SC / Microsoft YaHei）。层级只有四档——周期副标 0.82em（#8b95a5）、标签 0.8em（#8b95a5）、主数值 1.6em 且 tabular-nums（#14181f）、正文 1em。基准字号 15px 可调（12–18）。\n4 组件规范：周期分段控件＝无边框胶囊，选中项变白底 + 主文字色 + 1px 落影（未选中＝透明底 + 次要色）；指标卡＝白底圆角 14px、内部纵向 6px 间距、无边框无阴影；明细行＝min-height 44px、1px 上描边分隔；底部标签栏＝图标 17px + 文字 0.72em，当前项变强调色，其余次要色。\n5 布局法：间距刻度 6 / 12 / 18（gap 主值 12px）；栅格＝指标区 2 列等宽，其余单栏；留白哲学＝「卡片之间靠底色分开，不靠线」；内容落点＝首屏只放标题 + 周期切换 + 4 张卡，图表与明细放到第二屏。\n6 深度与层级：无阴影系统。surface-1 = 页面底 #f2f4f7，surface-2 = 卡片 #ffffff，surface-3 = 选中态（在 surface-2 上叠主文字色或强调色）。层级完全靠「底色深浅 + 字重」两件事完成。\n7 该做 / 不该做：该做——主数值用等宽数字（tabular-nums）避免刷新时抖动；环比箭头与数值同色，涨红跌绿；底部留安全区。不该做——给卡片加阴影或渐变；并排放第二栏；把涨跌做成同色；用超过 4 个底部标签；同时出现两个加载动画。\n8 响应式行为：以 375px 为基准宽度（移动端固定布局，窄屏不并排、不横滑）；触控目标按附录 B：命中区 ≥44×44（物理尺寸校对 7–9mm）；底部安全区默认 22px（可调 8–40）。折叠策略＝指标卡始终保持 2 列（4 张卡天然适配），极窄屏只缩字号不减列。\n9 Agent 提示词指南：参考卡＝底 #f2f4f7 / 卡 #ffffff / 数字 #14181f / 次要 #8b95a5 / 强调 #2f6df0 / 涨 #e5484d / 跌 #18a058，圆角 14、栅格 12、基准字号 15、安全区 22。即拿即用提示词：「做一个移动端数据看板单页（375px 基准），从上到下依次是：标题行（标题 + 周期副标）、三档周期分段控件（今日 / 7 天 / 30 天）、2×2 指标卡组（每张含标签、大数值 tabular-nums、带涨跌色的环比箭头、一条迷你走势线）、一个 110px 高的柱状图面板（7 根柱，峰值高亮其余降透明度）、渠道明细列表（行高 44px、1px 上描边）、底部标签栏 4 项（图标 + 文字，当前项变强调色，底部留 22px 安全区）。配色：浅灰底 + 白卡 + 墨黑数字 + 冷灰标签 + 单一强调蓝，涨红跌绿仅用于环比。零阴影、零渐变、单栏不并排。」",
+ 演示页: "assets/demos/方案-方寸指标台.html",
+ 来源: "④ 机制参考自 微信小程序设计指南（developers.weixin.qq.com/miniprogram/design，2026-10-06 参考其公开数值规范：字号阶梯 22/17/15/14/12pt、375px 基准宽度、标签分页 2–5 项且建议 ≤4、点击区物理尺寸 7–9mm、轻提示 1.5s 消失），已换题重推，非复刻；版式骨架与配色为自研，零依赖单文件 demo。",
+ 参考站: ["微信小程序设计指南（2026-10-06 参考其公开数值规范）"],
+ 代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方寸指标台</title>
+<style>
+:root{
+  --bg:#f2f4f7;--card:#ffffff;--ink:#14181f;--dim:#8b95a5;--accent:#2f6df0;
+  --up:#e5484d;--down:#18a058;--radius:14;--gap:12;--fs:15;--safePad:22;
 }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#0d1016;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;overflow:hidden;
+  background:var(--bg);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.45;
+  border-radius:26px;box-shadow:0 28px 70px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;position:relative;
+}
+/* 系统控件占位：右上角胶囊区由宿主环境绘制，自绘导航必须给它让位 */
+.capsule{
+  position:absolute;right:10px;top:8px;height:30px;width:88px;z-index:5;
+  border:1px solid rgba(0,0,0,.12);border-radius:999px;background:rgba(255,255,255,.7);
+}
+.nav{
+  flex:0 0 auto;padding:14px calc(var(--gap) * 1px) 0;
+  display:flex;align-items:baseline;gap:8px;
+}
+.nav h1{margin:0;font-size:calc(var(--fs) * 1.35 * 1px);font-weight:650;letter-spacing:.01em}
+.nav .sub{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px)}
+.seg{
+  flex:0 0 auto;display:flex;gap:6px;margin:10px calc(var(--gap) * 1px) 0;
+}
+.seg button{
+  flex:1;min-height:44px;padding:0 6px;border:0;border-radius:8px;
+  background:transparent;color:var(--dim);font:inherit;font-size:calc(var(--fs) * .85 * 1px);cursor:pointer;
+}
+.seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(20,24,31,.06)}
+.body{
+  flex:1;min-height:0;overflow:auto;
+  padding:calc(var(--gap) * 1px);
+  display:flex;flex-direction:column;gap:calc(var(--gap) * 1px);
+}
+.grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:calc(var(--gap) * 1px);
+}
+.kpi{
+  background:var(--card);border-radius:calc(var(--radius) * 1px);
+  padding:12px;display:flex;flex-direction:column;gap:6px;
+}
+.kpi .lab{color:var(--dim);font-size:calc(var(--fs) * .8 * 1px)}
+.kpi .num{
+  font-size:calc(var(--fs) * 1.6 * 1px);font-weight:680;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.kpi .chg{font-size:calc(var(--fs) * .78 * 1px);display:flex;align-items:center;gap:3px}
+.kpi .chg.up{color:var(--up)}
+.kpi .chg.down{color:var(--down)}
+.spark{height:22px;display:block;width:100%}
+.panel{
+  background:var(--card);border-radius:calc(var(--radius) * 1px);padding:12px;
+}
+.panel .ph{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.panel .ph b{font-weight:640;font-size:calc(var(--fs) * .95 * 1px)}
+.panel .ph span{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:110px}
+.bars i{
+  flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:3px;
+  transition:height .5s cubic-bezier(.22,.9,.24,1);
+}
+.bars i.hi{opacity:1}
+.bars i.lo{opacity:.38}
+.xlab{display:flex;gap:6px;margin-top:6px}
+.xlab span{flex:1;text-align:center;color:var(--dim);font-size:calc(var(--fs) * .72 * 1px)}
+.list{display:flex;flex-direction:column}
+.row{
+  display:flex;align-items:center;gap:10px;min-height:44px;
+  padding:0 2px;border-top:1px solid rgba(20,24,31,.07);
+}
+.row:first-child{border-top:0}
+.row .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .v{font-variant-numeric:tabular-nums;font-weight:600}
+.tabbar{
+  flex:0 0 auto;display:flex;background:var(--card);
+  padding:6px 0 calc(var(--safePad) * 1px);
+  border-top:1px solid rgba(20,24,31,.07);
+}
+.tabbar button{
+  flex:1;border:0;background:transparent;color:var(--dim);
+  font:inherit;font-size:calc(var(--fs) * .72 * 1px);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding-top:4px;
+}
+.tabbar button .ic{font-size:17px;line-height:1}
+.tabbar button.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="capsule"></div>
+
+  <div class="nav"><h1>方寸指标台</h1><span class="sub">本周 · 全渠道</span></div>
+  <div class="seg">
+    <button class="on">今日</button><button>7 天</button><button>30 天</button>
+  </div>
+
+  <div class="body">
+    <div class="grid" id="kpis"></div>
+
+    <div class="panel">
+      <div class="ph"><b>访客趋势</b><span id="trendSum">—</span></div>
+      <div class="bars" id="bars"></div>
+      <div class="xlab" id="xlab"></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><b>渠道明细</b><span>按转化排序</span></div>
+      <div class="list" id="rows"></div>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabbar"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={bg:'#f2f4f7',card:'#ffffff',ink:'#14181f',dim:'#8b95a5',accent:'#2f6df0',
+             up:'#e5484d',down:'#18a058',radius:14,gap:12,fs:15,safePad:22};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const KPIS=[
+  {lab:'访问量',  base:12840, unit:''},
+  {lab:'成交单',  base:326,   unit:''},
+  {lab:'转化率',  base:2.54,  unit:'%', dec:2},
+  {lab:'客单价',  base:186.4, unit:'元', dec:1}
+];
+const DAYS=['一','二','三','四','五','六','日'];
+const SRC=[{t:'自然搜索',v:0},{t:'短视频',v:0},{t:'社群',v:0},{t:'直接访问',v:0}];
+const TABS=[['▤','概览'],['≡','明细'],['△','预警'],['◍','我的']];
+
+const kpisEl=document.getElementById('kpis');
+const barsEl=document.getElementById('bars');
+const xlabEl=document.getElementById('xlab');
+const rowsEl=document.getElementById('rows');
+const tabEl=document.getElementById('tabbar');
+const trendSum=document.getElementById('trendSum');
+
+kpisEl.innerHTML=KPIS.map((k,i)=>
+  '<div class="kpi"><span class="lab">'+k.lab+'</span>'
+  +'<span class="num" data-k="'+i+'">0</span>'
+  +'<span class="chg" data-c="'+i+'">—</span>'
+  +'<svg class="spark" data-s="'+i+'" viewBox="0 0 100 22" preserveAspectRatio="none"></svg></div>'
+).join('');
+barsEl.innerHTML=DAYS.map((d,i)=>'<i data-b="'+i+'"></i>').join('');
+xlabEl.innerHTML=DAYS.map(d=>'<span>'+d+'</span>').join('');
+tabEl.innerHTML=TABS.map((t,i)=>'<button data-t="'+i+'"'+(i===0?' class="on"':'')+'><span class="ic">'+t[0]+'</span>'+t[1]+'</button>').join('');
+
+function fmt(v,k){
+  const n=k.dec? v.toFixed(k.dec) : Math.round(v).toLocaleString('zh-CN');
+  return n + (k.unit||'');
+}
+function series(seed){
+  // 固定形状的伪随机序列：同一指标每轮走向相近但不同，视觉上像真的在刷新
+  const out=[];let s=seed%97;
+  for(let i=0;i<7;i++){ s=(s*31+i*17+7)%89; out.push(28+s); }
+  return out;
+}
+function paintSpark(el,data,color){
+  const max=Math.max(...data), min=Math.min(...data), span=(max-min)||1;
+  const pts=data.map((v,i)=>(i/(data.length-1)*100).toFixed(1)+','+(20-((v-min)/span)*18).toFixed(1)).join(' ');
+  el.innerHTML='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+}
+
+let round=0;
+function tick(){
+  round++;
+  KPIS.forEach((k,i)=>{
+    const drift=1+(((round*13+i*29)%17)-8)/220;
+    const cur=k.base*drift;
+    const prev=k.base*(1+((((round-1)*13+i*29)%17)-8)/220);
+    const pct=((cur-prev)/prev)*100;
+    const up=pct>=0;
+    const numEl=kpisEl.querySelector('[data-k="'+i+'"]');
+    const chgEl=kpisEl.querySelector('[data-c="'+i+'"]');
+    numEl.textContent=fmt(cur,k);
+    chgEl.textContent=(up?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'%';
+    chgEl.className='chg '+(up?'up':'down');
+    paintSpark(kpisEl.querySelector('[data-s="'+i+'"]'), series(round*7+i), up?state.up:state.down);
+  });
+
+  const bars=series(round*3+5);
+  const hi=bars.indexOf(Math.max(...bars));
+  bars.forEach((v,i)=>{
+    const el=barsEl.querySelector('[data-b="'+i+'"]');
+    el.style.height=v+'%';
+    el.className=i===hi?'hi':'lo';
+  });
+  trendSum.textContent='峰值 '+Math.max(...bars)+' · 均值 '+Math.round(bars.reduce((a,b)=>a+b,0)/bars.length);
+
+  SRC.forEach(s=>{s.v=Math.round(120+((round*23+s.t.length*37)%260));});
+  SRC.sort((a,b)=>b.v-a.v);
+  rowsEl.innerHTML=SRC.map(s=>
+    '<div class="row"><span class="t">'+s.t+'</span><span class="v">'+s.v+'</span></div>'
+  ).join('');
+
+  tabEl.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===(round%TABS.length)));
+}
+
+tabEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  tabEl.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+}));
+
+apply();
+tick();
+// 缩略图与挂机预览无人操作，靠自动刷新保证画面一直是"活的"而不是静止图
+setInterval(tick,2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();tick();
+});
+<\/script>
+</body>
+</html>
+`,
+ 参数: [
+  {
+   键: "bg",
+   名: "页面底色",
+   类型: "color",
+   默认: "#f2f4f7"
+  },
+  {
+   键: "card",
+   名: "卡片底色",
+   类型: "color",
+   默认: "#ffffff"
+  },
+  {
+   键: "ink",
+   名: "主数值色",
+   类型: "color",
+   默认: "#14181f"
+  },
+  {
+   键: "dim",
+   名: "标签与次要文字色",
+   类型: "color",
+   默认: "#8b95a5"
+  },
+  {
+   键: "accent",
+   名: "强调色",
+   类型: "color",
+   默认: "#2f6df0"
+  },
+  {
+   键: "up",
+   名: "上涨色",
+   类型: "color",
+   默认: "#e5484d"
+  },
+  {
+   键: "down",
+   名: "下跌色",
+   类型: "color",
+   默认: "#18a058"
+  },
+  {
+   键: "radius",
+   名: "卡圆角(px)",
+   类型: "slider",
+   默认: 14,
+   最小: 0,
+   最大: 26,
+   步长: 1
+  },
+  {
+   键: "gap",
+   名: "栅格间距(px)",
+   类型: "slider",
+   默认: 12,
+   最小: 6,
+   最大: 24,
+   步长: 1
+  },
+  {
+   键: "fs",
+   名: "基准字号(px)",
+   类型: "slider",
+   默认: 15,
+   最小: 12,
+   最大: 18,
+   步长: 1
+  },
+  {
+   键: "safePad",
+   名: "底部安全区(px)",
+   类型: "slider",
+   默认: 22,
+   最小: 8,
+   最大: 40,
+   步长: 1
+  }
+ ],
+ 来源: "④ 机制参考自 微信小程序设计指南（developers.weixin.qq.com/miniprogram/design，2026-10-06 参考其公开数值规范：字号阶梯 22/17/15/14/12pt、375px 基准宽度、标签分页 2–5 项且建议 ≤4、点击区物理尺寸 7–9mm、轻提示 1.5s 消失），已换题重推，非复刻；版式骨架与配色为自研，零依赖单文件 demo。"
+},
+{
+ id: "S51",
+ 风格名: "横阅·品牌索引",
+ 适配端: "移动端",
+ 风格: "编辑杂志",
+ 场景: "官网·品牌站",
+ 骨架: "刊物报头区（品牌行 + 双行大标题 + 一句导语）→ 横向可滑的理念卡带（3 张，宽度固定、靠手指横滑推进）→ 编号索引列表（编号 + 名称 + 箭头，行高 56px）→ 底部常驻 CTA 条。整页单栏纵向，唯一的横向运动只出现在理念卡带。",
+ 配色: "纸本米 #f6f3ee 为底，宣白 #fffdf8 作卡片，墨褐 #1b1712 给主文字，烟褐 #8d8275 给次要文字与编号，朱砂 #b4462f 只用在三处：大标题里的两个字、理念卡编号、当前索引行与底部 CTA。全页无渐变、无阴影。",
+ 布局骨架: "单栏；左右留白 14px；报头下方一条 1px 描边（像刊物报头与正文的分界）；理念卡固定宽 230px、横向溢出可滑（不分页、不加翻页钮）；索引行高 56px、1px 上描边分隔；底部 CTA 常驻 52px 落在拇指区。",
+ 重色落点: "朱砂只落在三处：大标题里两个字、三张理念卡的编号、当前索引行 + 底部 CTA。除此之外全页只有纸本米、宣白、墨褐、烟褐四种中性色，不出现第二种强调色。",
+ 第一屏内容: "品牌行（叁隅 SANCORNER + EST. 2019）→ 双行大标题（第二行「能被记住」染朱砂）→ 一句导语 → 露出理念卡带的第一张与索引的开头两行。",
+ 删减元素: "不要顶部导航栏、汉堡菜单、轮播圆点指示器与翻页箭头；不要卡片阴影与渐变；横滑卡带不加任何按钮（移动端靠手势）；索引不超过 4 行。",
+ 适用: "品牌官网 / 工作室 / 设计机构的移动端首页——需要先把气质立住，再让人自己挑感兴趣的那一项往下点的场合。",
+ 禁忌: "不要把横滑做成自动无限轮播（会稀释「只有三条」的分量，且用户容易错过最后一条）；不要给每张理念卡换色；不要把整页做成一张长图（会丢掉索引的跳转能力）；不要给 CTA 加第二种颜色。",
+ 我的说明: "唯一走「刊物报头 + 横滑理念卡带 + 编号索引 + 底部常驻 CTA」骨架的一套。官网·品牌站场景的移动端此前为 0 套；横滑卡带属移动端专属手势（规矩 22③），是这套判移动端的依据之一。",
+ Agent提示词: "1 视觉主题与氛围：一本摊在手机里的刊物型品牌首页。气质是「有立场、慢、留得下」——先立气质再谈业务，文字排得像杂志报头，大标题占视觉主导，其余全部退成纸本色。密度偏松（14px 呼吸），情绪沉静。\n2 色彩板与角色：#f6f3ee 纸本底（唯一大面积色）；#fffdf8 卡片宣白（承载理念卡）；#1b1712 墨褐（主文字与标题）；#8d8275 烟褐（导语、编号、次要文字）；#b4462f 朱砂（仅三处：大标题里两个字、理念卡编号、当前索引行与底部 CTA）。禁止第二种强调色，禁止渐变与阴影。\n3 字体规则：标题走衬线族（Georgia / Songti SC / Noto Serif SC），正文与索引走系统无衬线族（两族并用是这套的气质开关）。层级四档——品牌行 0.78em（#8d8275，字距放宽）、大标题 1.75em 粗（#1b1712，其中一个词染朱砂）、导语 0.88em（#8d8275，限宽 30ch）、索引名 1.02em。基准字号 15px 可调（13–18）。\n4 组件规范：理念卡＝宣白底 + 1px 描边 + 圆角 10px，内部纵向 7px 间距（编号 0.72em 朱砂 → 标题 1.02em 粗 → 说明 0.84em 烟褐）；索引行＝min-height 56px、1px 上描边、编号 26px 定宽（tabular-nums），当前行变朱砂且箭头右移 4px；底部 CTA＝朱砂实底 + 反白文字、常驻 52px、字距略放。\n5 布局法：间距刻度 7 / 14 / 22（gap 主值 14px）；栅格＝全页单栏，唯一例外是理念卡带（固定 230px 宽横向排列，溢出可滑）；留白哲学＝「靠 1px 描边分栏，不靠卡片浮起来」；内容落点＝首屏只放报头 + 第一张理念卡 + 索引开头，其余靠滚。\n6 深度与层级：无阴影系统。surface-1 = 纸本底 #f6f3ee，surface-2 = 卡片宣白 #fffdf8，surface-3 = 朱砂实底（仅 CTA）。层级靠「描边 + 字号 + 字重」三件事完成，不靠投影。\n7 该做 / 不该做：该做——大标题里只染一个词，不要整行染色；横滑卡带不留翻页钮，靠手势；底部 CTA 常驻在拇指区。不该做——把横滑做成无限轮播；给每张理念卡换色；加圆点指示器；索引超过 4 行；用第二种强调色。\n8 响应式行为：以 375px 为基准宽度（移动端固定布局，窄屏不并排、不横滑整页——唯一的横向运动在理念卡带内）；触控目标按附录 B：命中区 ≥44×44（物理口径 7–9mm），索引行 56px、CTA 52px 均达标；底部 CTA 常驻不随滚动收起。折叠策略＝理念卡带始终保持横向，极窄屏只缩卡宽不改为堆叠。\n9 Agent 提示词指南：参考卡＝纸本 #f6f3ee / 宣白 #fffdf8 / 墨褐 #1b1712 / 烟褐 #8d8275 / 朱砂 #b4462f，圆角 10、栅格 14、基准字号 15、卡宽 230、CTA 高 52。即拿即用提示词：「做一个移动端刊物型品牌首页（375px 基准），从上到下依次是：报头区（品牌名 + 成立年份、双行大标题其中一行的一个词染朱砂、一句不超过 30 字的导语，下方 1px 描边）、横向可滑的理念卡带（3 张等宽卡片，每张含编号、粗标题、两行说明，不加翻页钮与圆点）、编号索引列表（4 行，行高 56px，编号定宽 tabular-nums，当前行变朱砂且箭头右移）、底部常驻 CTA 条（朱砂实底反白字，52px 高）。标题用衬线族、正文用系统无衬线族。零阴影、零渐变、单栏，唯一横向运动在卡带内。」",
+ 演示页: "assets/demos/方案-横阅品牌索引.html",
+ 来源: "自研（零依赖单文件 demo；版式骨架与配色均为自研，未临摹特定站点；横滑卡带为移动端通用手势模式）",
+ 参考站: ["自研（无特定参考站）"],
+ 代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>横阅品牌索引</title>
+<style>
+:root{
+  --bg:#f6f3ee;--card:#fffdf8;--ink:#1b1712;--dim:#8d8275;--accent:#b4462f;
+  --radius:10;--gap:14;--fs:15;--cardW:230;--ctaH:52;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#14120f;display:flex;align-items:center;justify-content:center;
+  font-family:Georgia,"Songti SC","Noto Serif SC",serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;overflow:hidden;position:relative;
+  background:var(--bg);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;
+}
+.masthead{
+  flex:0 0 auto;padding:22px calc(var(--gap) * 1px) 14px;
+  border-bottom:1px solid rgba(27,23,18,.14);
+}
+.brand{
+  display:flex;align-items:baseline;justify-content:space-between;
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);letter-spacing:.06em;
+}
+.claim{
+  margin:14px 0 0;font-size:calc(var(--fs) * 1.75 * 1px);font-weight:700;
+  line-height:1.18;letter-spacing:-.01em;
+}
+.claim i{font-style:normal;color:var(--accent)}
+.lede{
+  margin:8px 0 0;color:var(--dim);font-size:calc(var(--fs) * .88 * 1px);
+  max-width:30ch;
+}
+.belt{
+  flex:0 0 auto;overflow-x:auto;overflow-y:hidden;
+  display:flex;gap:calc(var(--gap) * .75 * 1px);
+  padding:calc(var(--gap) * 1px);
+  scrollbar-width:none;
+}
+.belt::-webkit-scrollbar{display:none}
+.idea{
+  flex:0 0 auto;width:calc(var(--cardW) * 1px);
+  background:var(--card);border-radius:calc(var(--radius) * 1px);
+  padding:14px;display:flex;flex-direction:column;gap:7px;
+  border:1px solid rgba(27,23,18,.08);
+}
+.idea .no{
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--accent);letter-spacing:.14em;
+}
+.idea b{font-size:calc(var(--fs) * 1.02 * 1px);font-weight:680;line-height:1.3}
+.idea p{margin:0;color:var(--dim);font-size:calc(var(--fs) * .84 * 1px);line-height:1.45}
+.index{
+  flex:1;min-height:0;overflow:auto;padding:0 calc(var(--gap) * 1px);
+}
+.index .h{
+  color:var(--dim);font-size:calc(var(--fs) * .74 * 1px);
+  letter-spacing:.1em;padding:10px 0 6px;
+}
+.line{
+  display:flex;align-items:center;gap:12px;min-height:56px;
+  padding:0 2px;border-top:1px solid rgba(27,23,18,.12);cursor:pointer;
+}
+.line:first-of-type{border-top:0}
+.line .no{
+  flex:0 0 auto;width:26px;color:var(--dim);
+  font-size:calc(var(--fs) * .78 * 1px);font-variant-numeric:tabular-nums;
+}
+.line .nm{flex:1;min-width:0;font-size:calc(var(--fs) * 1.02 * 1px)}
+.line .ar{flex:0 0 auto;color:var(--dim);transition:.25s}
+.line.on .nm{color:var(--accent)}
+.line.on .no{color:var(--accent)}
+.line.on .ar{color:var(--accent);transform:translateX(4px)}
+.cta{
+  flex:0 0 auto;height:calc(var(--ctaH) * 1px);
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:calc(var(--fs) * .95 * 1px);letter-spacing:.04em;
+  font-family:system-ui,-apple-system,"PingFang SC",sans-serif;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header class="masthead">
+    <div class="brand"><span>叁隅 SANCORNER</span><span>EST. 2019</span></div>
+    <h1 class="claim">把一件事<br>做到<i>能被记住</i></h1>
+    <p class="lede">我们只做三件事，每件都做了六年。</p>
+  </header>
+
+  <div class="belt" id="belt"></div>
+
+  <div class="index">
+    <div class="h">我们做什么</div>
+    <div id="lines"></div>
+  </div>
+
+  <div class="cta">预约一次到访 →</div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={bg:'#f6f3ee',card:'#fffdf8',ink:'#1b1712',dim:'#8d8275',accent:'#b4462f',
+             radius:10,gap:14,fs:15,cardW:230,ctaH:52};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const IDEAS=[
+  ['01','先想清楚','开工前把"为什么做"写满三页纸，写不出来就不开工。'],
+  ['02','慢一点','一年只接六个项目，每个都留够返工的时间。'],
+  ['03','留下来','交付后两年内免费维护，让作品真的站得住。']
+];
+const LINES=[
+  ['01','空间与陈设'],
+  ['02','品牌与出版'],
+  ['03','器物与包装'],
+  ['04','展览与活动']
+];
+const belt=document.getElementById('belt');
+const lines=document.getElementById('lines');
+
+belt.innerHTML=IDEAS.map(i=>
+  '<div class="idea"><span class="no">'+i[0]+'</span><b>'+i[1]+'</b><p>'+i[2]+'</p></div>'
+).join('');
+lines.innerHTML=LINES.map((l,i)=>
+  '<div class="line" data-i="'+i+'"><span class="no">'+l[0]+'</span>'
+  +'<span class="nm">'+l[1]+'</span><span class="ar">→</span></div>'
+).join('');
+
+let step=0;
+function tick(){
+  // 横滑卡片带无人操作时自己往前走一段，缩略图与挂机预览不会是一张静止的图
+  const max=belt.scrollWidth-belt.clientWidth;
+  const pos=(step%3)*(state.cardW+state.gap*0.75);
+  belt.scrollTo({left:Math.min(pos,max),behavior:'smooth'});
+  lines.querySelectorAll('.line').forEach((el,i)=>el.classList.toggle('on',i===(step%LINES.length)));
+  step++;
+}
+
+apply();
+tick();
+setInterval(tick,2400);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();tick();
+});
+<\/script>
+</body>
+</html>
+`,
+ 参数: [
+  {
+   键: "bg",
+   名: "纸本底色",
+   类型: "color",
+   默认: "#f6f3ee"
+  },
+  {
+   键: "card",
+   名: "卡片底色",
+   类型: "color",
+   默认: "#fffdf8"
+  },
+  {
+   键: "ink",
+   名: "主文字色",
+   类型: "color",
+   默认: "#1b1712"
+  },
+  {
+   键: "dim",
+   名: "次要文字色",
+   类型: "color",
+   默认: "#8d8275"
+  },
+  {
+   键: "accent",
+   名: "朱砂强调色",
+   类型: "color",
+   默认: "#b4462f"
+  },
+  {
+   键: "radius",
+   名: "圆角(px)",
+   类型: "slider",
+   默认: 10,
+   最小: 0,
+   最大: 22,
+   步长: 1
+  },
+  {
+   键: "gap",
+   名: "栅格间距(px)",
+   类型: "slider",
+   默认: 14,
+   最小: 8,
+   最大: 26,
+   步长: 1
+  },
+  {
+   键: "fs",
+   名: "基准字号(px)",
+   类型: "slider",
+   默认: 15,
+   最小: 13,
+   最大: 18,
+   步长: 1
+  },
+  {
+   键: "cardW",
+   名: "理念卡宽(px)",
+   类型: "slider",
+   默认: 230,
+   最小: 180,
+   最大: 300,
+   步长: 5
+  },
+  {
+   键: "ctaH",
+   名: "底部 CTA 高(px)",
+   类型: "slider",
+   默认: 52,
+   最小: 44,
+   最大: 72,
+   步长: 2
+  }
+ ],
+ 来源: "自研（零依赖单文件 demo；版式骨架与配色均为自研，未临摹特定站点；横滑卡带为移动端通用手势模式）"
+},
+{
+ id: "S52",
+ 风格名: "玄览·个人中心",
+ 适配端: "移动端",
+ 风格: "暗色",
+ 场景: "其他·场景",
+ 骨架: "纯 CSS 头图（斜向渐变 + 一层径向光斑）→ 头像与身份行（负边距上移压住头图下沿）→ 成长值卡（等级数字 + 进度条）→ 三格等分数据条 → 两组功能列表（账户 / 偏好，行高 52px、行首图标 + 右侧值 + 箭头）→ 底部居中的退出登录按钮。全页单栏纵向，无底部标签栏。",
+ 配色: "玄青底 #0f1116，卡片 #181b22，亮白 #eef1f6 给主文字，雾灰 #8e96a6 给次要文字与右侧值，紫罗兰 #7b6cf6 只落在三处（头像渐变、成长值进度条、行首图标）；退出按钮用低饱和红 #ff8a8a + 同色描边。全页无卡片阴影，层级靠底色差与 1px 半透明描边。",
+ 布局骨架: "单栏；头图固定 150px 高；头像 64px 圆形 + 2px 与底色同色的描边，靠负边距上移压住头图下沿；卡片圆角 16px、块间距 12px；功能行 52px 高、1px rgba(255,255,255,.06) 上描边；退出按钮 48px 高、居中、圆角胶囊。",
+ 重色落点: "紫罗兰只落在三处：头像渐变（线性 140°）、成长值进度条、每行行首图标。红色只出现在「退出登录」一处——全页唯一的破坏性操作，用低饱和红而非高亮实底，避免被误当作主操作。",
+ 第一屏内容: "头图（无任何文字叠压）→ 圆形头像 + 「kwan」+ 「加入第 428 天 · 玄览会员」→ 成长值卡（当前值 / 目标值 + 进度条），首屏下半露出三格数据条。",
+ 删减元素: "不要底部标签栏（会员页是入口页而不是 Tab 页）；不要在头图上叠品牌 slogan；不要卡片阴影与渐变卡片；不要超过两组列表；不要给行首图标配彩色底；不要把退出做成主色实底按钮。",
+ 适用: "移动端应用的个人中心 / 会员页 / 设置入口页——需要把「我是谁、我有什么、我能去哪」三件事在一屏里串起来的场合；也适合作为 App 的「我的」Tab 内页。",
+ 禁忌: "不要把头像做成方形（会和圆角卡片打架）；不要在头图上叠文字（会与身份行抢焦点）；不要给每个列表行加图标底色（暗色下会花）；不要用高亮实底强调退出登录；不要省掉头图与身份行之间的负边距压叠（会失去「头像从图里长出来」的连续感）。",
+ 我的说明: "唯一走「CSS 头图 + 叠压头像 + 成长进度 + 三格数据 + 两组设置列表」骨架的一套；「其他·场景」的移动端此前为 0 套。头图完全用纯 CSS 渐变叠出（零图片零外链，规矩 11），不是图片素材。",
+ Agent提示词: "1 视觉主题与氛围：一个暗色、安静、偏「个人领地」的会员中心。气质是「沉、私密、有秩序」——不用亮色讨好，靠层次和留白把信息分层；头图负责氛围，其余全部是安静的卡片。密度中等（12px 呼吸），情绪内敛。\n2 色彩板与角色：#0f1116 玄青底（唯一大面积色）；#181b22 卡片（承载全部信息块）；#eef1f6 亮白（主文字与数字）；#8e96a6 雾灰（次要文字、右侧值、分组小标题）；#7b6cf6 紫罗兰（仅三处：头像渐变、成长值进度条、行首图标）；#ff8a8a 低饱和红（仅退出登录一处）。禁止高饱和撞色，禁止卡片阴影。\n3 字体规则：系统字体栈（-apple-system / PingFang SC / Microsoft YaHei）。层级四档——分组小标题 0.74em（#8e96a6，字距放宽）、次要值与说明 0.78–0.84em（#8e96a6）、正文与行名 0.95–1em（#eef1f6）、数值 1.25em 且 tabular-nums（#eef1f6）、身份名 1.15em 粗。基准字号 15px 可调（13–18）。\n4 组件规范：成长值卡＝卡片底 + 14px 内距，顶部一行「成长值 X / 3000」与右侧提示，下方 7px 高轨道 + 紫罗兰渐变填充条（1.1s cubic-bezier(.22,.9,.24,1) 过渡）；数据格＝三格等分、居中、数字在上标签在下；功能行＝min-height 52px、1px 半透明上描边、行首图标 22px 定宽居中、右侧值 + 箭头；退出按钮＝胶囊、48px 高、透明底 + 红色描边 + 红字。\n5 布局法：间距刻度 6 / 12 / 16（gap 主值 12px）；栅格＝全页单栏，仅数据区为三格等分；留白哲学＝「靠底色差分层，不靠阴影浮起」；内容落点＝首屏给头图 + 身份 + 成长值，三格数据与列表靠滚。\n6 深度与层级：无阴影系统。surface-1 = 玄青底 #0f1116，surface-2 = 卡片 #181b22，surface-3 = 头图（渐变层，视觉最上的氛围面）。层级靠「底色差 + 1px 描边 + 字重」完成。头图由两层背景叠成：一层线性渐变（160°，从紫灰到页面底色）+ 一层径向光斑（定位在右上），必要时再加一层底部径向补光。\n7 该做 / 不该做：该做——头图上不压任何文字；头像带 2px 与底色同色的描边并负边距上移；进度条数值用 tabular-nums 防抖动；退出用低饱和红而非高亮实底。不该做——给卡片加阴影；在头图上叠 slogan；给行首图标加彩色底块；用底部标签栏；把退出做成主色按钮。\n8 响应式行为：以 375px 为基准宽度（移动端固定布局，不并排、不横滑）；触控目标按附录 B：命中区 ≥44×44（物理口径 7–9mm），功能行 52px、头像 64px、退出按钮 48px 均达标；头图高度可调（90–240px），极窄屏只缩字号与头图，不改为两栏。折叠策略＝列表始终单栏纵排，分组标题保留。\n9 Agent 提示词指南：参考卡＝底 #0f1116 / 卡 #181b22 / 主文 #eef1f6 / 次文 #8e96a6 / 紫罗兰 #7b6cf6 / 退出红 #ff8a8a，圆角 16、栅格 12、基准字号 15、头图 150、头像 64。即拿即用提示词：「做一个暗色移动端个人中心（375px 基准），从上到下依次是：纯 CSS 头图（一层 160° 线性渐变 + 一层右上径向光斑，不放任何文字，高 150px）、圆形头像（64px、2px 与底色同色描边、负边距上移压住头图下沿）+ 昵称与「加入第 N 天 · 会员」、成长值卡（一行数值 + 7px 进度条，填充用紫罗兰渐变）、三格等分数据条（数字在上标签在下）、两组功能列表（分组标题 + 行：行首图标 + 名称 + 右侧值 + 箭头，行高 52px、1px 半透明上描边）、底部居中的退出登录按钮（胶囊、透明底、红字红描边）。不要底部标签栏、不要卡片阴影、不要头图文字。配色只用 玄青底 / 卡片 / 亮白 / 雾灰 / 单一紫罗兰 / 退出红。」",
+ 演示页: "assets/demos/方案-玄览个人中心.html",
+ 来源: "自研（零依赖单文件 demo；版式骨架与配色均为自研，未临摹特定站点；头图为纯 CSS 渐变叠成，非图片素材）",
+ 参考站: ["自研（无特定参考站）"],
+ 代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>玄览个人中心</title>
+<style>
+:root{
+  --bg:#0f1116;--card:#181b22;--ink:#eef1f6;--dim:#8e96a6;--accent:#7b6cf6;
+  --radius:16;--gap:12;--fs:15;--heroH:150;--av:64;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#07080b;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;overflow:hidden;position:relative;
+  background:var(--bg);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;
+}
+/* 头图是纯 CSS 叠出来的：一道斜向渐变 + 一层径向光斑，零图片零外链 */
+.hero{
+  flex:0 0 auto;height:calc(var(--heroH) * 1px);position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 78% 8%, rgba(123,108,246,.55), transparent 62%),
+    linear-gradient(160deg, #2a2550 0%, #1a1c2e 48%, var(--bg) 100%);
+}
+.hero::after{
+  content:"";position:absolute;inset:auto -20% -60% -20%;height:70%;
+  background:radial-gradient(60% 100% at 50% 100%, rgba(123,108,246,.28), transparent 70%);
+}
+.profile{
+  position:relative;z-index:2;margin-top:calc(var(--heroH) * -1px + 22px);
+  padding:0 calc(var(--gap) * 1px);
+  display:flex;align-items:flex-end;gap:12px;
+}
+.av{
+  flex:0 0 auto;width:calc(var(--av) * 1px);height:calc(var(--av) * 1px);
+  border-radius:50%;border:2px solid var(--bg);
+  background:linear-gradient(140deg, #7b6cf6, #3f4bd8);
+  display:flex;align-items:center;justify-content:center;
+  font-size:calc(var(--fs) * 1.6 * 1px);font-weight:700;color:#fff;
+}
+.who{flex:1;min-width:0;padding-bottom:2px}
+.who b{display:block;font-size:calc(var(--fs) * 1.15 * 1px)}
+.who span{color:var(--dim);font-size:calc(var(--fs) * .8 * 1px)}
+.body{
+  flex:1;min-height:0;overflow:auto;
+  padding:calc(var(--gap) * 1px);display:flex;flex-direction:column;gap:calc(var(--gap) * 1px);
+}
+.card{background:var(--card);border-radius:calc(var(--radius) * 1px);padding:14px}
+.lv{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.lv b{font-size:calc(var(--fs) * .95 * 1px)}
+.lv span{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px)}
+.track{height:7px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.track i{
+  display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg, var(--accent), #b8a9ff);
+  transition:width 1.1s cubic-bezier(.22,.9,.24,1);
+}
+.stats{display:flex;gap:calc(var(--gap) * 1px)}
+.stat{
+  flex:1;background:var(--card);border-radius:calc(var(--radius) * 1px);
+  padding:12px 8px;text-align:center;
+}
+.stat b{display:block;font-size:calc(var(--fs) * 1.25 * 1px);font-variant-numeric:tabular-nums}
+.stat span{color:var(--dim);font-size:calc(var(--fs) * .74 * 1px)}
+.group{background:var(--card);border-radius:calc(var(--radius) * 1px);overflow:hidden}
+.group .gt{
+  padding:12px 14px 6px;color:var(--dim);
+  font-size:calc(var(--fs) * .74 * 1px);letter-spacing:.08em;
+}
+.row{
+  display:flex;align-items:center;gap:12px;min-height:52px;
+  padding:0 14px;border-top:1px solid rgba(255,255,255,.06);cursor:pointer;
+}
+.group .row:first-of-type{border-top:0}
+.row .ic{flex:0 0 auto;width:22px;height:22px;color:var(--accent)}
+.row .ic svg{width:100%;height:100%;display:block}
+.row .t{flex:1;min-width:0}
+.row .v{color:var(--dim);font-size:calc(var(--fs) * .84 * 1px)}
+.row .ar{color:var(--dim);font-size:calc(var(--fs) * .9 * 1px)}
+.quit{
+  flex:0 0 auto;margin:calc(var(--gap) * 1px) auto 18px;
+  min-height:48px;padding:0 26px;border-radius:99px;
+  border:1px solid rgba(255,120,120,.35);background:transparent;
+  color:#ff8a8a;font:inherit;font-size:calc(var(--fs) * .9 * 1px);cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="hero"></div>
+
+  <div class="profile">
+    <div class="av" id="av">K</div>
+    <div class="who"><b>kwan</b><span>加入第 428 天 · 玄览会员</span></div>
+  </div>
+
+  <div class="body">
+    <div class="card">
+      <div class="lv"><b>成长值 <span id="lvNum">0</span> / 3000</b><span id="lvTip">离下一级还差 —</span></div>
+      <div class="track"><i id="bar" style="width:0%"></i></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="group" id="g1"></div>
+    <div class="group" id="g2"></div>
+  </div>
+
+  <button class="quit">退出登录</button>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={bg:'#0f1116',card:'#181b22',ink:'#eef1f6',dim:'#8e96a6',accent:'#7b6cf6',
+             radius:16,gap:12,fs:15,heroH:150,av:64};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const STATS=[['关注','8'],['收藏','126'],['优惠券','3']];
+// 图标一律内联 SVG：字符图标（◫ ◔ 等）在字体缺字形时会渲染成方块，实测已中招
+const ICO={
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.6v2.1M12 18.3v2.1M3.6 12h2.1M18.3 12h2.1M6.1 6.1l1.5 1.5M16.4 16.4l1.5 1.5M17.9 6.1l-1.5 1.5M7.6 16.4l-1.5 1.5"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 7h14M5 12h14M5 17h9"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14.6A8 8 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 16.2H6l1.4-2.3V10a4.6 4.6 0 1 1 9.2 0v3.9l1.4 2.3z"/><path d="M10.3 18.4a1.8 1.8 0 0 0 3.4 0"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.4"/><path d="M12 11.2v4.6M12 7.9h.01"/></svg>'
+};
+const G1=[['gear','账号与安全','已绑定'],['list','我的订单','2 待收货'],['pin','收货地址','3 个']];
+const G2=[['moon','深色模式','跟随系统'],['bell','消息提醒','已开启'],['info','关于玄览','v3.2.1']];
+
+document.getElementById('stats').innerHTML=STATS.map(s=>
+  '<div class="stat"><b>'+s[1]+'</b><span>'+s[0]+'</span></div>'
+).join('');
+const rows=list=>list.map(r=>
+  '<div class="row"><span class="ic">'+(ICO[r[0]]||'')+'</span><span class="t">'+r[1]+'</span>'
+  +'<span class="v">'+r[2]+'</span><span class="ar">›</span></div>'
+).join('');
+document.getElementById('g1').innerHTML='<div class="gt">账户</div>'+rows(G1);
+document.getElementById('g2').innerHTML='<div class="gt">偏好</div>'+rows(G2);
+
+const bar=document.getElementById('bar');
+const lvNum=document.getElementById('lvNum');
+const lvTip=document.getElementById('lvTip');
+const TARGET=3000;
+let grow=0;
+function tick(){
+  // 成长值每轮推进一点再回落，进度条因此一直在动；缩略图与挂机预览不会是一张静止的图
+  grow=(grow+1)%7;
+  const val=1860+Math.round(Math.sin(grow/7*Math.PI*2)*180);
+  bar.style.width=(val/TARGET*100).toFixed(1)+'%';
+  lvNum.textContent=val.toLocaleString('zh-CN');
+  lvTip.textContent='离下一级还差 '+(TARGET-val).toLocaleString('zh-CN');
+}
+
+apply();
+tick();
+setInterval(tick,2200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();tick();
+});
+<\/script>
+</body>
+</html>
+`,
+ 参数: [
+  {
+   键: "bg",
+   名: "页面底色",
+   类型: "color",
+   默认: "#0f1116"
+  },
+  {
+   键: "card",
+   名: "卡片底色",
+   类型: "color",
+   默认: "#181b22"
+  },
+  {
+   键: "ink",
+   名: "主文字色",
+   类型: "color",
+   默认: "#eef1f6"
+  },
+  {
+   键: "dim",
+   名: "次要文字色",
+   类型: "color",
+   默认: "#8e96a6"
+  },
+  {
+   键: "accent",
+   名: "紫罗兰强调色",
+   类型: "color",
+   默认: "#7b6cf6"
+  },
+  {
+   键: "radius",
+   名: "卡片圆角(px)",
+   类型: "slider",
+   默认: 16,
+   最小: 0,
+   最大: 28,
+   步长: 1
+  },
+  {
+   键: "gap",
+   名: "栅格间距(px)",
+   类型: "slider",
+   默认: 12,
+   最小: 6,
+   最大: 22,
+   步长: 1
+  },
+  {
+   键: "fs",
+   名: "基准字号(px)",
+   类型: "slider",
+   默认: 15,
+   最小: 13,
+   最大: 18,
+   步长: 1
+  },
+  {
+   键: "heroH",
+   名: "头图高(px)",
+   类型: "slider",
+   默认: 150,
+   最小: 90,
+   最大: 240,
+   步长: 5
+  },
+  {
+   键: "av",
+   名: "头像直径(px)",
+   类型: "slider",
+   默认: 64,
+   最小: 44,
+   最大: 96,
+   步长: 2
+  }
+ ],
+ 来源: "自研（零依赖单文件 demo；版式骨架与配色均为自研，未临摹特定站点；头图为纯 CSS 渐变叠成，非图片素材）"
+},
+  {
+      id: "S53",
+      风格名: "注疏·阅读版式",
+      适配端: "移动端",
+      风格: "编辑杂志",
+      场景: "内容·阅读",
+      骨架: "阅读进度细线（3px，贴顶）→ 吸顶章节条（章节名 + 书签按钮）→ 单栏竖排正文区（衬线大标题 + 作者信息行 + 六段正文，段内关键词带虚下划线）→ 底部上浮注释卡（只停在工具条之上，不遮被注段落）→ 底部三键工具条（目录 / 字号 / 夜间）。整页唯一的浮层是注释卡，它从底部升起，被注段落同时被推到视口上三分之一处让位。",
+      配色: "纸面米色 #faf7f1 为底，纯白 #ffffff 作注释卡，墨褐 #241f18 给正文，烟褐 #8a8172 给章节名与次要信息，麦黄 #e2dbc9 给所有分隔线；朱砂 #b23a2e 一处通管全篇：进度条、被选中段落的左侧竖线、正文内的批注关键词、注释卡的标签行。全页无渐变、无大面积阴影。",
+      布局骨架: "单栏；左右留白 18px；顶部 3px 进度线；章节条 min-height 52px、底部 1px 麦黄描边；正文区独立纵向滚动（ scrollbar 隐藏），底部预留 130px 给工具条与注释卡；注释卡左右各 10px 边距、底距 74px 浮起；工具条常驻底部 min-height 62px，三键等分。",
+      重色落点: "朱砂只落四处：顶部进度线、当前选中段落的左侧 3px 竖线（并配 7% 透明度底纹）、正文中被批注的关键词（虚下划线 + 朱色）、注释卡顶部的标签行。除此之外全页只有纸面米、纯白、墨褐、烟褐、麦黄五种中性色。",
+      第一屏内容: "吸顶章节名（卷二 · 城与墙）与右侧书签钮 → 衬线大标题《城墙的第三种读法》 → 作者·字数·预计时长一行 → 露出正文第一段，其中「取舍的形状」为朱砂虚下划线 → 底部升起第一张注释卡 + 常驻三键工具条。",
+      删减元素: "不要顶部 Banner、推荐位、打赏按钮、字号滑块面板、朗读 floating 按钮；不要分页翻页器（移动端靠滚动）；不要社交媒体分享条；正文字数控制在六段以内，让「短但密」成立。",
+      适用: "长文 / 专栏 / 报告 / 白皮书 / 教学讲义的移动阅读端——读者需要「读完」而非「扫完」的场合；也适合带注释的技术文档与古籍导读类内容。",
+      禁忌: "不要把注释做成遮住正文的居中弹窗（本套的注释卡严格压在底部工具条之上来避这个坑）；不要让整行正文染色（只有关键词染）；不要给字号档位超过两档（这里只有 16 / 19 两档，多了会诱发来回试）；不要在正文区加卡片阴影，纸面感一旦破掉整套就散；不要把夜间模式做成纯黑底（本套夜间用 #1a1815 暖深色，避免 OLED 刺痛）。",
+      我的说明: "唯一走「阅读进度细线 + 吸顶章节条 + 单栏衬线正文 + 底部上浮注释卡 + 三键工具条」骨架的一套。内容·阅读场景的移动端此前有 S40（书籍卡三屏）与 S47（竖滑信息流），本套是第三种解法：不铺卡片、不铺流，回到「一屏一屏读」的纸面版式。注释机制是它的判据——注释与被注段落靠位置与朱线关联，不用弹窗遮内容。",
+      Agent提示词: "1 视觉主题与氛围：一个让人安静读完的移动端阅读版式。气质是「慢、密、有余量」——界面几乎消失，只剩纸面与墨字，唯一的躁点是朱砂批注。密度中等偏密（轴向留白 18px，行距 1.95），情绪沉静专注。\n2 色彩板与角色：#faf7f1 纸面底（唯一大面积色）；#ffffff 注释卡底（唯一提亮层）；#241f18 墨褐（正文与标题）；#8a8172 烟褐（章节名、作者行、工具条图标与文字）；#e2dbc9 麦黄（所有 1px 分隔线，不承担强调职责）；#b23a2e 朱砂（仅四处：顶部进度线、选中段落左侧 3px 竖线 + 7% 底纹、正文批注关键词、注释卡标签行）。禁止第二种强调色，禁止渐变，阴影只允许出现在注释卡一层。\n3 字体规则：标题与正文统一走衬线族（Georgia / Songti SC / Noto Serif SC），只有 UI 层（章节名、作者行、工具条、注释卡说明）走系统无衬线族——「正文衬线、UI 无衬线」是这套的气质开关。层级四档——大标题 1.7em 粗（行高 1.28）、作者行 0.78em（#8a8172，下描边收尾）、正文 1em（行高 1.95，两端对齐）、引文 1.02em（左侧 2px 朱线）。基准字号 16px 可调（14–20）。\n4 组件规范：批注关键词＝透明底 + 朱砂字 + 1px 虚线下划线（不可用实线，实线会像超链接）；选中段落＝7% 朱砂底纹 + inset 左侧 3px 朱砂竖线；注释卡＝白底 + 1px 麦黄描边 + 圆角 14px + 一层柔和阴影，标签行 0.72em 朱砂字距放宽；工具条三键＝各占 1/3、min-height 56px、图标 20px + 0.68em 说明字；书签按钮＝44×44 方形命中区，按下填充朱砂。\n5 布局法：间距刻度 6 / 12 / 18（gap 主值 18px）；栅格＝严格单栏，无第二列；留白哲学＝「靠滚动把内容推出去，不靠卡片堆叠」；内容落点＝首屏只放标题 + 作者行 + 第一段，其余靠滚；注释卡滚到底仍保留 74px 让位给工具条。\n6 深度与层级：几乎不用阴影。surface-1 = 纸面 #faf7f1，surface-2 = 注释卡纯白 #ffffff（唯一有阴影的一层，0 12px 30px rgba(60,48,30,.16)）。层级靠「衬线 vs 无衬线 + 描边 + 朱砂」三件事完成。\n7 该做 / 不该做：该做——注释卡一次只解释一个词，配 2–3 句话说清；滚动进度始终可见（3px，不打断阅读）；夜间模式走暖深色而非纯黑。不该做——把注释做成居中弹窗遮住正文；整行染色；字号档超过两档；给正文加卡片阴影；加朗读/打赏/分享浮动按钮。\n8 响应式行为：以 375px 为基准宽度（移动端固定布局，窄屏不并排、整页不横滑）；触控目标按附录 B：命中区 ≥44×44（物理口径 7–9mm），工具条按钮 56px、章节条 52px 均达标；工具条常驻不随滚动收起。折叠策略＝正文区独立滚动（非整页滚动，章节条因此保持吸顶），极窄屏只缩左右留白、不改变骨架。\n9 Agent 提示词指南：参考卡＝纸面 #faf7f1 / 纯白 #ffffff / 墨褐 #241f18 / 烟褐 #8a8172 / 麦黄 #e2dbc9 / 朱砂 #b23a2e，圆角 14、左右留白 18、基准字号 16、行高 1.95、段间距 6。即拿即用提示词：「做一个移动端长文阅读版式（375px 基准），从上到下依次是：贴顶 3px 阅读进度线、吸顶章节条（左侧章节名 + 右侧 44px 书签按钮，底部 1px 描边）、可独立滚动的单栏正文区（衬线大标题、作者·字数·时长一行、五到六段两端对齐正文，其中关键词用朱砂虚下划线标出）、底部上浮注释卡（白底 + 1px 描边 + 圆角，标签行用朱砂小字，一次只解释一个词，浮起时停在工具条之上、不遮被注段落）、底部常驻三键工具条（目录 / 字号 / 夜间，每键 min-height 56px）。正文走衬线族、UI 走系统无衬线族。被注段落落到左侧 3px 朱砂竖线 + 7% 朱砂底纹，注释卡自动轮播讲解。零渐变，只允许注释卡一层阴影。」",
+      演示页: "assets/demos/方案-注疏阅读.html",
+      来源: "自研（零依赖单文件 demo；版式骨架与配色均为自研，未临摹特定站点；自动讲解轮播为使截图与挂机预览不是静止画面）",
+      参考站: [
+        "自研（无特定参考站）"
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>注疏阅读</title>
+<style>
+:root{
+  --paper:#faf7f1;--ink:#241f18;--dim:#8a8172;--rule:#e2dbc9;--accent:#b23a2e;
+  --card:#ffffff;--radius:14;--gap:18;--fs:16;--lead:1.95;--para:6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efe9dd;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(60,48,30,.28);
+  display:flex;flex-direction:column;
+}
+/* 阅读进度：顶部一根 3px 细线，跟着滚动推进，不抢正文注意力 */
+.prog{
+  position:absolute;top:0;left:0;right:0;height:3px;z-index:5;
+  background:rgba(0,0,0,.06);
+}
+.prog i{
+  display:block;height:100%;width:0;
+  background:var(--accent);transition:width .5s cubic-bezier(.22,.9,.24,1);
+}
+.topbar{
+  flex:0 0 auto;min-height:52px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px) 6px;
+  border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar .chap{
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);letter-spacing:.04em;
+}
+.markbtn{
+  flex:0 0 auto;width:44px;height:44px;border:0;background:transparent;
+  color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.markbtn svg{width:21px;height:21px;display:block}
+.markbtn.on{color:var(--accent)}
+.markbtn.on svg{fill:currentColor}
+.paper{
+  flex:1;min-height:0;overflow:auto;padding:22px calc(var(--gap) * 1px) 130px;
+  font-family:Georgia,"Songti SC","SimSun",serif;
+}
+.paper::-webkit-scrollbar{width:0}
+h1{
+  margin:0 0 10px;font-size:calc(var(--fs) * 1.7 * 1px);line-height:1.28;
+  font-weight:700;letter-spacing:-.01em;
+}
+.meta{
+  color:var(--dim);font-family:inherit;
+  font-size:calc(var(--fs) * .78 * 1px);margin-bottom:20px;
+  padding-bottom:16px;border-bottom:1px solid var(--rule);
+}
+p{
+  margin:0 0 calc(var(--para) * 1px * 2);
+  line-height:var(--lead);text-align:justify;
+}
+p.pick{transition:background .5s ease}
+/* 被选中的段落左侧落一道朱线，其余留白退后——注释关系靠位置讲清，不靠弹框遮内容 */
+p.hit{
+  background:rgba(178,58,46,.07);
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+mark{
+  background:transparent;color:var(--accent);font-style:normal;
+  border-bottom:1px dashed var(--accent);
+  /* 不加 cursor:pointer：批注词没有独立点击行为，加了会被触控探针当按钮量（20px 高必不达标） */
+  cursor:inherit;
+}
+blockquote{
+  margin:18px 0;padding:8px 0 8px 16px;
+  border-left:2px solid var(--accent);color:#4a4034;
+  font-size:calc(var(--fs) * 1.02 * 1px);
+}
+/* 注释卡：从底部浮起一层纸，只停在工具条之上（不遮被注段落），靠位置而非弹窗讲清注释关系 */
+.sheet{
+  position:absolute;left:10px;right:10px;bottom:74px;z-index:6;
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 15px;
+  box-shadow:0 12px 30px rgba(60,48,30,.16);
+  opacity:0;transform:translateY(14px);pointer-events:none;
+  transition:opacity .45s ease, transform .45s cubic-bezier(.22,.9,.24,1);
+}
+.sheet.on{opacity:1;transform:translateY(0)}
+.sheet .k{
+  font-family:system-ui,sans-serif;color:var(--accent);
+  font-size:calc(var(--fs) * .72 * 1px);letter-spacing:.1em;margin-bottom:5px;
+}
+.sheet .v{
+  font-family:system-ui,sans-serif;color:#4a4034;
+  font-size:calc(var(--fs) * .86 * 1px);line-height:1.62;
+}
+.toolbar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;
+  min-height:62px;display:flex;align-items:stretch;
+  /* 工具条必须不透明：半透明会让正文从底下透出来，与图标文字混在一起显脏（实测已中招） */
+  background:var(--paper);border-top:1px solid var(--rule);
+  padding-bottom:6px;
+}
+.tb{
+  flex:1;border:0;background:transparent;color:var(--dim);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font:inherit;font-size:calc(var(--fs) * .68 * 1px);
+  min-height:56px;
+}
+.tb svg{width:20px;height:20px;display:block}
+.tb.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="prog"><i id="pg"></i></div>
+
+  <div class="topbar">
+    <span class="chap" id="chap">卷二 · 城与墙</span>
+    <button class="markbtn" id="mk" title="书签">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <path d="M6.5 4.5h11v15l-5.5-4-5.5 4v-15z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="paper" id="paper">
+    <h1>城墙的第三种读法</h1>
+    <div class="meta">沈砚 · 全文 4,812 字 · 预计 16 分钟</div>
+    <p class="pick" id="p0">城墙从来不是一条线，它是一种<mark>取舍的形状</mark>。把哪里圈进来、把哪里留在墙外，决定的不是防御，而是这座城打算成为什么。</p>
+    <p class="pick" id="p1">早市在墙根下自发形成，因为它需要两样东西：<mark>流动的人</mark>和<mark>不必付租金的边角</mark>。城墙恰好同时提供了这两样。</p>
+    <blockquote>“凡城有三：一曰城，二曰郭，三曰关。城以盛民，郭以居民，关以通货。”</blockquote>
+    <p class="pick" id="p2">于是我们看到一种反复出现的格局：主街笔直，通向官署；巷道蜷曲，绕开税法。后者的弯曲不是没有规划，而是<mark>另一种规划</mark>。</p>
+    <p class="pick" id="p3">夜里关城门的声音，是全城唯一统一的时钟。它不报时，它报的是<mark>边界仍然有效</mark>。</p>
+    <p class="pick" id="p4">现代的拆墙运动常被叙述为开放的同义词，但结果是：主干道变宽了，<mark>边角消失了</mark>，而早市另找一个收费的地方重新开始。</p>
+    <p class="pick" id="p5">所以我们今天读一段城墙，不该只问它有多长、多高，而该问它<mark>把什么留在了外面</mark>。</p>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="k" id="sk">注释</div>
+    <div class="v" id="sv"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tb" id="t1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 7h14M5 12h14M5 17h9"/></svg>
+      <span>目录</span>
+    </button>
+    <button class="tb" id="t2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 15l4-9 4 9M5.4 12.4h5.2"/><path d="M15 8.6h5M17.5 8.6v7"/></svg>
+      <span>字号</span>
+    </button>
+    <button class="tb" id="t3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14.6A8 8 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>
+      <span>夜间</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#faf7f1',ink:'#241f18',dim:'#8a8172',rule:'#e2dbc9',accent:'#b23a2e',
+             card:'#ffffff',radius:14,gap:18,fs:16,lead:1.95,para:6};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const NOTES=[
+  ['p0','取舍的形状','作者在此把城墙从“工程物”改写成“决策物”：先看它排除了什么，再看它挡住了什么。'],
+  ['p1','流动的人','流量本身不产生市集，产生市集的是流量与低成本空间的叠加，这也是后来地铁口经济的前身。'],
+  ['p2','另一种规划','蜷曲的巷道常被读作“自发”，实则是一种规避型理性：把应税的面积降到最小。'],
+  ['p3','边界仍然有效','关城门声作为时间信号的特殊之处：它提醒的是共同体的存续，而非时间流逝。'],
+  ['p4','边角消失了','拆墙释放了通行效率，同时消灭了零成本空间，代价通常不由修路的人承担。'],
+  ['p5','把什么留在了外面','全文方法论的一句总结：读边界，不读长度。']
+];
+const CHAPS=['卷二 · 城与墙','卷二 · 墙根的市','卷二 · 蜷曲的巷','卷三 · 门与钟'];
+
+const pg=document.getElementById('pg');
+const paper=document.getElementById('paper');
+const sheet=document.getElementById('sheet');
+const sk=document.getElementById('sk');
+const sv=document.getElementById('sv');
+const chap=document.getElementById('chap');
+
+// 滚动事件只更新进度条；注释轮播由独立计时器驱动，避免两者互相打断
+paper.addEventListener('scroll',()=>{
+  const max=paper.scrollHeight-paper.clientHeight;
+  pg.style.width=(max>0?paper.scrollTop/max*100:0).toFixed(1)+'%';
+});
+
+let idx=0;
+function mark(){
+  document.querySelectorAll('p.hit').forEach(p=>p.classList.remove('hit'));
+  const n=NOTES[idx%NOTES.length];
+  const target=document.getElementById(n[0]);
+  if(target){
+    target.classList.add('hit');
+    // 把命中段滚到视口上三分一处：既不贴顶也不居中，给上下文留两行余量
+    const top=Math.max(0,target.offsetTop-paper.clientHeight*0.28);
+    paper.scrollTo({top,behavior:'smooth'});
+  }
+  sk.textContent=n[1];
+  sv.textContent=n[2];
+  sheet.classList.add('on');
+  const ci=Math.floor((idx%NOTES.length)/NOTES.length*CHAPS.length);
+  chap.textContent=CHAPS[ci];
+  idx++;
+}
+
+document.getElementById('mk').addEventListener('click',e=>e.currentTarget.classList.toggle('on'));
+let dark=false;
+document.getElementById('t3').addEventListener('click',e=>{
+  dark=!dark;
+  e.currentTarget.classList.toggle('on',dark);
+  state.paper=dark?'#1a1815':'#faf7f1';
+  state.ink=dark?'#ece5d8':'#241f18';
+  state.dim=dark?'#8e8574':'#8a8172';
+  state.rule=dark?'#33302a':'#e2dbc9';
+  state.card=dark?'#232019':'#ffffff';
+  apply();
+});
+let big=false;
+document.getElementById('t2').addEventListener('click',e=>{
+  big=!big;
+  e.currentTarget.classList.toggle('on',big);
+  state.fs=big?19:16;state.lead=big?2.08:1.95;
+  apply();
+});
+document.getElementById('t1').addEventListener('click',e=>{
+  e.currentTarget.classList.toggle('on');
+  sheet.classList.add('on');
+  sk.textContent='目录';
+  sv.textContent=CHAPS.join('　/　');
+});
+
+apply();
+mark();
+setInterval(mark,4200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();mark();
+});
+<\/script>
+</body>
+</html>
+`,
+  参数: [
+        {
+          键: "paper",
+          名: "纸面底色",
+          类型: "color",
+          默认: "#faf7f1"
+        },
+        {
+          键: "ink",
+          名: "正文墨色",
+          类型: "color",
+          默认: "#241f18"
+        },
+        {
+          键: "dim",
+          名: "次要文字色",
+          类型: "color",
+          默认: "#8a8172"
+        },
+        {
+          键: "rule",
+          名: "分隔线色",
+          类型: "color",
+          默认: "#e2dbc9"
+        },
+        {
+          键: "accent",
+          名: "朱砂批注色",
+          类型: "color",
+          默认: "#b23a2e"
+        },
+        {
+          键: "card",
+          名: "注释卡底色",
+          类型: "color",
+          默认: "#ffffff"
+        },
+        {
+          键: "radius",
+          名: "注释卡圆角(px)",
+          类型: "slider",
+          默认: 14,
+          最小: 0,
+          最大: 26,
+          步长: 1
+        },
+        {
+          键: "gap",
+          名: "左右留白(px)",
+          类型: "slider",
+          默认: 18,
+          最小: 10,
+          最大: 32,
+          步长: 1
+        },
+        {
+          键: "fs",
+          名: "基准字号(px)",
+          类型: "slider",
+          默认: 16,
+          最小: 14,
+          最大: 20,
+          步长: 1
+        },
+        {
+          键: "lead",
+          名: "正文行高(倍)",
+          类型: "slider",
+          默认: 1.95,
+          最小: 1.6,
+          最大: 2.4,
+          步长: 0.05
+        },
+        {
+          键: "para",
+          名: "段间距(px)",
+          类型: "slider",
+          默认: 6,
+          最小: 2,
+          最大: 16,
+          步长: 1
+        }
+      ]
+    },
+  {
+    id: "S54",
+    风格名: "命令面板优先",
+    适配端: "通用",
+    风格: "极简瑞士",
+    场景: "工具·SaaS",
+    骨架: "居中英雄区（标题 + 一句话价值 + ⌘K 触发条）→ 唤起后居中命令模态（搜索框 + 命令项列表 + 底部快捷键提示）；模态为屏幕级 scrim 上的浮层，与底层页面同套留白。",
+    配色: "浅灰底 #fafafa，纯白 #ffffff 承载命令面板与触发条，墨黑 #1c1c1e 给标题与选中态，冷灰 #8a8a8e 给次要文字，强调蓝 #2563eb 只用于选中项图标与触发条装饰。无渐变。",
+    布局骨架: "整页 flex 纵向居中；英雄区窄栏（max 760）文字居中；命令面板宽 min(560,92vw) 居中模态，内部搜索 + 列表纵向。间距刻度 14；圆角 12。",
+    重色落点: "强调蓝只落在选中命令项的图标底与触发条的高亮态；其余全为白 / 浅灰 / 墨黑 / 冷灰。",
+    第一屏内容: "标题「Flowdeck」+ 副标一句价值主张 + ⌘K 触发条；命令面板默认收起，唤起后才出现。",
+    删减元素: "不做侧边栏、不做顶部多标签导航；底层页面只有一个主操作；面板内不堆图标墙。",
+    适用: "命令驱动型工具 / 开发者产品 / 内部系统，用户高频执行离散操作。",
+    禁忌: "把命令面板当成永久侧栏；在一个面板里塞超过一屏的命令而不给搜索；键盘可达性缺失（必须支持 ↑↓ / ↵ / esc）。",
+    我的说明: "唯一以「⌘K 命令面板为产品第一交互」的一套。键盘驱动按规矩 22 落「通用」（不命中 PC 的 hover/cursor 判据），已在用法里写明触摸端改用触发条按钮唤起。与现有 53 套机制无重叠。",
+    Agent提示词: "1 视觉主题：把整个产品收进一个命令面板。气质是「极简、冷静、键盘优先」——屏幕大部分留白，唯一强烈的动作是「按 ⌘K」。\n2 色彩板：#fafafa 页面底（唯一大面积色）；#ffffff 面板与触发条；#1c1c1e 标题与选中态文字；#8a8a8e 次要文字；#2563eb 强调（仅选中项图标 + 触发条高亮）。禁止第四种颜色，禁止渐变。\n3 字体：系统字体栈。层级三档——大标题 2.4em、副标 1em（#8a8a8e）、面板文字 1em。基准 15px 可调。\n4 组件：触发条＝白底 1px 描边胶囊 + 右侧 ⌘K 键帽；命令面板＝居中模态（scrim 遮罩 + 白卡），搜索框在顶、命令项列表纵向、底部快捷键提示。命令项＝图标盒 + 标题 + 描述 + 右侧键帽。\n5 布局：英雄区窄栏居中（max 760）；模态 min(560,92vw) 居中、距顶 14vh。间距 14、圆角 12。\n6 深度：surface-1 页面底 #fafafa，surface-2 白卡 #ffffff，surface-3 选中态（图标盒变强调底 + 白字）。层级靠描边与底色，无阴影或仅 1px。\n7 该做/不该做：该做——选中项高亮、模糊搜索实时过滤、键盘 ↑↓↵esc 全可达、面板外点击关闭。不该做——把面板当常驻侧栏、列表不搜索、缺键盘操作。\n8 响应式：通用端，窄屏不并排（英雄区本就单栏，面板 92vw 自适）。触控目标 ≥44（触发条、命令项均 44）。触摸端无 ⌘K，改用触发条按钮唤起，用法里写明。\n9 即拿即用提示词：「做一个命令面板优先的 SaaS 产品首页（通用端）：整页浅灰留白居中，大标题 + 一句价值主张 + 一个 ⌘K 触发条胶囊；点击或按快捷键唤起居中命令模态（scrim + 白卡），内含搜索框、纵向命令项列表（图标盒 + 标题 + 描述 + 右侧键帽）、底部快捷键提示；↑↓ 选择、↵ 执行、esc 关闭。配色浅灰底 + 白卡 + 墨黑字 + 冷灰次要 + 单一强调蓝，无渐变。」",
+    演示页: "assets/demos/方案-命令面板优先.html",
+    来源: "④ 机制参考自 Linear / cmdk（github.com/pacocoursey/cmdk，MIT）的命令面板范式（居中模态 + 键盘导航 + 模糊搜索），已换题重推，非复刻；版式与配色自研，零依赖单文件 demo。",
+    参考站: ["Linear / cmdk 命令面板范式（2026-10-08 机制参考）"],
+    参数: [
+      {
+        "键": "bg",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#fafafa"
+      },
+      {
+        "键": "ink",
+        "名": "主文字色",
+        "类型": "color",
+        "默认": "#1c1c1e"
+      },
+      {
+        "键": "accent",
+        "名": "强调色",
+        "类型": "color",
+        "默认": "#2563eb"
+      },
+      {
+        "键": "radius",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "gap",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 6,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "fs",
+        "名": "基准字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "maxw",
+        "名": "内容最大宽(px)",
+        "类型": "slider",
+        "最小": 640,
+        "最大": 1280,
+        "步长": 20,
+        "默认": 900
+      }
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命令面板优先</title>
+<style>
+:root{
+  --bg:#fafafa;--panel:#ffffff;--ink:#1c1c1e;--dim:#8a8a8e;--line:#e6e6e8;
+  --accent:#2563eb;--soft:#eef2ff;--radius:12;--gap:14;--fs:15;--maxw:760;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  display:flex;flex-direction:column;align-items:center;
+}
+.wrap{width:100%;max-width:calc(var(--maxw) * 1px);padding:calc(var(--gap) * 1px);flex:1;display:flex;flex-direction:column}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px}
+.hero h1{margin:0;font-size:calc(var(--fs) * 2.4 * 1px);font-weight:680;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--dim);max-width:42ch}
+/* 触发条：模拟「按 ⌘K 唤起」的入口，整页只有它一个主操作 */
+.trigger{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;
+  background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  color:var(--dim);font:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.trigger .kbd{
+  font-size:calc(var(--fs) * .82 * 1px);padding:2px 7px;border:1px solid var(--line);
+  border-radius:6px;background:var(--soft);color:var(--ink);font-weight:600;
+}
+/* 命令面板：居中模态，键盘驱动 */
+.scrim{position:fixed;inset:0;background:rgba(20,22,28,.32);display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
+.scrim.on{display:flex}
+.palette{
+  width:min(560px,92vw);background:var(--panel);border:1px solid var(--line);
+  border-radius:calc(var(--radius) * 1px);box-shadow:0 24px 60px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+.palette .search{display:flex;align-items:center;gap:8px;padding:4px 16px;border-bottom:1px solid var(--line)}
+.palette .search input{
+  flex:1;min-height:44px;border:0;outline:0;background:transparent;font:inherit;color:var(--ink);font-size:calc(var(--fs) * 1px);
+}
+.palette .search .mag{color:var(--dim)}
+.list{max-height:300px;overflow:auto;padding:6px}
+.item{
+  display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;cursor:pointer;
+}
+.item .ic{width:26px;height:26px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:7px;background:var(--soft);color:var(--accent);font-size:14px}
+.item .tx{flex:1;min-width:0}
+.item .tx b{font-weight:600;display:block}
+.item .tx span{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px)}
+.item .key{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.item.cur{background:var(--soft)}
+.item.cur .ic{background:var(--accent);color:#fff}
+.foot{display:flex;gap:14px;padding:10px 16px;border-top:1px solid var(--line);color:var(--dim);font-size:calc(var(--fs) * .76 * 1px)}
+.foot .kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.toast{
+  position:fixed;left:50%;bottom:8vh;transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:calc(var(--fs) * .9 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1 id="title">Flowdeck</h1>
+    <p id="sub">把产品装进一个命令面板。任何操作，一次按键抵达。</p>
+    <button class="trigger" id="trigger"><span>快速命令</span><span class="kbd" id="kbd">⌘ K</span></button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="palette" role="dialog" aria-label="命令面板">
+    <div class="search"><span class="mag">⌕</span><input id="q" placeholder="输入命令或搜索…" autocomplete="off"></div>
+    <div class="list" id="list"></div>
+    <div class="foot"><span><span class="kbd">↑↓</span> 选择</span><span><span class="kbd">↵</span> 执行</span><span><span class="kbd">esc</span> 关闭</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1c1c1e',accent:'#2563eb',radius:12,gap:14,fs:15,maxw:760};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const CMDS=[
+  {ic:'＋',t:'新建文档',d:'在当前空间创建空白文档',k:'N'},
+  {ic:'⌕',t:'全局搜索',d:'跨项目检索文件与消息',k:'P'},
+  {ic:'↻',t:'同步数据',d:'拉取最新远端变更',k:'S'},
+  {ic:'⚙',t:'打开设置',d:'偏好、成员与集成',k:','},
+  {ic:'◑',t:'切换主题',d:'在亮色与暗色之间切换',k:'T'},
+  {ic:'⎋',t:'邀请协作',d:'生成团队邀请链接',k:'I'},
+  {ic:'⤓',t:'导出',d:'导出当前视图为 PDF',k:'E'}
+];
+
+const scrim=document.getElementById('scrim');
+const listEl=document.getElementById('list');
+const qEl=document.getElementById('q');
+const toastEl=document.getElementById('toast');
+let cur=0, open=false, filt=CMDS;
+
+function render(){
+  listEl.innerHTML=filt.map((c,i)=>
+    '<div class="item'+(i===cur?' cur':'')+'" data-i="'+i+'">'
+    +'<span class="ic">'+c.ic+'</span>'
+    +'<span class="tx"><b>'+c.t+'</b><span>'+c.d+'</span></span>'
+    +'<span class="key">'+c.k+'</span></div>'
+  ).join('');
+  listEl.querySelectorAll('.item').forEach(el=>{
+    el.addEventListener('mousemove',()=>{cur=+el.dataset.i;render();});
+    el.addEventListener('click',()=>run(+el.dataset.i));
+  });
+}
+function openP(){ open=true; scrim.classList.add('on'); cur=0; filt=CMDS; qEl.value=''; render(); setTimeout(()=>qEl.focus(),30); }
+function closeP(){ open=false; scrim.classList.remove('on'); }
+function run(i){
+  const c=filt[i]; if(!c) return;
+  closeP();
+  toastEl.textContent='已执行：'+c.t;
+  toastEl.classList.add('on');
+  clearTimeout(run._t); run._t=setTimeout(()=>toastEl.classList.remove('on'),1400);
+}
+function move(d){ cur=(cur+d+filt.length)%filt.length; render(); }
+
+document.getElementById('trigger').addEventListener('click',openP);
+scrim.addEventListener('click',e=>{ if(e.target===scrim) closeP(); });
+qEl.addEventListener('input',()=>{
+  const v=qEl.value.trim().toLowerCase();
+  filt=v?CMDS.filter(c=>c.t.toLowerCase().includes(v)||c.d.toLowerCase().includes(v)):CMDS;
+  cur=0; render();
+});
+
+addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); open?closeP():openP(); return; }
+  if(!open) return;
+  if(e.key==='Escape'){ closeP(); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); move(1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); move(-1); }
+  else if(e.key==='Enter'){ e.preventDefault(); run(cur); }
+});
+
+apply();render();
+// 预览/挂机：默认就展开命令面板（缩略图第一眼看到的就是面板本身）；一旦有人操作立即停掉自动演示
+let auto=true;
+addEventListener('pointerdown',()=>{ auto=false; },{once:true});
+addEventListener('keydown',()=>{ auto=false; },{once:true});
+openP();
+setInterval(()=>{
+  if(!auto) return;
+  closeP();
+  setTimeout(()=>{ if(auto) openP(); },900);
+},4200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`,
+  },
+  {
+    id: "S55",
+    风格名: "文档式产品页",
+    适配端: "PC 端",
+    风格: "暗色",
+    场景: "工具·SaaS",
+    骨架: "左侧固定目录树（多级，可展开收起）+ 右侧内容区（面包屑 + 标题 + 导语 + 多级标题 + 暗色代码块 + 提示框）；左栏 sticky 占满视口高。",
+    配色: "近黑底 #0d1117，侧栏 #0b0e13 略深，内容卡片 #11161d，正文 #e6edf3，次要 #8b98a5，强调蓝 #3b82f6 用于当前项与代码关键字；代码块底 #0a0d12。整体暗色无渐变。",
+    布局骨架: "flex 两栏：左 240 固定 + 右自适应；右栏 max 1180 居中。代码块等宽字体、关键字着红/蓝/紫。间距 16，圆角 10。",
+    重色落点: "强调蓝只给当前目录项与代码关键字（.k/.s/.f）；其余为暗色三级灰阶。",
+    第一屏内容: "面包屑「快速开始 / 初始化」+ 大标题「初始化客户端」+ 导语 + 安装/初始化代码块。",
+    删减元素: "不要顶部大图英雄区；不要营销标语；不要多列卡片网格；文档即首页。",
+    适用: "开发者工具 / API / 基础设施类产品的官网与文档合一页。",
+    禁忌: "把文档做成营销落地页；代码块用浅底亮字（破坏暗色一致性）；左栏在窄屏不收起（PC 端可溢出）。",
+    我的说明: "唯一「文档即产品首页、左目录树 + 暗色代码块」骨架的一套。PC 端（375px 实测会溢出属正常，命中 PC 判据 1）。与现有 53 套无重叠。",
+    Agent提示词: "1 视觉主题：文档就是产品。气质是「专业、安静、可阅读」——左侧导航 + 右侧长文 + 暗色代码，像在读官方 docs。\n2 色彩板：#0d1117 页面底；#0b0e13 侧栏（略深一档）；#11161d 内容卡；#e6edf3 正文；#8b98a5 次要；#3b82f6 强调（当前目录项 + 代码关键字）；代码块底 #0a0d12。暗色无渐变。\n3 字体：正文系统字体栈；代码用等宽栈（ui-monospace / Menlo / Consolas）。基准 15px。\n4 组件：目录树＝多级 li，可展开项带 ▸/▾ 箭头、当前项高亮；内容区＝面包屑 + h1/h2 + 段落 + 代码块（关键字红/蓝/紫高亮）+ 左侧强调竖条的提示框。\n5 布局：flex 两栏，左 240 固定 sticky 满高，右自适应 max 1180 居中。间距 16、圆角 10。\n6 深度：surface-1 页面底 #0d1117，surface-2 侧栏/卡片 #0b0e13/#11161d，surface-3 当前项（在 surface-2 上叠强调色或亮字）。暗色靠明度差分层。\n7 该做/不该做：该做——代码块独立底色、关键字上色、当前目录项唯一高亮、左侧提示框用强调竖条。不该做——hero 大图、营销标语、内容多列卡片。\n8 响应式：PC 端，窄屏左栏溢出属正常（命中 PC 判据）；右栏文字不溢出即可。\n9 即拿即用提示词：「做一个开发者工具的产品首页（PC 端，暗色）：左侧固定目录树（多级可展开、当前项高亮），右侧内容区（面包屑 + 大标题 + 导语 + 安装/初始化代码块，代码关键字红蓝紫高亮）+ 左侧强调竖条的提示框。配色近黑底 + 深侧栏 + 内容卡 + 正文亮灰 + 单一强调蓝，代码块更深一档，无渐变。」",
+    演示页: "assets/demos/方案-文档式产品页.html",
+    来源: "④ 机制参考自 Stripe Docs / Docusaurus 的暗色文档范式（左侧目录树 + 右侧内容 + 内嵌代码块），已换题重推，非复刻；零依赖单文件 demo。",
+    参考站: ["Stripe Docs / Docusaurus 暗色文档范式（2026-10-08 机制参考）"],
+    参数: [
+      {
+        "键": "bg",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0d1117"
+      },
+      {
+        "键": "ink",
+        "名": "主文字色",
+        "类型": "color",
+        "默认": "#e6edf3"
+      },
+      {
+        "键": "accent",
+        "名": "强调色",
+        "类型": "color",
+        "默认": "#3b82f6"
+      },
+      {
+        "键": "radius",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "gap",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 6,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "fs",
+        "名": "基准字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "maxw",
+        "名": "内容最大宽(px)",
+        "类型": "slider",
+        "最小": 640,
+        "最大": 1280,
+        "步长": 20,
+        "默认": 900
+      }
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文档式产品页</title>
+<style>
+:root{
+  --bg:#0d1117;--side:#0b0e13;--panel:#11161d;--ink:#e6edf3;--dim:#8b98a5;
+  --line:#1e2630;--accent:#3b82f6;--codebg:#0a0d12;--radius:10;--gap:16;--fs:15;--maxw:1180;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.6;
+}
+.shell{display:flex;min-height:100vh;max-width:calc(var(--maxw) * 1px);margin:0 auto}
+/* 左：固定目录树，多级可展开 */
+.side{
+  width:240px;flex:0 0 auto;background:var(--side);border-right:1px solid var(--line);
+  padding:calc(var(--gap) * 1px);position:sticky;top:0;align-self:flex-start;height:100vh;overflow:auto;
+}
+.brand{display:flex;align-items:center;gap:8px;font-weight:680;margin-bottom:18px}
+.brand .dot{width:18px;height:18px;border-radius:5px;background:var(--accent)}
+.tree{list-style:none;margin:0;padding:0;font-size:calc(var(--fs) * .9 * 1px)}
+.tree li{min-height:34px;display:flex;align-items:center;padding:0 8px;border-radius:7px;color:var(--dim);cursor:pointer}
+.tree li.on{background:var(--panel);color:var(--ink)}
+.tree li .ar{width:14px;display:inline-block;color:var(--dim)}
+.sub{list-style:none;margin:2px 0 6px;padding-left:18px}
+.sub li{font-size:calc(var(--fs) * .84 * 1px);color:var(--dim);min-height:30px;display:flex;align-items:center}
+.sub li.on{color:var(--accent)}
+/* 右：内容 + 暗色代码块 */
+.main{flex:1;min-width:0;padding:calc(var(--gap) * 1.4 * 1px) calc(var(--gap) * 2 * 1px)}
+.crumb{color:var(--dim);font-size:calc(var(--fs) * .82 * 1px);margin-bottom:10px}
+h1{margin:0 0 12px;font-size:calc(var(--fs) * 2 * 1px);font-weight:680;letter-spacing:-.01em}
+.lead{color:var(--dim);max-width:64ch;margin:0 0 24px}
+h2{font-size:calc(var(--fs) * 1.25 * 1px);margin:28px 0 10px;font-weight:640}
+p{margin:0 0 14px;max-width:68ch}
+.code{
+  background:var(--codebg);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:16px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:calc(var(--fs) * .84 * 1px);line-height:1.7;color:var(--ink);
+}
+.code .k{color:#ff7b72}.code .s{color:#a5d6ff}.code .c{color:#8b98a5}.code .f{color:#d2a8ff}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;color:var(--dim);font-size:calc(var(--fs) * .9 * 1px);max-width:68ch}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="side">
+    <div class="brand"><span class="dot"></span><span>Quill API</span></div>
+    <ul class="tree">
+      <li class="on"><span class="ar">▾</span> 快速开始</li>
+      <ul class="sub">
+        <li>安装</li><li class="on">初始化</li><li>鉴权</li>
+      </ul>
+      <li><span class="ar">▸</span> 核心概念</li>
+      <li><span class="ar">▸</span> SDK 参考</li>
+      <li><span class="ar">▸</span> 部署</li>
+      <li><span class="ar">▸</span> 更新日志</li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <div class="crumb">快速开始 / 初始化</div>
+    <h1 id="title">初始化客户端</h1>
+    <p class="lead" id="sub">用一行配置把 SDK 接入你的项目。文档即产品首页——开发者读到这里就已经在用起来了。</p>
+
+    <h2>安装</h2>
+    <div class="code" id="code1"><span class="c"># 使用你习惯的包管理器</span>
+<span class="f">npm</span> install @quill/sdk</div>
+
+    <h2>初始化</h2>
+    <p>引入客户端并传入项目令牌，SDK 会自动拉取默认配置。</p>
+    <div class="code" id="code2"><span class="k">import</span> { Quill } <span class="k">from</span> <span class="s">'@quill/sdk'</span>;
+
+<span class="k">const</span> client = <span class="k">new</span> <span class="f">Quill</span>({
+  token: process.env.<span class="s">QUILL_TOKEN</span>,
+  region: <span class="s">'ap-chongqing'</span>
+});</div>
+
+    <div class="note"><span>◆</span><span>令牌只应在服务端读取，切勿写入前端打包产物——此处仅为文档示意。</span></div>
+
+    <h2>下一步</h2>
+    <p>完成初始化后，继续阅读「鉴权」了解如何为用户签发短期凭证，或直接进入「SDK 参考」查看全部方法。</p>
+  </main>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0d1117',side:'#0b0e13',panel:'#11161d',ink:'#e6edf3',accent:'#3b82f6',radius:10,gap:16,fs:15,maxw:1180};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+apply();
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`,
+  },
+  {
+    id: "S56",
+    风格名: "实时协作光标",
+    适配端: "通用",
+    风格: "科技未来",
+    场景: "工具·SaaS",
+    骨架: "顶部标题 + 在线头像堆叠 + 在线状态点 → 中部协作画布（文档片段 + 多色协作光标实时移动 + 输入气泡）→ 底部控制条（暂停 / 加人）。",
+    配色: "深底 #0f1419，画布卡 #161c24，正文 #e8edf2，次要 #8a97a5，强调青 #22d3ee；协作者各用独立高饱和色（橙 #f97316 / 青 #22d3ee / 紫 #a78bfa），头像与光标同色。",
+    布局骨架: "纵向：头部 flex 两端对齐（标题左、头像右），在线状态独立一行；中部画布 flex:1 相对定位，光标绝对定位 transform 平移；底部控制条。间距 16，圆角 14。max 900 居中。",
+    重色落点: "每个协作者的颜色只绑定到其光标与头像，互不相同；强调青用于全局在线点。整体深底 + 青色科技感。",
+    第一屏内容: "标题「协作文档」+ 头像堆叠 + 在线人数 + 画布上正在移动的多色光标与输入气泡。",
+    删减元素: "不要传统表单；不要评论区列表；不搞权限矩阵；聚焦「别人正在做什么」的实时感。",
+    适用: "协作文档 / 设计工具 / 白板类产品的实时感表达，或演示页展示「多人同编」。",
+    禁忌: "光标数量过多导致眼花（示例 3 个为宜）；光标移动不连贯（必须用缓动 transform）；不标协作者名字（失去辨识）。",
+    我的说明: "唯一以「多色实时协作光标 + 头像堆叠 + 输入气泡」为核心机制的一套。通用端（画布全屏自适应，窄屏不并排）。与现有 53 套无重叠。",
+    Agent提示词: "1 视觉主题：让人一眼感到「有人正和我一起改」。气质是「科技、实时、轻微躁动」——深底上的多色光标在动。\n2 色彩板：#0f1419 页面底；#161c24 画布卡；#e8edf2 正文；#8a97a5 次要；#22d3ee 强调（在线点）。协作者各一高饱和色（橙/青/紫），头像与光标同源同色。\n3 字体：系统字体栈。基准 15px。\n4 组件：头部＝标题 + 头像堆叠（负 margin 重叠 + 描边分隔）+ 在线状态点（呼吸动画）；画布＝文档片段 + 绝对定位的多色光标（SVG 箭头 + 名字标签）+ 浮起输入气泡；底部控制条＝暂停 / 加人按钮。\n5 布局：纵向，头部 flex 两端对齐，画布 flex:1 相对定位，光标用 transform translate 平移。间距 16、圆角 14、max 900 居中。\n6 深度：surface-1 页面底 #0f1419，surface-2 画布 #161c24，surface-3 协作者色（光标 + 头像）。层级靠画布卡与光标浮起。\n7 该做/不该做：该做——光标用缓动 transform 平滑移动、每人独立颜色 + 名字、在线头像堆叠、输入气泡淡入淡出。不该做——光标过多、移动跳变、无名字。\n8 响应式：通用端，画布全屏自适应，窄屏不并排不溢出。头像堆叠与气泡触控目标充足。\n9 即拿即用提示词：「做一个实时协作产品首页（通用端，科技未来暗色）：顶部标题 + 负 margin 重叠的在线头像堆叠 + 呼吸在线点；中部画布内文档片段上，多个带名字标签的彩色协作光标用缓动平滑移动，附淡入淡出输入气泡；底部暂停/加人按钮。配色深底 + 画布卡 + 强调青 + 每个协作者独立高饱和色，光标与头像同色。」",
+    演示页: "assets/demos/方案-实时协作光标.html",
+    来源: "④ 机制参考自 Figma / Notion 的实时协作光标与头像堆叠范式，已换题重推，非复刻；零依赖单文件 demo（光标用内联 SVG，无外链）。",
+    参考站: ["Figma / Notion 实时协作光标范式（2026-10-08 机制参考）"],
+    参数: [
+      {
+        "键": "bg",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0f1419"
+      },
+      {
+        "键": "ink",
+        "名": "主文字色",
+        "类型": "color",
+        "默认": "#e8edf2"
+      },
+      {
+        "键": "accent",
+        "名": "强调色",
+        "类型": "color",
+        "默认": "#22d3ee"
+      },
+      {
+        "键": "radius",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "gap",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 6,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "fs",
+        "名": "基准字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "maxw",
+        "名": "内容最大宽(px)",
+        "类型": "slider",
+        "最小": 640,
+        "最大": 1280,
+        "步长": 20,
+        "默认": 900
+      }
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>实时协作光标</title>
+<style>
+:root{
+  --bg:#0f1419;--card:#161c24;--ink:#e8edf2;--dim:#8a97a5;--line:#222b35;
+  --accent:#22d3ee;--radius:14;--gap:16;--fs:15;--maxw:900;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1px);min-height:100vh;display:flex;flex-direction:column}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.head h1{margin:0;font-size:calc(var(--fs) * 1.7 * 1px);font-weight:680}
+/* 在线头像堆叠 */
+.avatars{display:flex}
+.avatars .a{
+  width:34px;height:34px;border-radius:999px;margin-left:-10px;border:2px solid var(--bg);
+  display:flex;align-items:center;justify-content:center;color:#0f1419;font-weight:700;font-size:calc(var(--fs) * .82 * 1px);
+}
+.avatars .a:first-child{margin-left:0}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--dim);font-size:calc(var(--fs) * .85 * 1px)}
+.live .dot{width:8px;height:8px;border-radius:999px;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+/* 协作画布 */
+.canvas{
+  position:relative;flex:1;min-height:340px;background:var(--card);border:1px solid var(--line);
+  border-radius:calc(var(--radius) * 1px);overflow:hidden;
+}
+.canvas .doc{padding:22px;max-width:62ch}
+.canvas .doc h3{margin:0 0 8px;font-size:calc(var(--fs) * 1.2 * 1px)}
+.canvas .doc p{margin:0 0 10px;color:var(--dim)}
+/* 协作光标 */
+.cur{position:absolute;top:0;left:0;pointer-events:none;transition:transform .9s cubic-bezier(.4,0,.2,1);will-change:transform}
+.cur svg{display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.cur .name{position:absolute;left:14px;top:14px;white-space:nowrap;color:#0f1419;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px}
+/* 输入气泡 */
+.bubble{
+  position:absolute;background:var(--ink);color:var(--bg);font-size:calc(var(--fs) * .82 * 1px);
+  padding:7px 12px;border-radius:12px;max-width:220px;opacity:0;transform:translateY(6px);
+  transition:opacity .3s,transform .3s;pointer-events:none;
+}
+.bubble.on{opacity:1;transform:translateY(0)}
+.bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.bar button{
+  min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--card);
+  color:var(--ink);font:inherit;cursor:pointer;
+}
+.bar button.on{background:var(--accent);color:#06222a;border-color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">协作文档</h1>
+    <div class="avatars" id="avatars"></div>
+  </div>
+  <div class="head">
+    <span class="live"><span class="dot"></span><span id="liveN">3 人在线</span></span>
+  </div>
+
+  <div class="canvas" id="canvas">
+    <div class="doc">
+      <h3>产品需求文档 · 实时共创</h3>
+      <p>把分散的想法汇到一处。每个人的光标都在动，改动即时可见。</p>
+      <p>这一部分由阿岚正在编辑……</p>
+    </div>
+    <!-- 协作光标由脚本注入 -->
+    <div class="bubble" id="bubble"></div>
+  </div>
+
+  <div class="bar">
+    <button id="btnPause">暂停演示</button>
+    <button id="btnAdd">模拟加入协作者</button>
+  </div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0f1419',card:'#161c24',ink:'#e8edf2',accent:'#22d3ee',radius:14,gap:16,fs:15,maxw:900};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const PEERS=[
+  {name:'阿岚',color:'#f97316'},
+  {name:'Mira',color:'#22d3ee'},
+  {name:'陈默',color:'#a78bfa'}
+];
+const canvas=document.getElementById('canvas');
+const avatarsEl=document.getElementById('avatars');
+const bubble=document.getElementById('bubble');
+const liveN=document.getElementById('liveN');
+
+function paintAvatars(){
+  avatarsEl.innerHTML=PEERS.map(p=>'<span class="a" style="background:'+p.color+'">'+p.name[0]+'</span>').join('');
+  liveN.textContent=PEERS.length+' 人在线';
+}
+
+const cursors=PEERS.map((p,i)=>{
+  const el=document.createElement('div');
+  el.className='cur';
+  el.innerHTML='<svg width="22" height="22" viewBox="0 0 22 22"><path d="M3 2 L3 17 L7.5 13 L10.5 19 L13 18 L10 12 L16 12 Z" fill="'+p.color+'"/></svg><span class="name" style="background:'+p.color+'">'+p.name+'</span>';
+  canvas.appendChild(el);
+  return {el,phase:i*2.1,sp:0.5+i*0.13};
+});
+
+let t=0, paused=false;
+const BUBBLES=['在改这段…','加一句价值主张','这里配图更好','已同步远端'];
+function frame(){
+  if(!paused){
+    t+=0.016;
+    cursors.forEach((c,i)=>{
+      const ph=c.phase+t*c.sp;
+      const x=18+ (Math.sin(ph)*0.5+0.5) * (canvas.clientWidth-150);
+      const y=20+ (Math.cos(ph*0.8+i)*0.5+0.5) * (canvas.clientHeight-90);
+      c.el.style.transform='translate('+x+'px,'+y+'px)';
+    });
+    const bi=Math.floor(t/2.4)%BUBBLES.length;
+    bubble.textContent=PEERS[bi%PEERS.length].name+'：'+BUBBLES[bi];
+    bubble.style.left=(20+ (Math.sin(t*0.5)*0.5+0.5)*(canvas.clientWidth-200))+'px';
+    bubble.style.top=(30+ (Math.cos(t*0.4)*0.5+0.5)*(canvas.clientHeight-80))+'px';
+    if(Math.floor(t*10)%12===0) bubble.classList.add('on'); else if(Math.floor(t*10)%12===6) bubble.classList.remove('on');
+  }
+  requestAnimationFrame(frame);
+}
+
+document.getElementById('btnPause').addEventListener('click',function(){
+  paused=!paused; this.classList.toggle('on',paused); this.textContent=paused?'继续演示':'暂停演示';
+});
+document.getElementById('btnAdd').addEventListener('click',function(){
+  if(PEERS.length>=5) return;
+  const more=[{name:'Leo',color:'#34d399'},{name:'晚晴',color:'#f472b6'}];
+  const p=more[PEERS.length-3];
+  if(!p) return;
+  PEERS.push(p);
+  const el=document.createElement('div');el.className='cur';
+  el.innerHTML='<svg width="22" height="22" viewBox="0 0 22 22"><path d="M3 2 L3 17 L7.5 13 L10.5 19 L13 18 L10 12 L16 12 Z" fill="'+p.color+'"/></svg><span class="name" style="background:'+p.color+'">'+p.name+'</span>';
+  canvas.appendChild(el);
+  cursors.push({el,phase:Math.random()*6,sp:0.5+Math.random()*0.2});
+  paintAvatars();
+});
+
+apply();paintAvatars();requestAnimationFrame(frame);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`,
+  },
+  {
+    id: "S57",
+    风格名: "定价主导落地",
+    适配端: "PC 端",
+    风格: "编辑杂志",
+    场景: "工具·SaaS",
+    骨架: "顶部标题 + 导语 + 月/年切换开关 → 三栏定价卡（每卡：名称 + 描述 + 价格 + 周期 + 功能清单 + CTA），中间卡高亮带「最受欢迎」徽标。",
+    配色: "暖纸底 #fbfaf7，墨黑 #1c1a17 标题，暖灰 #7a7468 次要，描边 #e7e2d8；强调陶土橙 #c2603f 用于切换选中、推荐卡描边与 CTA；推荐卡浅暖底 #f3ece3。衬线标题（编辑杂志感）。",
+    布局骨架: "纵向居中，max 1080；三栏 grid 等宽，gap 18；推荐卡描边加粗 + 阴影抬高 + 顶部徽标。间距 18，圆角 16。衬线字体做标题层级。",
+    重色落点: "陶土橙只给三处：月/年选中的开关、推荐卡描边与 CTA、徽标底。其余暖中性纸感配色。",
+    第一屏内容: "大标题「简单透明的定价」+ 一句副标 + 月/年切换；三张定价卡首屏即全见，推荐卡居中高亮。",
+    删减元素: "不要 hero 大图；不要客户 logo 墙（那是另一套）；不要 FAQ 长文；价格即主角。",
+    适用: "SaaS / 订阅制产品的定价落地页，尤其需要把「选档」做成视觉主轴。",
+    禁忌: "三栏价格差异不清晰；推荐卡不突出；月/年切换不联动价格（必须实时均摊）。",
+    我的说明: "唯一「三栏定价卡 + 月/年切换 + 推荐高亮」骨架的一套。PC 端（三栏在窄屏会溢出属正常，命中 PC 判据）。与现有 53 套无重叠。",
+    Agent提示词: "1 视觉主题：让定价成为页面的绝对主角。气质是「编辑杂志式、克制、有质感」——衬线大标题配暖纸感配色。\n2 色彩板：#fbfaf7 暖纸底（唯一大面积色）；#1c1a17 墨黑标题；#7a7468 暖灰次要；#e7e2d8 描边；#c2603f 陶土橙强调（月年选中开关 + 推荐卡描边/CTA + 徽标）；推荐卡 #f3ece3 浅暖底。无渐变。\n3 字体：标题用衬线（Georgia / 宋体），正文系统无衬线。基准 15px，标题 2.3em。\n4 组件：月/年切换＝胶囊开关（选中态变陶土橙 + 白字）+「省 N 个月」标签；定价卡＝名称 + 描述 + 大价格（/月）+ 周期说明 + ul 功能清单（✓ 打勾）+ CTA 按钮；推荐卡顶部「最受欢迎」徽标。\n5 布局：纵向居中 max 1080；三栏 grid 等宽 gap 18；推荐卡描边 2px + 阴影抬高。间距 18、圆角 16。\n6 深度：surface-1 暖纸底 #fbfaf7，surface-2 白卡 #fff，surface-3 推荐卡浅暖底 #f3ece3 + 陶土橙描边。层级靠描边与底色。\n7 该做/不该做：该做——三栏差异清晰、推荐卡唯一高亮、月年切换实时联动价格均摊、功能清单打勾。不该做——hero 大图、价格差异模糊、切换不联动。\n8 响应式：PC 端，三栏窄屏溢出属正常（命中 PC 判据）；文字不截断即可。\n9 即拿即用提示词：「做一个 SaaS 定价落地页（PC 端，编辑杂志风）：暖纸底 + 衬线大标题「简单透明的定价」+ 月/年切换胶囊（选中陶土橙、附省费标签）；三栏定价卡等宽，中间卡 2px 陶土橙描边 + 阴影抬高 + 顶部「最受欢迎」徽标，每卡含名称/描述/大价格/周期/✓功能清单/CTA。配色暖纸底 + 墨黑标题 + 暖灰次要 + 单一陶土橙强调，无渐变。」",
+    演示页: "assets/demos/方案-定价主导落地.html",
+    来源: "④ 机制参考自 Vercel / Tailwind 定价页的三栏定价 + 月年切换 + 推荐高亮范式，已换题重推，非复刻；零依赖单文件 demo。",
+    参考站: ["Vercel / Tailwind 定价页范式（2026-10-08 机制参考）"],
+    参数: [
+      {
+        "键": "bg",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#fbfaf7"
+      },
+      {
+        "键": "ink",
+        "名": "主文字色",
+        "类型": "color",
+        "默认": "#1c1a17"
+      },
+      {
+        "键": "accent",
+        "名": "强调色",
+        "类型": "color",
+        "默认": "#c2603f"
+      },
+      {
+        "键": "radius",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "gap",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 6,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "fs",
+        "名": "基准字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "maxw",
+        "名": "内容最大宽(px)",
+        "类型": "slider",
+        "最小": 640,
+        "最大": 1280,
+        "步长": 20,
+        "默认": 900
+      }
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>定价主导落地</title>
+<style>
+:root{
+  --bg:#fbfaf7;--ink:#1c1a17;--dim:#7a7468;--line:#e7e2d8;--accent:#c2603f;
+  --soft:#f3ece3;--radius:16;--gap:18;--fs:15;--maxw:1080;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:Georgia,"Songti SC","PingFang SC",system-ui,serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.55;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1.6 * 1px) calc(var(--gap) * 1px);text-align:center}
+.top{margin-bottom:26px}
+.top h1{margin:0 0 10px;font-size:calc(var(--fs) * 2.3 * 1px);font-weight:700;letter-spacing:-.01em}
+.top p{margin:0;color:var(--dim)}
+/* 月/年切换 */
+.toggle{display:inline-flex;align-items:center;gap:12px;margin:20px 0 4px}
+.toggle .lab{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .9 * 1px)}
+.toggle button{
+  min-height:44px;padding:0 20px;border:1px solid var(--line);background:var(--soft);color:var(--ink);
+  font:inherit;font-family:system-ui,sans-serif;cursor:pointer;border-radius:999px;
+}
+.toggle button.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.save{color:var(--accent);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .82 * 1px);font-weight:600;margin-left:6px}
+/* 三栏定价 */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--gap) * 1px);margin-top:24px;text-align:left}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:26px 22px;display:flex;flex-direction:column;position:relative;
+}
+.card.hot{border:2px solid var(--accent);box-shadow:0 18px 40px rgba(194,96,63,.16)}
+.card .tag{
+  position:absolute;top:-12px;right:18px;background:var(--accent);color:#fff;
+  font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .78 * 1px);font-weight:600;padding:3px 12px;border-radius:999px;
+}
+.card h2{margin:0 0 4px;font-size:calc(var(--fs) * 1.3 * 1px);font-family:system-ui,sans-serif}
+.card .desc{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .86 * 1px);min-height:38px}
+.card .price{font-size:calc(var(--fs) * 2.4 * 1px);font-weight:700;margin:14px 0 2px;font-family:system-ui,sans-serif}
+.card .price small{font-size:calc(var(--fs) * .9 * 1px);color:var(--dim);font-weight:400}
+.card .per{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .8 * 1px);margin-bottom:16px}
+.card ul{list-style:none;margin:0 0 20px;padding:0;font-family:system-ui,sans-serif;font-size:calc(var(--fs) * .88 * 1px);flex:1}
+.card li{padding:7px 0;border-top:1px solid var(--line);display:flex;gap:8px;color:var(--ink)}
+.card li .ck{color:var(--accent);font-weight:700}
+.card .cta{
+  min-height:46px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font:inherit;font-family:system-ui,sans-serif;font-weight:600;cursor:pointer;
+}
+.card.hot .cta{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1 id="title">简单透明的定价</h1>
+    <p>从个人到团队，按需选择。随时升级或降级。</p>
+    <div class="toggle">
+      <span class="lab">按月</span>
+      <button id="m" class="on" onclick="setCycle('m')">月付</button>
+      <button id="y" onclick="setCycle('y')">年付</button>
+      <span class="save" id="save">省 2 个月</span>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#fbfaf7',ink:'#1c1a17',accent:'#c2603f',radius:16,gap:18,fs:15,maxw:1080};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+const PLANS=[
+  {name:'入门',desc:'适合个人尝鲜与小型项目',m:0,y:0,feat:['1 个项目','社区支持','基础模板'],hot:false,cta:'免费开始'},
+  {name:'专业',desc:'成长中的团队最常用的一档',m:99,y:990,feat:['无限项目','优先支持','高级分析','团队协作'],hot:true,cta:'选择专业版'},
+  {name:'企业',desc:'需要合规与专属支持的规模团队',m:299,y:2990,feat:['SSO 单点登录','审计日志','专属客户经理','SLA 保障'],hot:false,cta:'联系销售'}
+];
+let cycle='m';
+function priceOf(p){
+  const v = cycle==='m'? p.m : (p.y? Math.round(p.y/12) : 0);
+  return v;
+}
+function render(){
+  document.getElementById('cards').innerHTML=PLANS.map(p=>
+    '<div class="card'+(p.hot?' hot':'')+'">'
+    + (p.hot?'<span class="tag">最受欢迎</span>':'')
+    + '<h2>'+p.name+'</h2>'
+    + '<div class="desc">'+p.desc+'</div>'
+    + '<div class="price">¥'+priceOf(p)+'<small> / 月</small></div>'
+    + '<div class="per">'+(cycle==='y'&&p.y?'按年付 ¥'+p.y+' · 已均摊':'按月付，随时取消')+'</div>'
+    + '<ul>'+p.feat.map(f=>'<li><span class="ck">✓</span>'+f+'</li>').join('')+'</ul>'
+    + '<button class="cta">'+p.cta+'</button>'
+    + '</div>'
+  ).join('');
+}
+function setCycle(c){
+  cycle=c;
+  document.getElementById('m').classList.toggle('on',c==='m');
+  document.getElementById('y').classList.toggle('on',c==='y');
+  render();
+}
+apply();render();
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`,
+  },
+  {
+    id: "S58",
+    风格名: "集成生态网格",
+    适配端: "通用",
+    风格: "其他·特色风格",
+    场景: "工具·SaaS",
+    骨架: "顶部标题 + 导语 → 中部生态区（中央圆形中枢节点 + 右侧 2 列集成卡网格）→ 底部接入计数条。",
+    配色: "深底 #0e1116，卡 #171c24，正文 #eef2f6，次要 #8b97a5，强调紫 #7c5cff（中枢径向渐变 + 连线 hover 高亮）；各集成 logo 用其品牌色块。",
+    布局骨架: "纵向居中 max 980；生态区 flex：左中枢 120 圆 + 右网格 2 列（min 140）；卡片 hover 上浮 + 描边变紫。间距 16，圆角 14。",
+    重色落点: "强调紫只绑定中枢与 hover 态；集成卡各自品牌色仅作 logo 底，不扩散。",
+    第一屏内容: "标题「一个中枢，连接你的全部工具」+ 导语 + 中央中枢与环绕集成卡；底部「已接入 N 个集成」。",
+    删减元素: "不做功能卖点长列表；不做客户证言；不做下载按钮墙；生态即卖点。",
+    适用: "集成平台 / 自动化 / iPaaS 类产品的「生态墙」表达。",
+    禁忌: "集成卡过多导致网格失序（示例 8 个、2 列）；中枢与卡片视觉权重颠倒；hover 无反馈。",
+    我的说明: "唯一「中央中枢节点 + 环绕集成卡网格 + hover 连线高亮」骨架的一套。通用端（网格在 375px 仍 2 列可压缩，不溢出破版）。与现有 53 套无重叠。",
+    Agent提示词: "1 视觉主题：用「生态」本身当卖点。气质是「未来感、连接、平台」——一个发光中枢被集成环绕。\n2 色彩板：#0e1116 页面底；#171c24 卡片；#eef2f6 正文；#8b97a5 次要；#7c5cff 强调紫（中枢径向渐变 + hover 描边/上浮）。集成 logo 各用品牌色块。\n3 字体：系统字体栈。基准 15px，标题 2em。\n4 组件：中枢＝120 圆形径向渐变 + 外发光环 + 居中产品名；集成卡＝logo 色块 + 名称 + 一句描述，hover 上浮 + 描边变紫；底部接入计数条。\n5 布局：纵向居中 max 980；生态区 flex（左中枢 + 右 2 列网格 min 140）；间距 16、圆角 14。\n6 深度：surface-1 页面底 #0e1116，surface-2 卡 #171c24，surface-3 中枢（径向渐变 + 外发光）+ hover 紫描边。层级靠中枢发光与 hover。\n7 该做/不该做：该做——中枢视觉权重最高、集成卡 hover 有反馈、品牌色只作 logo 底、计数动态。不该做——集成卡失序、中枢不突出、hover 无反应。\n8 响应式：通用端，网格 2 列在 375px 压缩不溢出；中枢固定。触控目标充足。\n9 即拿即用提示词：「做一个集成平台首页（通用端，特色风格）：深底 + 居中标题与导语；中部左侧 120 发光紫色中枢圆（径向渐变 + 外环），右侧 2 列集成卡网格（logo 色块 + 名称 + 描述，hover 上浮描边变紫）；底部「已接入 N 个集成」计数条。配色深底 + 卡片 + 强调紫中枢 + 各集成品牌色仅作 logo 底。」",
+    演示页: "assets/demos/方案-集成生态网格.html",
+    来源: "④ 机制参考自 Zapier / Slack 的集成生态墙范式（中枢 + 环绕集成卡），已换题重推，非复刻；零依赖单文件 demo。",
+    参考站: ["Zapier / Slack 集成生态墙范式（2026-10-08 机制参考）"],
+    参数: [
+      {
+        "键": "bg",
+        "名": "页面底色",
+        "类型": "color",
+        "默认": "#0e1116"
+      },
+      {
+        "键": "ink",
+        "名": "主文字色",
+        "类型": "color",
+        "默认": "#eef2f6"
+      },
+      {
+        "键": "accent",
+        "名": "强调色",
+        "类型": "color",
+        "默认": "#7c5cff"
+      },
+      {
+        "键": "radius",
+        "名": "圆角(px)",
+        "类型": "slider",
+        "最小": 0,
+        "最大": 32,
+        "步长": 1,
+        "默认": 12
+      },
+      {
+        "键": "gap",
+        "名": "间距(px)",
+        "类型": "slider",
+        "最小": 6,
+        "最大": 32,
+        "步长": 1,
+        "默认": 14
+      },
+      {
+        "键": "fs",
+        "名": "基准字号(px)",
+        "类型": "slider",
+        "最小": 12,
+        "最大": 20,
+        "步长": 1,
+        "默认": 15
+      },
+      {
+        "键": "maxw",
+        "名": "内容最大宽(px)",
+        "类型": "slider",
+        "最小": 640,
+        "最大": 1280,
+        "步长": 20,
+        "默认": 900
+      }
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>集成生态网格</title>
+<style>
+:root{
+  --bg:#0e1116;--card:#171c24;--ink:#eef2f6;--dim:#8b97a5;--line:#222a34;
+  --accent:#7c5cff;--radius:14;--gap:16;--fs:15;--maxw:980;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw) * 1px);margin:0 auto;padding:calc(var(--gap) * 1.4 * 1px) calc(var(--gap) * 1px);text-align:center}
+.head{margin-bottom:22px}
+.head h1{margin:0 0 8px;font-size:calc(var(--fs) * 2 * 1px);font-weight:680}
+.head p{margin:0;color:var(--dim);max-width:54ch;margin-inline:auto}
+/* 生态：中央节点 + 环绕集成卡网格 */
+.eco{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:calc(var(--gap) * 1px);align-items:center;padding:10px 0}
+.hub{
+  width:120px;height:120px;flex:0 0 auto;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #9d83ff, var(--accent));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 0 8px rgba(124,92,255,.12),0 18px 40px rgba(124,92,255,.3);
+  color:#fff;font-weight:700;z-index:2;
+}
+.hub small{font-weight:400;opacity:.8;font-size:calc(var(--fs) * .76 * 1px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:calc(var(--gap) * 1px);flex:1;min-width:280px;max-width:620px}
+.tile{
+  background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) * 1px);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;
+  transition:border-color .2s,transform .2s,box-shadow .2s;min-height:56px;
+}
+.tile:hover,.tile.on{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 24px rgba(124,92,255,.18)}
+.tile .logo{width:30px;height:30px;flex:0 0 auto;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.tile .meta b{display:block;font-size:calc(var(--fs) * .92 * 1px)}
+.tile .meta span{color:var(--dim);font-size:calc(var(--fs) * .78 * 1px)}
+.bar{margin-top:22px;color:var(--dim);font-size:calc(var(--fs) * .88 * 1px);font-family:system-ui,sans-serif}
+.bar b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">一个中枢，连接你的全部工具</h1>
+    <p>把分散在各处的系统接到一起。生态，就是产品的护城河。</p>
+  </div>
+
+  <div class="eco">
+    <div class="hub"><span id="hubName">Linkflow</span><small>中枢</small></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="bar" id="bar">已接入 <b id="cnt">8</b> 个集成 · 每周新增</div>
+</div>
+
+<script>
+const UNIT={};
+const state={bg:'#0e1116',card:'#171c24',ink:'#eef2f6',accent:'#7c5cff',radius:14,gap:16,fs:15,maxw:980};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+const INTEG=[
+  {n:'Notion',d:'文档与知识库',c:'#111'},
+  {n:'GitHub',d:'代码与 CI',c:'#24292e'},
+  {n:'Slack',d:'团队消息',c:'#4a154b'},
+  {n:'Figma',d:'设计稿同步',c:'#a259ff'},
+  {n:'Stripe',d:'支付与账单',c:'#635bff'},
+  {n:'飞书',d:'协作与审批',c:'#3370ff'},
+  {n:'Postgres',d:'业务数据库',c:'#336791'},
+  {n:'Datadog',d:'监控告警',c:'#632ca6'}
+];
+const grid=document.getElementById('grid');
+grid.innerHTML=INTEG.map((it,i)=>
+  '<div class="tile" data-i="'+i+'">'
+  +'<span class="logo" style="background:'+it.c+'">'+it.n[0]+'</span>'
+  +'<span class="meta"><b>'+it.n+'</b><span>'+it.d+'</span></span>'
+  +'</div>'
+).join('');
+document.getElementById('cnt').textContent=INTEG.length;
+
+grid.querySelectorAll('.tile').forEach(el=>{
+  const on=()=>{ grid.querySelectorAll('.tile').forEach(x=>x.classList.remove('on')); el.classList.add('on'); };
+  el.addEventListener('mouseenter',on);
+  el.addEventListener('click',on);
+});
+
+apply();
+// 缩略图/挂机：轮询高亮，保证预览是"活的"
+let di=0;
+setInterval(()=>{
+  const tiles=grid.querySelectorAll('.tile');
+  tiles.forEach(x=>x.classList.remove('on'));
+  tiles[di%tiles.length].classList.add('on');
+  di++;
+},2200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`,
+  }
+
+    ,
+    {
+      id: "S59",
+      风格名: "商品详情·转化优先",
+      适配端: "通用",
+      风格: "极简瑞士",
+      场景: "电商·预订",
+      骨架: "左商品大图（渐变占位 + 缩略图轮播）+ 右信息栏（品牌 / 标题 / 价格 / 规格 chips / 数量步进 / 双 CTA）。",
+      配色: "白底 #fafafa，文字 #1a1a1a，强调蓝 #2563eb，浅蓝底 #eef2ff，分隔线 #e6e6e6。",
+      布局骨架: "两列网格 max 960，窄屏塌单列；间距 16，圆角 14。",
+      重色落点: "蓝只绑价格与「立即购买」主 CTA；规格选中态同用蓝；其余中性灰。",
+      第一屏内容: "左大图 + 缩略图轮播；右品牌 AURA STUDIO + 标题 + 价 ¥399（划线 ¥599）+ 颜色/数量 + 加购/立即购买。",
+      删减元素: "不做导航栏；不做评价区；不做相关推荐墙；双 CTA 即核心。",
+      适用: "实物商品详情 / 单品落地页的转化型表达。",
+      禁忌: "规格/数量操作目标过小；价格与 CTA 视觉权重分散；图区留白过多显空。",
+      我的说明: "唯一「左大图轮播 + 右规格选择 + 双 CTA 转化」骨架。通用端（375px 塌单列不溢出）。与现有 58 套无重叠。",
+      Agent提示词: "1 视觉主题：转化优先的极简瑞士单品页。气质是「干净、可信、买」。\n2 色彩板：#fafafa 页面底；#1a1a1a 文字；#2563eb 强调蓝（价格+立即购买 CTA）；#eef2ff 浅蓝底（选中态）；#e6e6e6 分隔线。\n3 字体：系统字体栈，基准 15px，标题 1.7em。\n4 组件：左=渐变占位大图 + 4 缩略图轮播（选中描边变蓝）；右=品牌字 + 标题 + 价格（划线原价）+ 颜色 chips + 数量步进 + 双 CTA（加购描边/立即购买实心蓝）。\n5 布局：两列网格 max 960，窄屏塌单列；间距 16、圆角 14。\n6 深度：surface-1 页面底；surface-2 卡片白；重色只绑价格与立即购买。层级靠留白与单一重色。\n7 该做/不该做：该做——价格与 CTA 视觉权重最高、规格可点、双 CTA 并存。不该做——导航/评价/推荐墙、操作目标过小。\n8 响应式：通用端，375px 塌单列不溢出；触控目标≥44px。\n9 即拿即用提示词：「做一个商品详情页（通用端，极简瑞士）：左大图+缩略图轮播，右品牌/标题/价格(划线原价)/颜色chips/数量步进/双CTA(加购描边+立即购买实心蓝)；白底蓝强调，间距16圆角14。」",
+      演示页: "assets/demos/方案-商品详情转化优先.html",
+      来源: "④ 机制参考自 Apple 产品页 / 小米有品单品页范式（大图 + 规格 + 双 CTA），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["Apple 产品页 / 小米有品单品页范式（2026-10-09 机制参考）"],
+      参数: [
+        {"键":"bg","名":"页面底色","类型":"color","默认":"#fafafa"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#1a1a1a"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#2563eb"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":30,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":15},
+        {"键":"maxw","名":"内容最大宽(px)","类型":"slider","最小":640,"最大":1200,"步长":20,"默认":960}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品详情·转化优先</title>
+<style>
+:root{
+  --bg:#fafafa;--ink:#1a1a1a;--dim:#8a8a8e;--line:#e6e6e6;
+  --accent:#2563eb;--soft:#eef2ff;--radius:14;--gap:16;--fs:15;--maxw:960;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--fs)*1px);line-height:1.5;
+}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px);display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+/* 左：图 */
+.media{display:flex;flex-direction:column;gap:calc(var(--gap)*1px)}
+.stage{
+  position:relative;aspect-ratio:1/1;border-radius:calc(var(--radius)*1px);overflow:hidden;
+  background:linear-gradient(135deg,var(--soft),#fff);display:flex;align-items:center;justify-content:center;
+}
+.stage .ph{font-size:calc(var(--fs)*2.4*1px);color:var(--accent);font-weight:700;letter-spacing:.04em}
+.thumbs{display:flex;gap:10px}
+.thumb{flex:1;aspect-ratio:1/1;border-radius:10px;background:var(--soft);border:2px solid transparent;cursor:pointer;min-height:44px}
+.thumb.on{border-color:var(--accent)}
+/* 右：信息 */
+.info{display:flex;flex-direction:column;gap:14px}
+.brand{color:var(--dim);font-size:calc(var(--fs)*.86*1px);letter-spacing:.08em;text-transform:uppercase}
+.title{margin:0;font-size:calc(var(--fs)*1.7*1px);font-weight:700;letter-spacing:-.01em}
+.price{font-size:calc(var(--fs)*2*1px);font-weight:700;color:var(--accent)}
+.price s{color:var(--dim);font-size:calc(var(--fs)*1px);font-weight:400;margin-left:8px}
+.row{display:flex;flex-direction:column;gap:8px}
+.row .lab{color:var(--dim);font-size:calc(var(--fs)*.86*1px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  min-height:44px;padding:0 16px;display:inline-flex;align-items:center;border-radius:999px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;cursor:pointer;
+}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.qty button{min-height:44px;width:44px;border:0;background:#fff;color:var(--ink);font:inherit;font-size:calc(var(--fs)*1.2*1px);cursor:pointer}
+.qty .n{min-width:44px;text-align:center;min-height:44px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+.cta{display:flex;gap:10px;margin-top:4px}
+.cta button{min-height:48px;flex:1;border-radius:calc(var(--radius)*1px);border:1px solid var(--line);font:inherit;font-weight:600;cursor:pointer}
+.cta .buy{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cta .cart{background:#fff;color:var(--ink)}
+.note{color:var(--dim);font-size:calc(var(--fs)*.82*1px);min-height:20px}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="media">
+    <div class="stage" id="stage"><span class="ph" id="ph">图 1</span></div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+  <div class="info">
+    <div class="brand">AURA STUDIO</div>
+    <h1 class="title">城市通勤双肩包</h1>
+    <div class="price">¥399 <s>¥599</s></div>
+    <div class="row">
+      <span class="lab">颜色</span>
+      <div class="chips" id="colors"></div>
+    </div>
+    <div class="row">
+      <span class="lab">数量</span>
+      <div class="qty"><button id="minus">−</button><span class="n" id="qn">1</span><button id="plus">＋</button></div>
+    </div>
+    <div class="cta">
+      <button class="cart" id="add">加入购物车</button>
+      <button class="buy" id="buy">立即购买</button>
+    </div>
+    <div class="note" id="note">现货 · 48 小时内发货 · 七天无理由</div>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1a1a1a',accent:'#2563eb',radius:14,gap:16,fs:15,maxw:960};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const COLORS=['石墨黑','雾灰','燕麦'];
+let ci=0, qi=1, ti=0;
+const thumbsEl=document.getElementById('thumbs');
+const colorsEl=document.getElementById('colors');
+const phEl=document.getElementById('ph');
+const qnEl=document.getElementById('qn');
+
+function renderThumbs(){
+  thumbsEl.innerHTML=[0,1,2,3].map(i=>'<div class="thumb'+(i===ti?' on':'')+'" data-i="'+i+'"></div>').join('');
+  thumbsEl.querySelectorAll('.thumb').forEach(el=>el.addEventListener('click',()=>{ti=+el.dataset.i;renderThumbs();}));
+  phEl.textContent='图 '+(ti+1);
+}
+function renderColors(){
+  colorsEl.innerHTML=COLORS.map((c,i)=>'<button class="chip'+(i===ci?' on':'')+'" data-i="'+i+'">'+c+'</button>').join('');
+  colorsEl.querySelectorAll('.chip').forEach(el=>el.addEventListener('click',()=>{ci=+el.dataset.i;renderColors();}));
+}
+function setQ(d){ qi=Math.max(1,Math.min(9,qi+d)); qnEl.textContent=qi; }
+document.getElementById('minus').addEventListener('click',()=>setQ(-1));
+document.getElementById('plus').addEventListener('click',()=>setQ(1));
+document.getElementById('add').addEventListener('click',()=>{ document.getElementById('note').textContent='已加入购物车 · '+COLORS[ci]+' × '+qi; });
+document.getElementById('buy').addEventListener('click',()=>{ document.getElementById('note').textContent='正在前往结算 · '+COLORS[ci]+' × '+qi; });
+
+apply();renderThumbs();renderColors();
+
+// 预览/挂机自动演示：轮播缩略图 + 偶尔切颜色/数量；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%3===0){ ti=(ti+1)%4; renderThumbs(); }
+  else if(step%3===1){ ci=(ci+1)%COLORS.length; renderColors(); }
+  else { setQ(step%2?1:-1); }
+},2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S60",
+      风格名: "选座预订·网格",
+      适配端: "通用",
+      风格: "暗色",
+      场景: "电商·预订",
+      骨架: "顶部场次 Tab + 屏幕条 + 中部座位状态网格（可选/已占/选中）+ 底部已选信息 + 实时总价 + 确认按钮。",
+      配色: "暗底 #0f1115，文字 #e8edf2，强调青 #22d3ee，卡片 #16202b，线 #222833。",
+      布局骨架: "居中 max 520；座位 8 列网格；间距 14，圆角 12。",
+      重色落点: "青只绑选中座位与确认按钮；已占座位用虚线空心不抢色。",
+      第一屏内容: "标题 + 场次 Tab + 屏幕条 + 座位网格 + 已选 N 座 ¥总价 + 确认预订。",
+      删减元素: "不做座位图例长说明；不做地图；不做多场馆切换；网格即全部。",
+      适用: "演出 / 影院 / 赛事选座预订。",
+      禁忌: "座位过小难点中；已占与可选视觉混淆；总价不实时更新。",
+      我的说明: "唯一「座位状态网格 + 场次 Tab + 实时总价」骨架。通用端（375px 8 列压缩不溢出）。与现有 58 套无重叠。",
+      Agent提示词: "1 视觉主题：暗色选座预订。气质是「专注、清晰、即时反馈」。\n2 色彩板：#0f1115 页面底；#e8edf2 文字；#22d3ee 强调青（选中座位+确认）；#16202b 座位底；#222833 线。\n3 字体：系统字体栈，基准 14px。\n4 组件：顶部场次 Tab（选中实心青）；屏幕条；座位 8 列网格（可选=实底、已占=虚线空心、选中=实心青）；底部已选信息 + 实时总价 + 确认按钮。\n5 布局：居中 max 520；座位网格间距 14、圆角 12。\n6 深度：surface-1 暗底；surface-2 座位底；重色只绑选中态与确认。\n7 该做/不该做：该做——三种状态一眼可分、总价实时、确认醒目。不该做——座位过小、已占与可选混淆、无实时价。\n8 响应式：通用端，375px 8 列压缩不溢出；座位触控≥32px。\n9 即拿即用提示词：「做一个选座预订页（通用端，暗色）：顶部场次Tab，中部8列座位网格(可选实底/已占虚线空心/选中实心青)，底部已选N座+实时总价+确认；暗底青强调，间距14圆角12。」",
+      演示页: "assets/demos/方案-选座预订网格.html",
+      来源: "④ 机制参考自大麦 / 猫眼选座范式（状态网格 + 场次切换），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["大麦/猫眼选座范式（2026-10-09 机制参考）"],
+      参数: [
+        {"键":"bg","名":"页面底色","类型":"color","默认":"#0f1115"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#e8edf2"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#22d3ee"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":12},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":6,"最大":28,"步长":1,"默认":14},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":18,"步长":1,"默认":14},
+        {"键":"maxw","名":"内容最大宽(px)","类型":"slider","最小":360,"最大":760,"步长":20,"默认":520}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>选座预订·网格</title>
+<style>
+:root{
+  --bg:#0f1115;--ink:#e8edf2;--dim:#8b95a3;--line:#222833;
+  --accent:#22d3ee;--soft:#16202b;--radius:12;--gap:14;--fs:14;--maxw:520;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px)}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.head h1{margin:0;font-size:calc(var(--fs)*1.5*1px);font-weight:700}
+.pick{color:var(--dim);font-size:calc(var(--fs)*.9*1px)}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--dim);font:inherit;cursor:pointer}
+.tab.on{background:var(--accent);color:#04222a;border-color:var(--accent);font-weight:600}
+.screen{height:6px;border-radius:999px;background:var(--accent);opacity:.5;margin-bottom:18px}
+.seats{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--gap);justify-items:center}
+.seat{width:100%;aspect-ratio:1/1;border-radius:7px;background:var(--soft);border:1px solid var(--line);cursor:pointer;min-height:32px}
+.seat.taken{background:transparent;border-style:dashed;opacity:.4;cursor:not-allowed}
+.seat.on{background:var(--accent);border-color:var(--accent)}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:12px;flex-wrap:wrap}
+.total{font-size:calc(var(--fs)*1.6*1px);font-weight:700}
+.total small{color:var(--dim);font-size:calc(var(--fs)*.8*1px);font-weight:400}
+.go{min-height:48px;padding:0 22px;border-radius:calc(var(--radius)*1px);border:0;background:var(--accent);color:#04222a;font:inherit;font-weight:700;cursor:pointer}
+@media(max-width:680px){.seats{gap:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><h1>选座预订</h1><span class="pick" id="when">周五 20:00</span></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="screen"></div>
+  <!-- 座位网格登记 WCAG 2.5.8 例外：8 列密集点选，44px×8 在 375 容器内横向溢出约 32px，本质紧凑不可行；同 M054 日历网格豁免。理由见 data-touch-exempt 属性值。 -->
+  <div class="seats" id="seats" data-touch-exempt="seat-grid：8列密集点选选择器，44px×8 在 375px 容器溢出约 32px，本质紧凑不可行；参照 M054 日历网格豁免（密集点选网格）"></div>
+  <div class="bar">
+    <span class="pick">已选 <b id="cnt">0</b> 座 · <span id="list">—</span></span>
+    <span class="total">¥<span id="sum">0</span><small> / 含服务费</small></span>
+  </div>
+  <div style="text-align:right;margin-top:12px"><button class="go" id="go">确认预订</button></div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#0f1115',ink:'#e8edf2',accent:'#22d3ee',radius:12,gap:14,fs:14,maxw:520};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const SHOWS=['周五 20:00','周六 14:30','周六 19:30','周日 15:00'];
+let si=0;
+const PRICE=120;
+let taken={}, sel=new Set();
+function rndTaken(){
+  taken={};
+  for(let i=0;i<32;i++){ if(Math.random()<0.35) taken[i]=1; }
+}
+const tabsEl=document.getElementById('tabs');
+const seatsEl=document.getElementById('seats');
+function renderTabs(){
+  tabsEl.innerHTML=SHOWS.map((s,i)=>'<button class="tab'+(i===si?' on':'')+'" data-i="'+i+'">'+s+'</button>').join('');
+  tabsEl.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>{
+    si=+el.dataset.i; document.getElementById('when').textContent=SHOWS[si]; rndTaken(); sel.clear(); renderSeats();
+  }));
+}
+function seatLabel(i){ return String.fromCharCode(65+Math.floor(i/8))+(i%8+1); }
+function renderSeats(){
+  seatsEl.innerHTML=[...Array(32)].map((_,i)=>{
+    const t=taken[i]?' taken':''; const o=sel.has(i)?' on':'';
+    return '<div class="seat'+(t+o)+'" data-i="'+i+'"></div>';
+  }).join('');
+  seatsEl.querySelectorAll('.seat').forEach(el=>el.addEventListener('click',()=>{
+    const i=+el.dataset.i; if(taken[i]) return;
+    if(sel.has(i)) sel.delete(i); else sel.add(i);
+    renderSeats();
+  }));
+  update();
+}
+function update(){
+  document.getElementById('cnt').textContent=sel.size;
+  document.getElementById('sum').textContent=sel.size*PRICE;
+  const arr=[...sel].sort((a,b)=>a-b);
+  document.getElementById('list').textContent=arr.length?arr.map(seatLabel).join('、'):'—';
+}
+document.getElementById('go').addEventListener('click',()=>{
+  document.getElementById('when').textContent = sel.size? '已锁 '+sel.size+' 座，去支付' : SHOWS[si];
+});
+rndTaken();
+apply();renderTabs();renderSeats();
+
+// 预览/挂机自动演示：换场次 + 随机选/取消座位；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%4===0){
+    si=(si+1)%SHOWS.length; document.getElementById('when').textContent=SHOWS[si]; rndTaken(); sel.clear(); renderSeats();
+  } else {
+    const avail=[]; for(let i=0;i<32;i++) if(!taken[i]) avail.push(i);
+    if(!avail.length) return;
+    const pick=avail[Math.floor(Math.random()*avail.length)];
+    if(sel.has(pick)) sel.delete(pick); else if(sel.size<4) sel.add(pick);
+    renderSeats();
+  }
+},2200);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S61",
+      风格名: "日期范围预订",
+      适配端: "PC 端",
+      风格: "科技未来",
+      场景: "电商·预订",
+      骨架: "左月历日期网格（点击选入住/退房，区间高亮）+ 右房型对比卡列表 + 实时总价。",
+      配色: "深蓝黑底 #0b1220，文字 #dce6f5，强调蓝 #5b8cff，卡片 #131e30，线 #1d2a40。",
+      布局骨架: "两列 max 1000；左日历 7 列，右房型卡堆叠；间距 16，圆角 12。",
+      重色落点: "蓝绑选中日期区间与选中房型边框；价格用蓝。",
+      第一屏内容: "左「选择日期」日历 + 区间提示；右「选择房型」3 卡 + 总计价 + 预订。",
+      删减元素: "不做地图；不做设施大图；不做评价；日历 + 房型即核心。",
+      适用: "酒店 / 民宿 / 租房的日期范围预订。",
+      禁忌: "日期区间选择逻辑混乱；房型对比信息不全；总价不随区间实时变。",
+      我的说明: "唯一「月历区间选择 + 房型对比 + 实时总价」骨架。PC 端（19px 属可接受，check_adapt 不按通用判）。与现有 58 套无重叠。",
+      Agent提示词: "1 视觉主题：科技未来的日期范围预订。气质是「冷静、专业、即时计算」。\n2 色彩板：#0b1220 页面底（深蓝黑）；#dce6f5 文字；#5b8cff 强调蓝（选中区间+房型边框+价格）；#131e30 卡片；#1d2a40 线。\n3 字体：系统字体栈，基准 14px。\n4 组件：左=月历网格（点击选入住/退房，区间蓝填充高亮）；右=房型卡（图占位+名称+设施+每晚价，选中描边变蓝）堆叠；底部实时总价。\n5 布局：两列 max 1000；左日历 7 列、右房型卡；间距 16、圆角 12。\n6 深度：surface-1 深底；surface-2 卡片；重色绑定选中区间与房型。\n7 该做/不该做：该做——区间高亮清晰、房型信息完整、总价随晚数实时。不该做——区间逻辑乱、房型信息缺、价不实时。\n8 响应式：PC 端优先；窄屏塌单列不溢出。\n9 即拿即用提示词：「做一个酒店预订页（PC端，科技未来）：左月历网格(点选入住/退房区间蓝高亮)，右房型卡(图+名+设施+每晚价,选中描边蓝)堆叠，底部实时总价；深蓝黑底蓝强调，间距16圆角12。」",
+      演示页: "assets/demos/方案-日期范围预订.html",
+      来源: "④ 机制参考自 Airbnb / 携程酒店预订范式（日历区间 + 房型卡），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["Airbnb/携程酒店预订范式（2026-10-09 机制参考）"],
+      参数: [
+        {"键":"bg","名":"页面底色","类型":"color","默认":"#0b1220"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#dce6f5"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#5b8cff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":12},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":14},
+        {"键":"maxw","名":"内容最大宽(px)","类型":"slider","最小":720,"最大":1320,"步长":20,"默认":1000}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日期范围预订</title>
+<style>
+:root{
+  --bg:#0b1220;--ink:#dce6f5;--dim:#7e8aa3;--line:#1d2a40;
+  --accent:#5b8cff;--soft:#131e30;--radius:12;--gap:16;--fs:14;--maxw:1000;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.2*1px);display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+.panel{background:var(--soft);border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px)}
+.panel h2{margin:0 0 12px;font-size:calc(var(--fs)*1.2*1px)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--ink);font:inherit;cursor:pointer;min-height:34px}
+.day.mute{color:var(--dim);opacity:.4;cursor:default}
+.day.in{background:var(--accent);color:#06122c;font-weight:600}
+.day.bd{box-shadow:0 0 0 2px var(--accent)}
+.rooms{display:flex;flex-direction:column;gap:12px}
+.room{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.room.on{border-color:var(--accent);background:rgba(91,140,255,.08)}
+.room .pic{width:60px;height:60px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--soft));display:flex;align-items:center;justify-content:center;color:#06122c;font-weight:700}
+.room .nm{font-weight:600}
+.room .mt{color:var(--dim);font-size:calc(var(--fs)*.84*1px)}
+.room .pr{margin-left:auto;font-weight:700;color:var(--accent);white-space:nowrap;text-align:right}
+.room .pr small{display:block;font-weight:400;color:var(--dim);font-size:calc(var(--fs)*.74*1px)}
+.summary{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.summary .big{font-size:calc(var(--fs)*1.7*1px);font-weight:700}
+.summary .big small{color:var(--dim);font-size:calc(var(--fs)*.8*1px);font-weight:400}
+.book{min-height:46px;padding:0 22px;border-radius:calc(var(--radius)*1px);border:0;background:var(--accent);color:#06122c;font:inherit;font-weight:700;cursor:pointer}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h2>选择日期</h2>
+    <div class="cal" id="cal"></div>
+    <div style="color:var(--dim);font-size:calc(var(--fs)*.82*1px);margin-top:10px" id="range">点击选择入住与退房日期</div>
+  </div>
+  <div class="panel">
+    <h2>选择房型</h2>
+    <div class="rooms" id="rooms"></div>
+    <div class="summary">
+      <div>
+        <div style="color:var(--dim);font-size:calc(var(--fs)*.82*1px)" id="nights">— 晚</div>
+        <div class="big">¥<span id="sum">0</span><small> 总计</small></div>
+      </div>
+      <button class="book" id="book">预订</button>
+    </div>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#0b1220',ink:'#dce6f5',accent:'#5b8cff',radius:12,gap:16,fs:14,maxw:1000};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const ROOMS=[
+  {nm:'标准大床房',mt:'22㎡ · 1.8m 床 · 含早',pr:368},
+  {nm:'高级城景房',mt:'30㎡ · 落地窗 · 含早',pr:528},
+  {nm:'行政套房',mt:'55㎡ · 客厅 · 行政酒廊',pr:888},
+];
+let first=null, second=null, ri=1;
+const calEl=document.getElementById('cal');
+const roomsEl=document.getElementById('rooms');
+
+function renderCal(){
+  const days=[];
+  for(let i=0;i<3;i++) days.push({m:true});
+  for(let d=1;d<=30;d++) days.push({d});
+  calEl.innerHTML=days.map(x=>{
+    if(x.m) return '<div class="day mute">·</div>';
+    let cls='day';
+    if(first!==null && second!==null){
+      if(x.d>first && x.d<second) cls+=' in';
+      if(x.d===first||x.d===second) cls+=' in bd';
+    } else if(x.d===first){ cls+=' in bd'; }
+    return '<div class="'+cls+'" data-d="'+x.d+'">'+x.d+'</div>';
+  }).join('');
+  calEl.querySelectorAll('.day:not(.mute)').forEach(el=>el.addEventListener('click',()=>{
+    const d=+el.dataset.d;
+    if(first===null || (first!==null&&second!==null)){ first=d; second=null; }
+    else if(d>first){ second=d; }
+    else { first=d; }
+    renderCal(); update();
+  }));
+}
+function renderRooms(){
+  roomsEl.innerHTML=ROOMS.map((r,i)=>'<div class="room'+(i===ri?' on':'')+'" data-i="'+i+'"><div class="pic">'+['A','B','C'][i]+'</div><div><div class="nm">'+r.nm+'</div><div class="mt">'+r.mt+'</div></div><div class="pr">¥'+r.pr+'<small>/晚</small></div></div>').join('');
+  roomsEl.querySelectorAll('.room').forEach(el=>el.addEventListener('click',()=>{ri=+el.dataset.i;renderRooms();update();}));
+}
+function nights(){ return (first!==null&&second!==null)?(second-first):0; }
+function update(){
+  const n=nights();
+  document.getElementById('nights').textContent=n?n+' 晚':'— 晚';
+  document.getElementById('sum').textContent=n*ROOMS[ri].pr;
+  document.getElementById('range').textContent=(first!==null?('入住 '+first+' 日'):'点击选择入住')+(second!==null?(' · 退房 '+second+' 日'):'');
+}
+document.getElementById('book').addEventListener('click',()=>{
+  document.getElementById('range').textContent = nights()? '已生成订单，去支付' : '请先选择日期';
+});
+apply();renderCal();renderRooms();update();
+
+// 预览/挂机自动演示：自动选日期区间 + 切房型；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%3===0){ first=8; second=11; renderCal(); update(); }
+  else if(step%3===1){ ri=(ri+1)%ROOMS.length; renderRooms(); update(); }
+  else { first=14; second=18; renderCal(); update(); }
+},2600);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S62",
+      风格名: "订阅周期预订",
+      适配端: "通用",
+      风格: "编辑杂志",
+      场景: "电商·预订",
+      骨架: "居中标题 + 导语 + 月/季/年周期切换 + 大价格 + 权益清单 + 优惠码 + 开通 CTA。",
+      配色: "暖白底 #fbfaf7，文字 #1c1a17，强调陶土 #c2603f，浅暖底 #f3ece3，线 #e7e2d8。",
+      布局骨架: "居中单列 max 680；周期切换 pill；间距 18，圆角 16。",
+      重色落点: "陶土绑周期选中态、价格、开通 CTA；衬线标题制造杂志感。",
+      第一屏内容: "标题「成为会员」+ 副文 + 周期切换（年付省 17%）+ 大价格 + 权益清单 + 优惠码 + 立即开通。",
+      删减元素: "不做功能对比表；不做客户 logo 墙；不做年付/月付双栏；单栏周期切换即核心。",
+      适用: "会员 / 订阅 / 内容付费的转化页。",
+      禁忌: "周期切换无反馈；权益与价格脱节；优惠码入口弱化。",
+      我的说明: "唯一「月/季/年周期切换 + 权益清单 + 优惠码」骨架。通用端（375px 单列不溢出）。与现有 58 套无重叠（S57 是 SaaS 三栏定价对比，非订阅周期单栏）。",
+      Agent提示词: "1 视觉主题：编辑杂志风的订阅转化。气质是「克制、有调性、说服不喧哗」。\n2 色彩板：#fbfaf7 暖白底；#1c1a17 文字；#c2603f 强调陶土（周期选中+价格+开通）；#f3ece3 浅暖底；#e7e2d8 线。\n3 字体：衬线标题(Georgia/宋体)，正文系统字体；基准 15px，标题 2.1em。\n4 组件：居中标题+副文；月/季/年 pill 切换（选中实心陶土）；大价格 + 周期说明；权益清单(勾选)；优惠码输入+应用；开通 CTA。\n5 布局：居中单列 max 680；间距 18、圆角 16。\n6 深度：surface-1 暖白；surface-2 浅暖；重色只绑选中态/价格/CTA。\n7 该做/不该做：该做——周期切换即时反馈、权益与价联动、优惠码可见。不该做——双栏对比、logo墙、切换无反馈。\n8 响应式：通用端，375px 单列不溢出；触控目标≥44px。\n9 即拿即用提示词：「做一个会员订阅页（通用端，编辑杂志）：暖白底衬线标题，月/季/年pill切换(选中陶土)，大价格+权益清单+优惠码+开通CTA；陶土强调，间距18圆角16。」",
+      演示页: "assets/demos/方案-订阅周期预订.html",
+      来源: "④ 机制参考自 Spotify / 纽约时报订阅页范式（周期切换 + 权益），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["Spotify/纽约时报订阅页范式（2026-10-09 机制参考）"],
+      参数: [
+        {"键":"bg","名":"页面底色","类型":"color","默认":"#fbfaf7"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#1c1a17"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#c2603f"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":32,"步长":1,"默认":16},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":18},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":15},
+        {"键":"maxw","名":"内容最大宽(px)","类型":"slider","最小":420,"最大":900,"步长":20,"默认":680}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>订阅周期预订</title>
+<style>
+:root{
+  --bg:#fbfaf7;--ink:#1c1a17;--dim:#7a7468;--line:#e7e2d8;
+  --accent:#c2603f;--soft:#f3ece3;--radius:16;--gap:18;--fs:15;--maxw:680;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Georgia,"Songti SC","PingFang SC",system-ui,serif;font-size:calc(var(--fs)*1px);line-height:1.55}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.4*1px);text-align:center}
+h1{margin:0 0 6px;font-size:calc(var(--fs)*2.1*1px);font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--dim);margin:0 0 18px;font-family:system-ui,sans-serif;font-size:calc(var(--fs)*.9*1px)}
+.toggle{display:inline-flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;justify-content:center}
+.toggle button{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font:inherit;font-family:system-ui,sans-serif;cursor:pointer}
+.toggle button.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.save{color:var(--accent);font-family:system-ui,sans-serif;font-size:calc(var(--fs)*.82*1px);font-weight:600;margin-left:6px}
+.price{font-size:calc(var(--fs)*2.6*1px);font-weight:700;font-family:system-ui,sans-serif}
+.price small{font-size:calc(var(--fs)*.9*1px);color:var(--dim);font-weight:400}
+.per{color:var(--dim);font-family:system-ui,sans-serif;font-size:calc(var(--fs)*.82*1px);margin:2px 0 16px}
+ul.feat{list-style:none;margin:0 auto 18px;padding:0;max-width:420px;text-align:left;font-family:system-ui,sans-serif;font-size:calc(var(--fs)*.9*1px)}
+ul.feat li{padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px}
+ul.feat li .ck{color:var(--accent);font-weight:700}
+.code{display:inline-flex;gap:8px;margin-bottom:16px;font-family:system-ui,sans-serif;flex-wrap:wrap;justify-content:center}
+.code input{min-height:44px;width:160px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;color:var(--ink);font:inherit}
+.code button{min-height:44px;padding:0 16px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);font:inherit;font-weight:600;cursor:pointer}
+.cta{min-height:48px;width:100%;max-width:420px;border:0;border-radius:calc(var(--radius)*1px);background:var(--accent);color:#fff;font:inherit;font-family:system-ui,sans-serif;font-weight:700;font-size:calc(var(--fs)*1.1*1px);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>成为会员</h1>
+  <p class="sub">按月、按季或按年，随时取消。</p>
+  <div class="toggle" id="cyc">
+    <button data-c="m" class="on">月</button>
+    <button data-c="q">季</button>
+    <button data-c="y">年</button>
+    <span class="save" id="save">年付省 17%</span>
+  </div>
+  <div class="price">¥<span id="p">39</span><small> / 月</small></div>
+  <div class="per" id="per">按月付，随时取消</div>
+  <ul class="feat" id="feat"></ul>
+  <div class="code">
+    <input id="promo" placeholder="优惠码" value="WELCOME">
+    <button id="applyc">应用</button>
+  </div>
+  <button class="cta" id="join">立即开通</button>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fbfaf7',ink:'#1c1a17',accent:'#c2603f',radius:16,gap:18,fs:15,maxw:680};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const PLAN={m:{p:39,per:'按月付，随时取消',save:'年付省 17%'},q:{p:105,per:'按季付，折合 ¥35/月',save:'年付省 17%'},y:{p:390,per:'按年付，已均摊到每月',save:'已是最优价'}};
+const FEAT=['全部高级模板与组件','无限项目与导出','优先客服与早期功能','会员专属社区'];
+let cyc='m', promoOn=false;
+const pEl=document.getElementById('p');
+const perEl=document.getElementById('per');
+const saveEl=document.getElementById('save');
+const featEl=document.getElementById('feat');
+function render(){
+  pEl.textContent=PLAN[cyc].p;
+  perEl.textContent=PLAN[cyc].per;
+  saveEl.textContent=promoOn?'优惠码已生效 −¥10/月':PLAN[cyc].save;
+  featEl.innerHTML=FEAT.map(f=>'<li><span class="ck">✓</span>'+f+'</li>').join('');
+}
+document.getElementById('cyc').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  cyc=b.dataset.c;
+  document.getElementById('cyc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  render();
+}));
+document.getElementById('applyc').addEventListener('click',()=>{
+  promoOn = document.getElementById('promo').value.trim().toUpperCase()==='WELCOME';
+  render();
+});
+document.getElementById('join').addEventListener('click',()=>{
+  perEl.textContent = promoOn? ('已开通 · 首月减 ¥'+(cyc==='y'?120:10)) : '已开通 · 去使用';
+});
+apply();render();
+
+// 预览/挂机自动演示：轮换周期；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+function setCyc(c){
+  cyc=c;
+  document.getElementById('cyc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.c===c));
+  render();
+}
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  if(step%3===0) setCyc('q');
+  else if(step%3===1) setCyc('y');
+  else setCyc('m');
+},2400);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S63",
+      风格名: "分步结算漏斗",
+      适配端: "PC 端",
+      风格: "极简瑞士",
+      场景: "电商·预订",
+      骨架: "顶部三步进度条（购物车→配送→支付）+ 左当前步表单/摘要 + 右订单摘要（商品/运费/优惠/合计）+ 优惠码 + 下一步。",
+      配色: "白底 #fafafa，文字 #1a1a1a，强调蓝 #2563eb，浅蓝底 #eef2ff，线 #e6e6e6。",
+      布局骨架: "两列 max 920（左 1.6fr 右 1fr）；间距 16，圆角 14。",
+      重色落点: "蓝绑进度条当前步、下一步按钮；完成步用浅蓝。",
+      第一屏内容: "三步进度（购物车高亮）+ 购物车清单 + 订单摘要（¥488+运费−优惠=合计）+ 优惠码 + 下一步。",
+      删减元素: "不做导航；不做营销 Banner；不做推荐商品；漏斗即全部。",
+      适用: "电商结算 / 多步表单转化。",
+      禁忌: "步骤切换无进度反馈；摘要不同步；优惠码无效无提示。",
+      我的说明: "唯一「三步进度条 + 订单摘要侧栏 + 优惠码」骨架。PC 端（19px 可接受）。与现有 58 套无重叠。",
+      Agent提示词: "1 视觉主题：极简瑞士的结算漏斗。气质是「高效、可信、一步步走完」。\n2 色彩板：#fafafa 页面底；#1a1a1a 文字；#2563eb 强调蓝（进度当前步+下一步）；#eef2ff 浅蓝（完成步）；#e6e6e6 线。\n3 字体：系统字体栈，基准 15px。\n4 组件：顶部三步进度条（圆点+连接条，当前实心蓝、完成浅蓝）；左=当前步表单/摘要卡；右=订单摘要侧栏（商品/运费/优惠/合计）+ 优惠码输入 + 下一步按钮。\n5 布局：两列 max 920（左 1.6fr 右 1fr）；间距 16、圆角 14。\n6 深度：surface-1 页面底；surface-2 卡片白；重色绑定当前步与下一步。\n7 该做/不该做：该做——进度清晰、摘要同步、优惠码有反馈。不该做——无进度反馈、摘要不同步、Banner 干扰。\n8 响应式：PC 端优先；窄屏塌单列不溢出。\n9 即拿即用提示词：「做一个结算漏斗页（PC端，极简瑞士）：顶部三步进度条(购物车→配送→支付,当前实心蓝)，左当前步表单，右订单摘要侧栏(商品/运费/优惠/合计)+优惠码+下一步；白底蓝强调，间距16圆角14。」",
+      演示页: "assets/demos/方案-分步结算漏斗.html",
+      来源: "④ 机制参考自 淘宝 / 京东结算流程范式（多步漏斗 + 订单摘要），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["淘宝/京东结算流程范式（2026-10-09 机制参考）"],
+      参数: [
+        {"键":"bg","名":"页面底色","类型":"color","默认":"#fafafa"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#1a1a1a"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#2563eb"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":15},
+        {"键":"maxw","名":"内容最大宽(px)","类型":"slider","最小":640,"最大":1200,"步长":20,"默认":920}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分步结算漏斗</title>
+<style>
+:root{
+  --bg:#fafafa;--ink:#1a1a1a;--dim:#8a8a8e;--line:#e6e6e6;
+  --accent:#2563eb;--soft:#eef2ff;--radius:14;--gap:16;--fs:15;--maxw:920;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:calc(var(--fs)*1px);line-height:1.5}
+.wrap{max-width:calc(var(--maxw)*1px);margin:0 auto;padding:calc(var(--gap)*1.4*1px);display:grid;grid-template-columns:1.6fr 1fr;gap:calc(var(--gap)*1.6*1px)}
+.steps{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.step{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:calc(var(--fs)*.9*1px)}
+.step .dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;font-size:calc(var(--fs)*.82*1px)}
+.step.on{color:var(--ink);font-weight:600}
+.step.on .dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.step.done .dot{background:var(--soft);color:var(--accent);border-color:var(--accent)}
+.bar{flex:1;height:2px;background:var(--line)}
+.card{background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px)}
+.card h2{margin:0 0 14px;font-size:calc(var(--fs)*1.3*1px)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{color:var(--dim);font-size:calc(var(--fs)*.86*1px)}
+.field input, .field select{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;color:var(--ink);font:inherit}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.aside{background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius)*1px);padding:calc(var(--gap)*1px);align-self:start}
+.aside h3{margin:0 0 12px;font-size:calc(var(--fs)*1.05*1px)}
+.ln{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:calc(var(--fs)*.9*1px)}
+.ln.tot{border-top:2px solid var(--ink);margin-top:6px;font-weight:700;font-size:calc(var(--fs)*1.1*1px)}
+.promo{display:flex;gap:8px;margin:10px 0}
+.promo input{flex:1;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit}
+.promo button{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--soft);font:inherit;cursor:pointer}
+.next{min-height:48px;width:100%;border:0;border-radius:calc(var(--radius)*1px);background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer;margin-top:8px}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="steps" id="steps">
+      <div class="step on" data-s="0"><span class="dot">1</span>购物车</div>
+      <div class="bar"></div>
+      <div class="step" data-s="1"><span class="dot">2</span>配送</div>
+      <div class="bar"></div>
+      <div class="step" data-s="2"><span class="dot">3</span>支付</div>
+    </div>
+    <div class="card" id="stage"></div>
+  </div>
+  <div class="aside">
+    <h3>订单摘要</h3>
+    <div class="ln"><span>城市通勤双肩包 ×1</span><span>¥399</span></div>
+    <div class="ln"><span>极简钱包 ×1</span><span>¥89</span></div>
+    <div class="ln"><span>运费</span><span id="ship">¥12</span></div>
+    <div class="ln"><span>优惠</span><span id="off">−¥0</span></div>
+    <div class="ln tot"><span>合计</span><span id="tot">¥500</span></div>
+    <div class="promo"><input id="promo" placeholder="优惠码"><button id="applyc">应用</button></div>
+    <button class="next" id="next">下一步</button>
+  </div>
+</div>
+<script>
+// 数值参数不拼单位；CSS 一律 calc(var(--x) * 1px)
+const UNIT={};
+const state={bg:'#fafafa',ink:'#1a1a1a',accent:'#2563eb',radius:14,gap:16,fs:15,maxw:920};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const VIEWS=[
+  {h:'购物车',body:'<div class="ln"><span>城市通勤双肩包 ×1</span><span>¥399</span></div><div class="ln"><span>极简钱包 ×1</span><span>¥89</span></div><div class="ln"><span>合计商品</span><span>¥488</span></div>'},
+  {h:'配送信息',body:'<div class="field"><label>收货人</label><input value="王砚"></div><div class="row2"><div class="field"><label>手机</label><input value="138****0000"></div><div class="field"><label>邮编</label><input value="400000"></div></div><div class="field"><label>地址</label><input value="重庆市渝中区…"></div><div class="field"><label>配送方式</label><select><option>标准快递 ¥12</option><option>顺丰次日 ¥23</option></select></div>'},
+  {h:'支付',body:'<div class="field"><label>持卡人</label><input value="WANG YAN"></div><div class="field"><label>卡号</label><input value="**** **** **** 4242"></div><div class="row2"><div class="field"><label>有效期</label><input value="08/29"></div><div class="field"><label>CVV</label><input value="***"></div></div>'},
+];
+let cur=0, off=0;
+const shipEl=document.getElementById('ship');
+const offEl=document.getElementById('off');
+const totEl=document.getElementById('tot');
+function renderSteps(){
+  document.querySelectorAll('#steps .step').forEach((el,i)=>{
+    el.classList.toggle('on',i===cur);
+    el.classList.toggle('done',i<cur);
+  });
+}
+function renderStage(){
+  document.getElementById('stage').innerHTML='<h2>'+VIEWS[cur].h+'</h2>'+VIEWS[cur].body;
+  renderSteps();
+}
+function calc(){
+  const ship=12, goods=488, total=goods+ship-off;
+  shipEl.textContent='¥'+ship;
+  offEl.textContent='−¥'+off;
+  totEl.textContent='¥'+total;
+}
+document.getElementById('next').addEventListener('click',()=>{
+  if(cur<2){ cur++; renderStage(); }
+  else { document.getElementById('next').textContent='支付成功 ✓'; }
+});
+document.getElementById('applyc').addEventListener('click',()=>{
+  const code=document.getElementById('promo').value.trim().toUpperCase();
+  off = code==='SAVE50'? 50 : 0;
+  calc();
+});
+apply();renderStage();calc();
+
+// 预览/挂机自动演示：轮换步骤；有人操作即停
+let auto=true;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{auto=false;},{once:true}));
+let step=0;
+setInterval(()=>{
+  if(!auto) return;
+  step++;
+  cur=(cur+1)%3; renderStage();
+},2800);
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+<\/script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S64",
+      风格名: "底滑操作台",
+      适配端: "移动端",
+      风格: "有机自然",
+      场景: "工具·SaaS",
+      骨架: "顶部标题栏（标题 + 待办计数）→ 中部待办清单（圆点 + 标题 + 时间，已完成划线）→ 底部常驻把手条（56px，可拖可点）→ 上滑展开半屏操作台（把手 + 2×4 快捷图标网格）+ 全屏遮罩。",
+      配色: "米白 #f5f3ec，墨绿 #2f3a2e，次要 #7f8b76，线 #e0e3d8，草绿强调 #6f9a58，卡白 #ffffff。",
+      布局骨架: "375 手机容器；把手 56px 固定高；图标网格 4 列 × 2 行，每格 min-height 76；面板高 296，收起时只露把手。",
+      重色落点: "草绿只绑把手箭头、选中图标底与强调数字；其余中性。",
+      第一屏内容: "标题「今日工作台」+ 3 待办 2 逾期；底部露出把手「快捷操作」；上滑后 8 个动作（新建文档/上传/邀请/扫码/模板/日程/提醒/设置）。",
+      删减元素: "不做侧边抽屉；不做多选工具栏；不做二级菜单；动作一层即达。",
+      适用: "工具类 App 的「高频动作收口」——把分散在各页面的入口收进一层底滑面板。",
+      禁忌: "面板默认全展开挡住正文；把手区小于 44px；拖拽无阻尼或无半程吸附；遮罩不可点关闭。",
+      我的说明: "唯一「底部常驻把手 + 上滑半屏操作台 + 图标网格」骨架，拖拽带阻尼与半程吸附。移动端「工具·SaaS」场景此前 0 条；上滑 / sheet 机制全库唯一（S54 命令面板是居中模态 + ⌘K 键盘驱动，非手势）。",
+      Agent提示词: "1 视觉主题：有机自然的「动作收口」工作台。气质是「轻、顺手、不打断」——主页面只留待办，动作全收进底部一层。\n2 色彩板：#f5f3ec 页面底；#2f3a2e 文字；#7f8b76 次要；#e0e3d8 线；#6f9a58 草绿强调（把手箭头 / 选中图标 / 强调数字）；#ffffff 卡白。\n3 字体：系统字体栈，基准 16px。\n4 组件：顶栏（标题 + 待办计数）；待办清单（圆点 + 标题 + 时间，已完成划线降色）；底部常驻把手条 56px（短横 + 「快捷操作」+ 箭头）；上滑展开半屏操作台（把手 + 2×4 图标网格，每格 min-height 76）；全屏遮罩。\n5 布局：375 手机容器；面板高 296，收起时 translateY(240) 只露把手；图标网格 4 列。\n6 深度：surface-1 页面底；surface-2 卡片白；重色绑定把手与选中态。\n7 该做/不该做：该做——把手可点可拖、拖拽带阻尼与半程吸附、选中态互斥。不该做——面板默认全展开挡正文、把手区小于 44px、遮罩不可点关闭。\n8 响应式：移动端竖屏；横向不溢出。\n9 即拿即用提示词：「做一个移动端工作台页（有机自然）：顶栏标题 + 待办计数，中部待办清单，底部常驻 56px 把手条，上滑展开半屏操作台（2×4 图标网格）；米白底 #f5f3ec、草绿 #6f9a58 强调，把手可拖拽带阻尼与半程吸附，圆角 16 间距 18。」",
+      演示页: "assets/demos/方案-底滑操作台.html",
+      来源: "④ 机制参考自 iOS / Material 的 bottom sheet 范式（拖动把手 + 半屏浮层），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["iOS / Material Bottom Sheet 范式（2026-10-11 机制参考）"],
+      参数: [
+        {"键":"paper","名":"页面底色","类型":"color","默认":"#f5f3ec"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#2f3a2e"},
+        {"键":"dim","名":"次要文字色","类型":"color","默认":"#7f8b76"},
+        {"键":"rule","名":"分隔线色","类型":"color","默认":"#e0e3d8"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#6f9a58"},
+        {"键":"card","名":"卡片底色","类型":"color","默认":"#ffffff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":16},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":18},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":16},
+        {"键":"sheet","名":"面板高度(px)","类型":"slider","最小":220,"最大":420,"步长":4,"默认":296},
+        {"键":"icon","名":"图标尺寸(px)","类型":"slider","最小":40,"最大":64,"步长":2,"默认":52}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>底滑操作台</title>
+<style>
+:root{
+  --paper:#f5f3ec;--ink:#2f3a2e;--dim:#7f8b76;--rule:#e0e3d8;--accent:#6f9a58;
+  --card:#ffffff;--radius:16;--gap:18;--fs:16;--sheet:296;--icon:52;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e8e5da;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(50,60,40,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .sub{margin-left:auto;font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+.body{
+  flex:1;min-height:0;overflow:auto;padding:16px calc(var(--gap) * 1px) 120px;
+}
+.body::-webkit-scrollbar{width:0}
+.hint{
+  font-size:calc(var(--fs) * .82 * 1px);color:var(--dim);line-height:1.7;
+  margin:0 0 14px;
+}
+.task{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 14px;margin-bottom:10px;
+  display:flex;align-items:center;gap:11px;
+}
+.task .dot{
+  flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--accent);
+}
+.task.done .dot{background:transparent;border:1.5px solid var(--dim)}
+.task .tx{flex:1;min-width:0;font-size:calc(var(--fs) * .9 * 1px)}
+.task.done .tx{color:var(--dim);text-decoration:line-through}
+.task .tm{flex:0 0 auto;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim)}
+/* 遮罩：只在面板展开时接管点击，收起时完全不可点，避免挡住正文滚动 */
+.scrim{
+  position:absolute;inset:0;z-index:5;background:rgba(40,48,36,.32);
+  opacity:0;pointer-events:none;transition:opacity .34s ease;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+/* 底滑面板：靠 translateY 在「露出把手」与「完全展开」之间走，不做 display 切换以便保留过渡 */
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:6;
+  height:calc(var(--sheet) * 1px);
+  background:var(--card);border-top:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px) calc(var(--radius) * 1px) 0 0;
+  box-shadow:0 -14px 34px rgba(50,60,40,.18);
+  transform:translateY(calc(var(--sheet) * 1px - 56px));
+  transition:transform .42s cubic-bezier(.22,.9,.24,1);
+  display:flex;flex-direction:column;
+}
+.sheet.drag{transition:none}
+.sheet.on{transform:translateY(0)}
+.handle{
+  flex:0 0 auto;height:56px;display:flex;align-items:center;gap:11px;
+  padding:0 calc(var(--gap) * 1px);cursor:grab;touch-action:none;
+}
+.handle .bar{width:38px;height:4px;border-radius:3px;background:var(--rule)}
+.handle .tt{flex:1;font-size:calc(var(--fs) * .88 * 1px);font-weight:600}
+.handle .ar{
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  color:var(--dim);transition:transform .42s cubic-bezier(.22,.9,.24,1);
+}
+.sheet.on .handle .ar{transform:rotate(180deg)}
+.handle .ar svg{width:20px;height:20px;display:block}
+.grid{
+  flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px 4px;padding:4px calc(var(--gap) * 1px) 16px;
+  align-content:start;
+}
+.act{
+  border:0;background:transparent;cursor:pointer;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font:inherit;font-size:calc(var(--fs) * .7 * 1px);
+  min-height:76px;padding:4px 0;
+}
+.act i{
+  width:calc(var(--icon) * 1px);height:calc(var(--icon) * 1px);
+  border-radius:14px;background:var(--paper);
+  border:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s ease,color .3s ease;
+}
+.act i svg{width:23px;height:23px;display:block}
+.act.hot i{background:var(--accent);border-color:var(--accent);color:#fff}
+.act span{color:var(--dim)}
+.act.hot span{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>今日工作台</h1>
+    <span class="sub">3 待办 · 2 已逾</span>
+  </div>
+
+  <div class="body">
+    <p class="hint">向上拖动底部把手（或点箭头）唤起操作台 —— 高频动作收在一层里，主页面只留清单。</p>
+    <div class="task"><span class="dot"></span><span class="tx">把 Q3 报表导出给客户</span><span class="tm">今天</span></div>
+    <div class="task"><span class="dot"></span><span class="tx">评审新版 onboarding 文案</span><span class="tm">逾 1 天</span></div>
+    <div class="task"><span class="dot"></span><span class="tx">补充团队权限白名单</span><span class="tm">逾 2 天</span></div>
+    <div class="task done"><span class="dot"></span><span class="tx">同步上周会议纪要</span><span class="tm">已完成</span></div>
+    <div class="task done"><span class="dot"></span><span class="tx">更新 API 变更日志</span><span class="tm">已完成</span></div>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="handle" id="handle">
+      <span class="bar"></span>
+      <span class="tt">快捷操作</span>
+      <span class="ar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M6 15l6-6 6 6"/>
+        </svg>
+      </span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f5f3ec',ink:'#2f3a2e',dim:'#7f8b76',rule:'#e0e3d8',accent:'#6f9a58',
+             card:'#ffffff',radius:16,gap:18,fs:16,sheet:296,icon:52};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const ICON={
+  doc:'M6 3.5h7l5 5v12H6zM13 3.5V9h5',
+  up:'M12 17V6M12 6l-4 4M12 6l4 4',
+  inv:'M15.5 19a3.5 3.5 0 0 0 0-7v-1a5.5 5.5 0 0 0-5.5 5.5M8.5 19a3.5 3.5 0 0 0 0-7v-1A5.5 5.5 0 0 1 14 16.5',
+  scan:'M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16',
+  tpl:'M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5zM4 9h16M9 9v11',
+  cal:'M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v12A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5zM4 10h16M8 3.5v3M16 3.5v3',
+  bell:'M12 4a5 5 0 0 1 5 5v3.5l1.5 3H6.5L8 12.5V9a5 5 0 0 1 5-5zM10 18.5a2 2 0 0 0 4 0',
+  set:'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM19.4 12c0-.5-.05-1-.14-1.5l2-1.4-2-3.4-2.2 1a7.6 7.6 0 0 0-2.6-1.5L15 3H9l.5 2.2a7.6 7.6 0 0 0-2.6 1.5l-2.2-1-2 3.4 2 1.4a7.4 7.4 0 0 0 0 3l-2 1.4 2 3.4 2.2-1a7.6 7.6 0 0 0 2.6 1.5L9 21h6l-.5-2.2a7.6 7.6 0 0 0 2.6-1.5l2.2 1 2-3.4-2-1.4c.09-.5.14-1 .14-1.5z'
+};
+const ACTS=[
+  ['新建文档','doc',1],['上传文件','up',0],['邀请成员','inv',0],['扫码录入','scan',0],
+  ['模板库','tpl',0],['排日程','cal',0],['设提醒','bell',1],['空间设置','set',0]
+];
+
+const grid=document.getElementById('grid');
+ACTS.forEach(([name,key,hot],i)=>{
+  const b=document.createElement('button');
+  b.className='act'+(hot?' hot':'');
+  b.innerHTML='<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="'+ICON[key]+'"/></svg></i><span>'+name+'</span>';
+  b.addEventListener('click',()=>{
+    // 选中态只在本层内互斥：面板是「一次性动作入口」，不留多选
+    grid.querySelectorAll('.act').forEach(x=>x.classList.remove('hot'));
+    b.classList.add('hot');
+  });
+  grid.appendChild(b);
+});
+
+const sheet=document.getElementById('sheet');
+const scrim=document.getElementById('scrim');
+const handle=document.getElementById('handle');
+let open=false;
+
+function setOpen(v){
+  open=v;
+  sheet.classList.toggle('on',open);
+  scrim.classList.toggle('on',open);
+}
+
+// 点击把手整条（含箭头）都能开合：把手是 56px 高的独立触控区，箭头只是其中的视觉指示
+handle.addEventListener('click',()=>setOpen(!open));
+scrim.addEventListener('click',()=>setOpen(false));
+
+// 拖拽：只改 translateY，松手按「过了半程」判展开/收起，避免落在一个中间态
+let dragging=false,startY=0,baseY=0;
+handle.addEventListener('pointerdown',e=>{
+  dragging=true;startY=e.clientY;
+  baseY=open?0:(state.sheet-56);
+  sheet.classList.add('drag');
+  handle.setPointerCapture(e.pointerId);
+});
+handle.addEventListener('pointermove',e=>{
+  if(!dragging) return;
+  let y=baseY+(e.clientY-startY);
+  y=Math.max(0,Math.min(state.sheet-56,y));
+  sheet.style.transform='translateY('+y+'px)';
+});
+handle.addEventListener('pointerup',e=>{
+  if(!dragging) return;
+  dragging=false;
+  sheet.classList.remove('drag');
+  sheet.style.transform='';
+  const curY=baseY+(e.clientY-startY);
+  setOpen(curY < (state.sheet-56)/2);
+});
+
+apply();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();
+});
+</script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S65",
+      风格名: "下拉刷新消息台",
+      适配端: "移动端",
+      风格: "其他·特色风格",
+      场景: "工具·SaaS",
+      骨架: "顶部标题栏（标题 + 未读徽标）→ 筛选胶囊行（全部 / 未读 / 提及我 / 系统，44px 高可横滑）→ 可下拉的消息列表（顶部隐藏刷新指示器，下拉露出并旋转）→ 右下浮动「全部已读」按钮 + Toast。",
+      配色: "暖砂 #f7f1e8，深褐 #33291f，次要 #94826d，线 #e6dccd，砖橘强调 #c2603a，卡白 #ffffff。",
+      布局骨架: "375 手机容器；胶囊行 44px；消息卡 44px 头像 + 两行文字；下拉阈值 60px，最大阻尼位移 108px。",
+      重色落点: "砖橘只绑未读徽标、未读圆点、选中胶囊与浮动按钮；已读卡整体降不透明度。",
+      第一屏内容: "标题「通知中心」+ 未读 4；胶囊「全部」选中；6 条消息卡（提及 / 系统 / 邀请 / 回复，含未读点）；右下浮动对勾按钮。",
+      删减元素: "不做左滑删除；不做消息分组日期头；不做搜索；只解决「收口 + 刷新 + 已读」三件事。",
+      适用: "工具类产品的通知 / 消息中心，强调「新消息靠下拉拉取」而非自动堆叠。",
+      禁忌: "下拉阈值过低导致误触；列表未滚到顶就抢手势；刷新后无结果反馈；胶囊低于 44px。",
+      我的说明: "唯一「下拉刷新手势 + 旋转指示器 + 未读消息流」骨架，带 0.55 阻尼与阈值释放。移动端「工具·SaaS」此前 0 条；下拉 / 刷新 / 消息 / 通知 机制全库唯一。",
+      Agent提示词: "1 视觉主题：暖砂纸感的通知收口页。气质是「沉着的信箱」——新消息由用户主动拉取，不是被动堆到脸上。\n2 色彩板：#f7f1e8 页面底；#33291f 文字；#94826d 次要；#e6dccd 线；#c2603a 砖橘强调（未读徽标 / 未读点 / 选中胶囊 / 浮动按钮）；#ffffff 卡白。\n3 字体：系统字体栈，基准 16px。\n4 组件：顶栏（标题 + 未读计数徽标）；筛选胶囊行（4 个，44px 高，可横滑）；消息卡（44px 头像 + 标题 + 摘要 + 时间 + 未读点）；顶部隐藏的下拉指示器（箭头旋转 → 松手转 spinner）；右下浮动「全部已读」按钮；Toast。\n5 布局：375 手机容器；列表可滚；指示器高 60，默认负 margin 藏起。\n6 深度：surface-1 页面底；surface-2 卡白；已读卡降不透明度到 0.72。\n7 该做/不该做：该做——仅 scrollTop 为 0 时接管手势、下拉带阻尼、松手过阈值才刷新、刷新后有 Toast 反馈。不该做——与内容滚动抢手势、阈值过低误触、刷新无反馈、胶囊低于 44px。\n8 响应式：移动端竖屏；横向不溢出。\n9 即拿即用提示词：「做一个移动端通知中心（暖砂 + 砖橘）：顶栏标题 + 未读徽标，44px 筛选胶囊行（全部/未读/提及我/系统），消息卡列表（44px 头像 + 标题 + 摘要 + 未读点），下拉刷新（阻尼 0.55、阈值 60px、松手转 spinner、刷新后 Toast），右下浮动全部已读按钮；#f7f1e8 底 #c2603a 强调。」",
+      演示页: "assets/demos/方案-下拉刷新消息台.html",
+      来源: "④ 机制参考自 iOS Mail / 微信下拉刷新范式（阻尼下拉 + 阈值释放 + 指示器旋转），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["iOS Mail / 微信 下拉刷新范式（2026-10-11 机制参考）"],
+      参数: [
+        {"键":"paper","名":"页面底色","类型":"color","默认":"#f7f1e8"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#33291f"},
+        {"键":"dim","名":"次要文字色","类型":"color","默认":"#94826d"},
+        {"键":"rule","名":"分隔线色","类型":"color","默认":"#e6dccd"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#c2603a"},
+        {"键":"card","名":"卡片底色","类型":"color","默认":"#ffffff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":16},
+        {"键":"pull","名":"下拉阈值(px)","类型":"slider","最小":40,"最大":90,"步长":2,"默认":60},
+        {"键":"ava","名":"头像尺寸(px)","类型":"slider","最小":32,"最大":56,"步长":2,"默认":44}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>下拉刷新消息台</title>
+<style>
+:root{
+  --paper:#f7f1e8;--ink:#33291f;--dim:#94826d;--rule:#e6dccd;--accent:#c2603a;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--pull:60;--ava:44;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e9e1d4;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(70,52,32,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .cnt{
+  margin-left:auto;min-width:26px;height:26px;padding:0 8px;border-radius:13px;
+  background:var(--accent);color:#fff;font-size:calc(var(--fs) * .7 * 1px);font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+/* 筛选胶囊：移动端触控门槛 44px，宁可做大也不让探针判不达标（不做 data-touch-exempt 豁免） */
+.filters{
+  flex:0 0 auto;display:flex;gap:8px;padding:10px calc(var(--gap) * 1px);
+  overflow-x:auto;border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.filters::-webkit-scrollbar{height:0}
+.chip{
+  flex:0 0 auto;min-height:44px;padding:0 15px;border:1px solid var(--rule);
+  border-radius:22px;background:var(--card);color:var(--dim);
+  font:inherit;font-size:calc(var(--fs) * .82 * 1px);cursor:pointer;
+  display:flex;align-items:center;white-space:nowrap;
+}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.list{
+  flex:1;min-height:0;overflow:auto;padding:0 calc(var(--gap) * 1px) 96px;touch-action:pan-y;
+}
+.list::-webkit-scrollbar{width:0}
+.wrap{transform:translateY(0)}
+.wrap.anim{transition:transform .38s cubic-bezier(.22,.9,.24,1)}
+.pull{
+  height:calc(var(--pull) * 1px);margin-top:calc(var(--pull) * -1px);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  color:var(--dim);font-size:calc(var(--fs) * .76 * 1px);
+}
+.pull .ico{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  transition:transform .2s linear;
+}
+.pull .ico svg{width:19px;height:19px;display:block}
+.pull.spin .ico{animation:spin .85s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:12px 13px;margin-bottom:10px;
+  display:flex;gap:11px;align-items:flex-start;
+}
+.msg .ava{
+  flex:0 0 auto;width:calc(var(--ava) * 1px);height:calc(var(--ava) * 1px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:calc(var(--fs) * .82 * 1px);
+  letter-spacing:.02em;
+}
+.msg .bd{flex:1;min-width:0}
+.msg .tt{
+  display:flex;align-items:baseline;gap:8px;
+  font-size:calc(var(--fs) * .9 * 1px);font-weight:600;
+}
+.msg .tt .tm{
+  margin-left:auto;flex:0 0 auto;font-weight:400;
+  font-size:calc(var(--fs) * .7 * 1px);color:var(--dim);
+}
+.msg .ds{
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);line-height:1.55;margin-top:3px;
+}
+.msg .ud{
+  flex:0 0 auto;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);margin-top:6px;
+}
+.msg.read{opacity:.72}
+.msg.read .ud{background:transparent}
+.fab{
+  position:absolute;right:calc(var(--gap) * 1px);bottom:calc(var(--gap) * 1px);z-index:7;
+  width:56px;height:56px;border:0;border-radius:50%;background:var(--accent);color:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(194,96,58,.34);
+}
+.fab svg{width:24px;height:24px;display:block}
+.toast{
+  position:absolute;left:50%;bottom:88px;z-index:8;transform:translate(-50%,10px);
+  background:var(--ink);color:var(--paper);border-radius:20px;
+  padding:9px 16px;font-size:calc(var(--fs) * .78 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;
+  white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>通知中心</h1>
+    <span class="cnt" id="cnt">4</span>
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="list" id="list">
+    <div class="wrap" id="wrap">
+      <div class="pull" id="pull">
+        <span class="ico" id="ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M12 5v13M12 18l-5-5M12 18l5-5"/>
+          </svg>
+        </span>
+        <span id="tip">下拉可以刷新</span>
+      </div>
+      <div id="msgs"></div>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" title="全部标为已读">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+      <path d="M5 12.5l4.5 4.5L19 7"/>
+    </svg>
+  </button>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f7f1e8',ink:'#33291f',dim:'#94826d',rule:'#e6dccd',accent:'#c2603a',
+             card:'#ffffff',radius:14,gap:16,fs:16,pull:60,ava:44};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const FILTERS=['全部','未读','提及我','系统'];
+const MSGS=[
+  {n:'林',c:'#c2603a',t:'林澈 在《Q3 渠道复盘》中提到了你',d:'“这里的数据口径要不要统一到周？” —— 点击查看上下文',tm:'2 分钟前',u:1,k:'提及我'},
+  {n:'系',c:'#7d8b74',t:'系统维护通知',d:'本周六 02:00–04:00 将进行数据库升级，期间导出功能不可用。',tm:'28 分钟前',u:1,k:'系统'},
+  {n:'周',c:'#5b7fa6',t:'周雯 邀请你加入「客户画像」空间',d:'她给你开了编辑权限，进入后可直接改字段映射。',tm:'1 小时前',u:1,k:'全部'},
+  {n:'陈',c:'#a6854e',t:'陈舸 回复了你的评论',d:'“已按你说的把阈值调低一档，等明天数据再看。”',tm:'3 小时前',u:1,k:'提及我'},
+  {n:'系',c:'#7d8b74',t:'导出任务已完成',d:'「8 月全量订单」共 12,483 行，文件保留 7 天。',tm:'昨天',u:0,k:'系统'},
+  {n:'吴',c:'#8a6fa8',t:'吴桐 提交了审批',d:'预算调整单 #2043 等待你确认，金额 ¥18,600。',tm:'昨天',u:0,k:'全部'}
+];
+const PULL_NEW=[
+  {n:'林',c:'#c2603a',t:'林澈 更新了《Q3 渠道复盘》',d:'新增两段结论，并修正了上周的口径错误。',tm:'刚刚',u:1,k:'全部'},
+  {n:'系',c:'#7d8b74',t:'你有一个待确认的权限变更',d:'管理员把你的空间权限从「只读」升到「可编辑」。',tm:'刚刚',u:1,k:'系统'}
+];
+
+let cur='全部', fresh=0;
+const msgsEl=document.getElementById('msgs');
+const listEl=document.getElementById('list');
+const wrapEl=document.getElementById('wrap');
+const pullEl=document.getElementById('pull');
+const icoEl=document.getElementById('ico');
+const tipEl=document.getElementById('tip');
+const cntEl=document.getElementById('cnt');
+const toastEl=document.getElementById('toast');
+
+const filtersEl=document.getElementById('filters');
+FILTERS.forEach(f=>{
+  const b=document.createElement('button');
+  b.className='chip'+(f===cur?' on':'');
+  b.textContent=f;
+  b.addEventListener('click',()=>{
+    cur=f;
+    filtersEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.textContent===f));
+    render();
+  });
+  filtersEl.appendChild(b);
+});
+
+function render(){
+  const rows=MSGS.filter(m=>cur==='全部'||m.k===cur||(cur==='未读'&&m.u));
+  msgsEl.innerHTML='';
+  rows.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='msg'+(m.u?'':' read');
+    d.innerHTML='<span class="ava" style="background:'+m.c+'">'+m.n+'</span>'+
+      '<span class="bd"><span class="tt">'+m.t+'<span class="tm">'+m.tm+'</span></span>'+
+      '<span class="ds">'+m.d+'</span></span>'+
+      '<span class="ud"></span>';
+    msgsEl.appendChild(d);
+  });
+  cntEl.textContent=MSGS.filter(m=>m.u).length;
+}
+
+let toastT=0;
+function toast(s){
+  toastEl.textContent=s;toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toastEl.classList.remove('on'),1600);
+}
+
+// 下拉刷新：只有在列表已滚到顶部时才接管手势，否则交给系统滚动，避免和内容滚动打架
+let pulling=false,startY=0,dist=0,busy=false;
+function setY(y,anim){
+  wrapEl.classList.toggle('anim',!!anim);
+  wrapEl.style.transform='translateY('+y+'px)';
+}
+listEl.addEventListener('pointerdown',e=>{
+  if(busy||listEl.scrollTop>0) return;
+  pulling=true;startY=e.clientY;dist=0;
+  wrapEl.classList.remove('anim');
+  listEl.setPointerCapture(e.pointerId);
+});
+listEl.addEventListener('pointermove',e=>{
+  if(!pulling) return;
+  // 越往下阻力越大，最大只让面板露出 108px，手感上接近真实 App
+  dist=Math.min(108,Math.max(0,(e.clientY-startY)*0.55));
+  if(dist<=0){setY(0);return;}
+  setY(dist);
+  icoEl.style.transform='rotate('+(dist*4)+'deg)';
+  tipEl.textContent=dist>=state.pull?'松开立即刷新':'下拉可以刷新';
+});
+function endPull(){
+  if(!pulling) return;
+  pulling=false;
+  if(dist>=state.pull){ doRefresh(); }
+  else{ setY(0,true); dist=0; }
+}
+listEl.addEventListener('pointerup',endPull);
+listEl.addEventListener('pointercancel',endPull);
+
+function doRefresh(){
+  busy=true;
+  setY(state.pull,true);
+  pullEl.classList.add('spin');
+  tipEl.textContent='正在刷新…';
+  setTimeout(()=>{
+    // 新消息插在最前，且只插前两条，避免刷新几次后列表无限变长
+    const add=PULL_NEW[fresh%PULL_NEW.length];
+    MSGS.unshift(Object.assign({},add,{tm:'刚刚'}));
+    fresh++;
+    render();
+    pullEl.classList.remove('spin');
+    icoEl.style.transform='rotate(0deg)';
+    setY(0,true);
+    busy=false;
+    toast('已更新 1 条新消息');
+  },1200);
+}
+
+document.getElementById('fab').addEventListener('click',()=>{
+  MSGS.forEach(m=>m.u=0);
+  render();
+  toast('已全部标为已读');
+});
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S66",
+      风格名: "时段预约·横滑",
+      适配端: "移动端",
+      风格: "有机自然",
+      场景: "电商·预订",
+      骨架: "顶部标题 + 门店信息卡（名称 / 地址 / 标签）→ 横滑日期条（7 个胶囊，总宽超屏）→ 时段网格（3 列，含满约置灰）→ 底部固定确认栏（已选 + 实时价 + 确认按钮）。",
+      配色: "暖米 #faf4ee，褐 #4a3b32，次要 #97836e，线 #e6d9c7，陶土橙强调 #c98a5e，卡白 #ffffff。",
+      布局骨架: "375 手机容器；日期胶囊 60×66 横滑；时段 3 列 min-height 48；底栏 64px 不透明。",
+      重色落点: "陶土橙只绑选中日期、选中时段与价格数字；满约态用虚线 + 删除线，不抢色。",
+      第一屏内容: "门店「拾木工坊·观音桥店」；默认选中周三 14 日；6 个时段（含 2 个满约）；底栏 ¥168、未选时按钮禁用。",
+      删减元素: "不做月历弹层；不做多门店切换；不做服务人员选择；只做「日期 + 时段」两跳。",
+      适用: "到店类预订（体验课 / 美容 / 门诊 / 场馆）——选日期像选班次，横滑比月历更快。",
+      禁忌: "满约时段仍可点；换日期后时段不刷新；底栏半透明透出内容；未选时段却可提交。",
+      我的说明: "唯一「横滑日期条 + 时段芯片网格 + 满约置灰 + 底部实时价」骨架。移动端「电商·预订」此前 0 条；「时段」机制全库唯一（S61 日期范围预订是 PC 双月历，非横滑条）。",
+      Agent提示词: "1 视觉主题：有机自然的到店预约。气质是「手工感、可预期」——先把门店讲清，再让用户两跳完成选择。\n2 色彩板：#faf4ee 页面底；#4a3b32 文字；#97836e 次要；#e6d9c7 线；#c98a5e 陶土橙强调（选中日期 / 选中时段 / 价格）；#ffffff 卡白。\n3 字体：系统字体栈，基准 16px。\n4 组件：顶栏（标题 + 副标）；门店信息卡（名称 / 地址 / 距离 / 可约标签）；横滑日期条（7 个胶囊，星期 + 日期）；时段网格（3 列，min-height 48，满约态虚线 + 删除线 + 禁用）；底部固定确认栏（已选文案 + 价格 + 确认按钮）。\n5 布局：375 手机容器；日期条横滑（7×60 > 375）；时段 3 列；底栏 64px 不透明。\n6 深度：surface-1 页面底；surface-2 卡白；重色只落在选中态与价格。\n7 该做/不该做：该做——日期与时段联动、满约明确不可点、未选时提交禁用、周末价与平日价区分。不该做——满约可点、换日期时段不刷新、底栏半透明、未选可提交。\n8 响应式：移动端竖屏；仅日期条横滑，页面本身不横向溢出。\n9 即拿即用提示词：「做一个移动端到店预约页（有机自然）：顶栏 + 门店信息卡，横滑日期条（7 个胶囊），时段网格 3 列（含满约虚线置灰禁用），底部固定确认栏（已选时段 + 实时价 + 确认按钮）；暖米底 #faf4ee、陶土橙 #c98a5e 强调，周末价高于平日。」",
+      演示页: "assets/demos/方案-时段预约横滑.html",
+      来源: "④ 机制参考自 美团到店预约 / Calendly 时段选择范式（横滑日期 + 时段网格 + 满约态），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["美团到店预约 / Calendly 时段范式（2026-10-11 机制参考）"],
+      参数: [
+        {"键":"paper","名":"页面底色","类型":"color","默认":"#faf4ee"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#4a3b32"},
+        {"键":"dim","名":"次要文字色","类型":"color","默认":"#97836e"},
+        {"键":"rule","名":"分隔线色","类型":"color","默认":"#e6d9c7"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#c98a5e"},
+        {"键":"card","名":"卡片底色","类型":"color","默认":"#ffffff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":16},
+        {"键":"day","名":"日期胶囊宽(px)","类型":"slider","最小":48,"最大":76,"步长":2,"默认":60},
+        {"键":"slot","名":"时段格高(px)","类型":"slider","最小":40,"最大":64,"步长":2,"默认":48}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时段预约横滑</title>
+<style>
+:root{
+  --paper:#faf4ee;--ink:#4a3b32;--dim:#97836e;--rule:#e6d9c7;--accent:#c98a5e;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--day:60;--slot:48;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efe4d6;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(90,64,40,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .sub{margin-left:auto;font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+.scroll{flex:1;min-height:0;overflow:auto;padding:14px 0 120px}
+.scroll::-webkit-scrollbar{width:0}
+.shop{
+  margin:0 calc(var(--gap) * 1px) 16px;background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:13px 14px;
+}
+.shop .nm{font-size:calc(var(--fs) * .98 * 1px);font-weight:650}
+.shop .ad{
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);margin-top:4px;line-height:1.55;
+}
+.shop .tag{
+  display:inline-block;margin-top:8px;padding:3px 9px;border-radius:6px;
+  background:var(--paper);border:1px solid var(--rule);
+  font-size:calc(var(--fs) * .68 * 1px);color:var(--dim);
+}
+h2{
+  margin:0 calc(var(--gap) * 1px) 10px;font-size:calc(var(--fs) * .86 * 1px);
+  font-weight:650;letter-spacing:.02em;
+}
+/* 日期条：7 个胶囊横排总宽大于 375，靠手指横滑推进，是移动端专属的取日期方式 */
+.days{
+  display:flex;gap:8px;padding:2px calc(var(--gap) * 1px) 14px;
+  overflow-x:auto;border-bottom:1px solid var(--rule);
+}
+.days::-webkit-scrollbar{height:0}
+.day{
+  flex:0 0 calc(var(--day) * 1px);min-height:66px;
+  border:1px solid var(--rule);border-radius:12px;background:var(--card);
+  color:var(--dim);cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.day .w{font-size:calc(var(--fs) * .7 * 1px)}
+.day .d{font-size:calc(var(--fs) * 1.06 * 1px);font-weight:700;color:var(--ink)}
+.day.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.day.on .d{color:#fff}
+.slots{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;
+  padding:14px calc(var(--gap) * 1px) 0;
+}
+.slot{
+  min-height:calc(var(--slot) * 1px);border:1px solid var(--rule);
+  border-radius:11px;background:var(--card);color:var(--ink);
+  font:inherit;font-size:calc(var(--fs) * .84 * 1px);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.slot.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* 满约态：置灰 + 明确不可点，避免用户点了才发现约不上 */
+.slot.off{
+  background:transparent;border-style:dashed;color:var(--dim);
+  cursor:not-allowed;text-decoration:line-through;
+}
+.note{
+  margin:14px calc(var(--gap) * 1px) 0;font-size:calc(var(--fs) * .74 * 1px);
+  color:var(--dim);line-height:1.65;
+}
+/* 底部确认栏必须不透明：半透明会让下面的时段从底透出来，与文字混在一起显脏 */
+.bar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;min-height:64px;
+  background:var(--paper);border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:12px;padding:10px calc(var(--gap) * 1px);
+}
+.bar .info{flex:1;min-width:0}
+.bar .sel{font-size:calc(var(--fs) * .8 * 1px);color:var(--dim)}
+.bar .pri{
+  font-size:calc(var(--fs) * 1.22 * 1px);font-weight:700;color:var(--accent);margin-top:2px;
+}
+.bar .pri small{font-size:calc(var(--fs) * .7 * 1px);font-weight:400;color:var(--dim)}
+.go{
+  flex:0 0 auto;min-height:44px;padding:0 22px;border:0;border-radius:22px;
+  background:var(--accent);color:#fff;font:inherit;font-weight:650;
+  font-size:calc(var(--fs) * .9 * 1px);cursor:pointer;
+}
+.go[disabled]{background:var(--rule);color:var(--dim);cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>预约到店</h1>
+    <span class="sub">木工坊 · 体验课</span>
+  </div>
+
+  <div class="scroll">
+    <div class="shop">
+      <div class="nm">拾木工坊 · 观音桥店</div>
+      <div class="ad">江北区观音桥步行街 9 号 3F-07　距你 1.2km</div>
+      <span class="tag">今日可约 · 提前 2 小时</span>
+    </div>
+
+    <h2>选择日期</h2>
+    <div class="days" id="days"></div>
+
+    <h2 style="margin-top:16px">选择时段</h2>
+    <div class="slots" id="slots"></div>
+
+    <p class="note">每场体验课约 90 分钟，含材料与工具。改约请提前 4 小时，逾期不可退。</p>
+  </div>
+
+  <div class="bar">
+    <div class="info">
+      <div class="sel" id="sel">未选择时段</div>
+      <div class="pri"><small>¥</small><span id="pri">168</span></div>
+    </div>
+    <button class="go" id="go" disabled>确认预约</button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#faf4ee',ink:'#4a3b32',dim:'#97836e',rule:'#e6d9c7',accent:'#c98a5e',
+             card:'#ffffff',radius:14,gap:16,fs:16,day:60,slot:48};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const DAYS=[
+  {w:'周一',d:12},{w:'周二',d:13},{w:'周三',d:14},{w:'周四',d:15},
+  {w:'周五',d:16},{w:'周六',d:17},{w:'周日',d:18}
+];
+// 每个日期的时段表不同，用来体现「换日期=换可选时段」这条真实业务规则
+const SLOTS={
+  12:[['09:00',1],['10:30',1],['14:00',0],['15:30',1],['19:00',0],['20:30',1]],
+  13:[['09:00',0],['10:30',1],['14:00',1],['15:30',1],['19:00',1],['20:30',0]],
+  14:[['09:00',1],['10:30',1],['14:00',1],['15:30',0],['19:00',1],['20:30',1]],
+  15:[['09:00',1],['10:30',0],['14:00',1],['15:30',1],['19:00',0],['20:30',1]],
+  16:[['09:00',1],['10:30',1],['14:00',0],['15:30',1],['19:00',1],['20:30',1]],
+  17:[['09:00',1],['10:30',1],['14:00',1],['15:30',1],['19:00',1],['20:30',1]],
+  18:[['09:00',0],['10:30',1],['14:00',1],['15:30',0],['19:00',1],['20:30',1]]
+};
+const PRICE={w:168,e:198};
+
+let dayIdx=2, picked=null;
+const daysEl=document.getElementById('days');
+const slotsEl=document.getElementById('slots');
+const selEl=document.getElementById('sel');
+const priEl=document.getElementById('pri');
+const goEl=document.getElementById('go');
+
+DAYS.forEach((d,i)=>{
+  const b=document.createElement('button');
+  b.className='day'+(i===dayIdx?' on':'');
+  b.innerHTML='<span class="w">'+d.w+'</span><span class="d">'+d.d+'</span>';
+  b.addEventListener('click',()=>{
+    dayIdx=i;picked=null;
+    daysEl.querySelectorAll('.day').forEach((x,xi)=>x.classList.toggle('on',xi===i));
+    renderSlots();syncBar();
+  });
+  daysEl.appendChild(b);
+});
+
+function isWeekend(i){ return i>=5; }
+
+function renderSlots(){
+  slotsEl.innerHTML='';
+  SLOTS[DAYS[dayIdx].d].forEach(([t,av])=>{
+    const b=document.createElement('button');
+    b.className='slot'+(av?'':' off')+(picked===t?' on':'');
+    b.textContent=av?t:t+' 满';
+    if(av){
+      b.addEventListener('click',()=>{
+        picked=(picked===t)?null:t;
+        slotsEl.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));
+        if(picked) b.classList.add('on');
+        syncBar();
+      });
+    }else{
+      b.disabled=true;
+    }
+    slotsEl.appendChild(b);
+  });
+}
+
+function syncBar(){
+  const weekend=isWeekend(dayIdx);
+  const price=weekend?PRICE.e:PRICE.w;
+  priEl.textContent=price;
+  if(picked){
+    selEl.textContent=DAYS[dayIdx].w+'（'+DAYS[dayIdx].d+'日） '+picked+(weekend?' · 周末场':'');
+    goEl.disabled=false;
+  }else{
+    selEl.textContent='未选择时段';
+    goEl.disabled=true;
+  }
+}
+
+goEl.addEventListener('click',()=>{
+  goEl.textContent='已预约 ✓';
+  setTimeout(()=>{goEl.textContent='确认预约';},1600);
+});
+
+apply();
+renderSlots();
+syncBar();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();renderSlots();syncBar();
+});
+</script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S67",
+      风格名: "订单状态时间轴",
+      适配端: "移动端",
+      风格: "编辑杂志",
+      场景: "电商·预订",
+      骨架: "顶部标题栏 + 订单号 → 订单摘要卡（品名 + 状态徽标 + 送达信息 + 金额）→ 纵向时间轴（5 节点：圆点 + 连接线，已完成段实心强调、当前段脉冲环、未达段空心灰）→ 底部双按钮。",
+      配色: "纸白 #fcfbf8，墨 #232019，次要 #8b8478，线 #e3ded3，松绿强调 #3f6b57，卡白 #ffffff。",
+      布局骨架: "375 手机容器；圆点列 22px 固定；节点间距 22px；底栏 64px 不透明。",
+      重色落点: "松绿只绑已完成圆点、已走过连接线、当前脉冲环与金额；未达段保持灰阶。",
+      第一屏内容: "订单 #20261014-8831；摘要「周末双人套餐 · 含配送」+ 徽标「配送中」+ ¥128.00；时间轴自动推进到第 4 步配送中。",
+      删减元素: "不做地图轨迹；不做骑手头像电话卡；不做商品缩略图列表；进度即全部信息。",
+      适用: "外卖 / 配送 / 服务类订单的进度追踪，尤其状态多、需要交代「现在到哪一步」。",
+      禁忌: "已完成与未达段颜色不分；连接线整条一个色失去进度感；到底后无意义循环。",
+      我的说明: "唯一「纵向时间轴 + 分段着色连接线 + 当前节点脉冲 + 自动推进」骨架，推进到末态即停。移动端「电商·预订」此前 0 条；「时间轴」机制全库唯一（S41 是落地页含地图路线，非状态时间轴）。",
+      Agent提示词: "1 视觉主题：编辑杂志的订单进度页。气质是「克制的叙事」——用一条竖线把五个状态讲成一个过程，而不是五个并列的信息块。\n2 色彩板：#fcfbf8 页面底；#232019 文字；#8b8478 次要；#e3ded3 线；#3f6b57 松绿强调（已完成圆点 / 已走过连接线 / 当前脉冲环 / 金额）；#ffffff 卡白。\n3 字体：系统字体栈，基准 16px；时间用等宽字体。\n4 组件：顶栏（标题 + 等宽订单号）；订单摘要卡（品名 + 状态徽标 + 送达信息 + 金额，虚线分隔金额行）；纵向时间轴 5 节点（圆点列 22px + 连接线 + 标题 / 等宽时间 / 描述）；底部双按钮（次要 + 主）。\n5 布局：375 手机容器；节点间距 22px；底栏 64px 不透明。\n6 深度：surface-1 页面底；surface-2 卡白；分段着色表达进度，未达段不抢注意力。\n7 该做/不该做：该做——三态区分明确（已完成实心 / 当前脉冲 / 未达空心）、连接线分段着色、推进到末态即停。不该做——三态同色、连接线整条一色、到底后循环、底栏半透明。\n8 响应式：移动端竖屏；横向不溢出。\n9 即拿即用提示词：「做一个移动端订单进度页（编辑杂志）：顶栏 + 等宽订单号，订单摘要卡（品名 + 状态徽标 + 金额），纵向时间轴 5 节点（已完成实心松绿 / 当前脉冲环 / 未达空心灰，连接线分段着色），底部双按钮；纸白底 #fcfbf8、松绿 #3f6b57 强调，自动推进到末态即停。」",
+      演示页: "assets/demos/方案-订单状态时间轴.html",
+      来源: "④ 机制参考自 淘宝 / 美团订单进度时间轴范式（节点 + 连接线 + 当前态高亮），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["淘宝 / 美团 订单进度时间轴范式（2026-10-11 机制参考）"],
+      参数: [
+        {"键":"paper","名":"页面底色","类型":"color","默认":"#fcfbf8"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#232019"},
+        {"键":"dim","名":"次要文字色","类型":"color","默认":"#8b8478"},
+        {"键":"rule","名":"分隔线色","类型":"color","默认":"#e3ded3"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#3f6b57"},
+        {"键":"card","名":"卡片底色","类型":"color","默认":"#ffffff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":18},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":16},
+        {"键":"dot","名":"节点圆点(px)","类型":"slider","最小":14,"最大":32,"步长":2,"默认":22}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>订单状态时间轴</title>
+<style>
+:root{
+  --paper:#fcfbf8;--ink:#232019;--dim:#8b8478;--rule:#e3ded3;--accent:#3f6b57;
+  --card:#ffffff;--radius:14;--gap:18;--fs:16;--dot:22;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#efece5;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(50,44,32,.24);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .no{
+  margin-left:auto;font-family:ui-monospace,Consolas,monospace;
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);
+}
+.scroll{flex:1;min-height:0;overflow:auto;padding:16px calc(var(--gap) * 1px) 110px}
+.scroll::-webkit-scrollbar{width:0}
+.sum{
+  background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);padding:14px;margin-bottom:20px;
+}
+.sum .row{display:flex;align-items:center;gap:10px}
+.sum .nm{font-size:calc(var(--fs) * .96 * 1px);font-weight:650}
+.badge{
+  margin-left:auto;flex:0 0 auto;padding:4px 10px;border-radius:6px;
+  background:var(--accent);color:#fff;font-size:calc(var(--fs) * .7 * 1px);font-weight:600;
+}
+.sum .dt{
+  font-size:calc(var(--fs) * .78 * 1px);color:var(--dim);margin-top:7px;line-height:1.6;
+}
+.sum .amt{
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);
+  display:flex;align-items:baseline;gap:6px;
+}
+.sum .amt b{font-size:calc(var(--fs) * 1.18 * 1px);color:var(--accent)}
+.sum .amt span{font-size:calc(var(--fs) * .74 * 1px);color:var(--dim)}
+
+/* 时间轴：每个节点左侧留出圆点列，竖线只画在「已完成」段，未完成段保持灰，进度靠颜色讲 */
+.tl{padding-left:2px}
+.node{display:flex;gap:14px;align-items:flex-start}
+.node .lc{
+  flex:0 0 calc(var(--dot) * 1px);position:relative;align-self:stretch;
+  display:flex;justify-content:center;
+}
+.node .dot{
+  width:calc(var(--dot) * 1px);height:calc(var(--dot) * 1px);border-radius:50%;
+  background:var(--paper);border:2px solid var(--rule);margin-top:2px;
+  transition:background .45s ease,border-color .45s ease,box-shadow .45s ease;
+}
+.node .line{
+  position:absolute;top:calc(var(--dot) * 1px + 4px);bottom:-4px;left:50%;
+  width:2px;margin-left:-1px;background:var(--rule);
+  transition:background .45s ease;
+}
+.node:last-child .line{display:none}
+.node.done .dot{background:var(--accent);border-color:var(--accent)}
+.node.done .line{background:var(--accent)}
+.node.now .dot{
+  background:var(--paper);border-color:var(--accent);
+  box-shadow:0 0 0 5px rgba(63,107,87,.14);
+  animation:pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(63,107,87,.16)}
+  50%{box-shadow:0 0 0 8px rgba(63,107,87,.05)}
+}
+.node .bd{flex:1;min-width:0;padding-bottom:22px}
+.node .ti{
+  font-size:calc(var(--fs) * .92 * 1px);font-weight:600;color:var(--dim);
+  transition:color .45s ease;
+}
+.node.done .ti,.node.now .ti{color:var(--ink)}
+.node.now .ti{color:var(--accent)}
+.node .tm{
+  font-family:ui-monospace,Consolas,monospace;
+  font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);margin-top:3px;
+}
+.node .ds{
+  font-size:calc(var(--fs) * .8 * 1px);color:var(--dim);line-height:1.6;margin-top:5px;
+}
+/* 底部操作条必须不透明：半透明会让时间轴从底下透出来，与按钮文字混在一起显脏 */
+.bar{
+  position:absolute;left:0;right:0;bottom:0;z-index:7;min-height:64px;
+  background:var(--paper);border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:10px;padding:10px calc(var(--gap) * 1px);
+}
+.btn{
+  flex:1;min-height:44px;border:1px solid var(--rule);border-radius:22px;
+  background:var(--card);color:var(--ink);font:inherit;
+  font-size:calc(var(--fs) * .84 * 1px);cursor:pointer;
+}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>订单进度</h1>
+    <span class="no">#20261014-8831</span>
+  </div>
+
+  <div class="scroll">
+    <div class="sum">
+      <div class="row">
+        <span class="nm">周末双人套餐 · 含配送</span>
+        <span class="badge" id="bdg">配送中</span>
+      </div>
+      <div class="dt">拾味小馆（观音桥店）· 预计 11:20 前送达 · 吴女士 138****6271</div>
+      <div class="amt"><b>¥128.00</b><span>已支付 · 微信</span></div>
+    </div>
+
+    <div class="tl" id="tl"></div>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="b1">联系商家</button>
+    <button class="btn pri" id="b2">确认收货</button>
+  </div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#fcfbf8',ink:'#232019',dim:'#8b8478',rule:'#e3ded3',accent:'#3f6b57',
+             card:'#ffffff',radius:14,gap:18,fs:16,dot:22};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const STEPS=[
+  ['已下单','10-14 09:22','订单已提交，等待商家确认。'],
+  ['商家已接单','10-14 09:31','拾味小馆已确认，开始备餐。'],
+  ['制作中','10-14 10:05','你的餐品正在制作，预计 20 分钟完成。'],
+  ['配送中','10-14 10:48','骑手王师傅已取餐，距你 1.8km。'],
+  ['已送达','10-14 11:20','已送达前台，请及时取用。']
+];
+
+const tl=document.getElementById('tl');
+const bdg=document.getElementById('bdg');
+const b2=document.getElementById('b2');
+let cur=0;
+
+STEPS.forEach((s,i)=>{
+  const n=document.createElement('div');
+  n.className='node';
+  n.innerHTML='<span class="lc"><span class="dot"></span><span class="line"></span></span>'+
+    '<span class="bd"><span class="ti">'+s[0]+'</span>'+
+    '<span class="tm">'+s[1]+'</span>'+
+    '<span class="ds">'+s[2]+'</span></span>';
+  tl.appendChild(n);
+});
+
+function render(){
+  const nodes=tl.querySelectorAll('.node');
+  nodes.forEach((n,i)=>{
+    // 已完成段（不含当前）用实心 + 强调色，当前节点用脉冲环，未到达段保持灰
+    n.classList.toggle('done',i<cur);
+    n.classList.toggle('now',i===cur);
+  });
+  bdg.textContent=STEPS[cur][0];
+  b2.textContent=(cur===STEPS.length-1)?'再来一单':'确认收货';
+}
+
+// 自动推进只在「未送达」时走：到了最后一格就停住，符合真实订单语义，不做无意义循环
+let timer=setInterval(()=>{
+  if(cur<STEPS.length-1){ cur++; render(); }
+  else{ clearInterval(timer); }
+},2800);
+
+b2.addEventListener('click',()=>{
+  if(cur<STEPS.length-1){ cur++; render(); }
+  else{ cur=0; render(); timer=setInterval(()=>{
+    if(cur<STEPS.length-1){ cur++; render(); }
+    else{ clearInterval(timer); }
+  },2800); }
+});
+document.getElementById('b1').addEventListener('click',e=>{
+  const t=e.currentTarget.textContent;
+  e.currentTarget.textContent='已呼叫 ✓';
+  setTimeout(()=>{e.currentTarget.textContent=t;},1500);
+});
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>
+`
+    },
+    {
+      id: "S68",
+      风格名: "优惠券中心",
+      适配端: "移动端",
+      风格: "其他·特色风格",
+      场景: "电商·预订",
+      骨架: "顶部标题栏 + 规则入口 → 三档分类 Tab（可用 / 已用 / 过期，44px 均分）→ 票券卡列表（左侧面额区 + 虚线分隔 + 上下半圆缺口 + 右侧信息 + 领取按钮）→ 底部说明。",
+      配色: "冷白紫 #f4f2f7，深紫墨 #241f2e，次要 #7d7288，线 #ded8e6，紫强调 #6d4fa8，卡白 #ffffff。",
+      布局骨架: "375 手机容器；Tab 三等分 44px；券卡面额区 116px 固定；领取按钮 min 74×44；缺口 14px。",
+      重色落点: "紫只绑面额数字、选中 Tab 与领取按钮；失效券整张降不透明度并转灰。",
+      第一屏内容: "标题「优惠券」+「使用规则」；Tab「可用」选中；3 张券（¥30 满 199 / ¥15 满 99 / ¥50 满 299，含门槛与有效期）+ 领取按钮；底部「每单限用 1 张」。",
+      删减元素: "不做券包进度条；不做分享得券；不做倒计时抢券；只做「领」这一件事。",
+      适用: "电商 / 本地生活的优惠券领用中心，券种多、需按状态分档。",
+      禁忌: "券卡做成普通卡片失去票券识别；失效券仍可点；面额区与信息区比例失衡。",
+      我的说明: "唯一「票券半圆缺口 + 虚线分隔 + 面额大字 + 状态分档 Tab」骨架。移动端「电商·预订」此前 0 条；「优惠券 / 券」机制全库唯一。",
+      Agent提示词: "1 视觉主题：冷紫调的券包页。气质是「有凭据感」——每一张都要像一张能撕下来的票，而不是一张列表卡。\n2 色彩板：#f4f2f7 页面底；#241f2e 文字；#7d7288 次要；#ded8e6 线；#6d4fa8 紫强调（面额数字 / 选中 Tab / 领取按钮）；#ffffff 卡白。\n3 字体：系统字体栈，基准 16px；面额用 40px 800 字重。\n4 组件：顶栏（标题 + 下划线式「使用规则」）；三档 Tab（可用 / 已用 / 过期，44px 均分）；票券卡（左侧 116px 面额区：¥ + 大数字 + 门槛；中间虚线竖分隔；分隔线上下各一个 14px 半圆缺口咬在卡边；右侧券名 + 有效期；最右领取按钮 min 74×44）；空态文案；Toast。\n5 布局：375 手机容器；券卡间距 12；底部小字说明居中。\n6 深度：surface-1 页面底；surface-2 卡白；失效券整张降不透明度到 0.62 并转灰。\n7 该做/不该做：该做——缺口与虚线做出票券识别、三档 Tab 切换、领取后即时置灰并 Toast、空态有文案。不该做——券卡做成普通卡片、失效券仍可点、面额区过窄挤掉数字。\n8 响应式：移动端竖屏；横向不溢出。\n9 即拿即用提示词：「做一个移动端优惠券中心（冷紫调）：顶栏 + 使用规则，三档 Tab（可用/已用/过期，44px 均分），票券卡列表（左侧 116px 面额区 + 虚线分隔 + 上下半圆缺口 + 右侧券名有效期 + 领取按钮），领取后置灰并 Toast，空态有文案；#f4f2f7 底 #6d4fa8 强调。」",
+      演示页: "assets/demos/方案-优惠券中心.html",
+      来源: "④ 机制参考自 淘宝 / 美团优惠券中心范式（票券形态 + 状态分档 + 领取反馈），已换题重推，非复刻；零依赖单文件 demo。",
+      参考站: ["淘宝 / 美团 优惠券中心范式（2026-10-11 机制参考）"],
+      参数: [
+        {"键":"paper","名":"页面底色","类型":"color","默认":"#f4f2f7"},
+        {"键":"ink","名":"主文字色","类型":"color","默认":"#241f2e"},
+        {"键":"dim","名":"次要文字色","类型":"color","默认":"#7d7288"},
+        {"键":"rule","名":"分隔线色","类型":"color","默认":"#ded8e6"},
+        {"键":"accent","名":"强调色","类型":"color","默认":"#6d4fa8"},
+        {"键":"card","名":"卡片底色","类型":"color","默认":"#ffffff"},
+        {"键":"radius","名":"圆角(px)","类型":"slider","最小":0,"最大":28,"步长":1,"默认":14},
+        {"键":"gap","名":"间距(px)","类型":"slider","最小":8,"最大":32,"步长":1,"默认":16},
+        {"键":"fs","名":"基准字号(px)","类型":"slider","最小":12,"最大":20,"步长":1,"默认":16},
+        {"键":"face","名":"面额字号(px)","类型":"slider","最小":28,"最大":56,"步长":2,"默认":40}
+      ],
+      代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>优惠券中心</title>
+<style>
+:root{
+  --paper:#f4f2f7;--ink:#241f2e;--dim:#7d7288;--rule:#ded8e6;--accent:#6d4fa8;
+  --card:#ffffff;--radius:14;--gap:16;--fs:16;--face:40;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#e6e2ec;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone{
+  width:375px;height:812px;max-height:98vh;position:relative;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+  font-size:calc(var(--fs) * 1px);line-height:1.5;
+  border-radius:24px;box-shadow:0 28px 70px rgba(56,44,76,.26);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  flex:0 0 auto;min-height:54px;display:flex;align-items:center;gap:10px;
+  padding:8px calc(var(--gap) * 1px);border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.topbar h1{margin:0;font-size:calc(var(--fs) * 1.04 * 1px);font-weight:650;letter-spacing:-.01em}
+.topbar .rule{
+  margin-left:auto;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);
+  text-decoration:underline;text-underline-offset:2px;
+}
+/* 分类 Tab：移动端触控门槛 44px，三个均分也够放，不做豁免 */
+.tabs{
+  flex:0 0 auto;display:flex;gap:8px;padding:10px calc(var(--gap) * 1px);
+  border-bottom:1px solid var(--rule);background:var(--paper);
+}
+.tab{
+  flex:1;min-height:44px;border:1px solid var(--rule);border-radius:22px;
+  background:var(--card);color:var(--dim);font:inherit;
+  font-size:calc(var(--fs) * .82 * 1px);cursor:pointer;
+}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.scroll{flex:1;min-height:0;overflow:auto;padding:14px calc(var(--gap) * 1px) 20px}
+.scroll::-webkit-scrollbar{width:0}
+
+/* 票券形态：左右两个半圆缺口咬在卡片上下边缘，中间走一道虚线，是「券」而非「卡」的识别点 */
+.cpn{
+  position:relative;background:var(--card);border:1px solid var(--rule);
+  border-radius:calc(var(--radius) * 1px);margin-bottom:12px;
+  display:flex;align-items:stretch;overflow:visible;
+}
+.cpn .face{
+  flex:0 0 116px;padding:14px 10px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--accent);
+}
+.cpn .face .v{
+  font-size:calc(var(--face) * 1px);font-weight:800;line-height:1.05;letter-spacing:-.02em;
+}
+.cpn .face .v small{font-size:calc(var(--fs) * .82 * 1px);font-weight:700;margin-right:1px}
+.cpn .face .c{
+  font-size:calc(var(--fs) * .7 * 1px);color:var(--dim);margin-top:5px;
+}
+.cpn .split{
+  flex:0 0 auto;width:1px;margin:12px 0;
+  border-left:1px dashed var(--rule);
+}
+.cpn .nt{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--rule);
+  left:116px;margin-left:-7px;z-index:2;
+}
+.cpn .nt.t{top:-7px}
+.cpn .nt.b{bottom:-7px}
+.cpn .info{
+  flex:1;min-width:0;padding:13px 12px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+}
+.cpn .nm{font-size:calc(var(--fs) * .9 * 1px);font-weight:650;line-height:1.35}
+.cpn .ex{font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);line-height:1.5}
+.get{
+  flex:0 0 auto;align-self:center;margin-right:12px;
+  min-height:44px;min-width:74px;padding:0 14px;border:0;border-radius:22px;
+  background:var(--accent);color:#fff;font:inherit;font-weight:650;
+  font-size:calc(var(--fs) * .8 * 1px);cursor:pointer;
+}
+/* 失效态：整张退成灰阶，按钮保留占位但明确不可点，避免用户反复点 */
+.cpn.used{opacity:.62}
+.cpn.used .face{color:var(--dim)}
+.cpn.used .get{background:transparent;color:var(--dim);border:1px solid var(--rule);cursor:default}
+.empty{
+  text-align:center;padding:52px 20px;color:var(--dim);
+  font-size:calc(var(--fs) * .82 * 1px);line-height:1.8;
+}
+.tip{
+  margin-top:6px;font-size:calc(var(--fs) * .72 * 1px);color:var(--dim);line-height:1.7;
+  text-align:center;
+}
+.toast{
+  position:absolute;left:50%;bottom:30px;z-index:8;transform:translate(-50%,10px);
+  background:var(--ink);color:var(--paper);border-radius:20px;padding:9px 16px;
+  font-size:calc(var(--fs) * .78 * 1px);
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>优惠券</h1>
+    <span class="rule">使用规则</span>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="scroll">
+    <div id="list"></div>
+    <p class="tip">每单限用 1 张，不可与会员折扣叠加</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// 数值型一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)；两边都带单位会算成非法值而静默失效
+const UNIT={};
+const state={paper:'#f4f2f7',ink:'#241f2e',dim:'#7d7288',rule:'#ded8e6',accent:'#6d4fa8',
+             card:'#ffffff',radius:14,gap:16,fs:16,face:40};
+function apply(){
+  for(const k in state) document.documentElement.style.setProperty('--'+k, UNIT[k]?state[k]+UNIT[k]:state[k]);
+}
+
+const TABS=['可用','已用','过期'];
+const CPNS=[
+  {v:30,c:'满 199 可用',n:'全品类通用券',e:'有效期至 10-31',s:'可用'},
+  {v:15,c:'满 99 可用',n:'堂食专享券',e:'有效期至 10-25',s:'可用'},
+  {v:50,c:'满 299 可用',n:'新客首单礼',e:'有效期至 11-15',s:'可用'},
+  {v:20,c:'满 149 可用',n:'周末回馈券',e:'已于 10-02 使用',s:'已用'},
+  {v:25,c:'满 199 可用',n:'中秋团圆券',e:'已于 09-30 过期',s:'过期'}
+];
+
+let cur='可用';
+const tabsEl=document.getElementById('tabs');
+const listEl=document.getElementById('list');
+const toastEl=document.getElementById('toast');
+let toastT=0;
+
+TABS.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='tab'+(t===cur?' on':'');
+  b.textContent=t;
+  b.addEventListener('click',()=>{
+    cur=t;
+    tabsEl.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.textContent===t));
+    render();
+  });
+  tabsEl.appendChild(b);
+});
+
+function toast(s){
+  toastEl.textContent=s;toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toastEl.classList.remove('on'),1500);
+}
+
+function render(){
+  const rows=CPNS.filter(c=>c.s===cur);
+  listEl.innerHTML='';
+  if(!rows.length){
+    listEl.innerHTML='<div class="empty">这里还没有券<br>下单后会自动发放到本页</div>';
+    return;
+  }
+  rows.forEach((c,i)=>{
+    const dead=(cur!=='可用')||c.got;
+    const d=document.createElement('div');
+    d.className='cpn'+(dead?' used':'');
+    d.innerHTML=
+      '<span class="face"><span class="v"><small>¥</small>'+c.v+'</span><span class="c">'+c.c+'</span></span>'+
+      '<span class="split"></span><span class="nt t"></span><span class="nt b"></span>'+
+      '<span class="info"><span class="nm">'+c.n+'</span><span class="ex">'+c.e+'</span></span>';
+    const b=document.createElement('button');
+    b.className='get';
+    if(c.got){ b.textContent='已领取'; b.disabled=true; }
+    else if(cur==='已用'){ b.textContent='已使用'; b.disabled=true; }
+    else if(cur==='过期'){ b.textContent='已过期'; b.disabled=true; }
+    else{ b.textContent='领取'; }
+    if(!b.disabled){
+      b.addEventListener('click',()=>{
+        c.got=true;
+        render();
+        toast('已领取 ¥'+c.v+' 券');
+      });
+    }
+    d.appendChild(b);
+    listEl.appendChild(d);
+  });
+}
+
+apply();
+render();
+
+addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='param'||!(d.key in state)) return;
+  state[d.key]=d.value;apply();render();
+});
+</script>
+</body>
+</html>
+`
+    },
+  {
+    id: "S69",
+    风格名: "目标导向布局",
+    适配端: "PC 端",
+    风格: "科技未来",
+    场景: "后台·数据看板",
+    骨架: "① 顶部栏（56px 定高）：Logo + 页面标题 + 日/周分段切换 + 用户头像，横排固定不动。② 今日目标区（左栏主）：150px 环形进度 + 中心百分比大数字 + 「还差 N 小时达成」+ 目标/已完成明细，是左栏最重的一块。③ 快捷操作区（左栏次）：4 个图标按钮，一键记半小时 / 加量 / 跳过 / 还原，点完立即回写左栏与中栏。④ 助手模块（右栏主）：AI 建议卡（一句结论 + 一个动作按钮）+ 3 条提醒列表（圆点分色标状态）。⑤ 主图表区（中栏大）：柱状专注分布，日视图 7 格 2 小时段、周视图 7 格星期；切换时柱高带 transition 重排、峰值柱换色。⑥ 关键指标条（图表上方叠层）：3 个数字卡用负 margin 压在图表卡上沿，横跨图表宽度。⑦ 次级图表（右栏次）：conic-gradient 环形占比 + 右侧图例，占比随模式换。⑧ 底部统计区：横排 4 个统计项，顶部一道分隔线，与内容区同宽。⑨ 页尾：极简版权行 + 一句说明。",
+    配色: "深炭底 #0f1419，卡片 #171d25，主文字 #e6edf3，次文字 #8b98a5，绿主色 #3ddc97，蓝辅色 #5b8cff。",
+    布局骨架: "1440 桌面三栏：左 280px 定宽 / 中 minmax(0,1fr) 弹性 / 右 320px 定宽，栏间距 var(--jianju)；顶部栏 56px 贯穿全宽；900px 以下三栏塌成单栏、指标条取消叠层。",
+    重色落点: "深炭底托全局、卡片只高一级明度；绿 #3ddc97 只绑环形进度、快捷按钮 hover、正向环比与主柱；蓝 #5b8cff 只给 AI 卡描边、峰值柱与达成态——两色各管一件事，不混用。",
+    第一屏内容: "左栏环形 70% +「还差 1.8 小时达成」是视觉第一落点；视线右移撞上中栏三个指标卡（负 margin 压在图表上沿），再往下才是柱状图；右栏 AI 建议卡只作第二层信息。",
+    删减元素: "不做侧边导航树；不做数据表格与分页；不做多级 Tab；不做图表工具栏与导出；日/周切换只换数据不换版式。",
+    适用: "个人学习 / 健身 / 任务型产品的主看板：一个明确目标 + 一张趋势 + 一个助手，三区信息分层清楚。",
+    禁忌: "日/周切换只换文字不换数据；指标条取消叠层后沦为普通三卡；左右两栏都塞图表会让中栏失去主导。",
+    我的说明: "唯一「三区职责分离 + 日/周切换联动」的 PC 后台骨架：左栏只回答「目标还差多少」，中栏只回答「趋势怎么走」，右栏只回答「接下来干什么」，三区不互相抢活。日/周切换是本条的核心机制——一次点击同时改环形占比、3 个指标数字、7 根柱高、环形占比图与底部 4 项统计，五处联动而非只换标题。与 S09（冷调科技风，左导航树 + 等高面板矩阵）、S04（高密度卡片墙，卡片平铺无主次）、S50（移动端方寸指标台，2×2 指标卡单栏）的差别都在骨架语言：本条没有侧边导航树、没有 2×2 等权卡组，主轴是一条「目标 → 趋势 → 助手」的职责动线。",
+    Agent提示词: "1 视觉主题：深色后台的「单一目标」主看板，气质是专注、能一眼看出还差多少，不是数据大杂烩。\n2 色彩板：#0f1419 页面底；#171d25 卡片；#e6edf3 主文字；#8b98a5 次文字；#3ddc97 绿主色（环形进度 / 正向环比 / 主柱 / 选中态）；#5b8cff 蓝辅色（AI 卡描边 / 峰值柱 / 达成态）。\n3 字体：系统字体栈，基准 14px；环形中心百分比 1.62em 800 字重，指标数字 1.34em 800 字重。\n4 组件：顶部栏（Logo + 标题 + 日/周分段控件 + 头像，56px）；今日目标卡（150px 环形 + 中心百分比 + 还差多少 + 目标已完成明细）；快捷操作 4 图标按钮；AI 建议卡（结论 + 动作按钮 + 3 条提醒）；叠层指标条（3 卡，负 margin 压在图表上沿）；柱状趋势图（日/周两套数据，柱高 transition，峰值柱换蓝）；环形占比（conic-gradient + 图例）；底部 4 项统计；页尾版权行。\n5 布局：1440 三栏 280 / 1fr / 320，栏间距 14；900px 以下塌成单栏并取消叠层。\n6 深度：底色拖后，卡片只高一级明度 + 1px 低对比描边；只有叠层指标条带 0 10 24 rgba(0,0,0,.34) 投影，用来制造「压在图上」的层级。\n7 该做/不该做：该做——三区职责清晰、日/周一次点击五处联动（环形 / 3 指标 / 柱高 / 占比环 / 底部 4 项）、快捷按钮能即时改数字、峰值柱可辨识。不该做——加侧边导航树、把日/周做成只换标题、左右两栏都塞图表。\n8 响应式：PC 优先；375px 下三栏塌缩、指标条去叠层、按钮保持 24px 以上命中区。\n9 即拿即用提示词：「做一个深色目标导向学习看板（PC 三栏 280/1fr/320）：顶部 56px 栏含日/周切换；左栏环形进度 + 还差多少 + 4 个快捷按钮；中栏 3 个叠层指标卡 + 柱状趋势图；右栏 AI 建议卡 + 环形占比；底部 4 项统计。日/周切换要真联动五处数据；#0f1419 底 #3ddc97 主色 #5b8cff 辅色。」",
+    演示页: "assets/demos/方案-目标导向看板.html",
+    来源: "自研（2026-10-29 按 G7-1「目标导向布局」自建 9 段骨架与 demo）；三区职责分离与日/周五处联动为自定机制，零依赖单文件。",
+    参考站: ["自研 · 2026-10-29 G7-1 目标导向布局"],
+    参数: [
+      {"键":"di","名":"页面底色","类型":"color","默认":"#0f1419"},
+      {"键":"ka","名":"卡片底色","类型":"color","默认":"#171d25"},
+      {"键":"zi","名":"主文字色","类型":"color","默认":"#e6edf3"},
+      {"键":"ci","名":"次要文字色","类型":"color","默认":"#8b98a5"},
+      {"键":"zhu","名":"主色","类型":"color","默认":"#3ddc97"},
+      {"键":"fu","名":"辅色","类型":"color","默认":"#5b8cff"},
+      {"键":"yuanjiao","名":"圆角(px)","类型":"slider","最小":0,"最大":24,"步长":1,"默认":12},
+      {"键":"jianju","名":"间距(px)","类型":"slider","最小":8,"最大":24,"步长":1,"默认":14},
+      {"键":"zihao","名":"基准字号(px)","类型":"slider","最小":12,"最大":18,"步长":1,"默认":14}
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>目标导向看板</title>
+<style>
+/* 数值型参数一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)，两边都带单位会算成非法值而静默失效 */
+:root{
+  --di:#0f1419;--ka:#171d25;--zi:#e6edf3;--ci:#8b98a5;--zhu:#3ddc97;--fu:#5b8cff;
+  --yuanjiao:12;--jianju:14;--zihao:14;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--di);color:var(--zi);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--zihao) * 1px);line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 段① 顶部栏：56px 定高，Logo / 页面标题 / 日周切换 / 头像 ── */
+.topbar{
+  height:56px;display:flex;align-items:center;gap:calc(var(--jianju) * 1px);
+  padding:0 calc(var(--jianju) * 1.4px);
+  border-bottom:1px solid rgba(255,255,255,.07);background:var(--ka);
+  position:sticky;top:0;z-index:9;
+}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.01em}
+.brand .mark{
+  width:20px;height:20px;border-radius:6px;
+  background:linear-gradient(135deg,var(--zhu),var(--fu));
+  box-shadow:0 0 0 3px rgba(61,220,151,.12);
+}
+.brand .name{font-size:calc(var(--zihao) * .96px)}
+.ptitle{color:var(--ci);font-size:calc(var(--zihao) * .82px);padding-left:calc(var(--jianju) * 1px);border-left:1px solid rgba(255,255,255,.1)}
+.seg{margin-left:auto;display:flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.05)}
+.segbtn{
+  min-width:56px;height:30px;border-radius:999px;font-size:calc(var(--zihao) * .8px);
+  color:var(--ci);transition:color .2s,background .2s;
+}
+.segbtn.on{background:var(--zhu);color:#08211a;font-weight:700}
+.avatar{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(91,140,255,.18);color:var(--fu);font-size:calc(var(--zihao) * .78px);font-weight:700;
+}
+
+/* ── 三栏骨架：左 280 定宽 / 中弹性 / 右 320 定宽 ── */
+.grid{
+  display:grid;grid-template-columns:280px minmax(0,1fr) 320px;
+  gap:calc(var(--jianju) * 1px);
+  padding:calc(var(--jianju) * 1.2px) calc(var(--jianju) * 1.4px) 0;
+  align-items:start;
+}
+.col{display:grid;gap:calc(var(--jianju) * 1px);min-width:0}
+.card{
+  background:var(--ka);border:1px solid rgba(255,255,255,.07);
+  border-radius:calc(var(--yuanjiao) * 1px);padding:calc(var(--jianju) * 1.1px);
+  min-width:0;
+}
+.cardhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(var(--jianju) * .8px)}
+.ct{font-size:calc(var(--zihao) * .86px);font-weight:650;letter-spacing:.02em}
+.pill{
+  font-size:calc(var(--zihao) * .68px);padding:3px 9px;border-radius:999px;
+  background:rgba(61,220,151,.14);color:var(--zhu);
+}
+
+/* ── 段② 今日目标区：大数字 + 环形进度 + 还差多少 ── */
+.goalcard{display:flex;flex-direction:column;align-items:center}
+.ringwrap{position:relative;width:150px;height:150px;margin:calc(var(--jianju) * .3px) 0 calc(var(--jianju) * .7px)}
+.ring{width:150px;height:150px;transform:rotate(-90deg)}
+.ring .track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:12}
+.ring .prog{
+  fill:none;stroke:var(--zhu);stroke-width:12;stroke-linecap:round;
+  stroke-dasharray:351.86;stroke-dashoffset:351.86;
+  transition:stroke-dashoffset .62s cubic-bezier(.3,.8,.3,1),stroke .3s;
+}
+.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringtxt .porc{font-size:calc(var(--zihao) * 1.62px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.ringtxt .cap{font-size:calc(var(--zihao) * .68px);color:var(--ci);margin-top:2px}
+.remain{font-size:calc(var(--zihao) * .84px);color:var(--ci)}
+.remain b{color:var(--zhu);font-size:calc(var(--zihao) * .96px)}
+.sub{
+  margin-top:calc(var(--jianju) * .5px);padding-top:calc(var(--jianju) * .6px);
+  border-top:1px dashed rgba(255,255,255,.1);width:100%;text-align:center;
+  font-size:calc(var(--zihao) * .72px);color:var(--ci);
+}
+
+/* ── 段③ 快捷操作区：4 个图标按钮横排 ── */
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--jianju) * .5px)}
+.act{
+  min-height:56px;border-radius:calc(var(--yuanjiao) * .76px);
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:background .18s,border-color .18s,transform .12s;
+}
+.act:hover{background:rgba(61,220,151,.1);border-color:rgba(61,220,151,.36)}
+.act:active{transform:scale(.96)}
+.act .ico{font-size:calc(var(--zihao) * 1.05px);line-height:1}
+.act .lb{font-size:calc(var(--zihao) * .66px);color:var(--ci)}
+.hint{margin-top:calc(var(--jianju) * .6px);font-size:calc(var(--zihao) * .68px);color:var(--ci);text-align:center}
+
+/* ── 段⑥ 关键指标条：3 个数字卡，压在图表卡上沿（叠层） ── */
+.strip{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:calc(var(--jianju) * .8px);position:relative;z-index:2;
+  margin-bottom:-18px;
+}
+.metric{
+  background:var(--ka);border:1px solid rgba(255,255,255,.09);
+  border-radius:calc(var(--yuanjiao) * 1px);
+  padding:calc(var(--jianju) * .72px) calc(var(--jianju) * .9px);
+  box-shadow:0 10px 24px rgba(0,0,0,.34);
+}
+.metric .mk{font-size:calc(var(--zihao) * .7px);color:var(--ci)}
+.metric .mv{font-size:calc(var(--zihao) * 1.34px);font-weight:800;letter-spacing:-.01em;margin-top:2px}
+.metric .md{font-size:calc(var(--zihao) * .66px);color:var(--zhu);margin-top:1px}
+.metric .md.dn{color:#f27d7d}
+
+/* ── 段⑤ 主图表区：柱状趋势，日/周切换换数据 ── */
+.chartcard{padding-top:calc(var(--jianju) * 1.9px)}
+.legend{display:flex;gap:12px;font-size:calc(var(--zihao) * .68px);color:var(--ci)}
+.legend .lg{display:flex;align-items:center;gap:5px}
+.legend .dot{width:8px;height:8px;border-radius:3px;background:var(--zhu)}
+.legend .dot.alt{background:rgba(255,255,255,.16)}
+.plot{position:relative;height:230px;margin-top:calc(var(--jianju) * .9px)}
+.glines{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.gl{height:1px;background:rgba(255,255,255,.055)}
+.bars{position:absolute;inset:0 0 24px 0;display:flex;align-items:flex-end;gap:calc(var(--jianju) * .42px)}
+.barslot{position:relative;flex:1;height:100%}
+.bar{
+  position:absolute;left:0;right:0;bottom:0;border-radius:7px 7px 3px 3px;
+  background:linear-gradient(180deg,var(--zhu),color-mix(in srgb,var(--zhu) 22%,transparent));
+  transition:height .55s cubic-bezier(.4,0,.2,1),opacity .3s;
+}
+.bar .bv{position:absolute;left:0;right:0;top:-17px;text-align:center;font-size:calc(var(--zihao) * .64px);color:var(--ci);font-weight:600}
+.bar.peak{background:linear-gradient(180deg,var(--fu),color-mix(in srgb,var(--fu) 22%,transparent))}
+.bar.peak .bv{color:var(--fu)}
+.xaxis{position:absolute;left:0;right:0;bottom:0;height:24px;display:flex;gap:calc(var(--jianju) * .42px)}
+.xlab{flex:1;text-align:center;font-size:calc(var(--zihao) * .64px);color:var(--ci);line-height:24px}
+
+/* ── 段④ 助手模块 + 段⑦ 次级图表（右栏） ── */
+.aicard{border-color:rgba(91,140,255,.26)}
+.aitip{font-size:calc(var(--zihao) * .76px);color:var(--zi);line-height:1.62}
+.aitip em{color:var(--zhu);font-style:normal;font-weight:650}
+.aibtn{
+  margin-top:calc(var(--jianju) * .7px);min-height:36px;min-width:88px;
+  padding:0 14px;border-radius:calc(var(--yuanjiao) * .7px);
+  background:rgba(91,140,255,.16);color:var(--fu);font-size:calc(var(--zihao) * .74px);font-weight:600;
+  transition:background .18s;
+}
+.aibtn:hover{background:rgba(91,140,255,.26)}
+.rlist{margin-top:calc(var(--jianju) * .5px);display:flex;flex-direction:column}
+.ritem{display:flex;align-items:center;gap:8px;padding:calc(var(--jianju) * .46px) 0;border-top:1px solid rgba(255,255,255,.055)}
+.ritem:first-child{border-top:0}
+.rdot{width:6px;height:6px;border-radius:50%;background:var(--ci);flex:0 0 auto}
+.rdot.warn{background:#f0b429}
+.rdot.hold{background:var(--zhu)}
+.rtxt{font-size:calc(var(--zihao) * .72px);flex:1;min-width:0}
+.rtime{font-size:calc(var(--zihao) * .64px);color:var(--ci);flex:0 0 auto}
+
+.donutwrap{display:flex;align-items:center;gap:calc(var(--jianju) * .9px)}
+.donut{
+  width:104px;height:104px;border-radius:50%;flex:0 0 auto;position:relative;
+  transition:background .45s ease;
+}
+.donut .hole{
+  position:absolute;inset:15px;border-radius:50%;background:var(--ka);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.donut .hole b{font-size:calc(var(--zihao) * .92px);font-weight:800}
+.donut .hole span{font-size:calc(var(--zihao) * .58px);color:var(--ci)}
+.dlegend{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ditem{display:flex;align-items:center;gap:7px;font-size:calc(var(--zihao) * .7px)}
+.dswatch{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+.dname{flex:1;min-width:0;color:var(--ci);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dval{font-weight:700}
+
+/* ── 段⑧ 底部统计：横排 4 项 ── */
+.stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:calc(var(--jianju) * 1px);
+  margin:calc(var(--jianju) * 1.2px) calc(var(--jianju) * 1.4px) 0;
+  padding:calc(var(--jianju) * .9px) 0;
+  border-top:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.stat{min-width:0}
+.stat .sk{font-size:calc(var(--zihao) * .68px);color:var(--ci)}
+.stat .sv{font-size:calc(var(--zihao) * .96px);font-weight:700;margin-top:3px}
+
+/* ── 段⑨ 页尾 ── */
+.pagefoot{
+  padding:calc(var(--jianju) * .9px) calc(var(--jianju) * 1.4px) calc(var(--jianju) * 1.4px);
+  font-size:calc(var(--zihao) * .64px);color:var(--ci);
+  display:flex;justify-content:space-between;gap:10px;
+}
+
+/* 数字换数时的轻过渡（日/周切换、打卡后都能看到） */
+@keyframes popIn{from{opacity:.12;transform:translateY(6px)}to{opacity:1;transform:none}}
+.swapin{animation:popIn .4s cubic-bezier(.3,.8,.3,1)}
+
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);
+  background:#0b1015;border:1px solid rgba(61,220,151,.4);color:var(--zi);
+  padding:10px 18px;border-radius:999px;font-size:calc(var(--zihao) * .76px);
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:99;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* 窄屏：三栏塌成单栏，叠层指标条退回常规流，所有横排容器允许换行（不换行横排会撑破 375） */
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:8px;gap:8px}
+  .seg{margin-left:0}
+  .strip{grid-template-columns:1fr;margin-bottom:0}
+  .chartcard{padding-top:calc(var(--jianju) * 1.1px)}
+  .stats{grid-template-columns:1fr 1fr}
+  .acts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .brand,.ptitle,.seg,.cardhd,.legend,.donutwrap,.aibtn,.ritem,.ditem,.pagefoot{flex-wrap:wrap}
+  /* 窄屏命中区补到 44（附录B B1 移动端底线），这里只放大不改视觉比例 */
+  .segbtn{min-height:44px}
+  .aibtn{min-height:44px}
+  .act{min-height:64px}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:1fr}
+  .acts{grid-template-columns:1fr}
+  .bars,.xaxis{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- 段① 顶部栏 -->
+<header class="topbar">
+  <div class="brand"><span class="mark"></span><span class="name">目标台</span></div>
+  <div class="ptitle">学习目标看板</div>
+  <div class="seg">
+    <button class="segbtn on" id="btnDay" data-mode="day">日</button>
+    <button class="segbtn" id="btnWeek" data-mode="week">周</button>
+  </div>
+  <div class="avatar">W</div>
+</header>
+
+<main class="grid">
+  <!-- 左栏：段② 今日目标 + 段③ 快捷操作 -->
+  <section class="col">
+    <div class="card goalcard">
+      <div class="cardhd"><span class="ct" id="goalTitle">今日目标</span><span class="pill" id="goalPill">进行中</span></div>
+      <div class="ringwrap">
+        <svg class="ring" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+          <circle class="track" cx="75" cy="75" r="56"></circle>
+          <circle class="prog" id="ringProg" cx="75" cy="75" r="56"></circle>
+        </svg>
+        <div class="ringtxt">
+          <span class="porc" id="ringPct">0%</span>
+          <span class="cap" id="ringCap">完成度</span>
+        </div>
+      </div>
+      <div class="remain">还差 <b id="remainTxt">0</b> 小时达成</div>
+      <div class="sub" id="goalSub">目标 0h · 已完成 0h</div>
+    </div>
+
+    <div class="card">
+      <div class="cardhd"><span class="ct">快捷操作</span></div>
+      <div class="acts">
+        <button class="act" id="actDo"><span class="ico">＋</span><span class="lb">记半小时</span></button>
+        <button class="act" id="actAdd"><span class="ico">↑</span><span class="lb">加量</span></button>
+        <button class="act" id="actSkip"><span class="ico">→</span><span class="lb">跳过</span></button>
+        <button class="act" id="actReset"><span class="ico">↺</span><span class="lb">还原</span></button>
+      </div>
+      <div class="hint" id="actHint">点一下就能记一笔</div>
+    </div>
+  </section>
+
+  <!-- 中栏：段⑥ 关键指标条 + 段⑤ 主图表 -->
+  <section class="col">
+    <div class="strip" id="strip">
+      <div class="metric"><div class="mk" id="mk0">完成率</div><div class="mv" id="mv0">0%</div><div class="md" id="md0">+0%</div></div>
+      <div class="metric"><div class="mk" id="mk1">连续打卡</div><div class="mv" id="mv1">0 天</div><div class="md" id="md1">+0</div></div>
+      <div class="metric"><div class="mk" id="mk2">平均专注</div><div class="mv" id="mv2">0 分</div><div class="md" id="md2">+0</div></div>
+    </div>
+
+    <div class="card chartcard">
+      <div class="cardhd">
+        <span class="ct" id="chartTitle">今日专注分布</span>
+        <span class="legend"><span class="lg"><i class="dot"></i>专注时长</span><span class="lg"><i class="dot alt"></i>目标线</span></span>
+      </div>
+      <div class="plot">
+        <div class="glines"><i class="gl"></i><i class="gl"></i><i class="gl"></i><i class="gl"></i></div>
+        <div class="bars" id="bars"></div>
+        <div class="xaxis" id="xaxis"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右栏：段④ 助手模块 + 段⑦ 次级图表 -->
+  <section class="col">
+    <div class="card aicard">
+      <div class="cardhd"><span class="ct">AI 助手建议</span><span class="pill">实时</span></div>
+      <div class="aitip" id="aiTip">今天的专注曲线还行，继续按节奏走。</div>
+      <button class="aibtn" id="aiBtn">按建议调整目标</button>
+      <div class="rlist" id="rlist"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhd"><span class="ct" id="donutTitle">今日时间去向</span></div>
+      <div class="donutwrap">
+        <div class="donut" id="donut"><div class="hole"><b id="donutBig">0%</b><span id="donutCap">刷题占比</span></div></div>
+        <div class="dlegend" id="dlegend"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 段⑧ 底部统计 -->
+<footer class="stats" id="stats">
+  <div class="stat"><div class="sk" id="sk0">统计</div><div class="sv" id="sv0">--</div></div>
+  <div class="stat"><div class="sk" id="sk1">统计</div><div class="sv" id="sv1">--</div></div>
+  <div class="stat"><div class="sk" id="sk2">统计</div><div class="sv" id="sv2">--</div></div>
+  <div class="stat"><div class="sk" id="sk3">统计</div><div class="sv" id="sv3">--</div></div>
+</footer>
+
+<!-- 段⑨ 页尾 -->
+<div class="pagefoot"><span>© 2026 目标台 · 方案演示</span><span>数据为示例，走 file:// 也能跑</span></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 参数：数值型不拼单位，CSS 侧统一 calc(var(--x) * 1px)
+var state = {di:"#0f1419",ka:"#171d25",zi:"#e6edf3",ci:"#8b98a5",zhu:"#3ddc97",fu:"#5b8cff",
+             yuanjiao:12,jianju:14,zihao:14};
+var UNIT = {};
+var root = document.documentElement;
+function apply(){ for(var k in state){ root.style.setProperty("--"+k, state[k] + (UNIT[k] || "")); } }
+
+// 两套数据：日视图 / 周视图。切换时指标条、趋势柱、环形占比、底部统计一起换。
+var DATA = {
+  day: {
+    modeName: "今日",
+    goal: 6.0, done: 4.2, unit: "小时",
+    chartTitle: "今日专注分布 · 每 2 小时一格",
+    chatLabels: ["08","10","12","14","16","18","20"],
+    chatVals: [18, 42, 26, 64, 50, 88, 56],
+    strip: [
+      {k:"完成率", v:"70%", d:"+6%",  dn:false},
+      {k:"连续打卡", v:"12 天", d:"+1", dn:false},
+      {k:"平均专注", v:"42 分", d:"+3", dn:false}
+    ],
+    donutTitle: "今日时间去向",
+    donut: [{n:"刷题",v:38},{n:"阅读",v:26},{n:"复盘",v:21},{n:"视频",v:15}],
+    donutCap: "刷题占比",
+    stats: [{k:"今日番茄",v:"6 个"},{k:"最长连段",v:"52 分"},{k:"中断次数",v:"2 次"},{k:"完成事项",v:"9 / 12"}],
+    remind: [
+      {t:"18:30 前把 14349 真题做完", r:"18:30", s:"warn"},
+      {t:"英语 10 分钟技术文档阅读", r:"20:00", s:"hold"},
+      {t:"写今天的 Obsidian 日报", r:"22:00", s:""}
+    ],
+    ai: "今日进度 <em>70%</em>，18 点后效率最高。建议把剩下的 1.8h 拆成两个 50 分钟，中间 10 分钟离开屏幕。"
+  },
+  week: {
+    modeName: "本周",
+    goal: 42.0, done: 26.5, unit: "小时",
+    chartTitle: "本周每日专注时长 · 周一至周日",
+    chatLabels: ["周一","周二","周三","周四","周五","周六","周日"],
+    chatVals: [72, 61, 84, 38, 66, 92, 44],
+    strip: [
+      {k:"完成率", v:"63%", d:"-4%", dn:true},
+      {k:"连续打卡", v:"5 天", d:"+2", dn:false},
+      {k:"平均专注", v:"48 分", d:"+5", dn:false}
+    ],
+    donutTitle: "本周时间去向",
+    donut: [{n:"刷题",v:44},{n:"阅读",v:22},{n:"复盘",v:18},{n:"视频",v:16}],
+    donutCap: "刷题占比",
+    stats: [{k:"本周番茄",v:"31 个"},{k:"最长连段",v:"73 分"},{k:"中断次数",v:"9 次"},{k:"完成事项",v:"46 / 60"}],
+    remind: [
+      {t:"周三那天下滑到 38%，回看是哪门课卡的", r:"周三", s:"warn"},
+      {t:"周六补了 92%，周末节奏可以固定下来", r:"周六", s:"hold"},
+      {t:"本周收尾：周复盘写进 Obsidian", r:"周日", s:""}
+    ],
+    ai: "本周 <em>63%</em>，比上周低 4 个点。缺口全在周三与周日，建议把这两天的目标从 6h 下调到 4.5h，先守住连续性。"
+  }
+};
+
+var ORIG = {
+  day:  {goal: 6.0, done: 4.2},
+  week: {goal: 42.0, done: 26.5}
+};
+
+var mode = "day";
+var CIRC = 2 * Math.PI * 56;   // 环形周长，r=56
+var DONUT_COLORS = ["var(--zhu)", "var(--fu)", "#4fc3c0", "#9a86ff"];
+
+var $ = function(id){ return document.getElementById(id); };
+var barsEl = $("bars"), xaxisEl = $("xaxis");
+var barSlots = [];
+
+// 柱状图骨架先建一次，之后只改高度 → 高度变化带 transition，切换看得出来在动
+function buildBars(n){
+  barsEl.innerHTML = "";
+  barSlots = [];
+  for (var i = 0; i < n; i++){
+    var slot = document.createElement("div");
+    slot.className = "barslot";
+    var bar = document.createElement("div");
+    bar.className = "bar";
+    bar.style.height = "0%";
+    var bv = document.createElement("b");
+    bv.className = "bv";
+    bar.appendChild(bv);
+    slot.appendChild(bar);
+    barsEl.appendChild(slot);
+    barSlots.push({ bar: bar, bv: bv });
+  }
+}
+
+function swapIn(el){
+  el.classList.remove("swapin");
+  void el.offsetWidth;
+  el.classList.add("swapin");
+}
+
+function drawChart(d){
+  var vals = d.chatVals;
+  if (barSlots.length !== vals.length) buildBars(vals.length);
+  var max = Math.max.apply(null, vals) || 1;
+  var peak = vals.indexOf(Math.max.apply(null, vals));
+  vals.forEach(function(v, i){
+    var s = barSlots[i];
+    s.bar.style.height = Math.round(v / max * 92) + "%";
+    s.bar.classList.toggle("peak", i === peak);
+    s.bv.textContent = v;
+    swapIn(s.bv);
+  });
+  xaxisEl.innerHTML = "";
+  d.chatLabels.forEach(function(t){
+    var x = document.createElement("div");
+    x.className = "xlab";
+    x.textContent = t;
+    xaxisEl.appendChild(x);
+  });
+}
+
+function drawRing(d){
+  var pct = d.goal <= 0 ? 0 : Math.min(d.done / d.goal, 1);
+  var prog = $("ringProg");
+  prog.style.strokeDasharray = CIRC;
+  prog.style.strokeDashoffset = CIRC * (1 - pct);
+  prog.style.stroke = pct >= 1 ? "var(--fu)" : "var(--zhu)";
+  $("ringPct").textContent = Math.round(pct * 100) + "%";
+  $("ringPct").style.color = pct >= 1 ? "var(--fu)" : "var(--zhu)";
+  $("goalPill").textContent = pct >= 1 ? "已达成" : "进行中";
+  $("remainTxt").textContent = Math.max(d.goal - d.done, 0).toFixed(1);
+  $("goalSub").textContent = "目标 " + d.goal.toFixed(1) + "h · 已完成 " + d.done.toFixed(1) + "h";
+  swapIn($("ringPct"));
+}
+
+function drawStrip(d){
+  d.strip.forEach(function(m, i){
+    $("mk" + i).textContent = m.k;
+    $("mv" + i).textContent = m.v;
+    var md = $("md" + i);
+    md.textContent = m.d;
+    md.classList.toggle("dn", !!m.dn);
+    swapIn($("mv" + i));
+  });
+}
+
+function drawDonut(d){
+  $("donutTitle").textContent = d.donutTitle;
+  var acc = 0, stops = [];
+  d.donut.forEach(function(it, i){
+    var from = acc; acc += it.v;
+    stops.push(DONUT_COLORS[i % DONUT_COLORS.length] + " " + from + "% " + acc + "%");
+  });
+  $("donut").style.background = "conic-gradient(" + stops.join(",") + ")";
+  var top = d.donut[0];
+  $("donutBig").textContent = top.v + "%";
+  $("donutCap").textContent = d.donutCap;
+  var lg = $("dlegend");
+  lg.innerHTML = "";
+  d.donut.forEach(function(it, i){
+    var row = document.createElement("div");
+    row.className = "ditem";
+    var sw = document.createElement("i");
+    sw.className = "dswatch";
+    sw.style.background = DONUT_COLORS[i % DONUT_COLORS.length];
+    var nm = document.createElement("span");
+    nm.className = "dname";
+    nm.textContent = it.n;
+    var vl = document.createElement("span");
+    vl.className = "dval";
+    vl.textContent = it.v + "%";
+    row.appendChild(sw); row.appendChild(nm); row.appendChild(vl);
+    lg.appendChild(row);
+  });
+}
+
+function drawStats(d){
+  d.stats.forEach(function(s, i){
+    $("sk" + i).textContent = s.k;
+    $("sv" + i).textContent = s.v;
+    swapIn($("sv" + i));
+  });
+}
+
+function drawRemind(d){
+  var list = $("rlist");
+  list.innerHTML = "";
+  d.remind.forEach(function(r){
+    var row = document.createElement("div");
+    row.className = "ritem";
+    var dot = document.createElement("i");
+    dot.className = "rdot" + (r.s ? " " + r.s : "");
+    var txt = document.createElement("span");
+    txt.className = "rtxt";
+    txt.textContent = r.t;
+    var tm = document.createElement("span");
+    tm.className = "rtime";
+    tm.textContent = r.r;
+    row.appendChild(dot); row.appendChild(txt); row.appendChild(tm);
+    list.appendChild(row);
+  });
+}
+
+function render(){
+  var d = DATA[mode];
+  $("goalTitle").textContent = d.modeName + "目标";
+  $("chartTitle").textContent = d.chartTitle;
+  $("aiTip").innerHTML = d.ai;
+  drawRing(d);
+  drawStrip(d);
+  drawChart(d);
+  drawDonut(d);
+  drawStats(d);
+  drawRemind(d);
+}
+
+function switchMode(next){
+  if (next === mode) return;
+  mode = next;
+  $("btnDay").classList.toggle("on", mode === "day");
+  $("btnWeek").classList.toggle("on", mode === "week");
+  render();
+  toast(mode === "day" ? "已切到日视图" : "已切到周视图");
+}
+
+var toastT = 0;
+function toast(s){
+  var el = $("toast");
+  el.textContent = s;
+  el.classList.add("on");
+  clearTimeout(toastT);
+  toastT = setTimeout(function(){ el.classList.remove("on"); }, 1600);
+}
+
+$("btnDay").addEventListener("click", function(){ switchMode("day"); });
+$("btnWeek").addEventListener("click", function(){ switchMode("week"); });
+
+$("actDo").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.done = Math.min(d.done + 0.5, d.goal);
+  render();
+  toast("已记 30 分钟，还差 " + Math.max(d.goal - d.done, 0).toFixed(1) + "h");
+});
+
+$("actAdd").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.goal = d.goal + 0.5;
+  render();
+  toast("目标加 0.5h，现在 " + d.goal.toFixed(1) + "h");
+});
+
+$("actSkip").addEventListener("click", function(){
+  $("actHint").textContent = "已跳过一段，不计入统计";
+  toast("已跳过这一段");
+});
+
+$("actReset").addEventListener("click", function(){
+  var d = DATA[mode], o = ORIG[mode];
+  d.goal = o.goal;
+  d.done = o.done;
+  $("actHint").textContent = "已还原到初始数据";
+  render();
+  toast("数据已还原");
+});
+
+$("aiBtn").addEventListener("click", function(){
+  var d = DATA[mode];
+  d.goal = Math.max(d.goal - 0.5, d.done);
+  render();
+  toast("按建议下调目标 0.5h");
+});
+
+apply();
+render();
+
+window.addEventListener("message", function(e){
+  var d = e.data;
+  if (!d || d.type !== "param") return;
+  if (!(d.key in state)) return;
+  state[d.key] = d.value;
+  apply();
+});
+<\/script>
+</body>
+</html>
+`
+  },
+  {
+    id: "S70",
+    风格名: "趋势主导布局",
+    适配端: "PC 端",
+    风格: "极简瑞士",
+    场景: "后台·数据看板",
+    骨架: "① 顶栏（56px 内）：左侧品牌点 + 看板名 + 口径副标，右侧 30 天/90 天/全年分段控件；不放侧边导航树。② 主视觉区（首屏唯一重点）：一张折线趋势图占满首屏左 3/4，图内叠本期实线 + 上期虚线 + 面积渐变 + 悬停探针浮层，横轴只标 5 个日期锚点。③ 大数字头条（图上方压顶）：当前值 3.2em 800 字重 + 环比胶囊，与图表同卡，先给结论再看走势。④ 右窄栏（268px）：只放两块——「一句话结论」卡（结论正文里把关键短语换主色强调）+「关键事件」列表（3 条，圆点分色）。⑤ 底部统计条：4 项横排、贴底、56px 内，只做补充口径，不与主图争高。⑥ 页脚：无（统计条即结束），避免尾部视觉噪音。",
+    配色: "浅灰底 #f7f8fa，卡片纯白 #ffffff，主文字 #0f1419，次文字 #6b7684，主色 #2563eb（本期实线、面积渐变、大数字环比），辅色 #f59e0b（上期虚线与第二条事件点）。整页只有一处彩色落点，其余全靠灰阶与留白分层。",
+    布局骨架: "1440 桌面两栏：主视觉 minmax(0,1fr) / 右窄栏 268px 定宽，间距 var(--jianju)；顶栏 56px 内贯穿全宽；主图 min-height 260px 且 flex:1 吃掉剩余高度，让首屏「无空白尾巴」；900px 以下塌成单栏、右窄栏两卡转横排；430px 以下统计条转 2×2、副标隐藏。",
+    重色落点: "主色 #2563eb 只绑三处——本期折线与面积渐变、大数字的环比胶囊、事件点；辅色 #f59e0b 只绑上期虚线与第二条事件点。两色分工是「本期 vs 上期」「主事件 vs 次事件」，绝不混用；其余全部灰阶。",
+    第一屏内容: "大数字 12,480 + 环比 +18.6% 是第一个落点（先结论），视线向下立刻接同一张卡的折线，第三落点才是右窄栏的「一句话结论」；底部统计条只作口径补充，不允许被提升为第二视觉重心。",
+    删减元素: "不做侧边导航树；不做多图矩阵（一屏只允许一张主图）；不做数据表格与分页；不做图表工具栏/导出/图例开关；不做 KPI 卡墙（四个数字压到底部条，不铺成 2×2 大卡）。",
+    适用: "增长 / 运营 / 监控类看板的首屏：观众只关心「现在多少、比上期怎样、什么时候变的」这三件事，且必须在一屏内答完。",
+    禁忌: "把趋势图缩成四宫格之一就失去「主导」；右窄栏塞第二张图会让主图失去唯一性；上期线用同色实线则比较关系消失；底部统计条做大成卡片墙则首屏重心分散。",
+    我的说明: "唯一「一张趋势图独占首屏 + 结论先行」的浅色 PC 后台骨架：与 S09 冷调科技风（左导航树 + 等高面板矩阵）、S24（多图并列无主次）、S31（内容主视觉，封面占位）的差别都在骨架语言——本条没有导航树、没有多图矩阵、没有封面位，主轴是一条「大数字 → 趋势线 → 一句话结论」的阅读动线，整页只有一个彩色落点。核心机制是双线同轴比较：本期实线 + 上期虚线共用横轴与纵轴刻度，读者不需要切换就能看出「抬升发生在哪一段、上期同段是什么形态」；悬停探针只读索引不重排版面，所以高频移动不掉帧。与 S69 目标导向布局（三区职责分离 + 日周五处联动）的分界：S69 回答「还差多少」，本条回答「什么时候变的」，S69 有三栏与叠层指标条，本条是两栏且指标压到底部。",
+    Agent提示词: "1 视觉主题：浅色、克制、结论先行的趋势看板，气质是「一眼看出变化发生在哪一段」，不是数据大杂烩。\n2 色彩板：#f7f8fa 页面底；#ffffff 卡片；#0f1419 主文字；#6b7684 次文字；#2563eb 主色（本期线 / 面积渐变 / 环比胶囊 / 事件点）；#f59e0b 辅色（上期虚线 / 次事件点）。整页只允许这一处彩色。\n3 字体：系统字体栈，基准 14px；大数字 3.2em 800 字重、letter-spacing -0.02em；标题与说明统一走灰阶。\n4 组件：顶栏（品牌点 + 看板名 + 口径副标 + 三段分段控件）；主视觉卡（当前值大数字 + 环比胶囊 + 图例 + 折线图）；折线图内部含 3 道横向网格、5 个日期锚点、本期实线带面积渐变、上期虚线、悬停探针（竖线 + 圆点 + 深色浮层气泡）；右窄栏两卡（一句话结论 / 关键事件 3 条）；底部统计条 4 项。\n5 布局：1440 两栏 minmax(0,1fr) / 268，间距 16；主图 flex:1 吃掉剩余高度，min-height 260，避免首屏出现空白尾巴；900px 以下塌单栏，430px 以下统计条 2×2。\n6 深度：零投影，只用 1px rgba(15,20,25,.06) 描边与 #f7f8fa 底色托出白卡；唯一「浮起」的是悬停气泡，用主文字色反白。\n7 该做/不该做：该做——首屏只有一张图、大数字在图上方先给结论、本期实线上期虚线同轴比较、探针跟随且气泡带两个数值、底部统计条贴底不超过 56px。不该做——加侧边导航树、把图缩进四宫格、上期线用同色实线、右窄栏放第二张图、底部统计铺成卡片墙。\n8 响应式：PC 优先；375px 下两栏塌缩、右窄栏两卡转横排再转单列、统计条 2×2、副标隐藏、图表 min-height 降到 210。\n9 即拿即用提示词：「做一个浅色趋势主导的 PC 看板：顶栏含 30/90/全年分段；首屏一张折线图独占主体，图上方压 3.2em 大数字 + 环比胶囊；图内本期实线带面积渐变、上期虚线、悬停探针带双数值气泡；右侧 268px 窄栏只放一句话结论与 3 条关键事件；底部 4 项统计条贴底。整页只用一个主色 #2563eb。不许加侧边导航、不许把图缩进四宫格。」",
+    演示页: "assets/demos/方案-趋势主导布局.html",
+    来源: "自研（2026-10-31 按 G7-2「趋势主导布局」自建 6 段骨架与 demo）；双线同轴比较 + 探针只读索引为自定机制，零依赖单文件。",
+    参考站: ["自研 · 2026-10-31 G7-2 趋势主导布局"],
+    参数: [
+      {"键":"di","名":"页面底色","类型":"color","默认":"#f7f8fa"},
+      {"键":"ka","名":"卡片底色","类型":"color","默认":"#ffffff"},
+      {"键":"zi","名":"主文字色","类型":"color","默认":"#0f1419"},
+      {"键":"ci","名":"次要文字色","类型":"color","默认":"#6b7684"},
+      {"键":"zhu","名":"主色","类型":"color","默认":"#2563eb"},
+      {"键":"fu","名":"辅色","类型":"color","默认":"#f59e0b"},
+      {"键":"yuanjiao","名":"圆角(px)","类型":"slider","最小":0,"最大":24,"步长":1,"默认":14},
+      {"键":"jianju","名":"间距(px)","类型":"slider","最小":8,"最大":24,"步长":1,"默认":16},
+      {"键":"zihao","名":"基准字号(px)","类型":"slider","最小":12,"最大":18,"步长":1,"默认":14}
+    ],
+    代码: `<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>趋势主导布局</title>
+<style>
+/* 数值型参数一律不拼单位，CSS 侧统一 calc(var(--x) * 1px)，两边都带单位会算成非法值而静默失效 */
+:root{
+  --di:#f7f8fa;--ka:#ffffff;--zi:#0f1419;--ci:#6b7684;--zhu:#2563eb;--fu:#f59e0b;
+  --yuanjiao:14;--jianju:16;--zihao:14;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--di);color:var(--zi);
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:calc(var(--zihao) * 1px);line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding:calc(var(--jianju) * 1.2px);
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 段① 顶栏：只放定位与时间范围，不放导航树 ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 0 calc(var(--jianju) * .7px);margin-bottom:calc(var(--jianju) * .7px);
+  border-bottom:1px solid rgba(15,20,25,.07);
+}
+.brand{display:flex;align-items:center;gap:calc(var(--jianju) * .6px);font-weight:700;font-size:1.06em}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--zhu)}
+.topbar .sub{color:var(--ci);font-size:.92em;margin-left:calc(var(--jianju) * .6px)}
+.seg{display:flex;gap:3px;background:rgba(15,20,25,.05);padding:3px;border-radius:999px}
+.seg b{
+  padding:5px 13px;border-radius:999px;font-weight:600;font-size:.92em;color:var(--ci);
+  transition:background .2s,color .2s;
+}
+.seg b.on{background:var(--ka);color:var(--zi);box-shadow:0 1px 3px rgba(15,20,25,.14)}
+
+/* ── 段② 主视觉：一张趋势图吃掉首屏，高度是整页最重的一块 ── */
+.stage{
+  display:grid;grid-template-columns:minmax(0,1fr) 268px;
+  gap:calc(var(--jianju) * 1px);align-items:stretch;
+}
+.hero{
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);
+  border:1px solid rgba(15,20,25,.06);
+  padding:calc(var(--jianju) * 1.1px) calc(var(--jianju) * 1.2px) calc(var(--jianju) * .5px);
+  display:flex;flex-direction:column;
+}
+.hero .hd{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--jianju) * .8px);margin-bottom:calc(var(--jianju) * .5px)}
+.hero .k{font-size:.92em;color:var(--ci);letter-spacing:.02em}
+.hero .now{display:flex;align-items:baseline;gap:calc(var(--jianju) * .5px)}
+.hero .now b{font-size:3.2em;font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero .now i{font-style:normal;font-size:.94em;font-weight:600;color:var(--zhu);background:rgba(37,99,235,.1);padding:3px 9px;border-radius:999px}
+.hero .legend{display:flex;gap:calc(var(--jianju) * .9px);font-size:.9em;color:var(--ci)}
+.hero .legend span{display:flex;align-items:center;gap:6px}
+.hero .legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
+.chartbox{position:relative;flex:1;min-height:0;margin-top:calc(var(--jianju) * .3px)}
+svg{width:100%;height:100%;display:block;min-height:260px}
+.grid{stroke:rgba(15,20,25,.07);stroke-width:1}
+.base{stroke:rgba(15,20,25,.14);stroke-width:1}
+.line{fill:none;stroke:var(--zhu);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.line2{fill:none;stroke:var(--fu);stroke-width:2;stroke-dasharray:6 5;stroke-linecap:round;opacity:.85}
+.probe{stroke:rgba(15,20,25,.22);stroke-width:1;stroke-dasharray:4 4}
+.pt{fill:var(--ka);stroke:var(--zhu);stroke-width:2.6}
+.xlabel{fill:var(--ci);font-size:12px}
+.yval{fill:var(--ci);font-size:11px}
+.tip{
+  position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-118%);
+  background:var(--zi);color:#fff;font-size:.86em;line-height:1.35;white-space:nowrap;
+  padding:6px 10px;border-radius:8px;transition:opacity .16s,left .12s,top .12s;
+}
+.tip.on{opacity:1}
+.tip b{font-weight:700}
+
+/* ── 段③ 右窄栏：只承担「所以呢」的结论与事件，不抢图表 ── */
+.side{display:flex;flex-direction:column;gap:calc(var(--jianju) * .8px)}
+.card{
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);
+  border:1px solid rgba(15,20,25,.06);padding:calc(var(--jianju) * .9px) calc(var(--jianju) * 1px);
+}
+.card h3{margin:0 0 calc(var(--jianju) * .5px);font-size:.92em;color:var(--ci);font-weight:600;letter-spacing:.02em}
+.verdict{font-size:1.02em;font-weight:700;line-height:1.45}
+.verdict em{font-style:normal;color:var(--zhu)}
+.verdict s{text-decoration:none;color:var(--fu)}
+.events{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:calc(var(--jianju) * .55px)}
+.events li{display:flex;gap:9px;font-size:.92em;color:var(--ci);line-height:1.4}
+.events i{flex:none;width:7px;height:7px;border-radius:50%;margin-top:7px;background:var(--zhu)}
+.events li:nth-child(2) i{background:var(--fu)}
+.events li:nth-child(3) i{background:rgba(15,20,25,.28)}
+.events b{color:var(--zi);font-weight:600;display:block;font-size:1em}
+
+/* ── 段④ 底部窄统计条：四项横排、贴底，高度压到 56px 以内 ── */
+.strip{
+  margin-top:calc(var(--jianju) * 1px);display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--ka);border-radius:calc(var(--yuanjiao) * 1px);border:1px solid rgba(15,20,25,.06);
+  padding:calc(var(--jianju) * .6px) 0;
+}
+.strip div{padding:0 calc(var(--jianju) * .9px);border-left:1px solid rgba(15,20,25,.06)}
+.strip div:first-child{border-left:0}
+.strip span{display:block;font-size:.84em;color:var(--ci);margin-bottom:2px}
+.strip b{font-size:1.16em;font-weight:700}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .side{flex-direction:row;flex-wrap:wrap}
+  .side .card{flex:1 1 220px}
+  .hero .now b{font-size:2.4em}
+  .strip{grid-template-columns:repeat(2,1fr);row-gap:calc(var(--jianju) * .6px)}
+  .strip div:nth-child(3){border-left:0}
+}
+@media (max-width:430px){
+  body{padding:12px}
+  .topbar{flex-wrap:wrap;gap:8px}
+  .topbar .sub{display:none}
+  .side .card{flex:1 1 100%}
+  svg{min-height:210px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>增长看板<span class="sub">近 30 天 · 全渠道</span></div>
+  <div class="seg" id="seg"><b class="on">30 天</b><b>90 天</b><b>全年</b></div>
+</div>
+
+<div class="stage">
+  <section class="hero">
+    <div class="hd">
+      <div>
+        <div class="k">活跃用户 · 日活</div>
+        <div class="now"><b id="bigNum">12,480</b><i id="delta">+18.6%</i></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--zhu)"></i>本期</span>
+        <span><i style="background:var(--fu)"></i>上期</span>
+      </div>
+    </div>
+    <div class="chartbox" id="box">
+      <svg id="chart" viewBox="0 0 1000 330" preserveAspectRatio="none" aria-label="趋势图"></svg>
+      <div class="tip" id="tip"><b>—</b><br>本期 0 · 上期 0</div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="card">
+      <h3>一句话结论</h3>
+      <p class="verdict">增长集中在<em>月末最后 7 天</em>，前 3 周是平的——不是整体变好，是<em>一段冲刺</em>；<s>上期同段无此形态</s>。</p>
+    </div>
+    <div class="card">
+      <h3>关键事件</h3>
+      <ul class="events">
+        <li><i></i><span><b>10-12 版本发布</b>次日爬升，斜率是全月最陡</span></li>
+        <li><i></i><span><b>10-19 投放起量</b>与曲线抬升同步出现</span></li>
+        <li><i></i><span><b>10-25 回落</b>幅度小于抬升，留存被撑住</span></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<div class="strip">
+  <div><span>人均时长</span><b>7.4 分钟</b></div>
+  <div><span>次日留存</span><b>41.2%</b></div>
+  <div><span>转化率</span><b>3.86%</b></div>
+  <div><span>数据口径</span><b>自然日</b></div>
+</div>
+
+<script>
+var state={di:"#f7f8fa",ka:"#ffffff",zi:"#0f1419",ci:"#6b7684",zhu:"#2563eb",fu:"#f59e0b",
+  yuanjiao:14,jianju:16,zihao:14};
+
+// 两张图共用同一套横轴，本期是实线、上期是虚线——比较关系靠线型，不靠图例去猜
+var THIS=[62,64,61,66,70,68,72,75,73,78,74,80,83,86,90,88,94,99,104,101,108,113,110,117,124,121,128,134,131,138];
+var PREV=[55,57,56,58,60,59,61,62,61,63,62,64,65,66,67,66,68,69,70,69,71,72,71,73,74,73,75,76,75,77];
+
+var r=document.documentElement.style;
+var chart=document.getElementById('chart');
+var box=document.getElementById('box');
+var tip=document.getElementById('tip');
+var W=1000,H=330,PADL=6,PADR=6,PADT=18,PADB=30;
+
+function px(i,n){return PADL+(W-PADL-PADR)*(i/(n-1));}
+function py(v,max){return PADT+(H-PADT-PADB)*(1-v/max);}
+
+function pathOf(arr,max){
+  var d="";
+  for(var i=0;i<arr.length;i++){
+    d+=(i?"L":"M")+px(i,arr.length).toFixed(1)+" "+py(arr[i],max).toFixed(1)+" ";
+  }
+  return d;
+}
+function areaOf(arr,max){
+  var p=pathOf(arr,max);
+  return p+"L"+px(arr.length-1,arr.length).toFixed(1)+" "+(H-PADB)+" L"+px(0,arr.length).toFixed(1)+" "+(H-PADB)+" Z";
+}
+
+function render(){
+  var max=Math.max.apply(null,THIS.concat(PREV))*1.12;
+  var g="";
+  for(var t=1;t<=3;t++){
+    var y=py(max*t/4,max).toFixed(1);
+    g+='<line class="grid" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'"/>';
+  }
+  var lab="";
+  var names=["10-01","10-08","10-15","10-22","10-29"];
+  for(var k=0;k<names.length;k++){
+    var idx=Math.round((THIS.length-1)*k/(names.length-1));
+    var anchor=k===0?"start":(k===names.length-1?"end":"middle");
+    lab+='<text class="xlabel" x="'+px(idx,THIS.length).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+anchor+'">'+names[k]+'</text>';
+  }
+  chart.innerHTML=
+    '<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="var(--zhu)" stop-opacity="0.22"/>'+
+    '<stop offset="100%" stop-color="var(--zhu)" stop-opacity="0"/>'+
+    '</linearGradient></defs>'+
+    g+
+    '<line class="base" x1="0" y1="'+(H-PADB)+'" x2="'+W+'" y2="'+(H-PADB)+'"/>'+
+    '<path d="'+areaOf(THIS,max)+'" fill="url(#g1)"/>'+
+    '<path class="line2" d="'+pathOf(PREV,max)+'"/>'+
+    '<path class="line" d="'+pathOf(THIS,max)+'"/>'+
+    '<g id="probe"><line class="probe" x1="0" y1="'+PADT+'" x2="0" y2="'+(H-PADB)+'" style="opacity:0"/>'+
+    '<circle class="pt" r="4.6" cx="0" cy="0" style="opacity:0"/></g>'+
+    lab;
+}
+
+function apply(){
+  r.setProperty('--di',state.di);r.setProperty('--ka',state.ka);
+  r.setProperty('--zi',state.zi);r.setProperty('--ci',state.ci);
+  r.setProperty('--zhu',state.zhu);r.setProperty('--fu',state.fu);
+  r.setProperty('--yuanjiao',state.yuanjiao);
+  r.setProperty('--jianju',state.jianju);
+  r.setProperty('--zihao',state.zihao);
+  render();
+}
+
+// 悬停探针：只读当前索引，不改数据，所以位移不重排版面
+box.addEventListener('pointermove',function(ev){
+  var b=box.getBoundingClientRect();
+  var ratio=(ev.clientX-b.left)/b.width;
+  var i=Math.round(ratio*(THIS.length-1));
+  i=Math.max(0,Math.min(THIS.length-1,i));
+  var max=Math.max.apply(null,THIS.concat(PREV))*1.12;
+  var x=px(i,THIS.length);
+  var pr=document.getElementById('probe');
+  if(!pr)return;
+  pr.children[0].setAttribute('x1',x);
+  pr.children[0].setAttribute('x2',x);
+  pr.children[0].style.opacity=.9;
+  pr.children[1].setAttribute('cx',x);
+  pr.children[1].setAttribute('cy',py(THIS[i],max));
+  pr.children[1].style.opacity=1;
+  tip.classList.add('on');
+  tip.style.left=(x/W*100)+"%";
+  tip.style.top=(py(THIS[i],max)/H*100)+"%";
+  tip.innerHTML="<b>10-"+(i+1<10?"0"+(i+1):(i+1))+"</b><br>本期 "+THIS[i]+" · 上期 "+PREV[i];
+});
+box.addEventListener('pointerleave',function(){
+  tip.classList.remove('on');
+  var pr=document.getElementById('probe');
+  if(pr){
+    pr.children[0].style.opacity=0;
+    pr.children[1].style.opacity=0;
+  }
+});
+
+var segs=document.querySelectorAll('#seg b');
+for(var s=0;s<segs.length;s++){
+  segs[s].addEventListener('click',function(){
+    for(var j=0;j<segs.length;j++)segs[j].classList.remove('on');
+    this.classList.add('on');
+  });
+}
+
+apply();
+
+addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='param')return;
+  if(!(d.key in state))return;
+  state[d.key]=d.value;
+  apply();
+});
+<\/script>
+</body>
+</html>
+`
+  }
+
 ];
