@@ -29,6 +29,8 @@ venv/
 tmp/
 _filter_test.html
 mcp/test_mcp.js
+# 体检脚本的探针临时页（正常会自删，崩溃时残留；check_all 会跳过）
+assets/demos/_*_probe_tmp.html
 
 # ==== 系统与编辑器 ====
 .DS_Store
@@ -45,3 +47,6 @@ Thumbs.db
 Agent宪法.md
 ROADMAP.md
 _local/
+.facts/
+.fix-report/
+docs/
