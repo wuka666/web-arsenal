@@ -1,0 +1,412 @@
+/* ============================================================
+   画布 v1.4 —— 样式表（2026-11-03 C1 从 canvas.html 拆出）
+   设计语言：Material 3 紫（--c-primary 体系），与首页水墨暖调不共用配色。
+   尺度（字号/间距/圆角/字重/行高/字距/阴影/字体栈）一律吃 tokens.css。
+   加载顺序：tokens.css → canvas.css（本文件可用前者定义的变量）。
+   ============================================================ */
+/* ============================================================
+   画布 v1.4 —— 独立可交互页面设计器
+   架构：单文件零依赖；状态在 CVS，组件注册表在 PARTS。
+   版本要点：
+   - v1.2 兼容旧 localStorage（补 w/h/kind/parts）、防御 NaN 缩放、舞台 flex 布局
+   - v1.3 接入首页购物车（共用 localStorage['arsenal-cart']）
+   - v1.4 开场先选画布类型；屏按类型独立命名（屏幕N / 手机N）；--accent 与主题种子色解绑
+   ============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--c-on-surface);background:var(--cv-bg);display:flex;flex-direction:column;overflow:hidden}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-3);background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar h1{font-size:var(--fs-body);font-weight:var(--fw-medium)}
+.topbar .sp{flex:1}
+/* 画布名：h1 本身就是输入框的替身 —— 点击换成 input，失焦/回车提交。
+   直接写进 CVS.title，跟着 save() 一起落盘，不额外占一次撤销格。 */
+.cv-title{font-size:var(--fs-body);font-weight:var(--fw-medium);cursor:text;padding:2px var(--sp-1);border-radius:var(--r-sm);border:1px solid transparent;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv-title:hover{border-color:var(--line);background:#fafafb}
+.cv-title.editing{border-color:var(--accent);background:#fff;cursor:text}
+.cv-title input{font:inherit;color:inherit;border:0;outline:none;background:transparent;width:160px}
+/* 自动保存状态：常驻但不打扰（低对比度小字），写盘瞬间才变色 */
+.save-state{font-size:var(--fs-micro);color:var(--muted);white-space:nowrap;padding:2px var(--sp-1);border-radius:var(--r-sm);transition:color .16s ease,background .16s ease}
+.save-state.saving{color:var(--accent)}
+.save-state.saved{color:var(--muted)}
+.save-state.error{color:#b3261e;background:#fdecea}
+.btn{font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-3);border:1px solid var(--line);background:#fff;border-radius:var(--r-md);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{background:#fafafb}
+
+/* 屏幕标签 */
+.screens{display:flex;align-items:center;gap:var(--sp-1);overflow-x:auto;max-width:42vw}
+.screen-tab{font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-2);border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:var(--sp-1)}
+.screen-tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.screen-tab .x{opacity:.6;cursor:pointer}
+.screen-tab input{border:0;background:transparent;color:inherit;font:inherit;width:64px;outline:none}
+
+/* 三栏 */
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:228px minmax(0,1fr) 248px;transition:grid-template-columns .22s ease}
+/* 未选中组件 → 右栏折叠成 20px 窄条，画布吃回 228px。
+   折叠态保留一条窄边（而不是 0）是因为把手要留在可视区域里：
+   若压到 0 宽，.panel 的 overflow 会把把手一起裁掉，用户就没有「叫回面板」的入口了。 */
+.cols.ins-hidden{grid-template-columns:228px minmax(0,1fr) 20px}
+.panel{background:#fff;display:flex;flex-direction:column;min-height:0}
+.panel.left{border-right:1px solid var(--line);overflow-y:auto}
+.panel.right{border-left:1px solid var(--line);overflow-y:auto;position:relative;overflow-x:hidden}
+.cols.ins-hidden .panel.right{border-left:0}
+.cols.ins-hidden .right-inner{opacity:0;pointer-events:none}
+.right-inner{display:flex;flex-direction:column;min-height:0;transition:opacity .16s ease}
+/* 收起后的把手：贴在画布右边缘、垂直居中（放顶部会压住「检查器」标题） */
+.ins-toggle{position:absolute;top:50%;transform:translateY(-50%);left:0;z-index:20;width:20px;height:44px;border:1px solid var(--line);border-left:0;border-radius:0 var(--r-sm) var(--r-sm) 0;background:#fff;color:var(--muted);font:inherit;font-size:var(--fs-caption);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-1)}
+.ins-toggle:hover{color:var(--accent);border-color:var(--accent)}
+/* 展开时把手淡出：它只负责「把收起的面板叫回来」，
+   展开状态下留着会盖住「检查器」标题的第一个字。要继续收起，点画布空白处或按 Esc。 */
+.cols:not(.ins-hidden) .ins-toggle{opacity:0;pointer-events:none}
+.radius-v{font-size:var(--fs-micro);color:var(--muted);width:30px;text-align:right}
+
+/* 顶栏下拉菜单（存入书架 / 更多） */
+.menu-wrap{position:relative;display:inline-flex}
+.menu{position:absolute;top:calc(100% + var(--sp-1));right:0;z-index:150;min-width:210px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-2);padding:var(--sp-1);display:flex;flex-direction:column}
+.menu[hidden]{display:none}
+.menu-item{font:inherit;font-size:var(--fs-caption);text-align:left;background:none;border:0;border-radius:var(--r-sm);padding:var(--sp-2) var(--sp-2);cursor:pointer;color:var(--c-on-surface)}
+.menu-item:hover{background:var(--cv-bg)}
+.menu-item.danger{color:#b3261e}
+.menu-item.danger:hover{background:#fdecea}
+.menu-sep{height:1px;background:var(--line);margin:var(--sp-1) 0}
+.menu-note{font-size:var(--fs-micro);color:var(--muted);padding:0 var(--sp-2) var(--sp-1)}
+
+/* 轻提示（复制/粘贴反馈）：不打断操作 */
+.toast{position:fixed;left:50%;bottom:calc(var(--sp-7) + var(--sp-5));transform:translate(-50%,12px);z-index:500;background:rgba(28,27,31,.92);color:#fff;font-size:var(--fs-caption);padding:var(--sp-2) var(--sp-4);border-radius:var(--r-full);opacity:0;pointer-events:none;transition:opacity .16s ease,transform .16s ease}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.panel h3{font-size:var(--fs-micro);color:var(--muted);font-weight:var(--fw-medium);padding:var(--sp-2) var(--sp-3) var(--sp-1);text-transform:uppercase;letter-spacing:var(--ls-wide)}
+.pal{padding:var(--sp-1) var(--sp-2) var(--sp-3)}
+.pal button{font:inherit;font-size:var(--fs-caption);padding:var(--sp-2) var(--sp-2);border:1px solid var(--line);background:#fafafb;border-radius:var(--r-md);cursor:grab;text-align:left;width:calc(50% - 4px);margin:3px 2px}
+.pal button:hover{border-color:var(--accent)}
+.pal .grp{width:100%;font-size:var(--fs-micro);color:var(--muted);font-weight:var(--fw-medium);margin:var(--sp-2) 0 2px;padding-left:2px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.pal .grp .cnt{font-weight:var(--fw-regular);opacity:.7}
+.pal .grp .fold{font-size:var(--fs-micro);border:1px solid var(--line);border-radius:var(--r-sm);padding:1px var(--sp-1);background:#fff}
+.pal .grp-body{display:flex;flex-wrap:wrap;margin:0 -2px}
+.pal .grp-body.hidden{display:none}
+
+/* 画布舞台：flex 居中，zoombar 固定底部 */
+/* 注意 align-items 用 flex-start + 子元素 margin:auto 居中，而不是 align-items:center：
+   选中组件后右栏展开，stage 会从 754px 缩到 526px（窄 228px），此时缩放后的画布比 stage 宽。
+   flex 的 center 对齐在「子元素大于容器」时会把溢出量对半分到左右两侧，
+   左边那半截被推到 stage 的可滚动区之外（滚不到），并且直接画在左侧组件库下面，
+   于是「点画布左侧的组件」实际点到的是 .pal 面板 —— 这就是「画布内素材点不动」的根因。
+   换成 margin:auto 后，溢出只发生在右侧/下侧，仍在滚动区内，永远可滚可点。 */
+.stage{position:relative;flex:1;min-height:0;overflow:auto;background:var(--cv-bg);display:flex;flex-direction:column;align-items:flex-start;padding:var(--sp-6) 0 80px}
+.canvas-wrap{position:relative;flex:none;background:transparent;margin-left:auto;margin-right:auto}
+.canvas{position:absolute;top:0;left:0;background:var(--c-surface);box-shadow:var(--shadow-2);transform-origin:top left}
+.part{position:absolute;cursor:move;user-select:none}
+.part.sel{outline:2px solid var(--accent);outline-offset:1px;z-index:50}
+.part .handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:3px;display:none;z-index:60}
+.part.sel .handle{display:block}
+.handle.nw{left:-6px;top:-6px;cursor:nwse-resize}
+.handle.ne{right:-6px;top:-6px;cursor:nesw-resize}
+.handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+.handle.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+.part iframe{border:0;width:100%;height:100%;display:block;pointer-events:none}
+/* C5 ① 画布原地编辑：正在改的那段字长成输入框的样子。
+   只加虚线框 + 光标，不改字号/行高/位置 —— 否则「打字时字在跳」，
+   所见即所得就毁了。.part 本体的 user-select:none 必须在这里放开，
+   不然 contenteditable 里连光标都点不进去。 */
+.part .inline-edit{outline:2px dashed var(--accent);outline-offset:2px;border-radius:3px;background:rgba(255,255,255,.92);cursor:text;user-select:text;-webkit-user-select:text;caret-color:var(--accent);min-width:1em;display:inline-block}
+.part .inline-edit:empty::before{content:"输入文字…";color:var(--muted);opacity:.7}
+.part.editing{cursor:text}
+.part.editing.sel{outline-color:color-mix(in srgb, var(--accent) 45%, transparent)}
+/* 交互态（C4）：iframe 吃回鼠标 → 动效才真的能点。
+   编辑态必须 pointer-events:none（否则拖不动组件、选不中），
+   所以这里不是「默认放开」，而是**另一个状态**：进入交互态 = 暂时交出编辑权。
+   退出方式：Esc / 再点一次「▶ 交互」按钮 / 点画布空白处之外的顶栏按钮。 */
+.canvas-wrap.interactive .part iframe{pointer-events:auto}
+.canvas-wrap.interactive .part{cursor:default}
+/* 交互态下组件不响应选中/拖动：整块 .part 退成「透明的贴图」，
+   事件直接落到 iframe 里。手柄也一并隐藏，避免误抓到 4px 的小方块。 */
+.canvas-wrap.interactive .part .handle{display:none}
+.canvas-wrap.interactive .part.sel{outline-color:color-mix(in srgb, var(--accent) 42%, transparent)}
+/* 左上角提示条：交互态是「模式」，模式必须有可见出口 */
+.interact-banner{position:absolute;left:50%;top:var(--sp-3);transform:translateX(-50%) translateY(-6px);z-index:120;background:rgba(28,27,31,.92);color:#fff;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-4);border-radius:var(--r-full);box-shadow:var(--shadow-2);opacity:0;pointer-events:none;transition:opacity .16s ease,transform .16s ease;white-space:nowrap}
+.canvas-wrap.interactive .interact-banner{opacity:1;transform:translateX(-50%) translateY(0)}
+.interact-banner b{color:#ffd8a8;font-weight:var(--fw-medium)}
+.interact-banner button{font:inherit;font-size:var(--fs-micro);margin-left:var(--sp-1);padding:1px var(--sp-2);border:1px solid rgba(255,255,255,.42);background:transparent;color:#fff;border-radius:var(--r-full);cursor:pointer}
+.interact-banner button:hover{background:rgba(255,255,255,.18)}
+/* 提示条在交互态下必须能点（它自己不被 iframe 覆盖，但父层可能整体 pointer-events:none） */
+.canvas-wrap.interactive .interact-banner{pointer-events:auto}
+/* 顶栏交互按钮的激活态 */
+#interactBtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* 组件加载失败时的占位（规矩 32 ③：不能只留一块空白） */
+.part.failed::after{content:"组件没能加载出来 —— 检查 assets/demos 里的文件是否还在";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:var(--sp-2);font-size:var(--fs-micro);line-height:var(--lh-relaxed);color:#8a8577;background:repeating-linear-gradient(45deg,#f4f1ea,#f4f1ea 8px,#eeeae1 8px,#eeeae1 16px)}
+
+/* 原生组件样式（统一吃主题变量） */
+.c-btn{display:inline-flex;align-items:center;gap:var(--sp-1);justify-content:center;height:100%;width:100%;border:0;border-radius:calc(var(--radius) - 4px);font:inherit;font-size:var(--fs-body);font-weight:var(--fw-medium);cursor:pointer;padding:0 var(--sp-3)}
+.c-btn.filled{background:var(--c-primary);color:var(--c-on-primary)}
+.c-btn.tonal{background:var(--c-surface-variant);color:var(--c-on-surface)}
+.c-btn.outlined{background:transparent;color:var(--c-primary);border:1px solid var(--c-outline)}
+.c-iconbtn{width:100%;height:100%;border:0;border-radius:50%;background:var(--c-surface-variant);color:var(--c-on-surface);font-size:var(--fs-heading);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.c-fab{width:100%;height:100%;border:0;border-radius:var(--r-lg);background:var(--c-primary);color:var(--c-on-primary);font-size:var(--fs-display);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-1)}
+.c-chip{height:100%;width:100%;display:flex;align-items:center;justify-content:center;border-radius:var(--r-full);background:var(--c-surface-variant);color:var(--c-on-surface);font:inherit;font-size:var(--fs-caption);padding:0 var(--sp-3)}
+.c-appbar{height:100%;width:100%;background:var(--c-surface);color:var(--c-on-surface);display:flex;align-items:center;padding:0 var(--sp-3);font-weight:var(--fw-medium);font-size:var(--fs-heading);border-bottom:1px solid var(--line)}
+.c-navbar{height:100%;width:100%;background:var(--c-surface);display:flex;align-items:stretch;border-top:1px solid var(--line)}
+.c-navbar .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:var(--fs-micro);color:var(--c-on-surface-variant)}
+.c-navbar .ni .ic{font-size:var(--fs-heading)}
+.c-navbar .ni.on{color:var(--c-primary)}
+.c-tabbar{height:100%;width:100%;background:var(--c-surface);display:flex;align-items:center;border-top:1px solid var(--line)}
+.c-tabbar .ti{flex:1;text-align:center;font-size:var(--fs-caption);color:var(--c-on-surface-variant);padding:var(--sp-1) 0}
+.c-tabbar .ti.on{color:var(--c-primary);font-weight:var(--fw-medium)}
+.c-card{height:100%;width:100%;background:var(--c-surface);border:1px solid var(--line);border-radius:var(--radius);padding:var(--sp-3);overflow:hidden}
+.c-card .t{font-weight:var(--fw-medium);font-size:var(--fs-body);margin-bottom:var(--sp-1)}
+.c-card .b{font-size:var(--fs-caption);color:var(--c-on-surface-variant);line-height:var(--lh-normal)}
+.c-listitem{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);background:var(--c-surface)}
+.c-listitem .lt{font-weight:var(--fw-medium)}.c-listitem .ls{font-size:var(--fs-caption);color:var(--c-on-surface-variant)}
+.c-text{height:100%;width:100%;display:flex;align-items:center;padding:0 var(--sp-3);font-size:var(--fs-body);color:var(--c-on-surface-variant);line-height:var(--lh-normal)}
+.c-heading{height:100%;width:100%;display:flex;align-items:center;padding:0 var(--sp-3);font-weight:var(--fw-bold);font-size:var(--fs-display)}
+.c-image{height:100%;width:100%;background:repeating-linear-gradient(45deg,#eee,#eee 10px,#e3e3e3 10px,#e3e3e3 20px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:var(--fs-caption)}
+.c-input{height:100%;width:100%;display:flex;align-items:center;padding:0 var(--sp-3);border:1px solid var(--c-outline);border-radius:var(--r-md);color:var(--muted);font-size:var(--fs-body);background:var(--c-surface)}
+.c-switch{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);font-size:var(--fs-body)}
+.c-switch .tk{width:42px;height:24px;border-radius:var(--r-full);background:var(--c-surface-variant);position:relative;margin-left:auto}
+.c-switch .tk::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:var(--motion)}
+.c-switch.on .tk{background:var(--c-primary)}.c-switch.on .tk::after{left:21px}
+.c-slider{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);font-size:var(--fs-caption)}
+.c-slider .bar{flex:1;height:4px;background:var(--c-surface-variant);border-radius:var(--r-full);position:relative}
+.c-slider .bar::after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;background:var(--c-primary);top:-5px;left:40%}
+.c-dialog{height:100%;width:100%;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.c-dialog .box{background:var(--c-surface);border-radius:var(--radius);padding:var(--sp-4);width:80%}
+.c-dialog .box .t{font-weight:var(--fw-medium);margin-bottom:var(--sp-1)}.c-dialog .box .b{font-size:var(--fs-caption);color:var(--c-on-surface-variant);line-height:var(--lh-normal)}
+.c-snackbar{height:100%;width:100%;display:flex;align-items:center;padding:0 var(--sp-3);background:#333;color:#fff;font-size:var(--fs-caption);border-radius:var(--r-md)}
+.c-divider{height:100%;width:100%;background:var(--line)}
+.c-hero{height:100%;width:100%;display:flex;flex-direction:column;justify-content:center;padding:0 var(--sp-5);background:linear-gradient(135deg,var(--c-primary),var(--c-surface-variant));color:var(--c-on-surface)}
+.c-hero .t{font-weight:var(--fw-bold);font-size:var(--fs-display);margin-bottom:var(--sp-1)}.c-hero .s{font-size:var(--fs-body);opacity:.85}
+.c-box{height:100%;width:100%;background:var(--c-surface-variant);border-radius:var(--radius)}
+
+/* 检查器 */
+.ins{padding:var(--sp-2) var(--sp-3)}
+.ins .row{margin-bottom:var(--sp-2)}
+.ins label{display:block;font-size:var(--fs-micro);color:var(--muted);margin-bottom:3px}
+.ins input[type=text],.ins input[type=number],.ins textarea,.ins select{width:100%;font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-2);border:1px solid var(--line);border-radius:var(--r-sm);background:#fff}
+.ins textarea{resize:vertical;min-height:46px}
+.ins .hint{font-size:var(--fs-micro);color:var(--muted);line-height:var(--lh-normal);margin-top:var(--sp-1)}
+.ins .empty{color:var(--muted);font-size:var(--fs-caption);padding:var(--sp-5) var(--sp-1);text-align:center}
+.ins .typed{font-size:13px;color:var(--c-on-surface)}
+
+/* 折叠分区（内容 / 布局 / 行为）：原生 details，零依赖 */
+.ins .sec{border-top:1px solid var(--line);margin-top:var(--sp-2);padding-top:var(--sp-1)}
+.ins .sec:first-of-type{border-top:0}
+.ins .sec>summary{cursor:pointer;font-size:var(--fs-micro);color:var(--muted);font-weight:var(--fw-medium);letter-spacing:var(--ls-wide);text-transform:uppercase;padding:var(--sp-1) 0;list-style:none;display:flex;align-items:center;gap:var(--sp-1)}
+.ins .sec>summary::-webkit-details-marker{display:none}
+.ins .sec>summary::before{content:"▸";font-size:9px;transition:transform .12s ease}
+.ins .sec[open]>summary::before{transform:rotate(90deg)}
+.ins .sec-body{padding-top:var(--sp-1)}
+
+/* 对齐工具条 / 层级按钮 */
+.ins .align-bar,.ins .layer-bar{display:flex;gap:3px;flex-wrap:wrap}
+.ins .align-bar button,.ins .layer-bar button{flex:1;min-width:0;font:inherit;font-size:var(--fs-caption);line-height:1.2;padding:var(--sp-1) 0;border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);cursor:pointer;color:var(--c-on-surface)}
+.ins .align-bar button:hover,.ins .layer-bar button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* x / y / w / h 四个小数值框 */
+.ins .num-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.ins .num-cell{display:flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;padding:0 var(--sp-1)}
+.ins .num-cell i{font-style:normal;font-size:var(--fs-micro);color:var(--muted);width:10px;flex:none}
+.ins .num-cell input[type=number]{width:100%;border:0;padding:3px 0;font-size:var(--fs-caption);-moz-appearance:textfield;background:none}
+.ins .num-cell input[type=number]::-webkit-inner-spin-button,.ins .num-cell input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* 复选框行：label 跟在框后面，别被 .ins label 的 block 规则带偏 */
+.ins .row.chk{display:flex;align-items:center;gap:var(--sp-2)}
+.ins .row.chk label{display:inline;margin:0}
+.ins .row.chk input{width:auto;flex:none}
+
+/* 主题面板 */
+.theme{border-top:1px solid var(--line);padding:var(--sp-2) var(--sp-3);background:#fafafb}
+.theme .row{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-2)}
+.theme label{font-size:var(--fs-micro);color:var(--muted);width:48px}
+.theme input[type=color]{width:34px;height:26px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;padding:2px}
+.theme input[type=range]{flex:1}
+.theme select{flex:1;font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-1);border:1px solid var(--line);border-radius:var(--r-sm)}
+
+/* 缩放工具条：固定底部，不覆盖画布 */
+.zoombar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:inline-flex;gap:var(--sp-1);background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:var(--sp-1) var(--sp-1);box-shadow:var(--shadow-1);z-index:100}
+.zoombar button{font:inherit;font-size:var(--fs-caption);border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);cursor:pointer;padding:3px var(--sp-2)}
+.zoombar b{min-width:46px;text-align:center;font-size:var(--fs-caption);align-self:center;color:var(--muted)}
+.zoombar .zhint{font-size:var(--fs-micro);color:var(--muted);align-self:center;padding-left:var(--sp-1);border-left:1px solid var(--line);white-space:nowrap}
+/* 平移中的手型（空格按住 / 拖空白处） */
+.stage.panning{cursor:grabbing}
+.stage.panning *{cursor:grabbing!important}
+/* 检查器宽度拖拽条（C4）：贴在右栏左边缘。
+   为什么不做成「只能整体缩放」：PPT「设置形状格式」窗格与主流设计器
+   （Figma / Keynote）都是把宽度交给用户，因为右栏要装的东西差异极大 ——
+   参数多的素材有 11 个控件，固定 248px 会挤成一条缝。 */
+.ins-resizer{position:absolute;left:0;top:0;bottom:0;width:6px;cursor:col-resize;z-index:25;background:transparent}
+.ins-resizer::after{content:"";position:absolute;left:2px;top:0;bottom:0;width:1px;background:transparent;transition:background .12s ease}
+.ins-resizer:hover::after,.ins-resizer.dragging::after{background:var(--accent)}
+.cols.ins-hidden .ins-resizer{display:none}
+/* 拖拽期间禁掉过渡，否则每一帧都在跑 .22s 缓动，手感像拽橡皮筋 */
+.cols.resizing{transition:none}
+.cols.resizing *{cursor:col-resize!important;user-select:none!important}
+
+/* 右键菜单（C4）：与顶栏 .menu 同一套视觉，独立定位 */
+.ctxmenu{position:fixed;z-index:260;min-width:186px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-2);padding:var(--sp-1);display:flex;flex-direction:column}
+.ctxmenu[hidden]{display:none}
+.ctxmenu button{font:inherit;font-size:var(--fs-caption);text-align:left;background:none;border:0;border-radius:var(--r-sm);padding:var(--sp-1) var(--sp-2);cursor:pointer;color:var(--c-on-surface);display:flex;align-items:center;gap:var(--sp-2)}
+.ctxmenu button:hover{background:var(--cv-bg)}
+.ctxmenu button:disabled{opacity:.4;cursor:default;background:none}
+.ctxmenu button .k{margin-left:auto;font-size:var(--fs-micro);color:var(--muted);font-family:var(--ff-mono)}
+.ctxmenu button.danger{color:#b3261e}
+.ctxmenu button.danger:hover{background:#fdecea}
+.ctxmenu .sep{height:1px;background:var(--line);margin:var(--sp-1) 0}
+
+/* 参数控件（C4）：素材部件的「内容」区。
+   三种基本形态 —— color（色块 + 十六进制文本）/ slider（滑块 + 当前值）/ text（单行）。
+   另加 switch / select / number 兜底，覆盖实测出现的全部 6 种类型。 */
+.ins .params{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--sp-2);background:#fafafb;margin-bottom:var(--sp-2)}
+.ins .params-hd{display:flex;align-items:center;gap:var(--sp-1);font-size:var(--fs-micro);color:var(--muted);margin-bottom:var(--sp-2);letter-spacing:var(--ls-wide);text-transform:uppercase}
+.ins .params-hd .n{margin-left:auto;font-family:var(--ff-mono);text-transform:none}
+.ins .param{margin-bottom:var(--sp-2)}
+.ins .param:last-child{margin-bottom:0}
+.ins .param label{display:block;font-size:var(--fs-micro);color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ins .param .ctl{display:flex;align-items:center;gap:var(--sp-1)}
+/* 颜色：色块 26×22 + 等宽十六进制文本，两者互相同步 */
+.ins .param input[type=color]{width:26px;height:22px;flex:none;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;padding:1px;cursor:pointer}
+.ins .param .hex{flex:1;min-width:0;font-family:var(--ff-mono);font-size:var(--fs-micro);padding:2px var(--sp-1);border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;text-transform:lowercase}
+.ins .param .hex.bad{border-color:#b3261e;background:#fdecea}
+/* 滑块：range 自然撑满，数值框只有 46px 宽（PPT 里也是「拖 + 填」两条通道） */
+.ins .param input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
+.ins .param .num{width:46px;flex:none;text-align:right;font-family:var(--ff-mono);font-size:var(--fs-micro);padding:2px 3px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;-moz-appearance:textfield}
+.ins .param .num::-webkit-inner-spin-button,.ins .param .num::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.ins .param input[type=text]{width:100%;font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-2);border:1px solid var(--line);border-radius:var(--r-sm);background:#fff}
+.ins .param select{width:100%;font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-1);border:1px solid var(--line);border-radius:var(--r-sm);background:#fff}
+.ins .param.chk{display:flex;align-items:center;gap:var(--sp-2)}
+.ins .param.chk label{margin:0}
+.ins .param.chk input{flex:none}
+/* 「试运行」按钮：交互态的第二个入口（选中素材后就在「内容」区顶部） */
+.ins .runbar{display:flex;gap:var(--sp-1);margin-bottom:var(--sp-2)}
+.ins .runbar button{flex:1;font:inherit;font-size:var(--fs-caption);padding:var(--sp-1) var(--sp-2);border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:var(--r-sm);cursor:pointer}
+.ins .runbar button:hover{filter:brightness(1.06)}
+/* 检查器顶部的「名称」行：双击改名（PPT 的选择窗格同名能力） */
+.ins .name-row{display:flex;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-2);padding-bottom:var(--sp-1);border-bottom:1px dashed var(--line)}
+.ins .name-row .nm{font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--c-on-surface);cursor:text;border-radius:3px;padding:0 2px;min-width:24px}
+.ins .name-row .nm:hover{background:var(--cv-bg)}
+.ins .name-row .ty{font-size:var(--fs-micro);color:var(--muted);margin-left:auto;flex:none}
+.ins .name-row input{font:inherit;font-size:var(--fs-body);font-weight:var(--fw-medium);width:100%;border:1px solid var(--accent);border-radius:3px;padding:0 2px;background:#fff}
+
+/* 对齐参考线（C4）：拖动时出现的紫红虚线。
+   位置用 canvas 坐标系（父级 .canvas 已 transform:scale），线宽用 1px 但取整避免缩放后发虚。 */
+.guide{position:absolute;z-index:70;pointer-events:none;background:var(--accent)}
+.guide.v{width:1px;top:0;bottom:0}
+.guide.h{height:1px;left:0;right:0}
+/* 参考线用紫红，和主题紫分开一点，避免和选中框混淆 */
+.guide{background:#c2185b}
+/* 拖拽/缩放时临时挂的 class：让 .part 的 transition 不拖慢跟手感 */
+.canvas.dragging .part{transition:none}
+.modal .box .kb{padding:var(--sp-1) var(--sp-4) var(--sp-3);overflow:auto}
+.modal .box .kb table{width:100%;border-collapse:collapse;font-size:var(--fs-caption)}
+.modal .box .kb td{padding:var(--sp-1) var(--sp-1);border-bottom:1px solid var(--line);vertical-align:top}
+.modal .box .kb td:first-child{white-space:nowrap;color:var(--muted);width:46%}
+.modal .box .kb kbd{font-family:var(--ff-mono);font-size:var(--fs-micro);border:1px solid var(--line);border-bottom-width:2px;border-radius:var(--r-sm);padding:1px var(--sp-1);background:#fff}
+
+/* 预览遮罩 */
+.preview{position:fixed;inset:0;background:rgba(20,20,24,.6);display:none;align-items:center;justify-content:center;z-index:200}
+.preview.on{display:flex}
+.preview .frame{background:#000;border-radius:var(--r-lg);overflow:hidden;position:relative;box-shadow:var(--shadow-2)}
+.preview .bar{position:absolute;top:8px;right:10px;z-index:5}
+.preview .bar .btn{background:#fff}
+
+/* 提示词弹层 */
+.modal{position:fixed;inset:0;background:rgba(20,20,24,.55);display:none;align-items:center;justify-content:center;z-index:300}
+.modal.on{display:flex}
+/* 弹窗宽度从 680 → 960：提示词是长文本，680px 下每行只有 ~50 个汉字，
+   读起来要不停换行，复制前根本看不全一段。宽度跟着视口走，小屏仍然 92vw 兜底。 */
+.modal .box{background:#fff;border-radius:var(--r-lg);width:min(960px,92vw);max-height:86vh;display:flex;flex-direction:column;padding:0}
+.modal .box header{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:var(--sp-2)}
+.modal .box header h2{font-size:var(--fs-heading);flex:1;font-weight:var(--fw-medium)}
+/* 等宽正文 + 按视口定高：弹窗本身要「放大」，光加宽不增高等于没变 */
+.modal textarea{flex:1;border:0;padding:var(--sp-4);font-family:var(--ff-mono);font-size:var(--fs-body);line-height:var(--lh-relaxed);resize:none;outline:none;min-height:min(46vh,420px)}
+.modal .tip{font-size:var(--fs-caption);color:var(--muted);padding:0 var(--sp-4) var(--sp-2)}
+
+/* 小提示 */
+.hintbar{font-size:var(--fs-micro);color:var(--muted);padding:var(--sp-1) var(--sp-3);background:#fafafb;border-top:1px solid var(--line)}
+.cart-info{font-size:var(--fs-caption);color:var(--muted);white-space:nowrap}
+
+/* 开场：选画布类型（每次打开都先问一次） */
+.welcome{position:fixed;inset:0;background:var(--cv-bg);display:flex;align-items:center;justify-content:center;z-index:400}
+.welcome[hidden]{display:none}
+.wbox{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--sp-7) var(--sp-7);text-align:center;box-shadow:var(--shadow-2)}
+.wbox h2{font-size:var(--fs-heading);margin-bottom:var(--sp-1)}
+.wbox p{font-size:var(--fs-caption);color:var(--muted);margin-bottom:var(--sp-5)}
+.wbtns{display:flex;gap:var(--sp-3);justify-content:center}
+.wbtn{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fafafb;border-radius:var(--r-lg);padding:var(--sp-4) var(--sp-5);width:152px;display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);transition:border-color .15s ease,background .15s ease}
+.wbtn:hover{border-color:var(--accent);background:#fff}
+.wbtn b{font-size:var(--fs-display);font-weight:var(--fw-regular)}
+.wbtn span{font-size:var(--fs-body);font-weight:var(--fw-medium)}
+.wbtn i{font-size:var(--fs-micro);color:var(--muted);font-style:normal}
+.wcontinue{margin-top:var(--sp-4);font:inherit;font-size:var(--fs-caption);color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline}
+
+/* ============================================================
+   C4 ④2：组件扩到 40+ —— 新组件样式
+   —— 全部走 token（--fs-* / --sp-* / --r-*），不写字面量尺寸，
+      这样切主题时新老组件一起变，不会出现「新组件不跟主题」的割裂。
+   ============================================================ */
+.c-fabmenu{height:100%;width:100%;position:relative;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:var(--sp-1)}
+.c-fabmenu .mini{height:28px;padding:0 var(--sp-2);display:inline-flex;align-items:center;border-radius:var(--r-full);background:var(--c-surface);border:1px solid var(--line);font-size:var(--fs-micro);color:var(--c-on-surface-variant)}
+.c-fabmenu .c-fab.sm{width:44px;height:44px;border-radius:var(--r-lg);font-size:var(--fs-heading);box-shadow:var(--shadow-1)}
+.c-split{height:100%;width:100%;display:flex;align-items:stretch;border-radius:calc(var(--radius) - 2px);overflow:hidden}
+.c-split .main{flex:1;display:flex;align-items:center;justify-content:center;background:var(--c-primary);color:var(--c-on-primary);font-size:var(--fs-body);font-weight:var(--fw-medium)}
+.c-split .caret{display:flex;align-items:center;gap:2px;padding:0 var(--sp-2);background:var(--c-primary);color:var(--c-on-primary);font-size:var(--fs-caption);border-left:1px solid rgba(255,255,255,.35)}
+.c-rail{height:100%;width:100%;background:var(--c-surface);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);padding:var(--sp-2) 0}
+.c-rail .ri{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--c-on-surface-variant);font-size:var(--fs-micro)}
+.c-rail .ri .ic{font-size:var(--fs-body)}
+.c-rail .ri.on{color:var(--c-primary);font-weight:var(--fw-medium)}
+.c-toolbar{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-1);padding:0 var(--sp-2);background:var(--c-surface);border:1px solid var(--line);border-radius:var(--r-full);box-shadow:var(--shadow-1)}
+.c-toolbar .tb{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-sm);font-size:var(--fs-caption);color:var(--c-on-surface)}
+.c-toolbar .tb:hover{background:var(--c-surface-variant)}
+.c-search{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);border-radius:var(--r-full);background:var(--c-surface-variant);font-size:var(--fs-body);color:var(--muted)}
+.c-search .ic{font-size:var(--fs-heading)}
+.c-sheet{height:100%;width:100%;background:var(--c-surface);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:var(--shadow-1);padding:var(--sp-2) var(--sp-3)}
+.c-sheet .grab{display:block;width:36px;height:4px;border-radius:var(--r-full);background:var(--c-outline);margin:0 auto var(--sp-2)}
+.c-sheet .t{font-weight:var(--fw-medium);margin-bottom:var(--sp-1)}
+.c-sheet .acts{display:flex;flex-wrap:wrap;gap:var(--sp-2);font-size:var(--fs-caption);color:var(--c-on-surface-variant)}
+.c-select{height:100%;width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);padding:0 var(--sp-3);border:1px solid var(--c-outline);border-radius:var(--r-md);font-size:var(--fs-body);background:var(--c-surface)}
+.c-select .cv{font-style:normal;color:var(--muted);font-size:var(--fs-caption)}
+.c-select.open{border-color:var(--c-primary);box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+.c-check,.c-radio{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);font-size:var(--fs-body)}
+.c-check .bx{width:18px;height:18px;border-radius:var(--r-sm);border:2px solid var(--c-outline);display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-micro);font-style:normal;color:transparent}
+.c-check.on .bx{background:var(--c-primary);border-color:var(--c-primary);color:var(--c-on-primary)}
+.c-radio .rd{width:18px;height:18px;border-radius:50%;border:2px solid var(--c-outline);display:inline-block;position:relative}
+.c-radio.on .rd{border-color:var(--c-primary)}
+.c-radio.on .rd::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--c-primary)}
+.c-date{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3);border:1px solid var(--c-outline);border-radius:var(--r-md);font-size:var(--fs-body);background:var(--c-surface)}
+.c-date .cv{margin-left:auto;font-style:normal;color:var(--muted);font-size:var(--fs-caption)}
+.c-carousel{height:100%;width:100%;position:relative;display:flex;align-items:center;justify-content:center;background:var(--c-surface-variant);border-radius:var(--radius);color:var(--c-on-surface-variant);font-size:var(--fs-caption)}
+.c-carousel .ar{position:absolute;top:50%;transform:translateY(-50%);font-size:var(--fs-heading);color:var(--c-on-surface);opacity:.6}
+.c-carousel .ar.l{left:var(--sp-2)}.c-carousel .ar.r{right:var(--sp-2)}
+.c-carousel .dots{position:absolute;bottom:var(--sp-2);display:flex;gap:4px}
+.c-carousel .dots i{width:6px;height:6px;border-radius:50%;background:var(--c-outline)}
+.c-carousel .dots i.on{background:var(--c-primary);width:14px;border-radius:var(--r-full)}
+.c-loading{height:100%;width:100%;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);font-size:var(--fs-caption);color:var(--c-on-surface-variant)}
+.c-loading .spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--c-surface-variant);border-top-color:var(--c-primary);animation:c4spin 900ms linear infinite}
+@keyframes c4spin{to{transform:rotate(360deg)}}
+.c-wavy{height:100%;width:100%;position:relative;display:flex;align-items:center;padding:0 var(--sp-3);background:var(--c-surface-variant);border-radius:var(--r-full);overflow:hidden}
+.c-wavy .fill{position:absolute;left:0;top:0;bottom:0;background:var(--c-primary);opacity:.75}
+.c-wavy .lb{position:relative;font-size:var(--fs-caption);color:var(--c-on-primary);font-weight:var(--fw-medium)}
+.c-camera{height:100%;width:100%;position:relative;display:flex;align-items:center;justify-content:center;background:#111;color:#bbb;font-size:var(--fs-caption);border-radius:var(--r-md);overflow:hidden}
+.c-camera .lens{position:absolute;width:56%;aspect-ratio:1;border:2px solid #444;border-radius:50%}
+.c-camera .cap{position:relative}
+.c-map{height:100%;width:100%;position:relative;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(0deg,#eef5ee,#eef5ee 12px,#e4efe4 12px,#e4efe4 13px),repeating-linear-gradient(90deg,#eef5ee,#eef5ee 12px,#e4efe4 12px,#e4efe4 13px);color:#5a7a5a;font-size:var(--fs-caption);border-radius:var(--r-md)}
+.c-map .pin{position:absolute;top:38%;font-size:var(--fs-heading)}
+.c-map .cap{position:absolute;bottom:var(--sp-1)}
+.c-extfab{height:100%;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);border:0;border-radius:var(--r-lg);background:var(--c-primary);color:var(--c-on-primary);font:inherit;font-size:var(--fs-body);font-weight:var(--fw-medium);padding:0 var(--sp-4);box-shadow:var(--shadow-1);cursor:pointer}
+.c-extfab .ic{font-size:var(--fs-heading)}
+.c-badge{height:100%;width:100%;position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--fs-heading);color:var(--c-on-surface)}
+.c-badge .dot{position:absolute;top:4px;right:22%;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-full);background:#d32f2f;color:#fff;font-size:10px;font-style:normal;display:flex;align-items:center;justify-content:center}
+.c-avatar{height:100%;width:100%;border-radius:50%;background:var(--c-primary);color:var(--c-on-primary);display:flex;align-items:center;justify-content:center;font-weight:var(--fw-medium);font-size:var(--fs-body)}
+.c-crumb{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-1);padding:0 var(--sp-2);font-size:var(--fs-caption);color:var(--c-on-surface-variant);white-space:nowrap;overflow:hidden}
+.c-crumb .cur{color:var(--c-on-surface);font-weight:var(--fw-medium)}
+.c-crumb i{font-style:normal;opacity:.5}
+.c-page{height:100%;width:100%;display:flex;align-items:center;justify-content:center;gap:var(--sp-1);font-size:var(--fs-caption);color:var(--c-on-surface-variant)}
+.c-page b{min-width:22px;
+min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-sm);font-weight:var(--fw-regular)}
+.c-page b.on{background:var(--c-primary);color:var(--c-on-primary)}
+.c-page .ar{opacity:.5}
+.c-stepper{height:100%;width:100%;display:flex;align-items:center;gap:var(--sp-1);padding:0 var(--sp-2);font-size:var(--fs-micro);color:var(--c-on-surface-variant)}
+.c-stepper .st{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.c-stepper .st i{width:20px;height:20px;border-radius:50%;border:1px solid var(--c-outline);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;background:var(--c-surface)}
+.c-stepper .st.done i{background:var(--c-primary);border-color:var(--c-primary);color:var(--c-on-primary)}
+.c-stepper .st.cur{color:var(--c-on-surface);font-weight:var(--fw-medium)}
