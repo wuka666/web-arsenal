@@ -433,6 +433,18 @@
 
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: var(--sp-7) 0; font-size: var(--fs-body); }
 
+  /* 「加载更多」：真分页的出口（一页 24 条，第 25 条要有地方去）。
+     独立成行、跨满整栏，和卡片流区分开；不用行内链接，是因为它在页面底部、目标够大更好点。 */
+  .load-more-row { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-5) 0 var(--sp-4); }
+  .load-more-row .lm-btn { min-height: 40px; padding: 0 var(--sp-6); border-radius: var(--r-md); border: 1px solid var(--line);
+    background: var(--panel); color: var(--ink); font-size: var(--fs-body); cursor: pointer; transition: border-color .15s ease, color .15s ease; }
+  .load-more-row .lm-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .load-more-row .lm-btn[hidden] { display: none; }
+  .load-more-row .lm-hint { font-size: var(--fs-caption); color: var(--muted); opacity: .85; }
+  /* 无限滚动的哨兵：本身不占视觉空间，只给 IntersectionObserver 一个「到底了」的落点。
+     高度给 1px 而不是 0，是因为 0 高度元素在某些浏览器里拿不到相交回调。 */
+  .load-more-row .lm-sent { width: 1px; height: 1px; }
+
   /* ============ 书·往前翻开（覆盖式阅读器） ============ */
   #grid.away { filter: blur(6px) brightness(.84); transform: scale(.97); transform-origin: center top;
     transition: filter .5s var(--ease-sheet), transform .5s var(--ease-sheet); pointer-events: none; }
@@ -883,6 +895,14 @@
   // 每个维度**单选**：值为具体选项名，或 "全部"（默认）。同维度内不能同时选中两个值。
   const FILTER_DIMS = ["适配端", "元素", "风格", "场景"];
   const ALL = "全部";
+  // 一页取多少条（真分页：首屏只建这么多卡，其余靠「加载更多」追加）
+  // 24 = 桌面 3 列 × 8 行 / 手机 1 列，首屏基本铺满又不至于建 348 个 iframe
+  const PAGE_SIZE = 24;
+  // 当前已加载到第几条（= pageSize）。筛选/搜索/换视图时重置回 PAGE_SIZE，点「加载更多」往上加。
+  // 为什么不用「页码」：翻页控件是追加式的（不替换已加载的卡），页码表达不了「已加载 N 条」。
+  let pageSize = PAGE_SIZE;
+  // 上一次查询带回的分面计数，供 renderTier 直接取用
+  let facetsCache = null;
   const filter = { 适配端: ALL, 元素: ALL, 风格: ALL, 场景: ALL };
   const resetFilter = () => FILTER_DIMS.forEach(d => { filter[d] = ALL; });
 
@@ -954,6 +974,12 @@
   const tierVals = (it, dim) => asArr(it[dim]);
 
   function dimCount(dim) {
+    // 优先用上一次查询带回的分面计数（S2-b）：数据层已按「忽略本维」算好，
+    // 界面不必再遍历一遍全量；查询结果还没到时才退回自己算。
+    if (facetsCache && facetsCache[dim]) {
+      const obj = facetsCache[dim];
+      return new Map(Object.keys(obj).map(k => [k, obj[k]]));
+    }
     const obj = Repo.countByDim(curList(), filter, dim);
     return new Map(Object.keys(obj).map(k => [k, obj[k]]));
   }
@@ -1035,7 +1061,9 @@
     if (!show) { if (old) old.remove(); return; }
     const msg = text || "没有匹配的素材，试试减少筛选条件或清空搜索";
     if (old) { if (old.textContent !== msg) old.textContent = msg; return; }
-    gridBox.appendChild(el("p", "empty empty-filter", msg));
+    const node = el("p", "empty empty-filter", msg);
+    // 插在「加载更多」行之前：空态是一句话，不该跑到页面最底下的分页控件下面
+    gridBox.insertBefore(node, gridBox.querySelector(".load-more-row") || null);
   }
   // 同步所有可见卡片的标题高亮（搜索词变化时调用）
   function refreshTitleHighlights(q) {
@@ -1046,70 +1074,280 @@
     });
   }
 
-  // 排序：只重排 DOM 顺序（CSS Grid 自动重排，不用重建卡片，也不丢已加载的 iframe）
+  // 排序：数据层排好再切页（repo.query* 的 cmp 参数），此函数只负责「按新顺序重排已在 DOM 里的卡」
   // 仿 GitHub 仓库列表：默认顺序 / 名称 / 最近 / 分组，四个够用，不再加
   // 适配端排序权重直接复用 ADAPT_ORDER（同一份闭集顺序，避免两处定义漂移）
   let sortMode = "def";
-  let cardSeq = 0;                // 建卡流水号 = 「默认顺序」的还原依据
+  // 「默认顺序」= 数据文件里的原始顺序。以前靠建卡流水号 _ord 还原，
+  // 分页之后建卡顺序不再等于数据顺序（第 2 页的卡建得比第 1 页晚），
+  // 所以改成直接记数据数组下标——这恰好是「分页前肉眼看到的顺序」，行为不变。
+  const orderIndex = (doc) => {
+    if (!doc) return 0;
+    const arr = String(doc.id).charAt(0) === "S" ? SCHEMES : ITEMS;
+    const i = arr.indexOf(doc);
+    return i < 0 ? 0 : i;
+  };
+  const titleOf = it => (it && (it.标题 || it.风格名)) || "";
+  // cmp 交给数据层，让它在「切页之前」排好序（页内排序在第二页就会露馅）
+  function compareDocs(a, b) {
+    if (sortMode === "title") return titleOf(a).localeCompare(titleOf(b), "zh-Hans-CN") || orderIndex(a) - orderIndex(b);
+    if (sortMode === "id") return String((a && a.id) || "").localeCompare(String((b && b.id) || ""));
+    if (sortMode === "adapt") return ((ADAPT_ORDER[a.适配端] ?? 9) - (ADAPT_ORDER[b.适配端] ?? 9)) || orderIndex(a) - orderIndex(b);
+    return orderIndex(a) - orderIndex(b);
+  }
   function applySort() {
     const gridBox = document.getElementById("grid");
     if (!gridBox) return;
     const cards = [...gridBox.querySelectorAll(".card")];
-    const key = (c) => {
-      const it = byId(c.dataset.id) || SCHEMES.find(s => s.id === c.dataset.id) || {};
-      if (sortMode === "title") return (it.标题 || it.风格名 || "").localeCompare("zh-Hans-CN");
-      if (sortMode === "id") return String(c.dataset.id);
-      if (sortMode === "adapt") return ADAPT_ORDER[it.适配端] ?? 9;
-      return c._ord || 0;
-    };
+    // 排序键从数据层要，不再按 dataset 反查全量数组（分页后 DOM 里只有已加载的那些）
     const dir = sortMode === "id" ? -1 : 1;
-    cards.sort((a, b) => {
-      const ka = key(a), kb = key(b);
-      const r = (typeof ka === "number" || typeof kb === "number")
-        ? (Number(ka) - Number(kb))
-        : String(ka).localeCompare(String(kb), "zh-Hans-CN");
-      return (r || (a._ord - b._ord)) * dir;
-    });
-    // 空态提示不是 .card，重排后自然留在末尾
-    cards.forEach(c => gridBox.appendChild(c));
+    cards.sort((a, b) => compareDocs(docById(a.dataset.id), docById(b.dataset.id)) * dir);
+    // 重排后统一插回「行尾控件（加载更多 / 空态）」之前：
+    // 直接 appendChild 会把卡片排到「加载更多」按钮后面，按钮就跑到页面顶部去了
+    const anchor = gridBox.querySelector(".load-more-row") || gridBox.querySelector(".empty-filter");
+    cards.forEach(c => gridBox.insertBefore(c, anchor || null));
   }
 
-  function applyFilter() {
+  // ---- 卡片区：按查询结果重建（S3 真分页的核心） ----
+  //
+  // 为什么从「全建 + 显隐」改成「按页重建」：
+  //   旧做法启动时把 348 张素材卡 + 70 张方案卡全建进 DOM（418 个 iframe 占位），
+  //   PAGE_SIZE 一旦小于总数，第 25 条之后的卡片根本不存在，显隐再怎么改也显示不出来。
+  //   现在只建「当前要显示的那些」，切换筛选 = 换一页数据 = 换一批卡片。
+  //
+  // 为什么不每次整片 innerHTML 清空：
+  //   清空会连「加载更多」按钮和焦点一起丢掉，而且滚动时正在 IntersectionObserver
+  //   里的卡会被反复建/拆。这里只移除 .card、保留行尾控件，再在它前面插新卡。
+  // 最近一次查询结果：既决定「还有没有了」，也给「加载更多」做一次空翻页保护
+  let lastQuery = null;
+
+  // ---- ③ 卡片复用缓存（LRU，上限 60 张） ----
+  //
+  // 为什么需要：切筛选时旧卡整批 remove、新卡整批重建，重建出来的 iframe 要重新
+  // 走一遍 data-src → src，正在播的动效会从头开始（切来切去很晃眼）。
+  // 缓存命中的卡直接挪回 DOM，iframe 的 src 原地不动，帧不会重来。
+  //
+  // 为什么不无限缓存：每张卡里住着一个 iframe（独立文档 + 定时器 + rAF），
+  // 348 张堆在内存里就是 348 个页面在后台跑。60 张 ≈ 两屏半，够覆盖「来回切两次筛选」。
+  const CARD_CACHE_MAX = 60;
+  const cardCache = new Map();      // id -> { card, order }
+  let cardCacheSeq = 0;
+
+  function cacheKeyOf(doc) {
+    if (!doc || !doc.id) return "";
+    return (String(doc.id).charAt(0) === "S" ? "S:" : "M:") + doc.id;
+  }
+  function takeCachedCard(doc) {
+    const key = cacheKeyOf(doc);
+    if (!key) return null;
+    const hit = cardCache.get(key);
+    if (!hit) return null;
+    // LRU：取出来就重排序号（Map 保留插入顺序，淘汰时从头删即可）
+    cardCache.delete(key);
+    return hit.card;
+  }
+  function putCachedCard(doc, card) {
+    const key = cacheKeyOf(doc);
+    if (!key || !card) return;
+    const iframe = card.querySelector("iframe");
+    // 缓存期间不能再有「卸载」定时器在跑：否则 2.5 秒后它会把 src 抹成 about:blank，
+    // 而卡可能已经被重新挂回页面、正显示在用户眼前。
+    if (iframe) {
+      clearTimeout(parkTimers.get(iframe));
+      parkTimers.delete(iframe);
+    }
+    cardCache.set(key, { card: card, order: ++cardCacheSeq });
+    // 超上限：淘汰最早放进来的那张（它此刻一定不在 DOM 里，否则不会被 put）
+    while (cardCache.size > CARD_CACHE_MAX) {
+      const oldestKey = cardCache.keys().next().value;
+      const old = cardCache.get(oldestKey);
+      cardCache.delete(oldestKey);
+      if (!old || !old.card) continue;
+      const of = old.card.querySelector("iframe");
+      // 丢掉引用之前先把文档停掉，不然它会在后台继续跑
+      if (of) { clearTimeout(parkTimers.get(of)); parkTimers.delete(of); of.src = "about:blank"; }
+    }
+  }
+
+  function makeDoc(doc) {
+    const cached = takeCachedCard(doc);
+    if (cached) return cached;
+    return doc && doc.id && String(doc.id).charAt(0) === "S" ? makeSchemeCard(doc) : makeCard(doc);
+  }
+  function docById(id) {
+    return byId(id) || SCHEMES.find(s => s.id === id) || null;
+  }
+  // 清掉当前页的卡片（保留空态提示与「加载更多」行）
+  // ③ 起不再直接 remove：先塞进 LRU 缓存，下次同一条再来时能整卡复用（iframe 不重载）
+  function clearCards(gridBox) {
+    io.disconnect();
+    ioPark.disconnect();
+    // 卡片里的 iframe 靠 io / ioPark 两个观察器管；观察器已在上两行断开，
+    // 这里的卡要么进缓存等复用，要么被 LRU 淘汰时停掉文档。
+    gridBox.querySelectorAll(".card").forEach(c => {
+      const doc = docById(c.dataset.id);
+      c.remove();
+      if (doc) putCachedCard(doc, c);
+    });
+  }
+  function mountCards(docs) {
     const gridBox = document.getElementById("grid");
-    if (view === "schemes") {
-      document.getElementById("catTitle").textContent = "方案库";
-      const q = search.schemes;
-      const shown = SCHEMES.filter(s => matchesScheme(s) && matchSchemeSearch(s, q));
-      document.getElementById("catCount").textContent = "共 " + shown.length + " 套" + (q ? "（搜「" + q + "」）" : "");
-      const okIds = new Set(shown.map(s => s.id));
-      document.querySelectorAll(".card").forEach(card => {
-        card.style.display = (card.dataset.view === "schemes" && okIds.has(card.dataset.id)) ? "" : "none";
+    if (!gridBox) return;
+    const frag = document.createDocumentFragment();
+    docs.forEach(doc => {
+      const card = makeDoc(doc);
+      // 复用回来的卡：观察器在 clearCards/上次卸载时被 disconnect 掉了，必须重新挂上，
+      // 否则它的 iframe 再也不会因为「滚进视野」而被重载（表现为一片白框）。
+      io.observe(card);
+      ioPark.observe(card);
+      frag.appendChild(card);
+    });
+    // 插在行尾控件（加载更多 / 空态）之前
+    const anchor = gridBox.querySelector(".load-more-row");
+    gridBox.insertBefore(frag, anchor || null);
+    // 这里不调 applySort：数据层已经把 items 按当前排序规则排好，
+    // 拼接（第 1 页 + 第 2 页）仍然全局有序。再排一次要逐张 appendChild，
+    // 24 张就是 24 次布局重排 —— 实测占掉重建耗时的一半以上。
+  }
+
+  // 行尾控件：无限滚动的哨兵 + 降级用的「加载更多」按钮 + 计数提示
+  function ensureLoadMoreRow() {
+    const gridBox = document.getElementById("grid");
+    let row = gridBox.querySelector(".load-more-row");
+    if (row) return row;
+    row = el("div", "load-more-row");
+    const btn = el("button", "lm-btn", "加载更多");
+    btn.type = "button";
+    btn.addEventListener("click", onLoadMore);
+    const hint = el("span", "lm-hint", "");
+    // 哨兵放在按钮**之前**：它比按钮更靠近卡片流，滚到底时先撞到它。
+    // 放按钮后面的话，按钮本身的高度会把哨兵往下推，预加载窗口要多吃掉 40px。
+    const sent = el("div", "lm-sent");
+    sent.setAttribute("aria-hidden", "true");
+    row.append(sent, btn, hint);
+    gridBox.appendChild(row);
+    return row;
+  }
+  function syncLoadMore(result) {
+    const row = ensureLoadMoreRow();
+    const btn = row.querySelector(".lm-btn");
+    const hint = row.querySelector(".lm-hint");
+    const shown = result.items.length;
+    const more = result.total > shown;
+    // 一条都没有时整行收起：否则空态上面会留一块只有提示文字的空白
+    row.style.display = result.total ? "" : "none";
+    // 按钮只在「还有剩余」时出现，且降级成**次要出口**：正常滚动根本碰不到它，
+    // 但 IntersectionObserver 不可用、或哨兵被别的元素挡住时，用户永远有一条手动路。
+    btn.hidden = !more;
+    if (!result.total) { hint.textContent = ""; return; }
+    hint.textContent = "已显示 " + shown + " / " + result.total + (more ? " 条 · 还有 " + (result.total - shown) + " 条" : " 条");
+    if (more) btn.textContent = "加载更多（还有 " + (result.total - shown) + " 条）";
+    // 有新内容落地后立刻重算一次哨兵位置：新卡把哨兵推下去了，
+    // 但如果用户本来就贴在底部（比如慢慢滚），哨兵可能仍在预加载窗口里，
+    // 这时不主动补一次就永远等不到下一次相交回调 —— 表现为「停在底部不动了」。
+    scheduleSentinelCheck();
+  }
+  function onLoadMore() {
+    // 防重入第一道门：正在加载 / 已经到底，都不再发查询
+    if (loadingMore) return;
+    if (lastQuery && lastQuery.items.length >= lastQuery.total) return;
+    loadingMore = true;
+    pageSize += PAGE_SIZE;
+    // 追加：只把新增的那一段查回来挂上，不重建已加载的卡
+    applyFilter({ append: true });
+  }
+
+  // ---- ① 无限滚动：页尾哨兵 + IntersectionObserver ----
+  //
+  // 为什么用哨兵而不是监听 scroll 事件：
+  //   scroll 回调在滚动过程中每帧都跑，判「到底了吗」要读 scrollHeight（强制布局）；
+  //   哨兵交给浏览器的相交计算，滚动时零 JS 开销。
+  //
+  // rootMargin 600px：提前 600px 预加载。用户滚到底之前新卡就已经在 DOM 里了，
+  //   不会看到「滚到底 → 停住 → 等半秒 → 突然变长」。600 ≈ 两行卡片的高度。
+  //
+  // root 用 null（= 视口）而不是 #grid：主滚动容器就是 window（body 没设 overflow）。
+  let loadingMore = false;
+  let sentinelIO = null;
+
+  function getSentinel() {
+    const row = document.querySelector(".load-more-row");
+    return row ? row.querySelector(".lm-sent") : null;
+  }
+  // 哨兵在不在预加载窗口里，由浏览器算；这里只做「重新观察」把状态刷一遍。
+  // unobserve + observe 是标准做法：IntersectionObserver 只在「相交状态变化」时回调，
+  // 内容变长后哨兵仍然相交（状态没变）就不会再触发，必须手动重置一次。
+  function scheduleSentinelCheck() {
+    if (!sentinelIO) return;
+    const s = getSentinel();
+    if (!s) return;
+    sentinelIO.unobserve(s);
+    sentinelIO.observe(s);
+  }
+  function initSentinel() {
+    if (typeof IntersectionObserver === "undefined") return;   // 老浏览器：按钮兜底
+    sentinelIO = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        onLoadMore();     // 自身带防重入守卫，连续回调不会重复查
       });
-      refreshTitleHighlights(q);
-      // 方案库为空 ≠ 筛选没命中：一个是数据没读到，一个是条件太窄（规矩 32 ③）
+    }, { root: null, rootMargin: "600px 0px", threshold: 0 });
+    const s = getSentinel();
+    if (s) sentinelIO.observe(s);
+  }
+
+
+  // opts.append=true 表示「加载更多」：沿用当前 pageSize，只挂新增的那批卡片
+  // opts.keepSize=true 表示「按 hash 里记下的条数复原」：不要退回第一屏（② 分页进 URL）
+  function applyFilter(opts) {
+    const append = !!(opts && opts.append);
+    const keepSize = !!(opts && opts.keepSize);
+    const gridBox = document.getElementById("grid");
+    const isSchemes = view === "schemes";
+    if (!append && !keepSize) pageSize = PAGE_SIZE;   // 换了筛选/搜索/视图：回到第一屏
+    const q = isSchemes ? search.schemes : search.arsenal;
+    const result = isSchemes
+      ? Repo.querySchemes(filter, q, 1, pageSize, compareDocs)
+      : Repo.queryMaterials(filter, q, 1, pageSize, compareDocs);
+    facetsCache = result.facets;
+    lastQuery = result;
+
+    // 标题 / 计数
+    if (isSchemes) {
+      document.getElementById("catTitle").textContent = "方案库";
+      document.getElementById("catCount").textContent = "共 " + result.total + " 套" + (q ? "（搜「" + q + "」）" : "");
+    } else {
+      const active = FILTER_DIMS.filter(d => filter[d] !== ALL).map(d => d + "：" + filter[d]);
+      document.getElementById("catTitle").textContent = active.length ? active.join(" · ") : "全部素材";
+      document.getElementById("catCount").textContent = "共 " + result.total + " 条" + (q ? "（搜「" + q + "」）" : "");
+    }
+
+    if (append) {
+      // 只挂「上次之后新增的那一段」：items 是前 pageSize 条，前面那些已经在 DOM 里
+      const prevCount = gridBox.querySelectorAll(".card").length;
+      mountCards(result.items.slice(prevCount));
+    } else {
+      clearCards(gridBox);
+      mountCards(result.items);
+    }
+    // 这一轮查询结束，放行下一次「加载更多」
+    loadingMore = false;
+
+    refreshTitleHighlights(q);
+    // 空态文案（规矩 32 ③：不同原因给不同话术）
+    if (isSchemes) {
       if (!SCHEMES.length) {
         setEmptyHint(gridBox, true, "方案数据没有加载出来（data/方案.js 可能没读到，或被浏览器拦了）。刷新一次试试；仍然空的话按 F12 看控制台报错。");
       } else {
-        setEmptyHint(gridBox, shown.length === 0);
+        setEmptyHint(gridBox, result.total === 0);
       }
-      renderFilters();
-      writeHash();
-      return;
+    } else if (!ITEMS.length) {
+      setEmptyHint(gridBox, true, "没有数据：请检查 data/素材.js 是否存在。");
+    } else {
+      setEmptyHint(gridBox, result.total === 0);
     }
-    // 标题：无筛选时「全部素材」，有筛选则列出当前生效条件（体现四维交集）
-    const q = search.arsenal;
-    const active = FILTER_DIMS.filter(d => filter[d] !== ALL).map(d => d + "：" + filter[d]);
-    document.getElementById("catTitle").textContent = active.length ? active.join(" · ") : "全部素材";
-    const shown = ITEMS.filter(it => matches(it) && matchSearch(it, q));
-    document.getElementById("catCount").textContent = "共 " + shown.length + " 条" + (q ? "（搜「" + q + "」）" : "");
-    document.querySelectorAll(".card").forEach(card => {
-      if (card.dataset.view === "schemes") { card.style.display = "none"; return; }
-      const it = byId(card.dataset.id);
-      card.style.display = (it && matches(it) && matchSearch(it, q)) ? "" : "none";
-    });
-    refreshTitleHighlights(q);
-    setEmptyHint(gridBox, shown.length === 0);
-
+    syncLoadMore(result);
+    syncCart();
     renderFilters();
     writeHash();
   }
@@ -1270,12 +1508,12 @@
 
   // 卡片外壳：素材卡（makeCard）与方案卡（makeSchemeCard）逐字相同的 21 行收在这里，
   // 差异段（角标 / 加书架按钮 / 标签栏 / 点击与键盘）各自在调用处拼。
-  // 注意 cardSeq++ 必须留在壳里：_ord 是「默认顺序」的还原依据，建卡时就得按真实顺序发号。
+  // 分页之后不再需要建卡流水号：排序一律回数据数组下标（见 orderIndex），
+  // 因为同一张卡会被反复建/拆，建卡顺序已经不能代表「默认顺序」。
   function makeCardShell({ id, title, demoTitle, demoSrc, ariaLabel, dataset }) {
     const card = el("article", "card");
     card.dataset.id = id;
     for (const k in (dataset || {})) card.dataset[k] = dataset[k];
-    card._ord = cardSeq++;
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-expanded", "false");
@@ -1874,6 +2112,10 @@
     view = v;
     // 每次切换视图都重置为「全部」（用户要求：打开页面默认全选「全部」）
     resetFilter();
+    // 分面计数属于上一个视图，不清会让两个库的数字串味
+    facetsCache = null;
+    // 换了视图 = 换一页数据，已加载条数也要退回首屏（否则方案库一进来就是「已加载 34 套」）
+    pageSize = PAGE_SIZE;
     renderViewFilters();
     applyViewChrome();
     document.getElementById("searchHistory").hidden = true;
@@ -2085,21 +2327,34 @@
     searchHistoryBox.hidden = false;
   }
 
-  // 输入法组合态：拼音没选完之前不重算 340 条（规矩 32 ④）
+  // 输入法组合态：拼音没选完之前不重算（规矩 32 ④）
   let searchComposing = false;
+  // 输入防抖 150ms（S3 分页落地时补）：
+  // 以前一页是全量、改显隐，每敲一个字只是几十次 style.display，还能忍；
+  // 现在每次筛选都要重建卡片区，逐键重建会把输入体验拖垮。
+  // 组合态（中文拼音）另有一道守卫，两道互不替代：组合态是「不该算」，防抖是「别算太勤」。
+  const SEARCH_DEBOUNCE = 150;
+  let searchTimer = 0;
+  function applyFilterDebounced() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      searchTimer = 0;
+      applyFilter();
+    }, SEARCH_DEBOUNCE);
+  }
   searchInput.addEventListener("compositionstart", () => { searchComposing = true; });
   searchInput.addEventListener("compositionend", () => {
     searchComposing = false;
     search[view] = searchInput.value;
     searchBox.classList.toggle("has", !!searchInput.value);
-    applyFilter();
+    applyFilterDebounced();
     saveSearchHistory(searchInput.value);
   });
   searchInput.addEventListener("input", () => {
     if (searchComposing) return;
     search[view] = searchInput.value;
     searchBox.classList.toggle("has", !!searchInput.value);
-    applyFilter();
+    applyFilterDebounced();
   });
   searchInput.addEventListener("change", () => { saveSearchHistory(searchInput.value); });
   document.getElementById("searchClear").addEventListener("click", () => {
@@ -2597,6 +2852,8 @@
   // ---------- ② 状态写进地址栏 ----------
   const DIM_CODE = { 适配端: "a", 元素: "e", 风格: "s", 场景: "c" };
   let hashWritten = null;
+  // ② hash 里读回来的「已加载条数」（0 = 没记录/不恢复）
+  let restoredN = 0;
 
   function writeHash() {
     const p = new URLSearchParams();
@@ -2605,6 +2862,13 @@
     const q = (search[view] || "").trim();
     if (q) p.set("q", q);
     if (sortMode !== "def") p.set("o", sortMode);
+    // ② 已加载条数也进地址栏：滚到第 5 页按 F5，回来还是第 5 页。
+    // 只在「超过首屏」时写（=24 是默认值，写进去只会让每个 URL 都拖一条没用的尾巴）。
+    // 上限夹到 total：筛选一换命中数可能比已加载数还少，此时 pageSize 大于 total，
+    // 原样写进去的话再 F5 会去要 120 条、实际只有 6 条，虽然不报错但 URL 说假话。
+    const total = lastQuery ? lastQuery.total : 0;
+    const n = Math.min(pageSize, total);
+    if (n > PAGE_SIZE) p.set("n", String(n));
     const rmask = document.getElementById("readerMask");
     if (rmask && !rmask.hidden && readerCard) p.set("rd", readerCard.dataset.id);
     const s = p.toString();
@@ -2638,6 +2902,14 @@
     });
     const q = p.get("q");
     if (q) search[view] = q;
+    // ② 已加载条数：读回来交给 applyFilter 按这个 size 一次查全（而不是先 24 再补齐），
+    // 这样 F5 之后不会先闪一下 24 张再涨上去。返回的是「要恢复的条数」，0 = 没记录。
+    const rawN = p.get("n");
+    restoredN = 0;
+    if (rawN) {
+      const n = Number(rawN);
+      if (isFinite(n) && n > PAGE_SIZE) restoredN = Math.floor(n);
+    }
     return p.get("rd");
   }
 
@@ -2663,7 +2935,15 @@
     }
     applyViewChrome();
     renderFilters();
-    applyFilter();
+    // ② 前进后退也恢复已加载条数：hash 里有 n 就按 n 查，没有就回第一屏。
+    // 这条路径风险最高的地方是「n 比当前命中数还大」——pageSize 会被夹到 total，
+    // 所以不会出现空白页；条数夹小由 paginate 与 Math.min 兜住。
+    if (restoredN > PAGE_SIZE) {
+      pageSize = restoredN;
+      applyFilter({ keepSize: true });
+    } else {
+      applyFilter();
+    }
     const rmask = document.getElementById("readerMask");
     if (rd && rmask.hidden) openReaderById(rd);
     else if (!rd && !rmask.hidden) closeReader();
@@ -2934,34 +3214,27 @@
   applyUser();              // 账户头像占位状态
 
   renderViewFilters();
-  if (!ITEMS.length) {
-    document.getElementById("grid").appendChild(el("p", "empty", "没有数据：请检查 data/素材.js 是否存在。"));
+  // 启动只建「当前这一页」的卡（S3 真分页）：
+  // 以前这里是 ITEMS.forEach + SCHEMES.forEach 把 418 张卡全建好再靠 display 显隐，
+  // 分页后那样做等于白建 394 个用不上的 iframe 占位。现在卡片完全由 applyFilter 决定。
+  renderFilters();
+  // ② hash 里记了「已加载 N 条」就按 N 一次查全（keepSize），否则照常第一屏 24 条
+  if (restoredN > PAGE_SIZE) {
+    pageSize = restoredN;
+    applyFilter({ keepSize: true });
   } else {
-    renderFilters();
     applyFilter();
-    ITEMS.forEach(it => {
-      const card = makeCard(it);
-      document.getElementById("grid").appendChild(card);
-      io.observe(card);
-      ioPark.observe(card);
-    });
   }
-  // 方案库卡片：默认隐藏，切到「方案库」视图才显示（复用懒加载 io）
-  SCHEMES.forEach(s => {
-    const card = makeSchemeCard(s);
-    card.style.display = "none";
-    document.getElementById("grid").appendChild(card);
-    io.observe(card);
-    ioPark.observe(card);
-  });
+  // ① 页尾哨兵开始观察（必须在 applyFilter 之后：那一行是它建的）
+  initSentinel();
 
   // hash 里带着的搜索词写回输入框（applyFilter 之前读过状态，这里只同步 UI）
   {
     const sInput = document.getElementById("searchInput");
     sInput.value = search[view] || "";
     document.getElementById("searchBox").classList.toggle("has", !!search[view]);
-  }
-  // 排序控件：初值从 hash 恢复，改了立刻重排并写回地址栏
+  }  // 排序控件：初值从 hash 恢复，改了重排当前已加载的卡并写回地址栏
+  // （排序变化不重查数据：compareDocs 只是排序规则，页面里已有的卡按新顺序重排即可）
   {
     const sel = document.getElementById("sortSel");
     if (sel) {
@@ -2989,9 +3262,24 @@
   if (pendingReaderId) {
     if (!openReaderById(pendingReaderId)) writeHash();   // 书已不存在：把失效的 rd 抹掉
   } else {
+    // ⑤ 滚动位置复原要「等页面真的够高」：卡片是刚建的，iframe 尺寸靠 CSS aspect-ratio
+    // 撑开，但首帧布局未必已经算完。一次性 scrollTo 在页面还没长够时会被夹到当前最大值，
+    // 之后就停在半路（表现为「F5 回来只滚到一半」）。所以分几帧重试，直到位置稳定。
     let y = 0;
     try { y = Number(sessionStorage.getItem(SCROLL_KEY) || 0) || 0; } catch (e) {}
-    if (y > 0) requestAnimationFrame(() => window.scrollTo(0, y));
+    if (y > 0) {
+      let tries = 0;
+      const settle = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        window.scrollTo(0, Math.min(y, Math.max(0, max)));
+        tries++;
+        // 还没滚到位且页面还有得长 → 下一帧再试（最多 8 帧，够懒加载的 iframe 落位）
+        if (tries < 8 && Math.abs(window.scrollY - Math.min(y, Math.max(0, max))) > 2) {
+          requestAnimationFrame(settle);
+        }
+      };
+      requestAnimationFrame(settle);
+    }
   }
 
   // 画布启动器：右下角「画布」按钮打开独立设计器 assets/canvas.html（与画廊解耦）

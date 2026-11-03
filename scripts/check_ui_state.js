@@ -44,6 +44,31 @@ function readTarget(rel) {
   return fs.readFileSync(abs, 'utf8');
 }
 
+/**
+ * 把页面里「同目录/子目录的本地外链」就地展开后再查。
+ *
+ * 背景（2026-11-03 C1）：canvas.html 按 ROADMAP 拆成 canvas.html + canvas.css + canvas.js，
+ * 宿主页只剩 124 行骨架。规矩 32 查的是「宿主页面的工程特征」，这些特征搬进了 canvas.js，
+ * 若只读 HTML 就会误报「0 处 location.hash / 0 处 iframe 兜底」。
+ *
+ * 判据：相对路径（不以 http(s):、//、data: 开头）且文件真实存在才展开；
+ * 展开的是同一份源码，不改变检查口径，只是跟随了拆分后的文件边界。
+ */
+function expandLocalRefs(absDir, src) {
+  return src.replace(/<(?:script|link)\b[^>]*>/g, (tag) => {
+    const hit = tag.match(/(?:src|href)=["']([^"']+)["']/);
+    if (!hit) return tag;
+    const url = hit[1];
+    if (/^(https?:)?\/\//.test(url) || /^data:/.test(url)) return tag;
+    const abs = path.resolve(absDir, url);
+    const ext = path.extname(abs).toLowerCase();
+    if (ext !== ".js" && ext !== ".css") return tag;
+    if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return tag;
+    // 只展开一层（被引文件不再递归），够用且避免意外的环
+    return tag + "\n" + fs.readFileSync(abs, "utf8");
+  });
+}
+
 /** 数「含某关键词的行数」，用行号定位，方便回查 */
 function hits(src, re) {
   const out = [];
@@ -63,7 +88,8 @@ for (const rel of TARGETS) {
     continue;
   }
   console.log(`\n[${rel}]  ${src.split('\n').length} 行`);
-
+  // 拆分后的宿主页：把同目录本地 <script src>/<link href> 展开进同一份待查文本
+  const full = expandLocalRefs(path.dirname(path.join(ROOT, rel)), src);
   // ① 焦点
   checkCount++;
   const dialogs = count(src, /role="dialog"|aria-modal=/);
@@ -80,9 +106,9 @@ for (const rel of TARGETS) {
 
   // ② 状态持久化
   checkCount++;
-  const hash = count(src, /location\.hash|history\.replaceState|history\.pushState/);
-  const sess = count(src, /sessionStorage/);
-  const ls = count(src, /localStorage/);
+  const hash = count(full, /location\.hash|history\.replaceState|history\.pushState/);
+  const sess = count(full, /sessionStorage/);
+  const ls = count(full, /localStorage/);
   if (hash === 0 && sess === 0) {
     warn('刷新会丢状态：0 处 location.hash / replaceState / sessionStorage',
       `localStorage 有 ${ls} 处，通常只存偏好（收藏/主题），存不下「视图+筛选+搜索词」（规矩 32 ②）`);
@@ -92,8 +118,8 @@ for (const rel of TARGETS) {
 
   // ③ 降级
   checkCount++;
-  const iframes = count(src, /<iframe|createElement\(["']iframe["']\)/);
-  const onerror = count(src, /onerror|addEventListener\(["']error["']/);
+  const iframes = count(full, /<iframe|createElement\(["']iframe["']\)/);
+  const onerror = count(full, /onerror|addEventListener\(["']error["']/);
   if (iframes > 0 && onerror === 0) {
     warn(`iframe 失败无提示：${iframes} 处 iframe，0 处 onerror`,
       '加载失败只会留一块空白，用户以为「没有内容」（规矩 32 ③）');
@@ -105,8 +131,8 @@ for (const rel of TARGETS) {
 
   // ④ 组合输入
   checkCount++;
-  const comp = count(src, /compositionstart|compositionend|isComposing/);
-  const inputEvt = count(src, /addEventListener\(["']input["']/);
+  const comp = count(full, /compositionstart|compositionend|isComposing/);
+  const inputEvt = count(full, /addEventListener\(["']input["']/);
   if (inputEvt > 0 && comp === 0) {
     warn(`输入法组合态没守卫：${inputEvt} 处 input 监听，0 处 compositionstart/end`,
       '中文拼音每敲一个字母都会触发过滤 / 重算（规矩 32 ④）');
@@ -118,8 +144,8 @@ for (const rel of TARGETS) {
 
   // ⑤ 资源卸载
   checkCount++;
-  const io = count(src, /new IntersectionObserver/);
-  const teardown = count(src, /about:blank|\.src\s*=\s*["']{2}|removeAttribute\(["']src["']\)|pause\(\)/);
+  const io = count(full, /new IntersectionObserver/);
+  const teardown = count(full, /about:blank|\.src\s*=\s*["']{2}|removeAttribute\(["']src["']\)|pause\(\)/);
   if (io > 0 && teardown === 0) {
     warn('懒加载只加载不销毁：有 IntersectionObserver，但 0 处 about:blank / 清空 src / pause()',
       '滚过的 iframe 会一直跑自己的 rAF（规矩 32 ⑤）');
