@@ -869,10 +869,12 @@
 
 <script src="data/素材.js"></script>
 <script src="data/方案.js"></script>
+<script src="repo.js"></script>
 <script>
 
-  const ITEMS = (window.WEB_ARSENAL || []).slice();
-  const SCHEMES = (window.WEB_SCHEMES || []).slice();
+  // S2：数据改由 repo.js 提供，界面不再直接读 window.WEB_ARSENAL
+  const ITEMS = Repo.listMaterials();
+  const SCHEMES = Repo.listSchemes();
   let view = "arsenal";
 
 
@@ -941,13 +943,9 @@
 
   // 四个维度同级、互为交集；素材与方案共用同一套判定
   // 维度内单选：选中值只需出现在该条目的值数组里即命中（一条允许挂多个端/多个元素）
+  // S2：规则本体搬去 repo.js，这里只负责把「当前界面状态」当参数传进去
   function matches(it, ignore) {
-    for (const dim of FILTER_DIMS) {
-      if (ignore === dim) continue;
-      const want = filter[dim];
-      if (want !== ALL && !tierVals(it, dim).includes(want)) return false;
-    }
-    return true;
+    return Repo.matchItem(it, filter, ignore);
   }
   const matchesScheme = matches;
 
@@ -956,41 +954,21 @@
   const tierVals = (it, dim) => asArr(it[dim]);
 
   function dimCount(dim) {
-    const map = new Map();
-    curList().forEach(it => {
-      if (!curMatch(it, dim)) return;
-      tierVals(it, dim).forEach(v => { if (v) map.set(v, (map.get(v) || 0) + 1); });
-    });
-    return map;
+    const obj = Repo.countByDim(curList(), filter, dim);
+    return new Map(Object.keys(obj).map(k => [k, obj[k]]));
   }
 
   function uniqVals(dim) {
-    const s = new Set();
-    curList().forEach(it => {
-      tierVals(it, dim).forEach(v => v && s.add(v));
-    });
-    return [...s];
+    return Repo.uniqDimVals(curList(), dim);
   }
 
 
   // ===== 搜索：命中 标题 / 说明 / 用法 / 来源 / 标签 / 风格 / 场景 / 提示词 =====
   function matchSearch(it, q) {
-    q = (q || "").trim().toLowerCase();
-    if (!q) return true;
-    const hay = [
-      it.标题, it.效果说明, it.用法, it.来源, it.提示词, it.元素, it.适配端,
-      (it.标签 || []).join(" "), asArr(it.风格).join(" "), asArr(it.场景).join(" ")
-    ].filter(Boolean).join(" ").toLowerCase();
-    return hay.includes(q);
+    return Repo.searchMaterial(it, q);
   }
   function matchSchemeSearch(s, q) {
-    q = (q || "").trim().toLowerCase();
-    if (!q) return true;
-    const hay = [
-      s.风格名, s.骨架, s.重色落点, s.布局骨架, s.第一屏内容, s.删减元素, s.适用, s.禁忌, s.我的说明, s.Agent提示词,
-      (s.参考站 || []).join(" "), (s.配色 ? Object.keys(s.配色).join(" ") : "")
-    ].filter(Boolean).join(" ").toLowerCase();
-    return hay.includes(q);
+    return Repo.searchScheme(s, q);
   }
 
   function renderFilters() {
